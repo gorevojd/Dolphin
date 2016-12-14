@@ -247,8 +247,15 @@ RenderGround(loaded_bitmap* Buffer, game_state* State)
 	}
 }
 
+#ifdef INTERNAL_BUILD
+game_memory* DebugGlobalMemory;
+#endif
 
 GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
+
+#ifdef INTERNAL_BUILD
+	DebugGlobalMemory = Memory;
+#endif
 
 	game_state* GameState = (game_state*)Memory->MemoryBlock;
 	if (!Memory->IsInitialized){
@@ -389,7 +396,7 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 		}
 	}
 
-	//PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_LastOfUs), gd_vec3_zero(), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_LastOfUs), gd_vec3_zero(), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	
 	hero_bitmaps* HeroBitmaps = &GameState->Assets.HeroBitmaps[GameState->HeroFacingDirection];
 	
@@ -414,11 +421,13 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 	real32 Angle = GameState->Time;
 	gdVec2 Origin = gd_vec2(400, 300);
 	real32 AngleW = 0.5f;
-	gdVec2 XAxis = 400.0f * gd_vec2(gd_cos(Angle  * AngleW), gd_sin(Angle * AngleW));
-	gdVec2 YAxis = 400.0f * gd_vec2(-gd_sin(Angle * AngleW), gd_cos(Angle * AngleW));
+	gdVec2 XAxis = 200.0f * gd_vec2(gd_cos(Angle  * AngleW), gd_sin(Angle * AngleW));
+	gdVec2 YAxis = 200.0f * gd_vec2(-gd_sin(Angle * AngleW), gd_cos(Angle * AngleW));
 	real32 OffsetX = cosf(Angle * 0.5f) * 200.0f;
 	//gdVec2 XAxis = 100.0f * gd_vec2(1, 0);
 	//gdVec2 YAxis = 100.0f * gd_vec2(0, 1);
+	
+	
 	PushCoordinateSystem(RenderGroup,
 		Origin + gd_vec2(OffsetX, 0.0f) - 0.5f * XAxis - 0.5f * YAxis,
 		XAxis, YAxis,
@@ -428,6 +437,8 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 		1.0f,
 		1.0f),
 		GetBitmap(&GameState->Assets, GAI_Tree));
+	
+	
 
 	RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer);
 

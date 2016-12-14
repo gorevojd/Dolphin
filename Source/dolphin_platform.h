@@ -19,6 +19,9 @@
 #define INVALID_CODE_PATH Assert(!"Invalid code path!")
 #define INVALID_DEFAULT_CASE default:{INVALID_CODE_PATH;} break;
 
+#define INTERNAL_BUILD
+
+
 struct memory_arena{
 	size_t MemoryUsed;
 	void* BaseAddress;
@@ -175,7 +178,35 @@ inline game_controller_input* GetController(game_input* Input, int ControllerInd
 	return(Result);
 }
 
-struct game_memory{
+enum{
+	DebugCycleCounter_GameUpdateAndRender,
+	DebugCycleCounter_RenderRectangleQuickly,
+	DebugCycleCounter_RenderRectangleQuicklyCounted,
+	DebugCycleCounter_RenderRectangleSlowly,
+	DebugCycleCounter_RenderRectangleSlowlyCounted,
+
+	DebugCycleCounter_Count
+};
+
+struct debug_cycle_counter{
+	uint32 CycleCount;
+	uint32 HitCount;
+};
+
+extern struct game_memory* DebugGlobalMemory;
+#ifdef _MSC_VER
+#define BEGIN_TIMED_BLOCK(func_name) uint64 Start_##func_name = __rdtsc();
+#define END_TIMED_BLOCK(func_name) DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].CycleCount += __rdtsc() - Start_##func_name;	\
+	DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].HitCount++;
+#define END_TIMED_BLOCK_COUNTED(func_name, Count) DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].CycleCount += __rdtsc() - Start_##func_name;	\
+	DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].HitCount += (Count);
+#else
+#define BEGIN_TIMED_BLOCK()
+#define END_TIMED_BLOCK()
+#define END_TIMED_BLOCK_COUNTED()
+#endif
+
+typedef struct game_memory{
 	bool32 IsInitialized;
 
 	uint32 MemoryBlockSize;
@@ -184,10 +215,16 @@ struct game_memory{
 	uint32 TempMemoryBlockSize;
 	void* TempMemoryBlock;
 
+
 	debug_platform_write_entire_file* DEBUGWriteEntireFile;
 	debug_platform_read_entire_file* DEBUGReadEntireFile;
 	debug_platform_free_file_memory* DEBUGFreeFileMemory;
-};
+
+#ifdef INTERNAL_BUILD
+	debug_cycle_counter Counters[DebugCycleCounter_Count];
+#endif
+} game_memory;
+
 
 #define GAME_UPDATE_AND_RENDER(name) void name(thread_context* Thread, game_memory* Memory, game_input* Input, game_offscreen_buffer* Buffer, game_sound_output_buffer* SoundOutput)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);

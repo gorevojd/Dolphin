@@ -438,6 +438,28 @@ Win32ProcessKeyboardMessage(game_button_state* State, bool32 IsDown, bool32 WasD
 
 
 INTERNAL_FUNCTION void
+HandleDebugCycleCounter(game_memory* Memory){
+#ifdef INTERNAL_BUILD
+	for (int i = 0; i < ArrayCount(Memory->Counters); i++){
+		debug_cycle_counter* Counter = Memory->Counters + i;
+
+		if (Counter->HitCount){
+			char Buffer[256];
+			_snprintf_s(Buffer, sizeof(Buffer),
+				"%d: Cycles:%u Hits:%u CyclesPerHit:%u\n",
+				i,
+				Counter->CycleCount,
+				Counter->HitCount,
+				Counter->CycleCount / Counter->HitCount);
+			OutputDebugStringA(Buffer);
+		}
+		Counter->CycleCount = 0;
+		Counter->HitCount = 0;
+	}
+#endif
+}
+
+INTERNAL_FUNCTION void
 Win32ToggleFullscreen(HWND Window)
 {
 	// NOTE(casey): This follows Raymond Chen's prescription
@@ -965,6 +987,7 @@ int WINAPI WinMain(
 		thread_context ThreadContext = {};
 
 		GameUpdateAndRender(&ThreadContext, &GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
+		HandleDebugCycleCounter(&GameMemory);
 
 		if (SoundIsValid == (bool32)true){
 			Win32FillSoundBuffer(&SoundOutput, ByteToLock, BytesToLock, &GameSoundOutputBuffer);
@@ -989,9 +1012,22 @@ int WINAPI WinMain(
 		real32 MCPF = ((real32)CyclesElapsed / (1000.0f * 1000.0f)); //mili cycles per frame
 		DeltaTime = SPF;
 
+		/*
 		char OutputStr[64];
-		sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
+		//sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
+		sprintf_s(OutputStr, "FPS: %.2f\nPixels filled: %d\nCycles per pixel: %d",
+			FPS,
+			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].HitCount,
+			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].CycleCount /
+			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].HitCount);
+		for (int i = 0; i < DebugCycleCounter_Count; i++){
+			DebugGlobalMemory->Counters[i].CycleCount = 0;
+			DebugGlobalMemory->Counters[i].HitCount = 0;
+		}
 		OutputDebugStringA(OutputStr);
+		*/
+
+
 
 		LastCounter = EndCounter;
 		LastCycleCount = EndCycleCount;
@@ -1001,3 +1037,4 @@ int WINAPI WinMain(
 
 	return 0;
 }
+
