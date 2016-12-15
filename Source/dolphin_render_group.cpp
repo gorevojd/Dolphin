@@ -25,6 +25,107 @@ inline gdVec4 Linear1ToSRGB255(gdVec4 v){
 	return(Result);
 }
 
+inline void RenderNonScaledAABitmapQuickly(
+	loaded_bitmap* Buffer,
+	loaded_bitmap* Bitmap,
+	gdVec2 Pos,
+	gdVec2 Align = {})
+{
+	
+	int32 MinX = Pos.x - Align.x;
+	int32 MinY = Pos.y - Align.y;
+	int32 MaxX = Pos.x - Align.x + Bitmap->Width;
+	int32 MaxY = Pos.y - Align.y + Bitmap->Height;
+
+	int SourceOffsetX = 0;
+	int SourceOffsetY = 0;
+
+	if (MinX < 0){
+		SourceOffsetX = -MinX;
+		MinX = 0;
+	}
+	if (MinY < 0){
+		SourceOffsetY = -MinY;
+		MinY = 0;
+	}
+	if (MaxX > Buffer->Width){
+		MaxX = Buffer->Width;
+	}
+	if (MaxY > Buffer->Height){
+		MaxY = Buffer->Height;
+	}
+
+	__m128i mMaskFF = _mm_set1_epi32(0xFF);
+	__m128 mOneOver255 = _mm_set1_ps(1.0f / 255.0f);
+	__m128 mOne = _mm_set1_ps(1.0f);
+
+	uint32* SourceRow = (uint32*)Bitmap->Memory + (-SourceOffsetY + Bitmap->Height - 1) * Bitmap->Width + SourceOffsetX;
+	uint32* DestRow = (uint32*)Buffer->Memory + MinY * Buffer->Width + MinX;
+
+	for (int32 j = MinY; j < MaxY; j++){
+		uint32* DestPtr = DestRow;
+		uint32* SourcePtr = SourceRow;
+		for (int32 i = MinX; i < MaxX; i+=4){
+
+			__m128i mSource = _mm_loadu_si128((__m128i*)SourcePtr);
+			__m128i mDest = _mm_loadu_si128((__m128i*)DestPtr);
+
+			__m128i mSource_a_epi32 = _mm_and_si128(_mm_srli_epi32(mSource, 24), mMaskFF);
+			__m128i mDest_a_epi32 = _mm_and_si128(_mm_srli_epi32(mDest, 24), mMaskFF);
+
+			//__m128i mWriteMask = _mm_and_si128();
+			
+			/*
+			//If Source Alpha is Fully is fully transparent, then draw only destination 
+			if (SourceA == 0.0f){
+				*DestPtr++ = *DestPtr;
+				SourcePtr++;
+				continue;
+			}
+
+			//If Source Alpha is fully opaque, then we render without intepolating
+			if (SourceA == 255.0){
+				*DestPtr++ = *SourcePtr++;
+				continue;
+			}
+			*/
+			__m128 mSource_a = _mm_cvtepi32_ps(mSource_a_epi32);
+			__m128 mSource_r = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mSource, 16), mMaskFF));
+			__m128 mSource_g = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mSource, 8), mMaskFF));
+			__m128 mSource_b = _mm_cvtepi32_ps(_mm_and_si128(mSource, mMaskFF));
+
+			__m128 mDest_a = _mm_cvtepi32_ps(mDest_a_epi32);
+			__m128 mDest_r = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mDest, 16), mMaskFF));
+			__m128 mDest_g = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mDest, 8), mMaskFF));
+			__m128 mDest_b = _mm_cvtepi32_ps(_mm_and_si128(mDest, mMaskFF));
+
+			__m128 mInvSrcAlpha = _mm_mul_ps(mSource_a, mOneOver255);
+			__m128 mOneMinusInvSrcAlpha = _mm_sub_ps(mOne, mInvSrcAlpha);
+
+			__m128 mResultColor_a = _mm_add_ps(mSource_a, _mm_mul_ps(mOneMinusInvSrcAlpha, mDest_a));
+			__m128 mResultColor_r = _mm_add_ps(mSource_r, _mm_mul_ps(mOneMinusInvSrcAlpha, mDest_r));
+			__m128 mResultColor_g = _mm_add_ps(mSource_g, _mm_mul_ps(mOneMinusInvSrcAlpha, mDest_g));
+			__m128 mResultColor_b = _mm_add_ps(mSource_b, _mm_mul_ps(mOneMinusInvSrcAlpha, mDest_b));
+
+			__m128i mResultColor_a_epi32 = _mm_cvttps_epi32(mResultColor_a);
+			__m128i mResultColor_r_epi32 = _mm_cvttps_epi32(mResultColor_r);
+			__m128i mResultColor_g_epi32 = _mm_cvttps_epi32(mResultColor_g);
+			__m128i mResultColor_b_epi32 = _mm_cvttps_epi32(mResultColor_b);
+
+			__m128i mOutColor = _mm_or_si128(
+				_mm_or_si128(mResultColor_b_epi32, _mm_slli_epi32(mResultColor_g_epi32, 8)),
+				_mm_or_si128(_mm_slli_epi32(mResultColor_r_epi32, 16), _mm_slli_epi32(mResultColor_r_epi32, 24)));
+
+			_mm_storeu_si128((__m128i*)DestPtr, mOutColor);
+
+			DestPtr += 4;
+			SourcePtr += 4;
+		}
+		DestRow += Buffer->Width;
+		SourceRow -= Bitmap->Width;
+	}
+}
+
 inline void RenderBitmap(
 	loaded_bitmap* Buffer,
 	loaded_bitmap* Bitmap,
@@ -98,6 +199,7 @@ inline void RenderBitmap(
 #else
 			real32 SourceA = (real32)((*SourcePtr >> AlphaShift) & 0xFF);
 			real32 DestA = (real32)((*DestPtr >> 24) & 0xFF);
+
 			//If Source Alpha is Fully is fully transparent, then draw only destination 
 			if (SourceA == 0.0f){
 				*DestPtr++ = *DestPtr;
@@ -260,11 +362,6 @@ inline void RenderRectangleQuickly(
 	real32 PremultipliedYAxis_x = InvYAxisLengthSq * YAxis.x;
 	real32 PremultipliedYAxis_y = InvYAxisLengthSq * YAxis.y;
 
-	__m128i mAlphaShift = _mm_set1_epi32(24);
-	__m128i mRedShift = _mm_set1_epi32(16);
-	__m128i mGreenShift = _mm_set1_epi32(8);
-	__m128i mBlueShift = _mm_set1_epi32(0);
-
 	__m128 mOneOver255 = _mm_set1_ps(1.0f / 255.0f);
 	__m128 mOne = _mm_set1_ps(1.0f);
 	__m128 mOne255 = _mm_set1_ps(255.0f);
@@ -289,6 +386,7 @@ inline void RenderRectangleQuickly(
 	__m128 mColor_a = _mm_set1_ps(Color.a);
 
 	__m128 mWidth = _mm_set1_ps((real32)Texture->Width);
+	__m128i mWidthI = _mm_set1_epi32(Texture->Width);
 	__m128 mHeight = _mm_set1_ps((real32)Texture->Height);
 
 	__m128i mMaskFF = _mm_set1_epi32(0xFF);
@@ -305,10 +403,10 @@ inline void RenderRectangleQuickly(
 	BEGIN_TIMED_BLOCK(RenderRectangleQuicklyCounted);
 	for (int Y = MinY; Y < MaxY; Y++){
 		uint32* DestPixel = (uint32*)Row;
+		__m128 mPixelPosition_y = _mm_set1_ps((real32)Y);
 		for (int X = MinX; X < MaxX; X+=4){
 
 			__m128 mPixelPosition_x = _mm_set_ps((real32)(X + 3), (real32)(X + 2), (real32)(X + 1), (real32)(X));
-			__m128 mPixelPosition_y = _mm_set1_ps((real32)Y);
 
 			__m128 mDiff_x = _mm_sub_ps(mPixelPosition_x, mOrigin_x);
 			__m128 mDiff_y = _mm_sub_ps(mPixelPosition_y, mOrigin_y);
@@ -347,12 +445,13 @@ inline void RenderRectangleQuickly(
 
 #if 1
 			mTextureSpaceY = _mm_or_si128(
-				_mm_mullo_epi16(mTextureSpaceY, _mm_set1_epi32(Texture->Width)),
-				_mm_slli_epi32(_mm_mulhi_epi16(mTextureSpaceY, _mm_set1_epi32(Texture->Width)), 16));
+				_mm_mullo_epi16(mTextureSpaceY, mWidthI),
+				_mm_slli_epi32(_mm_mulhi_epi16(mTextureSpaceY, mWidthI), 16));
 			__m128i mTextureFetch = _mm_add_epi32(mTextureSpaceY, mTextureSpaceX);
 #else
 			__m128i mTextureFetch = _mm_add_epi32(_mm_cvttps_epi32(_mm_mul_ps(_mm_cvtepi32_ps(mTextureSpaceY), mWidth)), mTextureSpaceX);
 #endif
+
 
 			int32 Fetch0 = Mi(mTextureFetch, 0);
 			int32 Fetch1 = Mi(mTextureFetch, 1);
@@ -551,14 +650,17 @@ inline void RenderRectangleQuickly(
 			__m128i mResColorShifted_b = mResultColor_b_epi32;
 			__m128i mResColorShifted_a = _mm_slli_epi32(mResultColor_a_epi32, 24);
 
+			/*Packing result color*/
 			__m128i mOut = _mm_or_si128(
 				_mm_or_si128(mResColorShifted_a, mResColorShifted_r),
 				_mm_or_si128(mResColorShifted_g, mResColorShifted_b));
 
+			/*Applying mWriteMask to the result set*/
 			__m128i mOutMasked = _mm_or_si128(
 				_mm_and_si128(mOut, mWriteMask),
 				_mm_andnot_si128(mWriteMask, mOriginalDest));
 
+			/*Storing the value*/
 			_mm_storeu_si128((__m128i*)DestPixel, mOutMasked);
 
 			DestPixel += 4;
@@ -780,11 +882,18 @@ inline void RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* Output
 			case RenderGroupEntry_render_entry_bitmap:{
 				render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
 				
-#if 0
+#if 1
+#if 1
+				RenderNonScaledAABitmapQuickly(
+					OutputTarget,
+					EntryBitmap->Bitmap,
+					EntryBitmap->EntityBasis.Offset.xy);
+#else
 				RenderBitmap(
 					OutputTarget,
 					EntryBitmap->Bitmap,
 					EntryBitmap->EntityBasis.Offset.xy);
+#endif
 #else
 				gdVec2 XAxis = { 1.0f, 0.0f };
 				gdVec2 YAxis = { 0.0f, 1.0f };

@@ -1,9 +1,10 @@
-﻿Build started 14.12.2016 22:09:08.
+﻿Build started 15.12.2016 16:50:52.
      1>Project "E:\Programming\MyProjects\DolphinEngine\DolphinEngine.vcxproj" on node 2 (Rebuild target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'e:\programming\myprojects\dolphinengine\build\dolphinengine.exe' because it is being used by another process.
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(363,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(364,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Z7 /nologo /W3 /WX- /O2 /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Build\\" /Fd".\Build\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Source\dolphin.cpp Source\dolphin_asset.cpp Source\dolphin_render_group.cpp Source\win32_dolphin.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Z7 /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\Build\\" /Fd".\Build\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Source\dolphin.cpp Source\dolphin_asset.cpp Source\dolphin_render_group.cpp Source\win32_dolphin.cpp
      1>cl : Command line warning D9007: '/Gm' requires '/Zi or /ZI'; option ignored
          dolphin.cpp
      1>E:/Programming/MyProjects/GDA/gd_math.h(24): warning C4615: #pragma warning : unknown user warning type
@@ -20,26 +21,28 @@
      1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(36): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
      1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(37): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
      1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(38): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(233): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(234): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(235): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(236): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(343): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(344): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(345): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(346): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(568): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(296): warning C4101: 'ShouldFill' : unreferenced local variable
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(607): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(608): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(609): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(610): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(641): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(750): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(755): warning C4018: '<' : signed/unsigned mismatch
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(765): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(795): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
-     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(796): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(136): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(137): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(138): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(139): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(335): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(336): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(337): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(338): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(441): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(442): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(443): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(444): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(670): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(394): warning C4101: 'ShouldFill' : unreferenced local variable
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(709): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(710): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(711): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(712): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(743): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(852): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(857): warning C4018: '<' : signed/unsigned mismatch
+     1>e:\programming\myprojects\dolphinengine\source\dolphin_render_group.cpp(867): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
      1>Source\dolphin.cpp(395): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
      1>Source\dolphin.cpp(406): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
          dolphin_asset.cpp
@@ -58,26 +61,28 @@
      1>Source\dolphin_render_group.cpp(36): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
      1>Source\dolphin_render_group.cpp(37): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
      1>Source\dolphin_render_group.cpp(38): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
-     1>Source\dolphin_render_group.cpp(233): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(234): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(235): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(236): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(343): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(344): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(345): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(346): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(568): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
-     1>Source\dolphin_render_group.cpp(296): warning C4101: 'ShouldFill' : unreferenced local variable
-     1>Source\dolphin_render_group.cpp(607): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(608): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(609): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(610): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>Source\dolphin_render_group.cpp(641): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>Source\dolphin_render_group.cpp(750): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
-     1>Source\dolphin_render_group.cpp(755): warning C4018: '<' : signed/unsigned mismatch
-     1>Source\dolphin_render_group.cpp(765): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
-     1>Source\dolphin_render_group.cpp(795): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
-     1>Source\dolphin_render_group.cpp(796): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
+     1>Source\dolphin_render_group.cpp(136): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>Source\dolphin_render_group.cpp(137): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>Source\dolphin_render_group.cpp(138): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>Source\dolphin_render_group.cpp(139): warning C4244: 'initializing' : conversion from 'float' to 'int32', possible loss of data
+     1>Source\dolphin_render_group.cpp(335): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(336): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(337): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(338): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(441): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(442): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(443): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(444): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(670): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
+     1>Source\dolphin_render_group.cpp(394): warning C4101: 'ShouldFill' : unreferenced local variable
+     1>Source\dolphin_render_group.cpp(709): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(710): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(711): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(712): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Source\dolphin_render_group.cpp(743): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>Source\dolphin_render_group.cpp(852): warning C4244: '+=' : conversion from 'unsigned __int64' to 'uint32', possible loss of data
+     1>Source\dolphin_render_group.cpp(857): warning C4018: '<' : signed/unsigned mismatch
+     1>Source\dolphin_render_group.cpp(867): warning C4244: 'argument' : conversion from 'int32' to 'float', possible loss of data
          win32_dolphin.cpp
      1>E:/Programming/MyProjects/GDA/gd_math.h(24): warning C4615: #pragma warning : unknown user warning type
      1>E:/Programming/MyProjects/GDA/gd_math.h(400): warning C4018: '<' : signed/unsigned mismatch
@@ -104,4 +109,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.94
+Time Elapsed 00:00:01.79

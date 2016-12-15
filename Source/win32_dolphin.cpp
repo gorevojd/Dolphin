@@ -1012,22 +1012,17 @@ int WINAPI WinMain(
 		real32 MCPF = ((real32)CyclesElapsed / (1000.0f * 1000.0f)); //mili cycles per frame
 		DeltaTime = SPF;
 
-		/*
 		char OutputStr[64];
 		//sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
-		sprintf_s(OutputStr, "FPS: %.2f\nPixels filled: %d\nCycles per pixel: %d",
-			FPS,
-			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].HitCount,
-			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].CycleCount /
-			DebugGlobalMemory->Counters[DebugCycleCounter_RenderRectangleQuicklyCounted].HitCount);
+		sprintf_s(OutputStr, "FPS: %.2f\n",	FPS);
+		OutputDebugStringA(OutputStr);
+
+		/*
 		for (int i = 0; i < DebugCycleCounter_Count; i++){
 			DebugGlobalMemory->Counters[i].CycleCount = 0;
 			DebugGlobalMemory->Counters[i].HitCount = 0;
 		}
-		OutputDebugStringA(OutputStr);
 		*/
-
-
 
 		LastCounter = EndCounter;
 		LastCycleCount = EndCycleCount;
