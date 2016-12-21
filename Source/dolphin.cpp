@@ -302,7 +302,7 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 		GameState->Assets.Tufts[0] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/tuft00.bmp");
 		GameState->Assets.Tufts[1] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/tuft01.bmp");
 
-		*GetBitmap(&GameState->Assets, GAI_LastOfUs) = LoadBitmapWithSTB(Thread, Memory->DEBUGReadEntireFile, "../Data/Images/witcher.jpg");
+		*GetBitmap(&GameState->Assets, GAI_LastOfUs) = LoadBitmapWithSTB(Thread, Memory->DEBUGReadEntireFile, "../Data/Images/marvel.jpg");
 		*GetBitmap(&GameState->Assets, GAI_Tree) = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/test2/tree00.bmp");
 		*GetBitmap(&GameState->Assets, GAI_Backdrop) = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/test/test_background.bmp");
 
@@ -388,7 +388,7 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 	//DEBUGRenderGrad(Buffer, OffsetX, OffsetY);
 
 
-	PushClear(RenderGroup, gd_vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	//PushClear(RenderGroup, gd_vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
 	for (int i = 0; i < 5; i++){
 		if (Input->MouseButtons[i].EndedDown){
@@ -399,11 +399,10 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 	PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_LastOfUs), gd_vec3_zero(), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	
 	hero_bitmaps* HeroBitmaps = &GameState->Assets.HeroBitmaps[GameState->HeroFacingDirection];
-	
-	PushBitmap(RenderGroup, &HeroBitmaps->Head, gd_vec3(800, 500, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	//PushBitmap(RenderGroup, &HeroBitmaps->Head, gd_vec3(800, 500, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	for (int i = 0; i < 4; i++){
-		PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_Tree), gd_vec3(200 + i * 150, 600, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		//PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_Tree), gd_vec3(200 + i * 150, 600, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 
 	//
@@ -413,8 +412,6 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
 	//RenderBitmap(Buffer, GetBitmap(&GameState->Assets, GAI_Backdrop), 0, 0);
 
-	//PushRectangle(RenderGroup, gd_vec3(100, 100, 0), gd_vec2(500, 300), gd_vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	//PushRectangleOutline(RenderGroup, gd_vec3(100, 100, 0), gd_vec2(500, 300));
 	PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 	GameState->Time += Input->DeltaTime;
@@ -427,20 +424,15 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 	//gdVec2 XAxis = 100.0f * gd_vec2(1, 0);
 	//gdVec2 YAxis = 100.0f * gd_vec2(0, 1);
 	
+	gdRect2 Rectangle1 = gd_rect2(gd_vec2(10, 10), gd_vec2(1000, 1000));
+	//PushRectangle(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension, gd_vec4(1.0f, 0.6f, 0.0f, 1.0f));
+	//PushRectangleOutline(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension);
 	
-	PushCoordinateSystem(RenderGroup,
-		Origin + gd_vec2(OffsetX, 0.0f) - 0.5f * XAxis - 0.5f * YAxis,
-		XAxis, YAxis,
-		gd_vec4(
-		1.0f,
-		1.0f,
-		1.0f,
-		1.0f),
-		GetBitmap(&GameState->Assets, GAI_Tree));
-	
-	
+	//PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_Tree), gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0), gd_vec2(0, 0), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer);
+	//gdRect2i ClipRect = gd_rect2_i(100, 100, 400, 400);
+	//RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer, ClipRect);
+	TiledRenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer);
 
 	EndTemporaryMemory(RenderMemory);
 }

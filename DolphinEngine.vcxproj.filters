@@ -53,10 +53,10 @@
     <ClInclude Include="Source\dolphin_asset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\GDA\gd_math.h">
+    <ClInclude Include="..\GD_LIBS\gd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\GDA\gd.h">
+    <ClInclude Include="..\GD_LIBS\gd_math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

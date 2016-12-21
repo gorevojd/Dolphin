@@ -4,12 +4,13 @@
 #include "dolphin_platform.h"
 #include "dolphin_intrinsics.h"
 
-#include "dolphin_asset.h"
 #include "dolphin_render_group.h"
+#include "dolphin_asset.h"
 
 #define GD_MATH_IMPLEMENTATION
 #define GD_MATH_STATIC
-#include "E:/Programming/MyProjects/GDA/gd_math.h"
+#include "E:/Programming/MyProjects/GD_LIBS/gd_math.h"
+
 
 struct hero_bitmaps{
 
@@ -29,7 +30,6 @@ enum game_assets_id{
 };
 
 struct game_assets{
-
 	hero_bitmaps HeroBitmaps[4];
 
 	loaded_bitmap Grasses[2];
@@ -43,6 +43,7 @@ inline loaded_bitmap* GetBitmap(game_assets* Assets, game_assets_id Id){
 	loaded_bitmap* Result = Assets->Bitmaps + Id;
 	return(Result);
 }
+
 
 struct game_state{
 	memory_arena PermanentArena;

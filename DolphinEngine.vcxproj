@@ -52,7 +52,7 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -87,8 +87,8 @@
     <ClCompile Include="Source\win32_dolphin.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GDA\gd.h" />
-    <ClInclude Include="..\GDA\gd_math.h" />
+    <ClInclude Include="..\GD_LIBS\gd.h" />
+    <ClInclude Include="..\GD_LIBS\gd_math.h" />
     <ClInclude Include="Source\dolphin.h" />
     <ClInclude Include="Source\dolphin_asset.h" />
     <ClInclude Include="Source\dolphin_intrinsics.h" />

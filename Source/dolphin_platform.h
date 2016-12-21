@@ -1,13 +1,14 @@
 #ifndef DOLPHIN_PLATFORM_H
 #define DOLPHIN_PLATFORM_H
 
+
 #include <stdio.h>
 #define GD_IMPLEMENTATION
-#include "E:/Programming/MyProjects/GDA/gd.h"
+#include "E:/Programming/MyProjects/GD_LIBS/gd.h"
 
 #define	GD_MATH_IMPLEMENTATION
 #define GD_MATH_STATIC	
-#include "E:/Programming/MyProjects/GDA/gd_math.h"
+#include "E:/Programming/MyProjects/GD_LIBS/gd_math.h"
 
 #define GLOBAL_VARIABLE static
 #define LOCAL_PERSIST static
@@ -184,6 +185,7 @@ enum{
 	DebugCycleCounter_RenderRectangleQuicklyCounted,
 	DebugCycleCounter_RenderRectangleSlowly,
 	DebugCycleCounter_RenderRectangleSlowlyCounted,
+	DebugCycleCounter_RenderRectangle,
 
 	DebugCycleCounter_Count
 };
