@@ -27,6 +27,9 @@
     <ClCompile Include="Source\dolphin_asset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\dolphin_opengl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\win32_dolphin.h">

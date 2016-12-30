@@ -3,7 +3,6 @@
 
 #include "dolphin_platform.h"
 #include "dolphin_intrinsics.h"
-
 #include "dolphin_render_group.h"
 #include "dolphin_asset.h"
 

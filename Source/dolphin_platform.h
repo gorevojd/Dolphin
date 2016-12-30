@@ -1,7 +1,6 @@
 #ifndef DOLPHIN_PLATFORM_H
 #define DOLPHIN_PLATFORM_H
 
-
 #include <stdio.h>
 #define GD_IMPLEMENTATION
 #include "E:/Programming/MyProjects/GD_LIBS/gd.h"
@@ -21,6 +20,12 @@
 #define INVALID_DEFAULT_CASE default:{INVALID_CODE_PATH;} break;
 
 #define INTERNAL_BUILD
+
+#if GD_COMPILER_MSVC
+#include <intrin.h>
+#else  
+#include <x86intrin.h>
+#endif
 
 
 struct memory_arena{
@@ -195,7 +200,6 @@ struct debug_cycle_counter{
 	uint32 HitCount;
 };
 
-extern struct game_memory* DebugGlobalMemory;
 #ifdef _MSC_VER
 #define BEGIN_TIMED_BLOCK(func_name) uint64 Start_##func_name = __rdtsc();
 #define END_TIMED_BLOCK(func_name) DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].CycleCount += __rdtsc() - Start_##func_name;	\
@@ -208,6 +212,15 @@ extern struct game_memory* DebugGlobalMemory;
 #define END_TIMED_BLOCK_COUNTED()
 #endif
 
+struct platform_work_queue;
+#define PLATFORM_WORK_QUEUE_CALLBACK(name) void name(platform_work_queue* Queue, void* Data)
+typedef PLATFORM_WORK_QUEUE_CALLBACK(platform_work_queue_callback);
+
+typedef void platform_add_entry(platform_work_queue* Queue, platform_work_queue_callback* Callback, void* Data);
+typedef void platform_complete_all_work(platform_work_queue* Queue);
+extern platform_add_entry* PlatformAddEntry;
+extern platform_complete_all_work* PlatformCompleteAllWork;
+
 typedef struct game_memory{
 	bool32 IsInitialized;
 
@@ -217,6 +230,11 @@ typedef struct game_memory{
 	uint32 TempMemoryBlockSize;
 	void* TempMemoryBlock;
 
+	platform_work_queue* HighPriorityQueue;
+	platform_work_queue* LowPriorityQueue;
+
+	platform_add_entry* PlatformAddEntry;
+	platform_complete_all_work* PlatformCompleteAllWork;
 
 	debug_platform_write_entire_file* DEBUGWriteEntireFile;
 	debug_platform_read_entire_file* DEBUGReadEntireFile;
@@ -226,6 +244,7 @@ typedef struct game_memory{
 	debug_cycle_counter Counters[DebugCycleCounter_Count];
 #endif
 } game_memory;
+extern game_memory* DebugGlobalMemory;
 
 
 #define GAME_UPDATE_AND_RENDER(name) void name(thread_context* Thread, game_memory* Memory, game_input* Input, game_offscreen_buffer* Buffer, game_sound_output_buffer* SoundOutput)
