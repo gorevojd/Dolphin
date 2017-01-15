@@ -1,153 +1,9 @@
 #include "dolphin.h"
-#include "dolphin_random.h"
-#include "dolphin_asset.cpp"
 #include "dolphin_render_group.cpp"
+#include "dolphin_random.h"
 #include "dolphin_opengl.cpp"
+#include "dolphin_asset.cpp"
 
-#pragma pack(push, 1)
-struct bitmap_header{
-    uint16 FileType; /*File type, always 4d42 ("BM")*/
-    uint32 FileSize; /*Size of the file in bytes*/
-    uint16 Reserved1; /*Always 0*/
-    uint16 Reserved2; /*Always 0*/
-    uint32 BitmapOffset; /*Starting position of image data in bytes*/
-
-    uint32 Size; /*Size of header in bytes*/
-    int32 Width; /*Image width in pixels*/
-    int32 Height; /*Image height in pixels*/
-    uint16 Planes; /*Number of color planes*/
-    uint16 BitsPerPixel; /*Number of bits per pixel*/
-
-    uint32 Compression; /*Compression methods used*/
-    uint32 SizeOfBitmap; /*Size of bitmap in bytes*/
-    int32 HorzResolution;/*Horizontal resolution in pixels per meter*/
-    int32 VertResolution;/*Vertical resolution in pixels per meter*/
-    uint32 ColorsUsed;/*Number of colors in the image*/
-    uint32 ColorsImportant;/*Minimum number of important colors*/
-
-    uint32 RedMask; /*Mask identifying bits of red component*/
-    uint32 GreenMask; /*Mask identifying bits of green component*/
-    uint32 BlueMask; /*Mask identifying bits of blue component*/
-    uint32 AlphaMask; /*Mask identifying bits of Alpha component*/
-    uint32 CSType; /*Color space type*/
-    int32 RedX; /*X coordinate of red endpoint*/
-    int32 RedY; /*Y coordinate of red endpoint*/
-    int32 RedZ; /*Z coordinate of red endpoint*/
-    int32 GreenX; /*X coordinate of green endpoint*/
-    int32 GreenY; /*Y coordinate of green endpoint*/
-    int32 GreenZ; /*Z coordinate of green endpoint*/
-    int32 BlueX; /*X coordinate of blue endpoint*/
-    int32 BlueY; /*Y coordinate of blue endpoint*/
-    int32 BlueZ; /*Z coordinate of blue endpoint*/
-    uint32 GammaRed; /*Gamma red coordinate scale value*/
-    uint32 GammaGreen; /*Gamma green coordinate scale value*/
-    uint32 GammaBlue; /*Gamma blue coordinate scale value*/
-};
-#pragma pack(pop)
-
-INTERNAL_FUNCTION loaded_bitmap
-LoadBitmap(thread_context* Thread, debug_platform_read_entire_file* ReadEntireFile, char* FileName){
-
-    loaded_bitmap Result = {};
-
-    debug_read_file_result ReadResult = ReadEntireFile(Thread, FileName);
-    if (ReadResult.ContentsSize != 0){
-        bitmap_header* Header = (bitmap_header*)ReadResult.Contents;
-        uint32* Pixels = (uint32*)((uint8*)ReadResult.Contents + Header->BitmapOffset);
-        Result.Width = Header->Width;
-        Result.Height = Header->Height;
-        Result.Memory = Pixels;
-        Result.BytesPerPixel = Header->BitsPerPixel / 8;
-
-        uint32 RedMask = Header->RedMask;
-        uint32 GreenMask = Header->GreenMask;
-        uint32 BlueMask = Header->BlueMask;
-        uint32 AlphaMask = ~(RedMask | GreenMask | BlueMask);
-
-        bit_scan_result RedShift = FindLeastSignificantSetBit(RedMask);
-        bit_scan_result GreenShift = FindLeastSignificantSetBit(GreenMask);
-        bit_scan_result BlueShift = FindLeastSignificantSetBit(BlueMask);
-        bit_scan_result AlphaShift = FindLeastSignificantSetBit(AlphaMask);
-
-        Assert(Header->Compression == 3);
-
-        Assert(RedShift.Found);
-        Assert(GreenShift.Found);
-        Assert(BlueShift.Found);
-        Assert(AlphaShift.Found);
-
-
-        uint32* Pixel = Pixels;
-        for (int j = 0; j < Result.Height; j++){
-            for (int i = 0; i < Result.Width; i++){
-                uint32 SrcPixel = *Pixel;
-
-                gdVec4 Color = {
-                    (real32)(((SrcPixel >> RedShift.Index) & 0xFF)),
-                    (real32)(((SrcPixel >> GreenShift.Index) & 0xFF)),
-                    (real32)(((SrcPixel >> BlueShift.Index) & 0xFF)),
-                    (real32)(((SrcPixel >> AlphaShift.Index) & 0xFF)) };
-
-#if 1
-                Color = SRGB255ToLinear1(Color);
-                //Premultiplied Alpha
-
-                real32 Alpha = Color.a;
-                Color.r = Color.r * Alpha;
-                Color.g = Color.g * Alpha;
-                Color.b = Color.b * Alpha;
-                Color = Linear1ToSRGB255(Color);
-#endif
-
-                *Pixel++ = (((uint32)(Color.a + 0.5f) << 24) |
-                    ((uint32)(Color.r + 0.5f) << 16) |
-                    ((uint32)(Color.g + 0.5f) << 8) |
-                    ((uint32)(Color.b + 0.5f) << 0));
-            }
-        }
-
-    }
-    return Result;
-}
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-INTERNAL_FUNCTION loaded_bitmap
-LoadBitmapWithSTB(thread_context* Thread, debug_platform_read_entire_file* ReadEntireFile, char* FileName, bool32 FlipOnLoad = true){
-    loaded_bitmap Result = {};
-
-    stbi_set_flip_vertically_on_load(FlipOnLoad);
-    
-    debug_read_file_result ReadResult = ReadEntireFile(Thread, FileName);
-
-    Result.Memory = stbi_load_from_memory(
-        (stbi_uc*)ReadResult.Contents,
-        ReadResult.ContentsSize,
-        &Result.Width,
-        &Result.Height,
-        &Result.BytesPerPixel, 
-        STBI_rgb_alpha);
-
-    uint32* Pixel = (uint32*)Result.Memory;
-    for (int j = 0; j < Result.Height; j++){
-        for (int i = 0; i < Result.Width; i++){
-            uint32 SrcPixel = *Pixel;
-            
-            uint8 Red = (SrcPixel & 0xFF);
-            uint8 Green = ((SrcPixel >> 8) & 0xFF);
-            uint8 Blue = ((SrcPixel >> 16) & 0xFF);
-            uint8 Alpha = ((SrcPixel >> 24) & 0xFF);
-
-            *Pixel++ = ((Alpha << 24) | 
-                (Red << 16) |
-                (Green << 8) |
-                (Blue) << 0);
-        }
-    }
-
-    return(Result);
-}
 
 INTERNAL_FUNCTION void
 GameOutputSound(game_sound_output_buffer* SoundBuffer, int Frequency){
@@ -179,7 +35,6 @@ GameOutputSound(game_sound_output_buffer* SoundBuffer, int Frequency){
 }
 
 
-
 INTERNAL_FUNCTION loaded_bitmap
 MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
     loaded_bitmap Result = {};
@@ -189,15 +44,15 @@ MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
     Result.Memory = (uint8*)Arena->BaseAddress + Arena->MemoryUsed;
     Result.Width = Width;
     Result.Height = Height;
-    Result.BytesPerPixel = BytesPerPixel;
 
     PushSize(Arena, Width * Height * BytesPerPixel);
 
     return(Result);
 }
 
+/*
 INTERNAL_FUNCTION void
-RenderGround(loaded_bitmap* Buffer, game_state* State)
+RenderGround(loaded_bitmap* Buffer, transient_state* State)
 {
 
     random_series Series = RandomSeed(123);
@@ -244,9 +99,31 @@ RenderGround(loaded_bitmap* Buffer, game_state* State)
             (loaded_bitmap*)Buffer,
             BitmapToRender,
             GrassScreenPosition);
-
     }
 }
+*/
+
+INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
+	task_with_memory* FoundTask = 0;
+	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
+		task_with_memory* Task = TranState->Tasks + i;
+		if (!Task->BeingUsed){
+			FoundTask = Task;
+			Task->BeingUsed = true;
+			Task->Memory = BeginTemporaryMemory(&Task->Arena);
+			break;
+		}
+	}
+	return(FoundTask);
+}
+
+INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
+	EndTemporaryMemory(Task->Memory);
+
+	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	Task->BeingUsed = false;
+}
+
 
 #ifdef INTERNAL_BUILD
 game_memory* DebugGlobalMemory;
@@ -254,9 +131,10 @@ game_memory* DebugGlobalMemory;
 platform_add_entry* PlatformAddEntry;
 platform_complete_all_work* PlatformCompleteAllWork;
 
-GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
+GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PlatformAddEntry = Memory->PlatformAddEntry;
     PlatformCompleteAllWork = Memory->PlatformCompleteAllWork;
+    PlatformReadEntireFile = Memory->DEBUGReadEntireFile;
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
 #endif
@@ -267,48 +145,6 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             &GameState->PermanentArena,
             Memory->MemoryBlockSize - sizeof(game_state),
             (uint8*)Memory->MemoryBlock + sizeof(game_state));
-
-        hero_bitmaps* Bitmap;
-        Bitmap = &GameState->Assets.HeroBitmaps[0];
-        Bitmap->Head = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_right_head.bmp");
-        Bitmap->Torso = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_right_torso.bmp");
-        Bitmap->Cape = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_right_cape.bmp");
-        Bitmap->Align = gd_vec2(72, 182);
-        Bitmap++;
-
-        Bitmap->Head = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_back_head.bmp");
-        Bitmap->Torso = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_back_torso.bmp");
-        Bitmap->Cape = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_back_cape.bmp");
-        Bitmap->Align = gd_vec2(72, 182);
-        Bitmap++;
-
-        Bitmap->Head = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_left_head.bmp");
-        Bitmap->Torso = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_left_torso.bmp");
-        Bitmap->Cape = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_left_cape.bmp");
-        Bitmap->Align = gd_vec2(72, 182);
-        Bitmap++;
-
-        Bitmap->Head = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_front_head.bmp");
-        Bitmap->Torso = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_front_torso.bmp");
-        Bitmap->Cape = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test/test_hero_front_cape.bmp");
-        Bitmap->Align = gd_vec2(72, 182);
-        Bitmap++;
-
-        GameState->Assets.Grasses[0] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/grass00.bmp");
-        GameState->Assets.Grasses[1] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/grass01.bmp");
-
-        GameState->Assets.Stones[0] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/ground00.bmp");
-        GameState->Assets.Stones[1] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/ground01.bmp");
-        GameState->Assets.Stones[2] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/ground02.bmp");
-        GameState->Assets.Stones[3] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/ground03.bmp");
-
-        GameState->Assets.Tufts[0] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/tuft00.bmp");
-        GameState->Assets.Tufts[1] = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/Test2/tuft01.bmp");
-
-        *GetBitmap(&GameState->Assets, GAI_LastOfUs) = LoadBitmapWithSTB(Thread, Memory->DEBUGReadEntireFile, "../Data/Images/assassin.jpg");
-        *GetBitmap(&GameState->Assets, GAI_Tree) = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/test2/tree00.bmp");
-        *GetBitmap(&GameState->Assets, GAI_Backdrop) = LoadBitmap(Thread, Memory->DEBUGReadEntireFile, "../Data/HH/test/test_background.bmp");
-
 
         uint32 Min = RandomNumberTable[0];
         uint32 Max = RandomNumberTable[0];
@@ -334,13 +170,30 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             (uint8*)Memory->TempMemoryBlock + sizeof(transient_state));
 
         TranState->GroundBitmap = MakeEmptyBitmap(&GameState->PermanentArena, Buffer->Width, Buffer->Height);
-        RenderGround(&TranState->GroundBitmap, GameState);
+        //RenderGround(&TranState->GroundBitmap, GameState);
+
+        TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState);
+        TranState->Assets->TranState = TranState;
+        TranState->LowPriorityQueue = Memory->LowPriorityQueue;
+        TranState->HighPriorityQueue = Memory->HighPriorityQueue;
+
+        for (int TaskIndex = 0;
+            TaskIndex < ArrayCount(TranState->Tasks);
+            TaskIndex++)
+        {
+            task_with_memory* Task = TranState->Tasks + TaskIndex;
+            Task->BeingUsed = false;
+            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
+        }
+
+
+
 
         TranState->IsInitialized = true;
     }
 
     temporary_memory RenderMemory = BeginTemporaryMemory(&TranState->TranArena);
-    render_group* RenderGroup = AllocateRenderGroup(&TranState->TranArena, GD_MEGABYTES(4), 42);
+    render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10), 1);
 
     int temp1 = ArrayCount(Input->Controllers[0].Buttons);
     Assert((&Input->Controllers[0].Terminator - &Input->Controllers[0].Buttons[0]) ==
@@ -381,61 +234,50 @@ GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         real32 PlayerSpeed = 100;
         GameState->PlayerPos = GameState->PlayerPos + gd_vec2_norm0(MoveVector) * Input->DeltaTime * PlayerSpeed;
 
-        // if (Controller->IsAnalog){
-        //     OffsetX -= Controller->StickAverageX * 10;
-        //     OffsetY += Controller->StickAverageY * 10;
-        // }
+        /*
+        if (Controller->IsAnalog){
+            OffsetX -= Controller->StickAverageX * 10;
+            OffsetY += Controller->StickAverageY * 10;
+        }
+        */
     }
 
-    //GameOutputSound(SoundOutput, ToneHz);
-    //DEBUGRenderGrad(Buffer, OffsetX, OffsetY);
-
-
-    //PushClear(RenderGroup, gd_vec4(0.1f, 0.1f, 0.1f, 1.0f));
+    PushClear(RenderGroup, gd_vec4(0.1f, 0.1f, 0.1f, 1.0f));
+    PushBitmap(RenderGroup, GetFirstBitmapID(TranState->Assets, Asset_StarWars), Buffer->Height, gd_vec3_zero());
 
     for (int i = 0; i < 5; i++){
         if (Input->MouseButtons[i].EndedDown){
-            //PushRectangle(RenderGroup, gd_vec3(10 + i * 20, 10, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
+            PushRectangle(RenderGroup, gd_vec3(10 + i * 20, 10, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
         }
     }
 
-    PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_LastOfUs), gd_vec3_zero(), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    
-    hero_bitmaps* HeroBitmaps = &GameState->Assets.HeroBitmaps[GameState->HeroFacingDirection];
-    //PushBitmap(RenderGroup, &HeroBitmaps->Head, gd_vec3(800, 500, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    hero_bitmaps* HeroBitmaps = &TranState->Assets->HeroBitmaps[GameState->HeroFacingDirection];
+    PushBitmap(RenderGroup, &HeroBitmaps->Torso, HeroBitmaps->Torso.Height, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, &HeroBitmaps->Cape, HeroBitmaps->Cape.Height, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, &HeroBitmaps->Head, HeroBitmaps->Head.Height, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
 
-    for (int i = 0; i < 4; i++){
-        //PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_Tree), gd_vec3(200 + i * 150, 600, 0), gd_vec2_zero(), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    }
-
-    //
-    //PushBitmap(RenderGroup, &HeroBitmaps->Torso, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f), HeroBitmaps->Align);
-    //PushBitmap(RenderGroup, &HeroBitmaps->Cape, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f), HeroBitmaps->Align);
-    //PushBitmap(RenderGroup, &HeroBitmaps->Head, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f), HeroBitmaps->Align);
-
-    //RenderBitmap(Buffer, GetBitmap(&GameState->Assets, GAI_Backdrop), 0, 0);
-
-    //PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
     GameState->Time += Input->DeltaTime;
     real32 Angle = GameState->Time;
     gdVec2 Origin = gd_vec2(400, 300);
     real32 AngleW = 0.5f;
-    gdVec2 XAxis = 200.0f * gd_vec2(gd_cos(Angle  * AngleW), gd_sin(Angle * AngleW));
-    gdVec2 YAxis = 200.0f * gd_vec2(-gd_sin(Angle * AngleW), gd_cos(Angle * AngleW));
-    real32 OffsetX = cosf(Angle * 0.5f) * 200.0f;
-    //gdVec2 XAxis = 100.0f * gd_vec2(1, 0);
-    //gdVec2 YAxis = 100.0f * gd_vec2(0, 1);
+    gdVec2 XAxis = 300.0f * gd_vec2(gd_cos(Angle  * AngleW), gd_sin(Angle * AngleW));
+    gdVec2 YAxis = 300.0f * gd_vec2(-gd_sin(Angle * AngleW), gd_cos(Angle * AngleW));
+    real32 OffsetX = cosf(Angle * 0.4f) * 200.0f;
     
-    gdRect2 Rectangle1 = gd_rect2(gd_vec2(10, 10), gd_vec2(1000, 1000));
-    //PushRectangle(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension, gd_vec4(1.0f, 0.6f, 0.0f, 1.0f));
-    //PushRectangleOutline(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension);
+    gdRect2 Rectangle1 = gd_rect2(gd_vec2(40, 40), gd_vec2(100, 200));
+    PushRectangle(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension, gd_vec4(1.0f, 0.6f, 0.0f, 1.0f));
+    PushRectangleOutline(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension);
     
-    PushBitmap(RenderGroup, GetBitmap(&GameState->Assets, GAI_Tree), gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0), gd_vec2(0, 0), gd_vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    PushBitmap(RenderGroup, GetFirstBitmapID(TranState->Assets, Asset_Tree), 100, gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0));
 
-    //gdRect2i ClipRect = gd_rect2_i(100, 100, 400, 400);
-    //RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer, ClipRect);
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 
     EndTemporaryMemory(RenderMemory);
+}
+
+GD_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
+    game_state* GameState = (game_state*)Memory->MemoryBlock;
+    GameOutputSound(SoundOutput, 256);
 }

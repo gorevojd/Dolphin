@@ -1,8 +1,3 @@
-//#include "dolphin_platform.h"
-
-#include "dolphin.h"
-//#include "dolphin.cpp"
-
 #include <dsound.h>
 #include <Xinput.h>
 #include <Windows.h>
@@ -83,7 +78,7 @@ DEBUG_PLATFORM_READ_ENTIRE_FILE(DEBUGPlatformReadEntireFile){
                     Res.ContentsSize = FileSize32;
                 }
                 else{
-                    DEBUGPlatformFreeFileMemory(Thread, Res.Contents);
+                    DEBUGPlatformFreeFileMemory(Res.Contents);
                     Res.Contents = 0;
                 }
             }
@@ -394,6 +389,97 @@ INTERNAL_FUNCTION void
     }
 }
 
+struct win32_game_code{
+    HMODULE GameCodeLib;
+    FILETIME LastWriteTimeDLL;
+    game_update_and_render* GameUpdateAndRender;
+    game_get_sound_samples* GameGetSoundSamples;
+    bool32 IsValid;
+};
+
+inline FILETIME
+Win32GetLastFileWriteTime(char* FileName){
+    FILETIME LastWriteTime = {};
+
+    WIN32_FIND_DATA FindData;
+    HANDLE FindHandle = FindFirstFileA(FileName, &FindData);
+    if(FindHandle != INVALID_HANDLE_VALUE){
+        LastWriteTime = FindData.ftLastWriteTime;
+        FindClose(FindHandle);
+    }
+
+    return(LastWriteTime);
+}
+
+INTERNAL_FUNCTION win32_game_code 
+Win32LoadGameCode(char* SourceFileName, char* TempFileName){
+    win32_game_code GameCode = {};
+
+    GameCode.LastWriteTimeDLL = Win32GetLastFileWriteTime(SourceFileName);
+    CopyFile(SourceFileName, TempFileName, FALSE);
+    GameCode.GameCodeLib = LoadLibraryA(TempFileName);
+    if(GameCode.GameCodeLib){
+        GameCode.GameUpdateAndRender = (game_update_and_render*)GetProcAddress(GameCode.GameCodeLib, "GameUpdateAndRender");
+        GameCode.GameGetSoundSamples = (game_get_sound_samples*)GetProcAddress(GameCode.GameCodeLib, "GameGetSoundSamples");             
+        
+        GameCode.IsValid = GameCode.GameUpdateAndRender && GameCode.GameGetSoundSamples;
+    }
+
+    if(!GameCode.IsValid){
+        GameCode.GameUpdateAndRender = GameUpdateAndRenderStub;
+        GameCode.GameGetSoundSamples = GameGetSoundSamplesStub;
+    }
+
+    return(GameCode);
+}
+
+INTERNAL_FUNCTION void 
+Win32UnloadGameCode(win32_game_code* GameCode){
+    if(GameCode->GameCodeLib){
+        FreeLibrary(GameCode->GameCodeLib);
+        GameCode->GameCodeLib = 0;
+    }
+    GameCode->GameUpdateAndRender = GameUpdateAndRenderStub;
+    GameCode->GameGetSoundSamples = GameGetSoundSamplesStub;
+    GameCode->IsValid = false;
+}
+
+INTERNAL_FUNCTION void Win32CheckAndReloadGameCodeIfNeeded(win32_game_code* GameCode, char* SourceDLLName, char* TempDLLName){
+    FILETIME NewDLLWriteFileTime = Win32GetLastFileWriteTime(SourceDLLName);
+    if(CompareFileTime(&NewDLLWriteFileTime, &GameCode->LastWriteTimeDLL) != 0){
+        Win32UnloadGameCode(GameCode);
+        *GameCode = Win32LoadGameCode(SourceDLLName, TempDLLName);
+    }
+}
+
+void BuildPathForFileInEXEDir(char* TargetFileName, char* FileName){
+    char BufferForModulePath[MAX_PATH];
+    DWORD RecomendedFilePathForModule = GetModuleFileName(0, BufferForModulePath, MAX_PATH);
+
+    int PathLen = 0;
+    for(int i = strlen(BufferForModulePath) - 1;
+        i >= 0;
+        i--)
+    {
+        if(BufferForModulePath[i] == '\\'){
+            PathLen = i + 1;
+            break;
+        }
+    }
+
+    int FileNameStrLen = strlen(FileName);
+    int FinalPathLen = PathLen + FileNameStrLen;
+    
+    int Count = 0;
+    for(;Count < PathLen; Count++){
+        TargetFileName[Count] = BufferForModulePath[Count];
+    }
+    for(int i = 0;Count < FinalPathLen; Count++, i++){
+        TargetFileName[Count] = FileName[i];
+    }
+
+    TargetFileName[Count] = 0;
+}
 
 INTERNAL_FUNCTION void
 Win32InitXInput(){
@@ -554,10 +640,10 @@ Win32InitScreenBuffer(win32_offscreen_buffer* Buffer, int Width, int Height){
 
 INTERNAL_FUNCTION void
 Win32DisplayScreenBufferToWindow(
-HDC hdc,
-win32_offscreen_buffer* Buffer,
-int TargetWidth,
-int TargetHeight)
+    HDC hdc,
+    win32_offscreen_buffer* Buffer,
+    int TargetWidth,
+    int TargetHeight)
 {
 #if 0
     StretchDIBits(
@@ -745,13 +831,13 @@ struct platform_work_queue{
 
 INTERNAL_FUNCTION void Win32AddEntry(platform_work_queue* Queue, platform_work_queue_callback* Callback, void* Data){
     int NewNextEntryToWrite = (Queue->NextEntryToWrite + 1) % ArrayCount(Queue->Entries);
-	Assert(NewNextEntryToWrite != Queue->NextEntryToRead);
+    Assert(NewNextEntryToWrite != Queue->NextEntryToRead);
     platform_work_queue_entry* Entry = Queue->Entries + Queue->NextEntryToWrite;
     Entry->Callback = Callback;
     Entry->Data = Data;
-	_mm_sfence();
-    _WriteBarrier();
     ++Queue->EntryCount;
+    _mm_sfence();
+    _WriteBarrier();
     Queue->NextEntryToWrite = NewNextEntryToWrite;
     ReleaseSemaphore(Queue->SemaphoreHandle, 1, 0);
 }
@@ -796,9 +882,9 @@ ThreadProcedure(LPVOID Param){
         if (Win32DoNextWork(Queue)){
             WaitForSingleObjectEx(Queue->SemaphoreHandle, INFINITE, FALSE);
         }
-    }					
+    }                   
 
-    //return(0);
+    return(0);
 }
 
 INTERNAL_FUNCTION void 
@@ -820,16 +906,16 @@ Win32MakeQueue(platform_work_queue* Queue, int ThreadCount){
     for (int i = 0; i < ThreadCount; i++){
         DWORD ThreadID;
         HANDLE ThreadHandle = CreateThread(0, 0, ThreadProcedure, Queue, 0, &ThreadID);
-		CloseHandle(ThreadHandle);
+        CloseHandle(ThreadHandle);
     }
 }
 
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(DoWorkerWork){
-	char Buffer[256];
-	sprintf(Buffer, "Thread %u: %s\n", GetCurrentThreadId(), (char*)Data);
-	OutputDebugStringA(Buffer);
-	Sleep(100);
+    char Buffer[256];
+    sprintf(Buffer, "Thread %u: %s\n", GetCurrentThreadId(), (char*)Data);
+    OutputDebugStringA(Buffer);
+    Sleep(100);
 }
 
 LRESULT CALLBACK
@@ -876,36 +962,41 @@ int WINAPI WinMain(
     platform_work_queue HighPriorityQueue = {};
     Win32MakeQueue(&HighPriorityQueue, 3);
     platform_work_queue LowPriorityQueue = {};
-    Win32MakeQueue(&LowPriorityQueue, 1);
+    Win32MakeQueue(&LowPriorityQueue, 2);
 
 #if 0
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A0");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A1");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A2");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A3");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A4");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A5");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A6");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A7");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A8");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A9");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A0");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A1");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A2");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A3");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A4");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A5");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A6");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A7");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A8");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A9");
 
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B0");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B1");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B2");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B3");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B4");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B5");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B6");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B7");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B8");
-	Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B9");
-	Win32CompleteAllWork(&HighPriorityQueue);
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B0");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B1");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B2");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B3");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B4");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B5");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B6");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B7");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B8");
+    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B9");
+    Win32CompleteAllWork(&HighPriorityQueue);
 #endif
 
     Win32InitXInput();
 
+#if 0
     Win32InitScreenBuffer(&GlobalScreen, 1366, 768);
+#else
+    Win32InitScreenBuffer(&GlobalScreen, 960, 540);
+#endif
+
 
     WNDCLASSEX wcex = {};
     wcex.hInstance = Instance;
@@ -947,6 +1038,17 @@ int WINAPI WinMain(
         Instance,
         0);
 
+    char* SourceDLLName = "dolphin.dll";
+    char* TempDLLName = "dolphin_temp.dll";
+
+    char SourceDLLFullPath[MAX_PATH];
+    BuildPathForFileInEXEDir(SourceDLLFullPath, SourceDLLName);
+
+	char TempDLLFullPath[MAX_PATH];
+    BuildPathForFileInEXEDir(TempDLLFullPath, TempDLLName);
+
+    win32_game_code Game = Win32LoadGameCode(SourceDLLFullPath, TempDLLFullPath);
+
     DWORD SampsPerSec = 44100;
     WORD Channs = 2;
     WORD BytesPerSample = 2;
@@ -970,7 +1072,7 @@ int WINAPI WinMain(
     LARGE_INTEGER PerfomanceCounterFreq;
     QueryPerformanceFrequency(&PerfomanceCounterFreq);
     GlobalPerfomanceCounterFrequency = PerfomanceCounterFreq.QuadPart;
-	real32 TargetMSPerFrame = 1000.0f / 30.0f;
+    real32 TargetMSPerFrame = 1000.0f / 30.0f;
 
     LARGE_INTEGER LastCounter;
     QueryPerformanceCounter(&LastCounter);
@@ -979,6 +1081,8 @@ int WINAPI WinMain(
 
     GlobalRunning = true;
     while (GlobalRunning){
+
+        Win32CheckAndReloadGameCodeIfNeeded(&Game, SourceDLLFullPath, TempDLLFullPath);
 
         game_controller_input* KeyboardController = GetController(&GameInput, 0);
         Win32ProcessPendingMessages(KeyboardController);
@@ -1164,17 +1268,14 @@ int WINAPI WinMain(
         GameSoundOutputBuffer.SampleCount = BytesToLock / SoundOutput.BlockSize;
         GameSoundOutputBuffer.Samples = Samples;
 
-
         win32_window_dimension WindowDim = Win32GetWindowDimension(GlobalScreen.Window);
         game_offscreen_buffer GameBuffer = {};
         GameBuffer.Memory = GlobalScreen.Memory;
         GameBuffer.Width = GlobalScreen.Width;
         GameBuffer.Height = GlobalScreen.Height;
-        GameBuffer.BytesPerPixel = GlobalScreen.BytesPerPixel;
 
-        thread_context ThreadContext = {};
-
-        GameUpdateAndRender(&ThreadContext, &GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
+        //Game.GameGetSoundSamples(&GameMemory, )
+        Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
         HandleDebugCycleCounter(&GameMemory);
 
         if (SoundIsValid == (bool32)true){
@@ -1186,16 +1287,12 @@ int WINAPI WinMain(
         Win32DisplayScreenBufferToWindow(hdc, &GlobalScreen, WindowDim.Width, WindowDim.Height);
         ReleaseDC(GlobalScreen.Window, hdc);
 
-
         //PROCESS COUNTERS AND CYCLES
         uint64 EndCycleCount = __rdtsc();
         LARGE_INTEGER EndCounter;
         QueryPerformanceCounter(&EndCounter);
-
-
-
         
-		uint64 CyclesElapsed = EndCycleCount - LastCycleCount;
+        uint64 CyclesElapsed = EndCycleCount - LastCycleCount;
         int64 CounterElapsed = EndCounter.QuadPart - LastCounter.QuadPart;
         real32 SPF = (real32)((real32)CounterElapsed / (real32)GlobalPerfomanceCounterFrequency); // seconds per frame OR delta time
         real32 MSPerFrame = SPF * 1000.0f; // mili seconds per frame
@@ -1203,21 +1300,14 @@ int WINAPI WinMain(
         real32 MCPF = ((real32)CyclesElapsed / (1000.0f * 1000.0f)); //mili cycles per frame
         DeltaTime = SPF;
 
-		//if (MSPerFrame < TargetMSPerFrame){
-		//	Sleep(TargetMSPerFrame - MSPerFrame);
-		//}
+        //if (MSPerFrame < TargetMSPerFrame){
+        //  Sleep(TargetMSPerFrame - MSPerFrame);
+        //}
 
         char OutputStr[64];
         //sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
         sprintf_s(OutputStr, "FPS: %.2f\n", FPS);
         OutputDebugStringA(OutputStr);
-
-        /*
-        for (int i = 0; i < DebugCycleCounter_Count; i++){
-            DebugGlobalMemory->Counters[i].CycleCount = 0;
-            DebugGlobalMemory->Counters[i].HitCount = 0;
-        }
-        */
 
         LastCounter = EndCounter;
         LastCycleCount = EndCycleCount;

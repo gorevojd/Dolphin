@@ -1,6 +1,8 @@
 #ifndef WIN32_DOLPHIN_H
 #define WIN32_DOLPHIN_H
 
+#include "dolphin.h"
+
 struct win32_offscreen_buffer{
 	void* Memory;
 	int Width;
