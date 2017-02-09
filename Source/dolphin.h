@@ -7,11 +7,31 @@
 #include "dolphin_render_group.h"
 #include "dolphin_asset.h"
 
+struct hero_bitmap_ids
+{
+    bitmap_id Head;
+    bitmap_id Cape;
+    bitmap_id Torso;
+};
+
+struct playing_sound{
+	real32 Volume[2];
+	sound_id ID;
+	int32 SamplesPlayed;
+	playing_sound* Next;
+};
+
 struct game_state{
 	memory_arena PermanentArena;
 
 	gdVec2 PlayerPos;
-	int32 HeroFacingDirection;
+	real32 HeroFacingDirection;
+
+	loaded_sound TestSound;
+	uint32 TestSampleIndex;
+
+	playing_sound* FirstPlayingSound;
+	playing_sound* FirstFreePlayingSound;
 
 	real32 Time;
 };

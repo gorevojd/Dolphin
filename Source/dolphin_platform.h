@@ -280,11 +280,11 @@ extern platform_complete_all_work* PlatformCompleteAllWork;
 typedef struct game_memory{
     bool32 IsInitialized;
 
-    uint32 MemoryBlockSize;
-    void* MemoryBlock;
+    uint32 PermanentStorageSize;
+    void* PermanentStorage;
 
-    uint32 TempMemoryBlockSize;
-    void* TempMemoryBlock;
+    uint32 TransientStorageSize;
+    void* TransientStorage;
 
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;

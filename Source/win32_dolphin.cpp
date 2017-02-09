@@ -192,13 +192,14 @@ Win32InitDirectCoundCapture()
     HRESULT CaptureCreateResult = DirectSoundCaptureCreate(0, &DirectSoundCapture, 0);
     if (DirectSoundCaptureCreate && SUCCEEDED(CaptureCreateResult))
     {
+        uint32 DiscreteFrequency = 44100;
         WAVEFORMATEX WaveFormat = {};
         WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
         WaveFormat.nChannels = 2;
-        WaveFormat.nSamplesPerSec = 44100;
+        WaveFormat.nSamplesPerSec = DiscreteFrequency;
         WaveFormat.wBitsPerSample = 16;
         WaveFormat.nBlockAlign = 4;
-        WaveFormat.nAvgBytesPerSec = 44100 * 4;
+        WaveFormat.nAvgBytesPerSec = DiscreteFrequency * WaveFormat.nBlockAlign;
         WaveFormat.cbSize = 0;
 
         DSCBUFFERDESC CaptureBufferDescription = {};
@@ -265,7 +266,6 @@ Win32FillSoundBuffer(
         DWORD Region1SampleCount = Region1Size / (Buffer->BlockSize);
         DWORD Region2SampleCount = Region2Size / (Buffer->BlockSize);
 
-#if 1
         //FROM ABSTRACTION LAYER
         int16* SourceSample = (int16*)SourceBuffer->Samples;
         int16* DestSample = (int16*)Region1Ptr;
@@ -290,43 +290,6 @@ Win32FillSoundBuffer(
 
             Buffer->RunningSample++;
         }
-
-#else
-        //FROM PLATFORM LAYER
-        LOCAL_PERSIST real32 Phase;
-        real32 Volume = Buffer->ToneVolume;
-        real32 WaveFrequency = (real32)Buffer->ToneHz / (real32)Buffer->SamplesPerSecond;
-
-        int16* DestSample = (int16*)Region1Ptr;
-        for (DWORD SampleIndex = 0;
-            SampleIndex < Region1SampleCount;
-            SampleIndex++)
-        {
-            real32 CurrentPhase = 2.0f * EditorPxi * WaveFrequency;
-            int16 SampleValue = (int16)(sinf((CurrentPhase * Buffer->RunningSample + Phase)) * Volume);
-
-            *DestSample++ = SampleValue;
-            *DestSample++ = SampleValue;
-
-            Phase = CurrentPhase;
-            Buffer->RunningSample++;
-        }
-
-        DestSample = (int16*)Region2Ptr;
-        for (DWORD SampleIndex = 0;
-            SampleIndex < Region2SampleCount;
-            SampleIndex++)
-        {
-            real32 CurrentPhase = 2.0f * EditorPi * WaveFrequency;
-            int16 SampleValue = (int16)(sinf((CurrentPhase * Buffer->RunningSample + Phase)) * Volume);
-
-            *DestSample++ = SampleValue;
-            *DestSample++ = SampleValue;
-
-            Phase = CurrentPhase;
-            Buffer->RunningSample++;
-        }
-#endif
 
 
         HRESULT UnlockResult = GlobalSecondaryBuffer->Unlock(
@@ -964,31 +927,6 @@ int WINAPI WinMain(
     platform_work_queue LowPriorityQueue = {};
     Win32MakeQueue(&LowPriorityQueue, 2);
 
-#if 0
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A0");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A1");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A2");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A3");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A4");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A5");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A6");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A7");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A8");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String A9");
-
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B0");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B1");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B2");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B3");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B4");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B5");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B6");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B7");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B8");
-    Win32AddEntry(&HighPriorityQueue, DoWorkerWork, "String B9");
-    Win32CompleteAllWork(&HighPriorityQueue);
-#endif
-
     Win32InitXInput();
 
 #if 0
@@ -1009,13 +947,13 @@ int WINAPI WinMain(
 
     LPVOID BaseAddress = 0;
     game_memory GameMemory = {};
-    GameMemory.MemoryBlockSize = GD_MEGABYTES(200);
-    GameMemory.TempMemoryBlockSize = GD_MEGABYTES(800);
+    GameMemory.PermanentStorageSize = GD_MEGABYTES(200);
+    GameMemory.TransientStorageSize = GD_MEGABYTES(800);
     
-    uint32 MemoryBlockSize = GameMemory.MemoryBlockSize + GameMemory.TempMemoryBlockSize;
+    uint32 MemoryBlockSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
     void* MemoryBlock = VirtualAlloc(0, MemoryBlockSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    GameMemory.MemoryBlock = MemoryBlock;
-    GameMemory.TempMemoryBlock = (uint8*)MemoryBlock + GameMemory.MemoryBlockSize;
+    GameMemory.PermanentStorage = MemoryBlock;
+    GameMemory.TransientStorage = (uint8*)MemoryBlock + GameMemory.PermanentStorageSize;
     GameMemory.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
     GameMemory.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;
     GameMemory.DEBUGWriteEntireFile = DEBUGPlatformWriteEntireFile;
@@ -1049,7 +987,7 @@ int WINAPI WinMain(
 
     win32_game_code Game = Win32LoadGameCode(SourceDLLFullPath, TempDLLFullPath);
 
-    DWORD SampsPerSec = 44100;
+    DWORD SampsPerSec = 48000;
     WORD Channs = 2;
     WORD BytesPerSample = 2;
     win32_sound_output SoundOutput = {};
@@ -1058,8 +996,6 @@ int WINAPI WinMain(
     SoundOutput.BlockSize = BytesPerSample * Channs;
     SoundOutput.SamplesPerSecond = (WORD)SampsPerSec;
     SoundOutput.SecondaryBufferByteSize = SampsPerSec * Channs * BytesPerSample;
-    SoundOutput.ToneVolume = 8000;
-    SoundOutput.ToneHz = 256;
     SoundOutput.LatencyCycleCount = SampsPerSec / 15;
     GlobalSecondaryBuffer = Win32InitDirectSound(GlobalScreen.Window, &SoundOutput);
     Win32ClearSoundBuffer(&SoundOutput);
@@ -1242,7 +1178,8 @@ int WINAPI WinMain(
 
         if (SUCCEEDED(GlobalSecondaryBuffer->GetCurrentPosition(&PlayCursor, &WriteCursor))){
             ByteToLock = (SoundOutput.RunningSample * SoundOutput.BlockSize) % SoundOutput.SecondaryBufferByteSize;
-            TargetPlayCursor = (PlayCursor + (SoundOutput.LatencyCycleCount * SoundOutput.BlockSize)) % SoundOutput.SecondaryBufferByteSize;
+            //TargetPlayCursor = (PlayCursor + (SoundOutput.LatencyCycleCount * SoundOutput.BlockSize)) % SoundOutput.SecondaryBufferByteSize;
+            TargetPlayCursor = (PlayCursor) % SoundOutput.SecondaryBufferByteSize;
 
             if (TargetPlayCursor == ByteToLock){
                 BytesToLock = 0;
@@ -1262,7 +1199,6 @@ int WINAPI WinMain(
             //TODO(Dima): Logging
         }
 
-        uint32 TargetSamplesSize = SoundOutput.SamplesPerSecond * SoundOutput.BlockSize;
         game_sound_output_buffer GameSoundOutputBuffer = {};
         GameSoundOutputBuffer.SamplesPerSecond = SoundOutput.SamplesPerSecond;
         GameSoundOutputBuffer.SampleCount = BytesToLock / SoundOutput.BlockSize;
@@ -1274,13 +1210,16 @@ int WINAPI WinMain(
         GameBuffer.Width = GlobalScreen.Width;
         GameBuffer.Height = GlobalScreen.Height;
 
-        //Game.GameGetSoundSamples(&GameMemory, )
-        Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
+        if(Game.GameUpdateAndRender){
+            Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
+        }
+        if(Game.GameGetSoundSamples){
+            Game.GameGetSoundSamples(&GameMemory, &GameSoundOutputBuffer);
+        }
         HandleDebugCycleCounter(&GameMemory);
 
-        if (SoundIsValid == (bool32)true){
+        if (SoundIsValid){
             Win32FillSoundBuffer(&SoundOutput, ByteToLock, BytesToLock, &GameSoundOutputBuffer);
-            //Win32FillSoundBufferWithSineWave(&SoundOutput);
         }
 
         HDC hdc = GetDC(GlobalScreen.Window);
@@ -1299,10 +1238,6 @@ int WINAPI WinMain(
         real32 FPS = (real32)GlobalPerfomanceCounterFrequency / (real32)CounterElapsed;
         real32 MCPF = ((real32)CyclesElapsed / (1000.0f * 1000.0f)); //mili cycles per frame
         DeltaTime = SPF;
-
-        //if (MSPerFrame < TargetMSPerFrame){
-        //  Sleep(TargetMSPerFrame - MSPerFrame);
-        //}
 
         char OutputStr[64];
         //sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
