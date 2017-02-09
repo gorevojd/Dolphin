@@ -1,6 +1,6 @@
  dolphin
 
- Timestamp is 589c7596 (Thu Feb 09 16:58:46 2017)
+ Timestamp is 589c79d2 (Thu Feb 09 17:16:50 2017)
 
  Preferred load address is 0000000180000000
 
@@ -114,8 +114,8 @@
  0001:0001f440       _wassert                   0000000180020440 f   LIBCMTD:wassert.obj
  0001:00020320       __GSHandlerCheck           0000000180021320 f   LIBCMTD:gshandler.obj
  0001:00020360       __GSHandlerCheckCommon     0000000180021360 f   LIBCMTD:gshandler.obj
- 0001:00020470       _alloca_probe              0000000180021470 f   LIBCMTD:chkstk.obj
  0001:00020470       __chkstk                   0000000180021470 f   LIBCMTD:chkstk.obj
+ 0001:00020470       _alloca_probe              0000000180021470 f   LIBCMTD:chkstk.obj
  0001:000204d0       __security_check_cookie    00000001800214d0 f   LIBCMTD:amdsecgs.obj
  0001:000204f0       cosf                       00000001800214f0 f   LIBCMTD:cosf.obj
  0001:000209f0       powf                       00000001800219f0 f   LIBCMTD:powf.obj
@@ -381,8 +381,8 @@
  0001:0003d770       ??0bad_exception@std@@QEAA@AEBV01@@Z 000000018003e770 f i LIBCMTD:frame.obj
  0001:0003d7b0       ??0bad_exception@std@@QEAA@PEBD@Z 000000018003e7b0 f i LIBCMTD:frame.obj
  0001:0003d7f0       ??1bad_exception@std@@UEAA@XZ 000000018003e7f0 f i LIBCMTD:frame.obj
- 0001:0003d820       ??_Gbad_exception@std@@UEAAPEAXI@Z 000000018003e820 f i LIBCMTD:frame.obj
  0001:0003d820       ??_Ebad_exception@std@@UEAAPEAXI@Z 000000018003e820 f i LIBCMTD:frame.obj
+ 0001:0003d820       ??_Gbad_exception@std@@UEAAPEAXI@Z 000000018003e820 f i LIBCMTD:frame.obj
  0001:0003e7f0       __AdjustPointer            000000018003f7f0 f   LIBCMTD:frame.obj
  0001:0003e870       __BuildCatchObject         000000018003f870 f   LIBCMTD:frame.obj
  0001:0003e9b0       __BuildCatchObjectHelper   000000018003f9b0 f   LIBCMTD:frame.obj
@@ -456,8 +456,8 @@
  0001:000492d0       ??3@YAXPEAX@Z              000000018004a2d0 f   LIBCMTD:dbgdel.obj
  0001:000493b0       strcmp                     000000018004a3b0 f   LIBCMTD:strcmp.obj
  0001:00049420       ?_ValidateExecute@@YAHP6A_JXZ@Z 000000018004a420 f   LIBCMTD:validate.obj
- 0001:00049450       ?_ValidateRead@@YAHPEBXI@Z 000000018004a450 f   LIBCMTD:validate.obj
  0001:00049450       ?_ValidateWrite@@YAHPEAXI@Z 000000018004a450 f   LIBCMTD:validate.obj
+ 0001:00049450       ?_ValidateRead@@YAHPEBXI@Z 000000018004a450 f   LIBCMTD:validate.obj
  0001:00049490       _CallSettingFrame          000000018004a490 f   LIBCMTD:handlers.obj
  0001:000494d0       _GetNextInstrOffset        000000018004a4d0 f   LIBCMTD:handlers.obj
  0001:000494e0       ??1type_info@@UEAA@XZ      000000018004a4e0 f   LIBCMTD:typinfo.obj
@@ -468,8 +468,8 @@
  0001:000495f0       ??0exception@std@@QEAA@AEBV01@@Z 000000018004a5f0 f   LIBCMTD:stdexcpt.obj
  0001:00049640       ??1exception@std@@UEAA@XZ  000000018004a640 f   LIBCMTD:stdexcpt.obj
  0001:00049670       ??4exception@std@@QEAAAEAV01@AEBV01@@Z 000000018004a670 f   LIBCMTD:stdexcpt.obj
- 0001:000496e0       ??_Eexception@std@@UEAAPEAXI@Z 000000018004a6e0 f i LIBCMTD:stdexcpt.obj
  0001:000496e0       ??_Gexception@std@@UEAAPEAXI@Z 000000018004a6e0 f i LIBCMTD:stdexcpt.obj
+ 0001:000496e0       ??_Eexception@std@@UEAAPEAXI@Z 000000018004a6e0 f i LIBCMTD:stdexcpt.obj
  0001:00049720       ?_Copy_str@exception@std@@AEAAXPEBD@Z 000000018004a720 f   LIBCMTD:stdexcpt.obj
  0001:00049790       ?_Tidy@exception@std@@AEAAXXZ 000000018004a790 f   LIBCMTD:stdexcpt.obj
  0001:000497d0       ?what@exception@std@@UEBAPEBDXZ 000000018004a7d0 f   LIBCMTD:stdexcpt.obj
@@ -607,11 +607,12 @@
  0002:00001fec       __real@42200000            0000000180052fec     dolphin.obj
  0002:00001ff0       __real@42c80000            0000000180052ff0     dolphin.obj
  0002:00001ff4       __real@43480000            0000000180052ff4     dolphin.obj
- 0002:00001ff8       __real@437f0000            0000000180052ff8     dolphin.obj
- 0002:00001ffc       __real@43960000            0000000180052ffc     dolphin.obj
- 0002:00002000       __real@43c80000            0000000180053000     dolphin.obj
- 0002:00002004       __real@49742400            0000000180053004     dolphin.obj
- 0002:00002008       __real@7f7fffff            0000000180053008     dolphin.obj
+ 0002:00001ff8       __real@437a0000            0000000180052ff8     dolphin.obj
+ 0002:00001ffc       __real@437f0000            0000000180052ffc     dolphin.obj
+ 0002:00002000       __real@43960000            0000000180053000     dolphin.obj
+ 0002:00002004       __real@43c80000            0000000180053004     dolphin.obj
+ 0002:00002008       __real@49742400            0000000180053008     dolphin.obj
+ 0002:0000200c       __real@7f7fffff            000000018005300c     dolphin.obj
  0002:00002010       __xmm@00000000000000000000000000000000 0000000180053010     dolphin.obj
  0002:00002020       __xmm@000000ff000000ff000000ff000000ff 0000000180053020     dolphin.obj
  0002:00002030       __xmm@00000200000002000000020000000200 0000000180053030     dolphin.obj
@@ -696,8 +697,8 @@
  0002:00003600       ??_C@_1EK@MBDPDCGA@?$AAM?$AAi?$AAc?$AAr?$AAo?$AAs?$AAo?$AAf?$AAt?$AA?5?$AAV?$AAi?$AAs?$AAu?$AAa?$AAl?$AA?5?$AAC?$AA?$CL?$AA?$CL?$AA?5?$AAR?$AAu?$AAn?$AAt?$AAi?$AAm?$AAe?$AA?5?$AAL?$AAi?$AAb@ 0000000180054600     LIBCMTD:wassert.obj
  0002:00004150       ??_C@_05KGFAIMPG@sqrtf?$AA@ 0000000180055150     LIBCMTD:sqrtf.obj
  0002:00004158       _FPinit                    0000000180055158     LIBCMTD:fpinit.obj
- 0002:00004160       _pDefaultRawDllMain        0000000180055160     LIBCMTD:dllcrt0.obj
  0002:00004160       _pRawDllMain               0000000180055160     LIBCMTD:dllcrt0.obj
+ 0002:00004160       _pDefaultRawDllMain        0000000180055160     LIBCMTD:dllcrt0.obj
  0002:00004168       ??_C@_0CL@OOIKPIHN@f?3?2dd?2vctools?2crt?2crtw32?2startup@ 0000000180055168     LIBCMTD:dllcrt0.obj
  0002:000041b0       ??_C@_1BA@GLMCNLEM@?$AAW?$AAa?$AAr?$AAn?$AAi?$AAn?$AAg?$AA?$AA@ 00000001800551b0     LIBCMTD:dbgrptw.obj
  0002:000041c0       ??_C@_1M@ILHOPKA@?$AAE?$AAr?$AAr?$AAo?$AAr?$AA?$AA@ 00000001800551c0     LIBCMTD:dbgrptw.obj

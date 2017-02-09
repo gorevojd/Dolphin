@@ -282,9 +282,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     HeroBitmaps.Cape = GetBestMatchBitmapFrom(TranState->Assets, Asset_Cape, &MatchVector, &WeightVector);
     HeroBitmaps.Torso = GetBestMatchBitmapFrom(TranState->Assets, Asset_Torso, &MatchVector, &WeightVector);
 
-    PushBitmap(RenderGroup, HeroBitmaps.Torso, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Cape, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Head, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Torso, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Cape, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Head, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
 
     PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
