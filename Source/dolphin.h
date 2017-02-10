@@ -3,9 +3,12 @@
 
 #include "dolphin_platform.h"
 
+
 #include "dolphin_intrinsics.h"
 #include "dolphin_render_group.h"
 #include "dolphin_asset.h"
+#include "dolphin_random.h"
+#include "dolphin_audio.h"
 
 struct hero_bitmap_ids
 {
@@ -14,12 +17,6 @@ struct hero_bitmap_ids
     bitmap_id Torso;
 };
 
-struct playing_sound{
-	real32 Volume[2];
-	sound_id ID;
-	int32 SamplesPlayed;
-	playing_sound* Next;
-};
 
 struct game_state{
 	memory_arena PermanentArena;
@@ -30,8 +27,7 @@ struct game_state{
 	loaded_sound TestSound;
 	uint32 TestSampleIndex;
 
-	playing_sound* FirstPlayingSound;
-	playing_sound* FirstFreePlayingSound;
+	audio_state AudioState;
 
 	real32 Time;
 };

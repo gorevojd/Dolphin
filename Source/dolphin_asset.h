@@ -4,6 +4,14 @@
 #include "dolphin_platform.h"
 #include "dolphin_intrinsics.h"
 
+struct bitmap_id{
+	uint32 Value;
+};
+
+struct sound_id{
+	uint32 Value;
+};
+
 struct loaded_sound{
 	uint32 SampleCount;
 	uint32 ChannelCount;
@@ -69,6 +77,9 @@ struct asset_bitmap_info{
 
 struct asset_sound_info{
 	char* FileName;
+	uint32 FirstSampleIndex;
+	uint32 SampleCount;
+	sound_id NextIDToPlay;
 };
 
 enum asset_state{
@@ -126,13 +137,6 @@ struct game_assets{
 	asset *DEBUGAsset;
 };
 
-struct bitmap_id{
-	uint32 Value;
-};
-
-struct sound_id{
-	uint32 Value;
-};
 
 inline loaded_bitmap* GetBitmap(game_assets* Assets, bitmap_id ID){
 	loaded_bitmap* Result = Assets->Bitmaps[ID.Value].Bitmap;

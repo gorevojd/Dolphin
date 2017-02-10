@@ -1,9 +1,8 @@
 #include "dolphin.h"
-#include "dolphin_render_group.cpp"
-#include "dolphin_random.h"
 #include "dolphin_opengl.cpp"
+#include "dolphin_render_group.cpp"
 #include "dolphin_asset.cpp"
-
+#include "dolphin_audio.cpp"
 
 INTERNAL_FUNCTION void
 GameOutputSound(game_sound_output_buffer* SoundBuffer, int Frequency){
@@ -124,27 +123,6 @@ INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
 	Task->BeingUsed = false;
 }
 
-INTERNAL_FUNCTION playing_sound*
-PlaySound(game_state* GameState, sound_id SoundID){
-    if(!GameState->FirstFreePlayingSound){
-        GameState->FirstFreePlayingSound = PushStruct(&GameState->PermanentArena, playing_sound);
-        GameState->FirstFreePlayingSound->Next = 0;
-    }
-
-    playing_sound* PlayingSound = GameState->FirstFreePlayingSound;
-    GameState->FirstFreePlayingSound = PlayingSound->Next;
-
-    PlayingSound->SamplesPlayed = 0;
-    PlayingSound->Volume[0] = 1.0f;
-    PlayingSound->Volume[1] = 1.0f;
-    PlayingSound->ID = SoundID;
-
-    PlayingSound->Next = GameState->FirstPlayingSound;
-    GameState->FirstPlayingSound = PlayingSound;
-
-    return(PlayingSound);
-}
-
 #ifdef INTERNAL_BUILD
 game_memory* DebugGlobalMemory;
 #endif
@@ -169,6 +147,8 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             Memory->PermanentStorageSize - sizeof(game_state),
             (uint8*)Memory->PermanentStorage + sizeof(game_state));
         
+        InitializeAudioState(&GameState->AudioState, &GameState->PermanentArena);
+
         uint32 Min = RandomNumberTable[0];
         uint32 Max = RandomNumberTable[0];
         int RandArrSize = ArrayCount(RandomNumberTable);
@@ -208,7 +188,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState);
 
-        PlaySound(GameState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
+        PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
         TranState->IsInitialized = true;
     }
@@ -282,9 +262,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     HeroBitmaps.Cape = GetBestMatchBitmapFrom(TranState->Assets, Asset_Cape, &MatchVector, &WeightVector);
     HeroBitmaps.Torso = GetBestMatchBitmapFrom(TranState->Assets, Asset_Torso, &MatchVector, &WeightVector);
 
-    PushBitmap(RenderGroup, HeroBitmaps.Torso, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Cape, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Head, 250, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Torso, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Cape, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Head, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
 
     PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
@@ -300,7 +280,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushRectangle(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension, gd_vec4(1.0f, 0.6f, 0.0f, 1.0f));
     PushRectangleOutline(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension);
     
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 100, gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 150, gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0));
 
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 
@@ -310,87 +290,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 GD_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
     game_state* GameState = (game_state*)Memory->PermanentStorage;
     transient_state* TranState = (transient_state*)Memory->TransientStorage;
-
-    temporary_memory MixerMemory = BeginTemporaryMemory(&TranState->TranArena);
-
-    real32* RealChannel0 = PushArray(&TranState->TranArena, SoundOutput->SampleCount, real32);
-    real32* RealChannel1 = PushArray(&TranState->TranArena, SoundOutput->SampleCount, real32);
-
-    {
-        real32* Dest0 = RealChannel0;
-        real32* Dest1 = RealChannel1;
-        for(int SampleIndex = 0;
-            SampleIndex < SoundOutput->SampleCount;
-            SampleIndex++)
-        {
-            *Dest0++ = 0.0f;
-            *Dest1++ = 0.0f;
-        }
-    }
-
-    /*Summing the sounds*/
-    for(playing_sound** PlayingSoundPtr = &GameState->FirstPlayingSound;
-        *PlayingSoundPtr;)
-    {
-        playing_sound* PlayingSound = *PlayingSoundPtr;
-        bool32 SoundFinished = false;
-
-        loaded_sound* LoadedSound = GetSound(TranState->Assets, PlayingSound->ID);
-        if(LoadedSound){
-            real32 Volume0 = PlayingSound->Volume[0];
-            real32 Volume1 = PlayingSound->Volume[1];
-
-            real32* Dest0 = RealChannel0;
-            real32* Dest1 = RealChannel1;
-            
-            Assert(PlayingSound->SamplesPlayed >= 0);
-
-            uint32 SamplesToMix = SoundOutput->SampleCount;
-            uint32 SamplesRemaining = LoadedSound->SampleCount - PlayingSound->SamplesPlayed;
-            if(SamplesToMix > SamplesRemaining){
-                SamplesToMix = SamplesRemaining;
-            }
-
-            for(int SampleIndex = PlayingSound->SamplesPlayed;
-                SampleIndex < PlayingSound->SamplesPlayed + SamplesToMix;
-                SampleIndex++)
-            {
-                real32 SampleValue = LoadedSound->Samples[0][SampleIndex];
-                *Dest0++ += Volume0 * SampleValue;
-                *Dest1++ += Volume1 * SampleValue;
-            }
-
-            SoundFinished = ((uint32)PlayingSound->SamplesPlayed == LoadedSound->SampleCount);
-
-            PlayingSound->SamplesPlayed += SamplesToMix;
-        }
-        else{
-            LoadSoundAsset(TranState->Assets, PlayingSound->ID);
-        }
-
-        if(SoundFinished){
-            *PlayingSoundPtr = PlayingSound->Next;
-            PlayingSound->Next = GameState->FirstFreePlayingSound;
-            GameState->FirstFreePlayingSound = PlayingSound;
-        }
-        else{
-            PlayingSoundPtr = &PlayingSound->Next;
-        }
-    }    
-
-    {
-        real32* Source0 = RealChannel0;
-        real32* Source1 = RealChannel1;
-
-        int16* SampleOut = SoundOutput->Samples;
-        for(int SampleIndex = 0;
-            SampleIndex < SoundOutput->SampleCount;
-            SampleIndex++)
-        {
-            *SampleOut++ = (int16)(*Source0++ + 0.5f);
-            *SampleOut++ = (int16)(*Source1++ + 0.5f);
-        }
-    }
-
-    EndTemporaryMemory(MixerMemory);
+/*
+    audio_state* AudioState,
+    game_sound_output_buffer* SoundOutput,
+    game_assets* Assets,
+    memory_arena* TempArena)
+*/
+    OutputPlayingSounds(&GameState->AudioState, SoundOutput, TranState->Assets, &GameState->PermanentArena);
 }
