@@ -99,6 +99,27 @@ inline void* PushSize_(memory_arena* Arena, size_t SizeInit, size_t Alignment = 
 	return(Result);
 }
 
+inline char* 
+PushString(memory_arena* Arena, char* Source){
+    uint32 BufferSize = 1;
+    for(char* It = Source;
+        *It;
+        It++)
+    {
+        BufferSize++;
+    }
+
+    char* Dest = (char*)PushSize_(Arena, BufferSize);
+    for(uint32 CharIndex = 0;
+        CharIndex < BufferSize;
+        CharIndex++)
+    {
+        Dest[CharIndex] = Source[CharIndex];
+    }
+
+    return(Dest);
+}
+
 inline void ZeroSize(void* Memory, size_t Size){
 	uint8* Ptr = (uint8*)Memory;
 	for (int i = 0; i < Size; i++){

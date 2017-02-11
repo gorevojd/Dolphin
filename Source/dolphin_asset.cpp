@@ -378,17 +378,8 @@ struct load_bitmap_work{
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadBitmapWork){
     load_bitmap_work* Work = (load_bitmap_work*)Data;
 
-#if 0
-    if(Work->HasAlignment){
-        *Work->Bitmap = LoadBitmap(PlatformReadEntireFile, Work->FileName, Work->AlignX, Work->TopDownAlignY);
-    }
-    else{
-        *Work->Bitmap = LoadBitmap(PlatformReadEntireFile, Work->FileName);
-    }
-#else
     asset_bitmap_info* Info = Work->Assets->BitmapInfos + Work->ID.Value;
     *Work->Bitmap = LoadBMP(Info->FileName, Info->AlignPercentage);
-#endif
 
     GD_COMPLETE_WRITES_BEFORE_FUTURE;
 
@@ -589,7 +580,7 @@ DEBUGAddBitmapInfo(game_assets* Assets, char* FileName, gdVec2 AlignPercentage){
     bitmap_id ID = {Assets->DEBUGUsedBitmapCount++};
 
     asset_bitmap_info* Info = Assets->BitmapInfos + ID.Value;
-    Info->FileName = FileName;
+    Info->FileName = PushString(&Assets->Arena, FileName);
     Info->AlignPercentage = AlignPercentage;
 
     return(ID);
@@ -601,7 +592,7 @@ DEBUGAddSoundInfo(game_assets* Assets, char* FileName, uint32 FirstSampleIndex, 
     sound_id ID = {Assets->DEBUGUsedSoundCount++};
 
     asset_sound_info* Info = Assets->SoundInfos + ID.Value;
-    Info->FileName = FileName;
+    Info->FileName = PushString(&Assets->Arena, FileName);
     Info->NextIDToPlay.Value = 0;
     Info->FirstSampleIndex = FirstSampleIndex;
     Info->SampleCount = SampleCount;

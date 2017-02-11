@@ -407,13 +407,6 @@ Win32UnloadGameCode(win32_game_code* GameCode){
     GameCode->IsValid = false;
 }
 
-INTERNAL_FUNCTION void Win32CheckAndReloadGameCodeIfNeeded(win32_game_code* GameCode, char* SourceDLLName, char* TempDLLName){
-    FILETIME NewDLLWriteFileTime = Win32GetLastFileWriteTime(SourceDLLName);
-    if(CompareFileTime(&NewDLLWriteFileTime, &GameCode->LastWriteTimeDLL) != 0){
-        Win32UnloadGameCode(GameCode);
-        *GameCode = Win32LoadGameCode(SourceDLLName, TempDLLName);
-    }
-}
 
 void BuildPathForFileInEXEDir(char* TargetFileName, char* FileName){
     char BufferForModulePath[MAX_PATH];
@@ -1018,7 +1011,16 @@ int WINAPI WinMain(
     GlobalRunning = true;
     while (GlobalRunning){
 
-        Win32CheckAndReloadGameCodeIfNeeded(&Game, SourceDLLFullPath, TempDLLFullPath);
+        FILETIME NewDLLWriteFileTime = Win32GetLastFileWriteTime(SourceDLLFullPath);
+        if(CompareFileTime(&NewDLLWriteFileTime, &Game.LastWriteTimeDLL) != 0){
+
+            Win32CompleteAllWork(&HighPriorityQueue);
+            Win32CompleteAllWork(&LowPriorityQueue);
+
+            Win32UnloadGameCode(&Game);
+            Game = Win32LoadGameCode(SourceDLLName, TempDLLFullPath);
+        }
+
 
         game_controller_input* KeyboardController = GetController(&GameInput, 0);
         Win32ProcessPendingMessages(KeyboardController);
