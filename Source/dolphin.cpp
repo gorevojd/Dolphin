@@ -4,36 +4,6 @@
 #include "dolphin_asset.cpp"
 #include "dolphin_audio.cpp"
 
-INTERNAL_FUNCTION void
-GameOutputSound(game_sound_output_buffer* SoundBuffer, int Frequency){
-
-    LOCAL_PERSIST real32 Phase = 0;
-    real32 Volume = 8000;
-    real32 Freq = (real32)Frequency;
-    real32 WaveFrequency = (real32)Freq / (real32)SoundBuffer->SamplesPerSecond;
-
-    //FIXED(Dima): BUG(Dima): Sound changing it's frequency every 3 - 5 seconds
-
-    int16* SampleOut = (int16*)SoundBuffer->Samples;
-    for (int SampleIndex = 0;
-        SampleIndex < SoundBuffer->SampleCount;
-        ++SampleIndex)
-    {
-
-        real32 Omega = 2.0f * GD_MATH_PI * WaveFrequency;
-        int16 SampleValue = (int16)(sinf(Phase) * Volume);
-
-        *SampleOut++ = SampleValue;
-        *SampleOut++ = SampleValue;
-
-        Phase += Omega;
-        if (Phase > 2.0f * GD_MATH_PI){
-            Phase -= 2.0f * GD_MATH_PI;
-        }
-    }
-}
-
-
 INTERNAL_FUNCTION loaded_bitmap
 MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
     loaded_bitmap Result = {};
@@ -48,59 +18,6 @@ MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
 
     return(Result);
 }
-
-/*
-INTERNAL_FUNCTION void
-RenderGround(loaded_bitmap* Buffer, transient_state* State)
-{
-
-    random_series Series = RandomSeed(123);
-
-    gdVec2 ScreenCenter = { (real32)Buffer->Width * 0.5f, (real32)Buffer->Height * 0.5f };
-
-    for (int GroundIndex = 0;
-        GroundIndex < 60;
-        GroundIndex++)
-    {
-        loaded_bitmap* BitmapToRender = State->Assets.Stones + RandomChoiceFromCount(&Series, ArrayCount(State->Assets.Stones));
-
-        gdVec2 BitmapOffset = { (real32)BitmapToRender->Width * 0.5f,
-            (real32)BitmapToRender->Height * 0.5f };
-
-        gdVec2 GroundLocalPosition =
-        { RandomFromNegativeOneToOne(&Series),
-        RandomFromNegativeOneToOne(&Series) };
-
-        gdVec2 GroundScreenPosition = ScreenCenter + GroundLocalPosition * 256.0f - BitmapOffset;
-
-        RenderBitmap(
-            (loaded_bitmap*)Buffer,
-            BitmapToRender,
-            GroundScreenPosition);
-    }
-
-    for (int GrassIndex = 0;
-        GrassIndex < 15;
-        GrassIndex++)
-    {
-        loaded_bitmap* BitmapToRender = State->Assets.Grasses + RandomChoiceFromCount(&Series, ArrayCount(State->Assets.Grasses));
-
-        gdVec2 BitmapOffset = { (real32)BitmapToRender->Width * 0.5f,
-            (real32)BitmapToRender->Height * 0.5f };
-
-        gdVec2 GrassLocalPosition =
-        { RandomFromNegativeOneToOne(&Series),
-        RandomFromNegativeOneToOne(&Series) };
-
-        gdVec2 GrassScreenPosition = ScreenCenter + GrassLocalPosition * 256.0f - BitmapOffset;
-
-        RenderBitmap(
-            (loaded_bitmap*)Buffer,
-            BitmapToRender,
-            GrassScreenPosition);
-    }
-}
-*/
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
 	task_with_memory* FoundTask = 0;
@@ -230,6 +147,10 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         if (Controller->MoveLeft.EndedDown){
             MoveVector.x -= 10;
             GameState->HeroFacingDirection = 0.5f * GD_MATH_TAU;
+        }
+
+        if(Controller->Space.EndedDown && Controller->Space.HalfTransitionCount){
+            PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Bloop));
         }
 
         real32 PlayerSpeed = 100;

@@ -291,12 +291,12 @@ Win32FillSoundBuffer(
             Buffer->RunningSample++;
         }
 
-
         HRESULT UnlockResult = GlobalSecondaryBuffer->Unlock(
             Region1Ptr, Region1Size,
             Region2Ptr, Region2Size);
         if (SUCCEEDED(UnlockResult)){
             //NOTE(Dima): Function complete succesfully
+            
         }
         else{
             //TODO(Dima): Logging
@@ -989,7 +989,7 @@ int WINAPI WinMain(
     SoundOutput.BlockSize = BytesPerSample * Channs;
     SoundOutput.SamplesPerSecond = (WORD)SampsPerSec;
     SoundOutput.SecondaryBufferByteSize = SampsPerSec * Channs * BytesPerSample;
-    SoundOutput.LatencyCycleCount = SampsPerSec / 15;
+    //SoundOutput.LatencyCycleCount = SampsPerSec / 15;
     GlobalSecondaryBuffer = Win32InitDirectSound(GlobalScreen.Window, &SoundOutput);
     Win32ClearSoundBuffer(&SoundOutput);
     GlobalSecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
