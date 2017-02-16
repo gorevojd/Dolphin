@@ -27,40 +27,6 @@ struct hero_bitmaps{
 	loaded_bitmap Cape;
 };
 
-enum asset_tag_id{	
-	Tag_FacingDirection,
-
-	Tag_Count,
-};
-
-enum asset_type_id{
-	Asset_None,
-
-	Asset_LastOfUs,
-	Asset_StarWars,
-	Asset_Witcher,
-	Asset_Assassin,
-	Asset_Tree,
-	Asset_Backdrop,
-
-	Asset_Grass,
-	Asset_Tuft,
-	Asset_Stone,
-
-    Asset_Head,
-    Asset_Cape,
-    Asset_Torso,
-
-	Asset_Bloop,
-	Asset_Crack,
-	Asset_Drop,
-	Asset_Glide,
-	Asset_Music,
-	Asset_Puhp,
-
-	Asset_Count,
-};
-
 struct asset_type{
 	uint32 FirstAssetIndex;
 	uint32 OnePastLastAssetIndex;
@@ -89,9 +55,13 @@ enum asset_state{
 };
 
 struct asset{
-	uint32 SlotID;
 	uint32 FirstTagIndex;
 	uint32 OnePastLastTagIndex;
+
+	union{
+		asset_bitmap_info Bitmap;
+		asset_sound_info Sound;
+	};
 };
 
 struct asset_slot{
@@ -113,19 +83,13 @@ struct game_assets{
 
 	real32 TagRange[Tag_Count];
 
-	uint32 BitmapCount;
-	asset_bitmap_info* BitmapInfos;
-	asset_slot* Bitmaps;
-
-	uint32 SoundCount;
-	asset_sound_info* SoundInfos;
-	asset_slot* Sounds;
-
-	uint32 AssetCount;
-	asset* Assets;
 
 	uint32 TagCount;
 	asset_tag* Tags;
+	
+	uint32 AssetCount;
+	asset* Assets;
+	asset_slot* Slots;
 
 	asset_type AssetTypes[Asset_Count];
 
@@ -139,20 +103,20 @@ struct game_assets{
 
 
 inline loaded_bitmap* GetBitmap(game_assets* Assets, bitmap_id ID){
-	loaded_bitmap* Result = Assets->Bitmaps[ID.Value].Bitmap;
+	loaded_bitmap* Result = Assets->Slots[ID.Value].Bitmap;
 	
 	return(Result);
 }
 
 inline loaded_sound* GetSound(game_assets* Assets, sound_id ID){
-	loaded_sound* Result = Assets->Sounds[ID.Value].Sound;
+	loaded_sound* Result = Assets->Slots[ID.Value].Sound;
 
 	return(Result);
 }
 
 inline asset_sound_info* GetSoundInfo(game_assets* Assets, sound_id ID){
-	Assert(ID.Value <= Assets->SoundCount);
-	asset_sound_info* Result = Assets->SoundInfos + ID.Value;
+	Assert(ID.Value <= Assets->AssetCount);
+	asset_sound_info* Result = &Assets->Assets[ID.Value].Sound;
 
 	return(Result);
 }

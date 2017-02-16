@@ -1,6 +1,6 @@
  win32_dolphin
 
- Timestamp is 58a2abab (Tue Feb 14 10:03:07 2017)
+ Timestamp is 58a5fc11 (Thu Feb 16 22:22:57 2017)
 
  Preferred load address is 0000000140000000
 
@@ -1923,28 +1923,28 @@
  0002:000003c0       pterm                      000000014002b3c0     LIBCMTD:wsetloca.obj
  0002:000003c8       pterm                      000000014002b3c8     LIBCMTD:initcon.obj
  0002:000003d0       pterm                      000000014002b3d0     LIBCMTD:_file.obj
- 0002:00000428       $SG86048                   000000014002b428     win32_dolphin.obj
- 0002:00000440       $SG86050                   000000014002b440     win32_dolphin.obj
- 0002:00000460       $SG86125                   000000014002b460     win32_dolphin.obj
- 0002:00000470       $SG86154                   000000014002b470     win32_dolphin.obj
- 0002:00000480       $SG86160                   000000014002b480     win32_dolphin.obj
- 0002:00000490       $SG86162                   000000014002b490     win32_dolphin.obj
- 0002:000004a0       $SG86164                   000000014002b4a0     win32_dolphin.obj
- 0002:000004b8       $SG86260                   000000014002b4b8     win32_dolphin.obj
- 0002:000004c8       $SG85713                   000000014002b4c8     win32_dolphin.obj
- 0002:000004d8       $SG85716                   000000014002b4d8     win32_dolphin.obj
- 0002:000004f0       $SG85743                   000000014002b4f0     win32_dolphin.obj
- 0002:00000500       $SG85746                   000000014002b500     win32_dolphin.obj
- 0002:00000520       $SG85847                   000000014002b520     win32_dolphin.obj
- 0002:00000538       $SG85849                   000000014002b538     win32_dolphin.obj
- 0002:00000550       $SG85880                   000000014002b550     win32_dolphin.obj
- 0002:00000560       $SG85882                   000000014002b560     win32_dolphin.obj
- 0002:00000570       $SG85884                   000000014002b570     win32_dolphin.obj
- 0002:00000580       $SG85886                   000000014002b580     win32_dolphin.obj
- 0002:00000590       $SG85888                   000000014002b590     win32_dolphin.obj
- 0002:000005a0       $SG85891                   000000014002b5a0     win32_dolphin.obj
- 0002:000005b0       $SG85893                   000000014002b5b0     win32_dolphin.obj
- 0002:000005c0       $SG85931                   000000014002b5c0     win32_dolphin.obj
+ 0002:00000428       $SG86052                   000000014002b428     win32_dolphin.obj
+ 0002:00000440       $SG86054                   000000014002b440     win32_dolphin.obj
+ 0002:00000460       $SG86129                   000000014002b460     win32_dolphin.obj
+ 0002:00000470       $SG86158                   000000014002b470     win32_dolphin.obj
+ 0002:00000480       $SG86164                   000000014002b480     win32_dolphin.obj
+ 0002:00000490       $SG86166                   000000014002b490     win32_dolphin.obj
+ 0002:000004a0       $SG86168                   000000014002b4a0     win32_dolphin.obj
+ 0002:000004b8       $SG86264                   000000014002b4b8     win32_dolphin.obj
+ 0002:000004c8       $SG85717                   000000014002b4c8     win32_dolphin.obj
+ 0002:000004d8       $SG85720                   000000014002b4d8     win32_dolphin.obj
+ 0002:000004f0       $SG85747                   000000014002b4f0     win32_dolphin.obj
+ 0002:00000500       $SG85750                   000000014002b500     win32_dolphin.obj
+ 0002:00000520       $SG85851                   000000014002b520     win32_dolphin.obj
+ 0002:00000538       $SG85853                   000000014002b538     win32_dolphin.obj
+ 0002:00000550       $SG85884                   000000014002b550     win32_dolphin.obj
+ 0002:00000560       $SG85886                   000000014002b560     win32_dolphin.obj
+ 0002:00000570       $SG85888                   000000014002b570     win32_dolphin.obj
+ 0002:00000580       $SG85890                   000000014002b580     win32_dolphin.obj
+ 0002:00000590       $SG85892                   000000014002b590     win32_dolphin.obj
+ 0002:000005a0       $SG85895                   000000014002b5a0     win32_dolphin.obj
+ 0002:000005b0       $SG85897                   000000014002b5b0     win32_dolphin.obj
+ 0002:000005c0       $SG85935                   000000014002b5c0     win32_dolphin.obj
  0002:00000910       _CrtDbgModeMsg             000000014002b910     LIBCMTD:dbgrptw.obj
  0002:000012d0       szBlockUseName             000000014002c2d0     LIBCMTD:dbgheap.obj
  0002:00002248       GS_ExceptionPointers       000000014002d248     LIBCMTD:gs_report.obj

@@ -6,6 +6,7 @@
 
 #include "dolphin_intrinsics.h"
 #include "dolphin_render_group.h"
+#include "dolphin_asset_ids.h"
 #include "dolphin_asset.h"
 #include "dolphin_random.h"
 #include "dolphin_audio.h"
