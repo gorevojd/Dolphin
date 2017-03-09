@@ -83,7 +83,6 @@ struct game_assets{
 
 	real32 TagRange[Tag_Count];
 
-
 	uint32 TagCount;
 	asset_tag* Tags;
 	

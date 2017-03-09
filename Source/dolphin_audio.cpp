@@ -289,15 +289,13 @@ OutputPlayingSounds(
                 real32 RealChunksRemainingInSound = 
                     (LoadedSound->SampleCount - (int32)(PlayingSound->SamplesPlayed + 0.5f)) / dSampleChunk;
                 uint32 ChunksRemainingInSound = (int32)(RealChunksRemainingInSound + 0.5f);
-                bool32 InputSamplesEnded = false;
                 if(ChunksToMix > ChunksRemainingInSound){
                     ChunksToMix = ChunksRemainingInSound;
-                    InputSamplesEnded = true;
                 }
 
-                bool32 VolumeEnded[AUDIO_STATE_OUTPUT_CHANNEL_COUNT] = {};
+                uint32 VolumeEndsAt[AUDIO_STATE_OUTPUT_CHANNEL_COUNT] = {};
                 for(uint32 ChannelIndex = 0;
-                    ChannelIndex < ArrayCount(VolumeEnded);
+                    ChannelIndex < ArrayCount(VolumeEndsAt);
                     ChannelIndex++)
                 {
                     if(dVolume.Data[ChannelIndex] != 0.0f){
@@ -306,7 +304,7 @@ OutputPlayingSounds(
                         uint32 VolumeChunkCount = (uint32)((DeltaVolume / dVolume.Data[ChannelIndex]) + 0.5f);
                         if(ChunksToMix > VolumeChunkCount){
                             ChunksToMix = VolumeChunkCount;
-                            VolumeEnded[ChannelIndex] = true;
+                            VolumeEndsAt[ChannelIndex] = VolumeChunkCount;
                         }
                     }
                 }
@@ -368,10 +366,10 @@ OutputPlayingSounds(
                 PlayingSound->CurrentVolume.Data[1] = ((real32*)&Volume1)[1];
 
                 for(uint32 ChannelIndex = 0;
-                    ChannelIndex < ArrayCount(VolumeEnded);
+                    ChannelIndex < ArrayCount(VolumeEndsAt);
                     ChannelIndex++)
                 {
-                    if(VolumeEnded[ChannelIndex]){
+                    if(ChunksToMix == VolumeEndsAt[ChannelIndex]){
                         PlayingSound->CurrentVolume.Data[ChannelIndex] = 
                             PlayingSound->TargetVolume.Data[ChannelIndex];
                         PlayingSound->dCurrentVolume.Data[ChannelIndex] = 0.0f;
@@ -382,7 +380,7 @@ OutputPlayingSounds(
                 Assert(TotalChunksToMix >= ChunksToMix);
                 TotalChunksToMix -= ChunksToMix;
 
-                if(InputSamplesEnded){
+                if(ChunksToMix == ChunksRemainingInSound){
                     if(IsValid(Info->NextIDToPlay)){
                         PlayingSound->ID = Info->NextIDToPlay;
                         Assert(PlayingSound->SamplesPlayed >= LoadedSound->SampleCount);
