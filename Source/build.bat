@@ -10,6 +10,8 @@ pushd ..\BatBuild
 
 del *.pdb > NUL 2> NUL
 
+cl %CommonCompilerFlags% -D_CRT_SECURE_NO_WARNINGS ..\Source\asset_builder.cpp /link %CommonLinkerFlags%
+
 cl %CommonCompilerFlags% /LD ..\Source\dolphin.cpp -Fmdolphin.map /link -incremental:no -opt:ref -PDB:dolphin_%random%.pdb
 cl %CommonCompilerFlags% ..\Source\win32_dolphin.cpp -Fmwin32_dolphin.map /link %CommonLinkerFlags%
 

@@ -4,14 +4,6 @@
 #include "dolphin_platform.h"
 #include "dolphin_intrinsics.h"
 
-struct bitmap_id{
-	uint32 Value;
-};
-
-struct sound_id{
-	uint32 Value;
-};
-
 struct loaded_sound{
 	uint32 SampleCount;
 	uint32 ChannelCount;
@@ -20,7 +12,7 @@ struct loaded_sound{
 };
 
 struct hero_bitmaps{
-	gdVec2 Align;
+	vec2 Align;
 
 	loaded_bitmap Head;
 	loaded_bitmap Torso;
@@ -38,7 +30,7 @@ struct asset_vector{
 
 struct asset_bitmap_info{
 	char* FileName;
-	gdVec2 AlignPercentage;
+	vec2 AlignPercentage;
 };
 
 struct asset_sound_info{
@@ -84,13 +76,15 @@ struct game_assets{
 	real32 TagRange[Tag_Count];
 
 	uint32 TagCount;
-	asset_tag* Tags;
+	dda_tag* Tags;
 	
 	uint32 AssetCount;
-	asset* Assets;
+	dda_asset* Assets;
 	asset_slot* Slots;
 
 	asset_type AssetTypes[Asset_Count];
+
+	uint8* DDAContents;
 
 	uint32 DEBUGUsedBitmapCount;
 	uint32 DEBUGUsedSoundCount;
@@ -113,9 +107,9 @@ inline loaded_sound* GetSound(game_assets* Assets, sound_id ID){
 	return(Result);
 }
 
-inline asset_sound_info* GetSoundInfo(game_assets* Assets, sound_id ID){
+inline dda_sound* GetSoundInfo(game_assets* Assets, sound_id ID){
 	Assert(ID.Value <= Assets->AssetCount);
-	asset_sound_info* Result = &Assets->Assets[ID.Value].Sound;
+	dda_sound* Result = &Assets->Assets[ID.Value].Sound;
 
 	return(Result);
 }

@@ -3,8 +3,8 @@
 inline void RenderBitmap(
     loaded_bitmap* Buffer,
     loaded_bitmap* Bitmap,
-    gdVec2 Pos,
-    gdVec2 Align = {})
+    vec2 Pos,
+    vec2 Align = {})
 {
 
     int32 MinX = Pos.x - Align.x;
@@ -48,21 +48,21 @@ inline void RenderBitmap(
             
             
 #if 0
-            gdVec4 Source = {
+            vec4 Source = {
                 (real32)((*SourcePtr >> RedShift) & 0xFF),
                 (real32)((*SourcePtr >> GreenShift) & 0xFF),
                 (real32)((*SourcePtr >> BlueShift) & 0xFF),
                 (real32)((*SourcePtr >> AlphaShift) & 0xFF) };
             Source = SRGB255ToLinear1(Source);
             
-            gdVec4 Dest = {
+            vec4 Dest = {
                 (real32)((*DestPtr >> 16) & 0xFF),
                 (real32)((*DestPtr >> 8) & 0xFF),
                 (real32)((*DestPtr >> 0) & 0xFF),
                 (real32)((*DestPtr >> 24) & 0xFF) };
             Dest = SRGB255ToLinear1(Dest);
 
-            gdVec4 Result = Source + (1.0f - Source.a) * Dest;
+            vec4 Result = Source + (1.0f - Source.a) * Dest;
 
             Result = Linear1ToSRGB255(Result);
             *DestPtr++ =
@@ -122,10 +122,10 @@ inline void RenderBitmap(
 
 inline void RenderRectangle(
     loaded_bitmap* Buffer,
-    gdVec2 MinP,
-    gdVec2 MaxP,
-    gdVec4 Color, 
-    gdRect2i ClipRect)
+    vec2 MinP,
+    vec2 MaxP,
+    vec4 Color, 
+    rectangle2 ClipRect)
 {
     int32 MinX = RoundReal32ToInt32(MinP.x);
     int32 MinY = RoundReal32ToInt32(MinP.y);
@@ -145,10 +145,10 @@ inline void RenderRectangle(
         MaxY = Buffer->Height;
     }
 
-    int ClipMinX = ClipRect.MinX;
-    int ClipMinY = ClipRect.MinY;
-    int ClipMaxX = ClipRect.MaxX;
-    int ClipMaxY = ClipRect.MaxY;
+    int ClipMinX = ClipRect.Min.x;
+    int ClipMinY = ClipRect.Min.y;
+    int ClipMaxX = ClipRect.Max.x;
+    int ClipMaxY = ClipRect.Max.y;
 
     if (MinX < ClipMinX){ MinX = ClipMinX; }
     if (MinY < ClipMinY){ MinY = ClipMinY; }
@@ -174,23 +174,23 @@ inline void RenderRectangle(
     END_TIMED_BLOCK_COUNTED(RenderRectangle, ((MaxY - MinY) * (MaxX - MinX)));
 }
 
-inline float DotProduct(gdVec2 v1, gdVec2 v2){
+inline float DotProduct(vec2 v1, vec2 v2){
     return v1.x * v2.x + v1.y * v2.y;
 }
 
 inline void RenderRectangleQuickly(
     loaded_bitmap* Buffer,
-    gdVec2 Origin,
-    gdVec2 XAxis,
-    gdVec2 YAxis,
+    vec2 Origin,
+    vec2 XAxis,
+    vec2 YAxis,
     loaded_bitmap* Texture,
-    gdVec4 Color,
-    gdRect2i ClipRect)
+    vec4 Color,
+    rectangle2 ClipRect)
 {
     Color.rgb *= Color.a;
 
-    real32 InvXAxisLengthSq = 1.0f / gd_vec2_squared_mag(XAxis);
-    real32 InvYAxisLengthSq = 1.0f / gd_vec2_squared_mag(YAxis);
+    real32 InvXAxisLengthSq = 1.0f / SqMagnitude(XAxis);
+    real32 InvYAxisLengthSq = 1.0f / SqMagnitude(YAxis);
 
     int MinX = Buffer->Width + 1;
     int MinY = Buffer->Height + 1;
@@ -205,7 +205,7 @@ inline void RenderRectangleQuickly(
     real32 InvWidthMax = 1.0f / (real32)WidthMax;
     real32 InvHeightMax = 1.0f / (real32)HeightMax;
 
-    gdVec2 Points[] = { Origin, Origin + XAxis, Origin + YAxis, Origin + XAxis + YAxis };
+    vec2 Points[] = { Origin, Origin + XAxis, Origin + YAxis, Origin + XAxis + YAxis };
 
     for (int i = 0; i < ArrayCount(Points); i++){
         if (Points[i].x < MinX){ MinX = Points[i].x; }
@@ -227,10 +227,10 @@ inline void RenderRectangleQuickly(
         MaxY = HeightMax;
     }
 
-    int ClipMinX = ClipRect.MinX;
-    int ClipMinY = ClipRect.MinY;
-    int ClipMaxX = ClipRect.MaxX;
-    int ClipMaxY = ClipRect.MaxY;
+    int ClipMinX = ClipRect.Min.x;
+    int ClipMinY = ClipRect.Min.y;
+    int ClipMaxX = ClipRect.Max.x;
+    int ClipMaxY = ClipRect.Max.y;
 
     if (MinX < ClipMinX){ MinX = ClipMinX; }
     if (MinY < ClipMinY){ MinY = ClipMinY; }
@@ -245,7 +245,7 @@ inline void RenderRectangleQuickly(
 
     __m128 mOneOver255 = _mm_set1_ps(1.0f / 255.0f);
     __m128 mOne = _mm_set1_ps(1.0f);
-    __m128 mTestOne = _mm_set1_ps(0.999f);
+    __m128 mTestOne = _mm_set1_ps(0.995f);
     __m128 mOne255 = _mm_set1_ps(255.0f);
     __m128 mZero = _mm_set1_ps(0.0f);
     __m128 mHalf = _mm_set1_ps(0.5f);
@@ -269,7 +269,7 @@ inline void RenderRectangleQuickly(
 
     __m128 mWidth = _mm_set1_ps((real32)Texture->Width);
     __m128i mWidthI = _mm_set1_epi32(Texture->Width);
-    __m128 mHeight = _mm_set1_ps((real32)Texture->Height);
+    __m128 mHeight = _mm_set1_ps((real32)Texture->Height - 1);
     __m128 mScreenWidth = _mm_set1_ps((real32)Buffer->Width);
 
     __m128i mMaskFF = _mm_set1_epi32(0xFF);
@@ -296,13 +296,8 @@ inline void RenderRectangleQuickly(
             __m128 mV = _mm_add_ps(_mm_mul_ps(mPremultYAxis_x, mDiff_x), _mm_mul_ps(mPremultYAxis_y, mDiff_y));
 
             /*Clamping U and V to range between 0 and 1*/
-#if 0
             mU = _mm_min_ps(_mm_max_ps(mU, mZero), mOne);
             mV = _mm_min_ps(_mm_max_ps(mV, mZero), mOne);
-#else
-            mU = _mm_min_ps(_mm_max_ps(mU, mZero), mTestOne);
-            mV = _mm_min_ps(_mm_max_ps(mV, mZero), mTestOne);
-#endif
 
             /*Calculating fractional part for bilinear texture blend*/
             __m128 mTextureSpaceXReal = _mm_mul_ps(mU, mWidth);
@@ -509,16 +504,16 @@ inline void RenderRectangleQuickly(
 
 inline void RenderRectangleSlowly(
     loaded_bitmap* Buffer,
-    gdVec2 Origin,
-    gdVec2 XAxis,
-    gdVec2 YAxis,
+    vec2 Origin,
+    vec2 XAxis,
+    vec2 YAxis,
     loaded_bitmap* Texture,
-    gdVec4 Color)
+    vec4 Color)
 {
     Color.rgb *= Color.a;
 
-    real32 InvXAxisLengthSq = 1.0f / gd_vec2_squared_mag(XAxis);
-    real32 InvYAxisLengthSq = 1.0f / gd_vec2_squared_mag(YAxis);
+    real32 InvXAxisLengthSq = 1.0f / SqMagnitude(XAxis);
+    real32 InvYAxisLengthSq = 1.0f / SqMagnitude(YAxis);
 
     int MinX = Buffer->Width, MinY = Buffer->Height, MaxX = 0, MaxY = 0;
     
@@ -528,7 +523,7 @@ inline void RenderRectangleSlowly(
     real32 InvWidthMax = 1.0f / (real32)WidthMax;
     real32 InvHeightMax = 1.0f / (real32)HeightMax;
 
-    gdVec2 Points[] = { Origin, Origin + XAxis, Origin + YAxis, Origin + XAxis + YAxis };
+    vec2 Points[] = { Origin, Origin + XAxis, Origin + YAxis, Origin + XAxis + YAxis };
     for (int i = 0; i < ArrayCount(Points); i++){
         
 #if 0
@@ -576,7 +571,7 @@ inline void RenderRectangleSlowly(
     for (int Y = MinY; Y < MaxY; Y++){
         for (int X = MinX; X < MaxX; X++){
             uint32* DestPixel = (uint32*)Buffer->Memory + Y * Buffer->Width + X;
-            gdVec2 P = gd_vec2(X, Y);
+            vec2 P = Vec2(X, Y);
             
             bool32 EdgeTest0 = DotProduct(P - (Origin), YAxis) > 0.0f;
             bool32 EdgeTest1 = DotProduct(P - (Origin + XAxis), -XAxis) > 0.0f;
@@ -588,9 +583,9 @@ inline void RenderRectangleSlowly(
                 EdgeTest2 &&
                 EdgeTest3)
             {
-                gdVec2 ScreenSpaceUV = { InvWidthMax * (real32)X, InvHeightMax * (real32)Y };
+                vec2 ScreenSpaceUV = { InvWidthMax * (real32)X, InvHeightMax * (real32)Y };
 
-                gdVec2 Diff = P - Origin;
+                vec2 Diff = P - Origin;
                 real32 U = InvXAxisLengthSq * DotProduct(Diff, XAxis);
                 real32 V = InvYAxisLengthSq * DotProduct(Diff, YAxis);
 
@@ -612,25 +607,25 @@ inline void RenderRectangleSlowly(
                 uint32* TexelCPtr = Source + Texture->Width;
                 uint32* TexelDPtr = Source + Texture->Width + 1;
 
-                gdVec4 TexelA = {
+                vec4 TexelA = {
                     (real32)((*TexelAPtr >> RedShift) & 0xFF),
                     (real32)((*TexelAPtr >> GreenShift) & 0xFF),
                     (real32)((*TexelAPtr >> BlueShift) & 0xFF),
                     (real32)((*TexelAPtr >> AlphaShift) & 0xFF)};
                 
-                gdVec4 TexelB = {
+                vec4 TexelB = {
                     (real32)((*TexelBPtr >> RedShift) & 0xFF),
                     (real32)((*TexelBPtr >> GreenShift) & 0xFF),
                     (real32)((*TexelBPtr >> BlueShift) & 0xFF), 
                     (real32)((*TexelBPtr >> AlphaShift) & 0xFF)};
 
-                gdVec4 TexelC = {
+                vec4 TexelC = {
                     (real32)((*TexelCPtr >> RedShift) & 0xFF),
                     (real32)((*TexelCPtr >> GreenShift) & 0xFF),
                     (real32)((*TexelCPtr >> BlueShift) & 0xFF),
                     (real32)((*TexelCPtr >> AlphaShift) & 0xFF) };
 
-                gdVec4 TexelD = {
+                vec4 TexelD = {
                     (real32)((*TexelDPtr >> RedShift) & 0xFF),
                     (real32)((*TexelDPtr >> GreenShift) & 0xFF),
                     (real32)((*TexelDPtr >> BlueShift) & 0xFF),
@@ -641,21 +636,21 @@ inline void RenderRectangleSlowly(
                 TexelC = SRGB255ToLinear1(TexelC);
                 TexelD = SRGB255ToLinear1(TexelD);
 
-                gdVec4 SampledResult = gd_vec4_lerp(
-                    gd_vec4_lerp(TexelA, TexelB, FractionalX),
-                    gd_vec4_lerp(TexelC, TexelD, FractionalX),
+                vec4 SampledResult = Lerp(
+                    Lerp(TexelA, TexelB, FractionalX),
+                    Lerp(TexelC, TexelD, FractionalX),
                     FractionalY);
 
 #else
                 /*Without texture filtering*/
-                gdVec4 SampledResult = {
+                vec4 SampledResult = {
                     (real32)((*Source >> RedShift) & 0xFF),
                     (real32)((*Source >> GreenShift) & 0xFF),
                     (real32)((*Source >> BlueShift) & 0xFF),
                     (real32)((*Source >> AlphaShift) & 0xFF)};
                 SampledResult = SRGB255ToLinear1(SampledResult);
 #endif
-                gdVec4 Dest = {
+                vec4 Dest = {
                     (real32)((*DestPixel >> 16) & 0xFF),
                     (real32)((*DestPixel >> 8) & 0xFF),
                     (real32)((*DestPixel >> 0) & 0xFF),
@@ -670,7 +665,7 @@ inline void RenderRectangleSlowly(
                 real32 InvDelta = 1.0f - SampledResult.a;
 
                 //Source##C calculated with premultiplied alpha
-                gdVec4 ResultColor;
+                vec4 ResultColor;
                 ResultColor.x = SampledResult.x + InvDelta * Dest.x;
                 ResultColor.y = SampledResult.y + InvDelta * Dest.y;
                 ResultColor.z = SampledResult.z + InvDelta * Dest.z;
@@ -689,7 +684,7 @@ inline void RenderRectangleSlowly(
 }
 
 INTERNAL_FUNCTION void 
-RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, gdRect2i ClipRect)
+RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rectangle2 ClipRect)
 {
     for (int Base = 0; Base < RenderGroup->PushBufferSize;){
         render_group_entry_header* Header = (render_group_entry_header*)(RenderGroup->PushBufferBase + Base);
@@ -701,8 +696,8 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, gdRe
 
                 RenderRectangle(
                     OutputTarget,
-                    gd_vec2_zero(),
-                    gd_vec2(OutputTarget->Width, OutputTarget->Height),
+                    Vec2(0.0f),
+                    Vec2(OutputTarget->Width, OutputTarget->Height),
                     EntryClear->Color,
                     ClipRect);
 
@@ -723,8 +718,8 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, gdRe
             case RenderGroupEntry_render_entry_bitmap:{
                 render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
                 
-                gdVec2 XAxis = { 1.0f, 0.0f };
-                gdVec2 YAxis = { 0.0f, 1.0f };
+                vec2 XAxis = { 1.0f, 0.0f };
+                vec2 YAxis = { 0.0f, 1.0f };
 
                 RenderRectangleQuickly(
                     OutputTarget,
@@ -733,7 +728,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, gdRe
                     YAxis * EntryBitmap->Size.y,
                     EntryBitmap->Bitmap,
                     EntryBitmap->Color,
-                    ClipRect);
+	                ClipRect);
 
                 Base += sizeof(*EntryBitmap);
             }break;
@@ -761,7 +756,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, gdRe
 struct tile_render_work{
     render_group* RenderGroup;
     loaded_bitmap* OutputTarget;
-    gdRect2i ClipRect;
+    rectangle2 ClipRect;
 };
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(DoTiledRenderWork){
@@ -791,24 +786,24 @@ TiledRenderGroupToOutput(
         for (int TileX = 0; TileX < TileCountX; TileX++){
             tile_render_work* Work = WorkArray + WorkCount++;
 
-            gdRect2i ClipRect;
+            rectangle2 ClipRect;
 #if 0
-            ClipRect.MinX = TileX * TileWidth + 4;
-            ClipRect.MinY = TileY * TileHeight + 4;
-            ClipRect.MaxX = TileX * TileWidth + TileWidth - 4;
-            ClipRect.MaxY = TileY * TileHeight + TileHeight - 4;
+            ClipRect.Min.x = TileX * TileWidth + 4;
+            ClipRect.Min.y = TileY * TileHeight + 4;
+            ClipRect.Max.x = TileX * TileWidth + TileWidth - 4;
+            ClipRect.Max.y = TileY * TileHeight + TileHeight - 4;
 #else
-            ClipRect.MinX = TileX * TileWidth;
-            ClipRect.MinY = TileY * TileHeight;
-            ClipRect.MaxX = TileX * TileWidth + TileWidth;
-            ClipRect.MaxY = TileY * TileHeight + TileHeight;
+            ClipRect.Min.x = TileX * TileWidth;
+            ClipRect.Min.y = TileY * TileHeight;
+            ClipRect.Max.x = TileX * TileWidth + TileWidth;
+            ClipRect.Max.y = TileY * TileHeight + TileHeight;
 #endif
 
             if (TileX == (TileCountX - 1)){
-                ClipRect.MaxX = OutputTarget->Width;
+                ClipRect.Max.x = OutputTarget->Width;
             }
             if (TileY == (TileCountY - 1)){
-                ClipRect.MaxY = OutputTarget->Height;
+                ClipRect.Max.y = OutputTarget->Height;
             }
 
             Work->RenderGroup = RenderGroup;
@@ -827,15 +822,39 @@ TiledRenderGroupToOutput(
     PlatformCompleteAllWork(RenderQueue);
 }
 
+inline void 
+SetOrthographic(
+    render_group* RenderGroup,
+    int32 PixelWidth,
+    int32 PixelHeight,
+    real32 MetersToPixels)
+{
+    real32 PixelsToMeters = 1.0f / MetersToPixels;
+    RenderGroup->MonitorHalfDimInMeters = 
+        {0.5f * PixelWidth * PixelsToMeters,
+        0.5f * PixelHeight * PixelsToMeters};
+
+    RenderGroup->Transform.MetersToPixels = MetersToPixels;
+    RenderGroup->Transform.FocalLength = 1.0f;
+    RenderGroup->Transform.DistanceAboveTarget = 1.0f;
+    RenderGroup->Transform.ScreenCenter = Vec2(0.5f * PixelWidth, 0.5f * PixelHeight);
+
+    RenderGroup->Transform.Orthographic = true;
+}
+
 INTERNAL_FUNCTION render_group*
-AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize, real32 MetersToPixels){ 
+AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize){ 
     render_group* Result = PushStruct(Arena, render_group);
     Result->PushBufferBase = (uint8*)PushSize(Arena, MaxPushBufferSize);
 
     Result->Assets = Assets;
-    Result->MetersToPixels = MetersToPixels;
+    Result->GlobalAlphaChannel = 1.0f;
+
     Result->MaxPushBufferSize = MaxPushBufferSize;
     Result->PushBufferSize = 0;
+
+    Result->Transform.OffsetP = Vec3(0.0f, 0.0f, 0.0f);
+    Result->Transform.Scale = 1.0f;
 
     return(Result);
 }
@@ -859,70 +878,112 @@ inline void* PushRenderElement_(
     return(Result);
 }
 
-inline void PushRectangle(
-    render_group* RenderGroup,
-    gdVec3 Offset,
-    gdVec2 Dim,
-    gdVec4 Color = gd_vec4(1.0f, 1.0f, 1.0f, 1.0f))
-{
-    render_entry_rectangle* PushedRect = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_rectangle);
-    if (PushedRect){
-        //gdVec2 HalfOfDimension = 0.5f * gd_vec2_mul(Dim, RenderGroup->MetersToPixels);
+struct entity_basis_p_result{
+    vec2 P;
+    real32 Scale;
+    bool32 Valid;
+};
 
-        PushedRect->Color = Color;
-        //PushedRect->Dim = gd_vec2_mul(Dim, RenderGroup->MetersToPixels);
-        //PushedRect->EntityBasis.Offset = RenderGroup->MetersToPixels * gd_vec2(Offset.x, -Offset.y) - HalfOfDimension;
-        PushedRect->Dim = Dim;
-        PushedRect->P = gd_vec2(Offset.x, Offset.y);
+inline entity_basis_p_result GetRenderEntityBasisP(render_group_transform* Transform, vec3 OriginalP){
+    entity_basis_p_result Result = {};
+
+    vec3 P = Add(Vec3(OriginalP.xy, 0.0f), Transform->OffsetP);
+
+    if(Transform->Orthographic){
+        Result.P = Transform->ScreenCenter + Transform->MetersToPixels * P.xy;
+        Result.Scale = Transform->MetersToPixels;
+        Result.Valid = true;
     }
+    else{
+        real32 OffsetZ = 0.0f;
+        real32 DistanceAboveTarget = Transform->DistanceAboveTarget;
+
+        real32 OffsetToPZ = (DistanceAboveTarget - P.z);
+        real32 NearClipPlane = 0.2f;
+
+        vec3 RawXY = Vec3(P.xy, 1.0f);
+
+        if(OffsetToPZ > NearClipPlane){
+            vec3 ProjectedXY = (1.0f / OffsetToPZ) * Transform->FocalLength * RawXY;
+            Result.Scale = Transform->MetersToPixels * ProjectedXY.z;
+            Result.P = Transform->ScreenCenter + Transform->MetersToPixels * ProjectedXY.xy + Vec2(0.0f, Result.Scale * OffsetZ);
+            Result.Valid = true;
+        }
+    }
+
+    return(Result);
 }
-
-/*
-inline used_bitmap_dim
-GetBitmapDim(render_group *Group, loaded_bitmap *Bitmap, real32 Height, v3 Offset, r32 CAlign)
-{
-    used_bitmap_dim Dim;
-
-    Dim.Size = V2(Height*Bitmap->WidthOverHeight, Height);
-    Dim.Align = CAlign*Hadamard(Bitmap->AlignPercentage, Dim.Size);
-    Dim.P = Offset - V3(Dim.Align, 0);
-    Dim.Basis = GetRenderEntityBasisP(&Group->Transform, Dim.P);
-
-    return(Dim);
-}
-*/
 
 inline bitmap_dimension
-GetBitmapDim(render_group* RenderGroup, loaded_bitmap* Bitmap, real32 Height, gdVec3 Offset, real32 CAlign)
+GetBitmapDim(render_group* RenderGroup, loaded_bitmap* Bitmap, real32 Height, vec3 Offset, real32 CAlign)
 {
     bitmap_dimension Dim;
 
-    Dim.Size = gd_vec2(Height * Bitmap->WidthOverHeight, Height);
-    Dim.Align = CAlign * gd_vec2_hadamard(Bitmap->AlignPercentage, Dim.Size);
-    Dim.P = gd_vec3_mul(Offset - gd_vec3_from_vec2(Dim.Align, 0), RenderGroup->MetersToPixels);
+    Dim.Size = Vec2(Height * Bitmap->WidthOverHeight, Height);
+    Dim.Align = CAlign * Hadamard(Bitmap->AlignPercentage, Dim.Size);
+    Dim.P = Offset - Vec3(Dim.Align, 0);
 
     return(Dim);
+}
+
+inline void PushRectangle(
+    render_group* RenderGroup,
+    vec3 Offset,
+    vec2 Dim,
+    vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f))
+{
+    vec3 P = Offset - (Vec3((0.5f * Dim), 0.0f));
+    entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Offset);
+    if(Basis.Valid){
+        render_entry_rectangle* PushedRect = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_rectangle);
+        if (PushedRect){
+            PushedRect->Color = Color;
+            PushedRect->Dim = Dim * Basis.Scale;
+            PushedRect->P = Basis.P;
+        }
+    }
 }
 
 inline void PushBitmap(
     render_group* RenderGroup,
     loaded_bitmap* Bitmap,
     real32 Height,
-    gdVec3 Offset,
-    gdVec4 Color = gd_vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    vec3 Offset,
+    vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f),
     real32 CAlign = 1.0f)
 {
     render_entry_bitmap* PushedBitmap = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_bitmap);
+
     bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, Height, Offset, CAlign);
+
+#if 1
+    entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Dim.P);
+    if(Basis.Valid){
+        if (PushedBitmap){
+            PushedBitmap->Bitmap = Bitmap;
+    
+            PushedBitmap->P = Basis.P;
+ 
+            PushedBitmap->Color = Color * RenderGroup->GlobalAlphaChannel;
+            PushedBitmap->Size = Basis.Scale * Dim.Size;
+    
+            /*This is for test*/
+            PushRectangle(RenderGroup, Offset, Vec2(0.02f));
+        }
+   }
+#else
     if (PushedBitmap){
         PushedBitmap->Bitmap = Bitmap;
+    
+        PushedBitmap->P = Offset.xy;
+ 
+        PushedBitmap->Color = Color * RenderGroup->GlobalAlphaChannel;
+        PushedBitmap->Size = Dim.Size * 1000;
 
-        PushedBitmap->P = Dim.P.xy;
-        PushedBitmap->Color = Color;
-        PushedBitmap->Size = Dim.Size;
-
-        PushRectangle(RenderGroup, gd_vec3_from_vec2(Offset.xy, 0), gd_vec2(10, 10));
+        /*This is for test*/
+        PushRectangle(RenderGroup, Offset, Vec2(0.02f));
     }
+#endif    
 }
 
 extern void LoadBitmapAsset(game_assets* Assets, bitmap_id ID);
@@ -930,8 +991,8 @@ inline void PushBitmap(
     render_group* RenderGroup,
     bitmap_id Id,
     real32 Height,
-    gdVec3 Offset,
-    gdVec4 Color = gd_vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    vec3 Offset,
+    vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f),
     real32 CAlign = 1.0f)
 {
     loaded_bitmap* BitmapToRender = GetBitmap(RenderGroup->Assets, Id);
@@ -945,25 +1006,25 @@ inline void PushBitmap(
 
 inline void PushRectangleOutline(
     render_group* RenderGroup,
-    gdVec3 Offset,
-    gdVec2 Dim,
-    gdVec4 Color = gd_vec4(0.0f, 0.0f, 0.0f, 1.0f),
+    vec3 Offset,
+    vec2 Dim,
+    vec4 Color = Vec4(0.0f, 0.0f, 0.0f, 1.0f),
     real32 Thickness = 4)
 {
-    PushRectangle(RenderGroup, Offset - gd_vec3(Thickness, 0.0f, 0.0f), gd_vec2(Thickness, Dim.y + Thickness), Color);
-    PushRectangle(RenderGroup, Offset - gd_vec3(Thickness, Thickness, 0.0f), gd_vec2(Dim.x + 2.0f * Thickness, Thickness), Color);
-    PushRectangle(RenderGroup, Offset + gd_vec3(0.0f, Dim.y, 0.0f), gd_vec2(Dim.x + Thickness, Thickness), Color);
-    PushRectangle(RenderGroup, Offset + gd_vec3(Dim.x, 0.0f, 0.0f), gd_vec2(Thickness, Dim.y), Color);
+    PushRectangle(RenderGroup, Offset - Vec3(Thickness, 0.0f, 0.0f), Vec2(Thickness, Dim.y + Thickness), Color);
+    PushRectangle(RenderGroup, Offset - Vec3(Thickness, Thickness, 0.0f), Vec2(Dim.x + 2.0f * Thickness, Thickness), Color);
+    PushRectangle(RenderGroup, Offset + Vec3(0.0f, Dim.y, 0.0f), Vec2(Dim.x + Thickness, Thickness), Color);
+    PushRectangle(RenderGroup, Offset + Vec3(Dim.x, 0.0f, 0.0f), Vec2(Thickness, Dim.y), Color);
 }
 
-inline void PushClear(render_group* RenderGroup, gdVec4 Color){
+inline void PushClear(render_group* RenderGroup, vec4 Color){
     render_entry_clear* PushedClear = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_clear);
     if (PushedClear){
         PushedClear->Color = Color;
     }
 }
 
-inline void PushCoordinateSystem(render_group* RenderGroup, gdVec2 Origin, gdVec2 XAxis, gdVec2 YAxis, gdVec4 Color, loaded_bitmap* Texture){
+inline void PushCoordinateSystem(render_group* RenderGroup, vec2 Origin, vec2 XAxis, vec2 YAxis, vec4 Color, loaded_bitmap* Texture){
     render_entry_coordinate_system* PushedCS = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_coordinate_system);
     if (PushedCS){
         PushedCS->Origin = Origin;

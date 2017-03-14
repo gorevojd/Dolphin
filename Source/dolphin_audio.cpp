@@ -13,7 +13,7 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
         ++SampleIndex)
     {
 
-        real32 Omega = 2.0f * GD_MATH_PI * WaveFrequency;
+        real32 Omega = 2.0f * DOLPHIN_MATH_PI * WaveFrequency;
         
         int16 SampleValue0 = (int16)(sinf(Phase) * Volume.Data[0]);
         int16 SampleValue1 = (int16)(sinf(Phase) * Volume.Data[1]);
@@ -22,8 +22,8 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
         *SampleOut++ = SampleValue1;
 
         Phase += Omega;
-        if (Phase > 2.0f * GD_MATH_PI){
-            Phase -= 2.0f * GD_MATH_PI;
+        if (Phase > 2.0f * DOLPHIN_MATH_PI){
+            Phase -= 2.0f * DOLPHIN_MATH_PI;
         }
     }
 }
@@ -43,7 +43,7 @@ PlaySound(audio_state* AudioState, sound_id SoundID){
     PlayingSound->dCurrentVolume = volume_v2_init(0.0f, 0.0f);
     PlayingSound->TargetVolume = volume_v2_init(0.0f, 0.0f);
     PlayingSound->ID = SoundID;
-    PlayingSound->dSample = 2.0f;
+    PlayingSound->dSample = 1.0f;
 
     PlayingSound->Next = AudioState->FirstPlayingSound;
     AudioState->FirstPlayingSound = PlayingSound;
@@ -86,7 +86,6 @@ OutputPlayingSounds(
 	memory_arena* TempArena)
 {
 #define AUDIO_STATE_OUTPUT_CHANNEL_COUNT 2
-#define DOLPHIN_AUDIO_SIMD_VERSION
 
     temporary_memory MixerMemory = BeginTemporaryMemory(TempArena);
 
@@ -94,33 +93,15 @@ OutputPlayingSounds(
     uint32 ChunkCount = SoundOutput->SampleCount / 4;
     real32 SecondsPerSample = 1.0f / (real32)SoundOutput->SamplesPerSecond;
 
-#ifndef DOLPHIN_AUDIO_SIMD_VERSION
-    real32* RealChannel0 = PushArray(TempArena, SoundOutput->SampleCount, real32);
-    real32* RealChannel1 = PushArray(TempArena, SoundOutput->SampleCount, real32);
-
-#else
     __m128 *RealChannel0 = PushArray(TempArena, ChunkCount, __m128, 16);
     __m128 *RealChannel1 = PushArray(TempArena, ChunkCount, __m128, 16);
 
     __m128 One = _mm_set1_ps(1.0f);
     __m128 Zero = _mm_set1_ps(0.0f);
 
-#endif
-
 
     /*Clearing out channels*/
     {
-#ifndef DOLPHIN_AUDIO_SIMD_VERSION
-        real32* Dest0 = RealChannel0;
-        real32* Dest1 = RealChannel1;
-        for(int SampleIndex = 0;
-            SampleIndex < SoundOutput->SampleCount;
-            SampleIndex++)
-        {
-            *Dest0++ = 0.0f;
-            *Dest1++ = 0.0f;
-        }
-#else
         __m128* Dest0 = RealChannel0;
         __m128* Dest1 = RealChannel1;
 
@@ -131,7 +112,6 @@ OutputPlayingSounds(
             _mm_store_ps((float *)Dest0++, Zero);
             _mm_store_ps((float *)Dest1++, Zero);
         }
-#endif
     }
 
     /*Summing the sounds*/
@@ -141,123 +121,16 @@ OutputPlayingSounds(
         playing_sound* PlayingSound = *PlayingSoundPtr;
         bool32 SoundFinished = false;
 
-#ifndef DOLPHIN_AUDIO_SIMD_VERSION
-        uint32 TotalSamplesToMix = SoundOutput->SampleCount;
-
-        real32* Dest0 = (real32*)RealChannel0;
-        real32* Dest1 = (real32*)RealChannel1;
-#else
         uint32 TotalChunksToMix = ChunkCount;
 
         __m128* Dest0 = RealChannel0;
         __m128* Dest1 = RealChannel1;
-#endif
 
-#ifndef DOLPHIN_AUDIO_SIMD_VERSION
-        while(TotalSamplesToMix && !SoundFinished){
-            loaded_sound* LoadedSound = GetSound(Assets, PlayingSound->ID);
-            if(LoadedSound){
-                asset_sound_info* Info = GetSoundInfo(Assets, PlayingSound->ID);
-                PrefetchSound(Assets, Info->NextIDToPlay);
 
-                volume_v2 Volume = PlayingSound->CurrentVolume;
-                volume_v2 dVolume = SecondsPerSample * PlayingSound->dCurrentVolume;
-                volume_v2 dVolumeChunk = 4.0f * dVolume;
-                real32 dSample = PlayingSound->dSample;
-                real32 dSampleChunk = 4.0f * dSample;
-
-                Assert(PlayingSound->SamplesPlayed >= 0);
-
-                uint32 SamplesToMix = TotalSamplesToMix;
-
-                //uint32 SamplesRemaining = LoadedSound->SampleCount - PlayingSound->SamplesPlayed;
-                real32 RealSamplesRemainingInSound = 
-                    (LoadedSound->SampleCount - (int32)(PlayingSound->SamplesPlayed + 0.5f)) / dSample;
-                uint32 SamplesRemainingInSound = (int32)(RealSamplesRemainingInSound + 0.5f);
-                bool32 InputSamplesEnded = false;
-                if(SamplesToMix > SamplesRemainingInSound){
-                    SamplesToMix = SamplesRemainingInSound;
-                    InputSamplesEnded = true;
-                }
-
-                bool32 VolumeEnded[AUDIO_STATE_OUTPUT_CHANNEL_COUNT] = {};
-                for(uint32 ChannelIndex = 0;
-                    ChannelIndex < ArrayCount(VolumeEnded);
-                    ChannelIndex++)
-                {
-                    if(dVolume.Data[ChannelIndex] != 0.0f){
-                        real32 DeltaVolume = 
-                            (PlayingSound->TargetVolume.Data[ChannelIndex] - Volume.Data[ChannelIndex]);
-                        uint32 VolumeSampleCount = (uint32)((DeltaVolume / dVolume.Data[ChannelIndex]) + 0.5f);
-                        if(SamplesToMix > VolumeSampleCount){
-                            SamplesToMix = VolumeSampleCount;
-                            VolumeEnded[ChannelIndex] = true;
-                        }
-                    }
-                }
-
-                real32 SamplePosition = PlayingSound->SamplesPlayed;
-                for(int RunIndex = PlayingSound->SamplesPlayed;
-                    RunIndex < PlayingSound->SamplesPlayed + SamplesToMix;
-                    RunIndex++)
-                {
-#ifdef DOLPHIN_AUDIO_NO_PITCH_LERP
-                    uint32 SampleIndex = (int32)(SamplePosition + 0.5f);
-                    real32 SampleValue = LoadedSound->Samples[0][SampleIndex];
-#else
-                    uint32 SampleIndex = FloorReal32ToInt32(SamplePosition);
-                    real32 FractionalPart = SamplePosition - (real32)SampleIndex;
-                    real32 Sample0 = (real32)LoadedSound->Samples[0][SampleIndex];
-                    real32 Sample1 = (real32)LoadedSound->Samples[0][SampleIndex + 1];
-                    real32 SampleValue = Sample0 + (Sample1 - Sample0) * FractionalPart;
-#endif
-                    *Dest0++ += AudioState->MasterVolume.Data[0] * Volume.Data[0] * SampleValue;
-                    *Dest1++ += AudioState->MasterVolume.Data[1] * Volume.Data[1] * SampleValue;
-
-                    Volume += dVolume;
-                    SamplePosition += dSample;
-                }
-
-                PlayingSound->CurrentVolume = Volume;
-
-                for(uint32 ChannelIndex = 0;
-                    ChannelIndex < ArrayCount(VolumeEnded);
-                    ChannelIndex++)
-                {
-                    if(VolumeEnded[ChannelIndex]){
-                        PlayingSound->CurrentVolume.Data[ChannelIndex] = 
-                            PlayingSound->TargetVolume.Data[ChannelIndex];
-                        PlayingSound->dCurrentVolume.Data[ChannelIndex] = 0.0f;
-                    }
-                }
-
-                Assert(TotalSamplesToMix >= SamplesToMix);
-                PlayingSound->SamplesPlayed  = SamplePosition;
-                TotalSamplesToMix -= SamplesToMix;
-
-                if((uint32)PlayingSound->SamplesPlayed == LoadedSound->SampleCount){
-                    if(IsValid(Info->NextIDToPlay)){
-                        PlayingSound->ID = Info->NextIDToPlay;
-                        PlayingSound->SamplesPlayed = 0;
-                    }
-                    else{
-                        SoundFinished = true;
-                    }
-                }
-                else{
-                    Assert(TotalSamplesToMix == 0);
-                }
-            }
-            else{
-                LoadSoundAsset(Assets, PlayingSound->ID);
-                break;
-            }
-        }
-#else
         while(TotalChunksToMix && !SoundFinished){
             loaded_sound* LoadedSound = GetSound(Assets, PlayingSound->ID);
             if(LoadedSound){
-                asset_sound_info* Info = GetSoundInfo(Assets, PlayingSound->ID);
+                dda_sound* Info = GetSoundInfo(Assets, PlayingSound->ID);
                 PrefetchSound(Assets, Info->NextIDToPlay);
 
                 volume_v2 Volume = PlayingSound->CurrentVolume;
@@ -399,7 +272,6 @@ OutputPlayingSounds(
                 break;
             }
         }
-#endif
 
         if(SoundFinished){
             *PlayingSoundPtr = PlayingSound->Next;
@@ -413,19 +285,6 @@ OutputPlayingSounds(
 
     /*Outputing 16-bits values*/
     {
-#ifndef DOLPHIN_AUDIO_SIMD_VERSION
-        real32* Source0 = RealChannel0;
-        real32* Source1 = RealChannel1;
-
-        int16* SampleOut = SoundOutput->Samples;
-        for(int SampleIndex = 0;
-            SampleIndex < SoundOutput->SampleCount;
-            SampleIndex++)
-        {
-            *SampleOut++ = (int16)(*Source0++ + 0.5f);
-            *SampleOut++ = (int16)(*Source1++ + 0.5f);
-        }
-#else
         __m128* Source0 = RealChannel0;
         __m128* Source1 = RealChannel1;
 
@@ -447,10 +306,9 @@ OutputPlayingSounds(
 
             *SampleOut++ = ShuffledResult;
         }
-#endif
     }
 
-    EndTemporaryMemory(MixerMemory);	
+    EndTemporaryMemory(MixerMemory);
 }
 
 INTERNAL_FUNCTION void

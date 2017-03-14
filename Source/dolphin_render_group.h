@@ -11,7 +11,7 @@ struct loaded_bitmap{
 	int32 Height;
 
 	real32 WidthOverHeight;
-	gdVec2 AlignPercentage;
+	vec2 AlignPercentage;
 };
 
 enum render_group_entry_type{
@@ -26,40 +26,57 @@ struct render_group_entry_header{
 };
 
 struct render_entry_coordinate_system{
-	gdVec2 Origin;
-	gdVec2 XAxis;
-	gdVec2 YAxis;
-	gdVec4 Color;
+	vec2 Origin;
+	vec2 XAxis;
+	vec2 YAxis;
+	vec4 Color;
 	loaded_bitmap* Texture;
 };
 
 struct render_entry_clear{
-	gdVec4 Color;
+	vec4 Color;
 };
 
 struct render_entry_rectangle{
-	gdVec2 Dim;
-	gdVec2 P;
-	gdVec4 Color;
+	vec2 Dim;
+	vec2 P;
+	vec4 Color;
 };
 
 struct render_entry_bitmap{
 	loaded_bitmap* Bitmap;
-	gdVec2 P;
-	gdVec4 Color;
-	gdVec2 Size;
+	vec2 P;
+	vec4 Color;
+	vec2 Size;
 };
 
 struct bitmap_dimension{
-	gdVec2 Size;
-	gdVec2 Align;
-	gdVec3 P;
+	vec2 Size;
+	vec2 Align;
+	vec3 P;
+};
+
+struct render_group_transform{
+	bool32 Orthographic;
+
+	real32 MetersToPixels;
+	vec2 ScreenCenter;
+
+	real32 FocalLength;
+	real32 DistanceAboveTarget;
+
+	vec3 OffsetP;
+	real32 Scale;
 };
 
 struct render_group{
-	real32 MetersToPixels;
 
 	struct game_assets* Assets;
+	real32 GlobalAlphaChannel;
+
+	vec2 MonitorHalfDimInMeters;
+
+	render_group_transform Transform;
 
 	uint32 MaxPushBufferSize;
 	uint32 PushBufferSize;

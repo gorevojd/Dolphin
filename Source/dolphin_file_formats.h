@@ -7,11 +7,19 @@
 
 #pragma pack(push, 1)
 
-struct gda_header{
-#define GDA_MAGIC_VALUE DOLPHIN_CODE('g', 'd', 'a', ' ')
-	uint32 MagickValue; 
+struct bitmap_id{
+	unsigned int Value;
+};
 
-#define GDA_VERSION 0
+struct sound_id{
+	unsigned int Value;
+};
+
+struct dda_header{
+#define DDA_MAGIC_VALUE DOLPHIN_CODE('d', 'd', 'a', ' ')
+	uint32 MagicValue; 
+
+#define DDA_VERSION 0
 	uint32 Version;
 
 	uint32 TagCount;
@@ -26,35 +34,36 @@ struct gda_header{
 	uint64 AssetOffset;
 };
 
-struct gda_bitmap{
+struct dda_bitmap{
 	uint32 Dimension[2];
 	real32 AlignPercentage[2];
 };
 
-struct gda_sound{
-	uint32 FirstSampleIndex;
-	uint32 SampleCount
+struct dda_sound{
+	uint32 SampleCount;
+	uint32 ChannelCount;
+	sound_id NextIDToPlay;
 };
 
-struct gda_tag{
+struct dda_tag{
 	uint32 ID;
 	real32 Value;
 };
 
-struct gda_asset{
+struct dda_asset{
 	uint64 DataOffset;
 	uint32 FirstTagIndex;
 	uint32 OnePastLastTagIndex;
 	union{
-		gda_bitmap Bitmap;
-		gda_sound Sound;
-	}
+		dda_bitmap Bitmap;
+		dda_sound Sound;
+	};
 };
 
-struct gda_asset_type{
+struct dda_asset_type{
 	uint32 TypeID;
 	uint32 FirstAssetIndex;
-	uint32 OnePastLastTagIndex;
+	uint32 OnePastLastAssetIndex;
 };
 
 #pragma pack(pop)

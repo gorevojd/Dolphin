@@ -6,10 +6,6 @@
 #define GD_IMPLEMENTATION
 #include "E:/Programming/MyProjects/GD_LIBS/gd.h"
 
-#define GD_MATH_IMPLEMENTATION
-#define GD_MATH_STATIC  
-#include "E:/Programming/MyProjects/GD_LIBS/gd_math.h"
-
 #define GLOBAL_VARIABLE static
 #define LOCAL_PERSIST static
 #define INTERNAL_FUNCTION static
@@ -28,7 +24,7 @@
 #include <x86intrin.h>
 #endif
 
-
+#include "dolphin_math.h"
 
 /*Some memory and arenas stuff*/
 struct memory_arena{
@@ -251,7 +247,7 @@ struct game_input{
 
     real32 DeltaTime;
 
-    gdVec3 MouseP;
+    vec3 MouseP;
     game_button_state MouseButtons[5];
 };
 
@@ -333,7 +329,7 @@ extern game_memory* DebugGlobalMemory;
 
 #if GD_COMPILER_MSVC
 inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Comparand){
-    uint32 Result = _InterlockedCompareExchange((long*)Value, New, Comparand);
+    uint32 Result = _InterlockedCompareExchange((long volatile*)Value, New, Comparand);
     return(Result);
 }
 #elif GD_COMPILER_GCC

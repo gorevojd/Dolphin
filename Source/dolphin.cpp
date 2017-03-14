@@ -21,6 +21,7 @@ MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
 	task_with_memory* FoundTask = 0;
+    
 	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
 		task_with_memory* Task = TranState->Tasks + i;
 		if (!Task->BeingUsed){
@@ -50,6 +51,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PlatformAddEntry = Memory->PlatformAddEntry;
     PlatformCompleteAllWork = Memory->PlatformCompleteAllWork;
     PlatformReadEntireFile = Memory->DEBUGReadEntireFile;
+    PlatformFreeFileMemory = Memory->DEBUGFreeFileMemory;
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
 #endif
@@ -111,7 +113,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     }
 
     temporary_memory RenderMemory = BeginTemporaryMemory(&TranState->TranArena);
-    render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10), 1);
+    render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10));
+    real32 WidthOfMonitor = 0.635f;
+    real32 MetersToPixels = (real32)Buffer->Width / WidthOfMonitor / 8;
+    //real32 MetersToPixels = 1;
+    SetOrthographic(RenderGroup, Buffer->Width, Buffer->Height, MetersToPixels);
 
     int temp1 = ArrayCount(Input->Controllers[0].Buttons);
     Assert((&Input->Controllers[0].Terminator - &Input->Controllers[0].Buttons[0]) ==
@@ -119,7 +125,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     int ToneHz = 256;
 
-    gdVec2 MoveVector = gd_vec2_zero();
+    vec2 MoveVector = Vec2(0.0f);
 
     for (int ControllerIndex = 0;
         ControllerIndex < ArrayCount(Input->Controllers);
@@ -130,31 +136,31 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         if (Controller->MoveUp.EndedDown){
             ToneHz = 170;
             MoveVector.y -= 10;
-            GameState->HeroFacingDirection = 0.25f * GD_MATH_TAU;
+            GameState->HeroFacingDirection = 0.25f * DOLPHIN_MATH_TAU;
         }
 
         if (Controller->MoveDown.EndedDown){
             ToneHz = 400;
             MoveVector.y += 10;
-            GameState->HeroFacingDirection = 0.75f * GD_MATH_TAU;
+            GameState->HeroFacingDirection = 0.75f * DOLPHIN_MATH_TAU;
         }
 
         if (Controller->MoveRight.EndedDown){
             MoveVector.x += 10;
-            GameState->HeroFacingDirection = 0.0f * GD_MATH_TAU;
+            GameState->HeroFacingDirection = 0.0f * DOLPHIN_MATH_TAU;
         }
 
         if (Controller->MoveLeft.EndedDown){
             MoveVector.x -= 10;
-            GameState->HeroFacingDirection = 0.5f * GD_MATH_TAU;
+            GameState->HeroFacingDirection = 0.5f * DOLPHIN_MATH_TAU;
         }
 
-        if(Controller->Space.EndedDown && Controller->Space.HalfTransitionCount){
+        if(Controller->Space.EndedDown && Controller->Space.HalfTransitionCount == 0){
             PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Bloop));
         }
 
-        real32 PlayerSpeed = 100;
-        GameState->PlayerPos = GameState->PlayerPos + gd_vec2_norm0(MoveVector) * Input->DeltaTime * PlayerSpeed;
+        real32 PlayerSpeed = 0.4f;
+        GameState->PlayerPos = GameState->PlayerPos + Normalize0(MoveVector) * Input->DeltaTime * PlayerSpeed;
 
         /*
         if (Controller->IsAnalog){
@@ -164,12 +170,12 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         */
     }
 
-    PushClear(RenderGroup, gd_vec4(0.1f, 0.1f, 0.1f, 1.0f));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_StarWars), Buffer->Height, gd_vec3_zero());
+    PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_StarWars), 4.0f, Vec3(0.0f));
 
     for (int i = 0; i < 5; i++){
         if (Input->MouseButtons[i].EndedDown){
-            PushRectangle(RenderGroup, gd_vec3(10 + i * 20, 10, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
+            PushRectangle(RenderGroup, Vec3(10 + i * 20, 10, 0.0f), Vec2(10, 10), Vec4(0.0f, 1.0f, 0.0f, 1.0f));
         }
     }
 
@@ -183,25 +189,24 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     HeroBitmaps.Cape = GetBestMatchBitmapFrom(TranState->Assets, Asset_Cape, &MatchVector, &WeightVector);
     HeroBitmaps.Torso = GetBestMatchBitmapFrom(TranState->Assets, Asset_Torso, &MatchVector, &WeightVector);
 
-    PushBitmap(RenderGroup, HeroBitmaps.Torso, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Cape, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
-    PushBitmap(RenderGroup, HeroBitmaps.Head, 200, gd_vec3_from_vec2(GameState->PlayerPos, 0.0f));
+    real32 PlayerSizeConst = 1.0f;
+    PushBitmap(RenderGroup, HeroBitmaps.Torso, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Cape, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
+    PushBitmap(RenderGroup, HeroBitmaps.Head, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
 
-    PushRectangle(RenderGroup, gd_vec3_from_vec2(Input->MouseP.xy, 0.0f), gd_vec2(10, 10), gd_vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    PushRectangle(RenderGroup, Vec3(Input->MouseP.xy, 0.0f), Vec2(10, 10), Vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
     GameState->Time += Input->DeltaTime;
     real32 Angle = GameState->Time;
-    gdVec2 Origin = gd_vec2(400, 300);
+    vec2 Origin = Vec2(400, 300);
     real32 AngleW = 0.5f;
-    gdVec2 XAxis = 300.0f * gd_vec2(gd_cos(Angle  * AngleW), gd_sin(Angle * AngleW));
-    gdVec2 YAxis = 300.0f * gd_vec2(-gd_sin(Angle * AngleW), gd_cos(Angle * AngleW));
-    real32 OffsetX = gd_cos(Angle * 0.4f) * 200.0f;
+    vec2 XAxis = 300.0f * Vec2(Cos(Angle  * AngleW), Sin(Angle * AngleW));
+    vec2 YAxis = 300.0f * Vec2(-Sin(Angle * AngleW), Cos(Angle * AngleW));
+    real32 OffsetX = Cos(Angle * 0.4f) / 4.0f;
     
-    gdRect2 Rectangle1 = gd_rect2(gd_vec2(40, 40), gd_vec2(100, 200));
-    PushRectangle(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension, gd_vec4(1.0f, 0.6f, 0.0f, 1.0f));
-    PushRectangleOutline(RenderGroup, gd_vec3(Rectangle1.Pos.x, Rectangle1.Pos.y, 0), Rectangle1.Dimension);
-    
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 150, gd_vec3(200, 200, 0) + gd_vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
 
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 

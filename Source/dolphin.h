@@ -3,10 +3,9 @@
 
 #include "dolphin_platform.h"
 
-
 #include "dolphin_intrinsics.h"
 #include "dolphin_render_group.h"
-#include "dolphin_asset_ids.h"
+#include "dolphin_file_formats.h"
 #include "dolphin_asset.h"
 #include "dolphin_random.h"
 #include "dolphin_audio.h"
@@ -18,11 +17,10 @@ struct hero_bitmap_ids
     bitmap_id Torso;
 };
 
-
 struct game_state{
 	memory_arena PermanentArena;
 
-	gdVec2 PlayerPos;
+	vec2 PlayerPos;
 	real32 HeroFacingDirection;
 
 	loaded_sound TestSound;
@@ -48,5 +46,7 @@ struct transient_state{
 };
 
 GLOBAL_VARIABLE debug_platform_read_entire_file *PlatformReadEntireFile;
+GLOBAL_VARIABLE debug_platform_free_file_memory *PlatformFreeFileMemory;
+
 
 #endif

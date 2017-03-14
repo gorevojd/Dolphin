@@ -916,9 +916,9 @@ int WINAPI WinMain(
     int ComandShow)
 {
     platform_work_queue HighPriorityQueue = {};
-    Win32MakeQueue(&HighPriorityQueue, 3);
+    Win32MakeQueue(&HighPriorityQueue, 4);
     platform_work_queue LowPriorityQueue = {};
-    Win32MakeQueue(&LowPriorityQueue, 2);
+    Win32MakeQueue(&LowPriorityQueue, 1);
 
     Win32InitXInput();
 
