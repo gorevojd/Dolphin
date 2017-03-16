@@ -116,12 +116,14 @@ PushString(memory_arena* Arena, char* Source){
     return(Dest);
 }
 
+#define ZeroStruct(Loc) ZeroSize(&(Loc), sizeof(Loc))
 inline void ZeroSize(void* Memory, size_t Size){
 	uint8* Ptr = (uint8*)Memory;
 	for (int i = 0; i < Size; i++){
 		*Ptr = 0;
 	}
 }
+
 
 inline void SubArena(memory_arena* Result, memory_arena* Arena, size_t Size, size_t Alignment = 16){
 	Result->MemorySize = Size;
@@ -197,6 +199,56 @@ struct game_button_state{
     int HalfTransitionCount;
     bool32 EndedDown;
 };
+
+typedef struct platform_file_handle{
+    bool32 NoErrors;
+} platform_file_handle;
+
+typedef struct platform_file_group{
+    uint32 FileCount;
+} platform_file_group;
+
+#define PLATFORM_GET_ALL_FILES_OF_TYPE_BEGIN(name) platform_file_group* name(char* Type)
+typedef PLATFORM_GET_ALL_FILES_OF_TYPE_BEGIN(platform_get_all_files_of_type_begin);
+
+#define PLATFORM_GET_ALL_FILES_OF_TYPE_END(name) void name(platform_file_group* FileGroup)
+typedef PLATFORM_GET_ALL_FILES_OF_TYPE_END(platform_get_all_files_of_type_end);
+
+#define PLATFORM_OPEN_FILE(name) platform_file_handle *name(platform_file_group* FileGroup, uint32 FileIndex)
+typedef PLATFORM_OPEN_FILE(platform_open_file);
+
+#define PLATFORM_READ_DATA_FROM_FILE(name) void name(platform_file_handle* Source, uint64 Offset, uint64 Size, void* Dest)
+typedef PLATFORM_READ_DATA_FROM_FILE(platform_read_data_from_file);
+
+#define PLATFORM_FILE_ERROR(name) void name(platform_file_handle* Handle, char* Message)
+typedef PLATFORM_FILE_ERROR(platform_file_error);
+
+#define PlatformNoFileErrors(Handle) ((Handle)->NoErrors)
+
+struct platform_work_queue;
+#define PLATFORM_WORK_QUEUE_CALLBACK(name) void name(platform_work_queue* Queue, void* Data)
+typedef PLATFORM_WORK_QUEUE_CALLBACK(platform_work_queue_callback);
+
+#define PLATFORM_ADD_ENTRY(name) void name(platform_work_queue* Queue, platform_work_queue_callback* Callback , void* Data)
+typedef PLATFORM_ADD_ENTRY(platform_add_entry);
+
+#define PLATFORM_COMPLETE_ALL_WORK(name) void name(platform_work_queue* Queue)
+typedef PLATFORM_COMPLETE_ALL_WORK(platform_complete_all_work);
+
+typedef struct platform_api{
+    platform_add_entry* AddEntry;
+    platform_complete_all_work* CompleteAllWork;
+
+    platform_get_all_files_of_type_begin* GetAllFilesOfTypeBegin;
+    platform_get_all_files_of_type_end* GetAllFilesOfTypeEnd;
+    platform_open_file* OpenNextFile;
+    platform_read_data_from_file* ReadDataFromFile;
+    platform_file_error* FileError;
+
+    debug_platform_write_entire_file* DEBUGWriteEntireFile;
+    debug_platform_read_entire_file* DEBUGReadEntireFile;
+    debug_platform_free_file_memory* DEBUGFreeFileMemory;
+} platform_api;
 
 struct game_controller_input{
     bool32 IsAnalog;
@@ -285,14 +337,11 @@ struct debug_cycle_counter{
 #define END_TIMED_BLOCK_COUNTED()
 #endif
 
-struct platform_work_queue;
-#define PLATFORM_WORK_QUEUE_CALLBACK(name) void name(platform_work_queue* Queue, void* Data)
-typedef PLATFORM_WORK_QUEUE_CALLBACK(platform_work_queue_callback);
 
-typedef void platform_add_entry(platform_work_queue* Queue, platform_work_queue_callback* Callback, void* Data);
-typedef void platform_complete_all_work(platform_work_queue* Queue);
-extern platform_add_entry* PlatformAddEntry;
-extern platform_complete_all_work* PlatformCompleteAllWork;
+
+
+//extern platform_add_entry* PlatformAddEntry;
+//extern platform_complete_all_work* PlatformCompleteAllWork;
 
 typedef struct game_memory{
     bool32 IsInitialized;
@@ -306,12 +355,7 @@ typedef struct game_memory{
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;
 
-    platform_add_entry* PlatformAddEntry;
-    platform_complete_all_work* PlatformCompleteAllWork;
-
-    debug_platform_write_entire_file* DEBUGWriteEntireFile;
-    debug_platform_read_entire_file* DEBUGReadEntireFile;
-    debug_platform_free_file_memory* DEBUGFreeFileMemory;
+    platform_api PlatformAPI;
 
 #ifdef INTERNAL_BUILD
     debug_cycle_counter Counters[DebugCycleCounter_Count];

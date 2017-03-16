@@ -815,11 +815,11 @@ TiledRenderGroupToOutput(
             DoTiledRenderWork(RenderQueue, Work);
 #else
             /*Multi-threaded*/
-            PlatformAddEntry(RenderQueue, DoTiledRenderWork, Work);
+            Platform.AddEntry(RenderQueue, DoTiledRenderWork, Work);
 #endif
         }
     }
-    PlatformCompleteAllWork(RenderQueue);
+    Platform.CompleteAllWork(RenderQueue);
 }
 
 inline void 

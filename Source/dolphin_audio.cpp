@@ -130,8 +130,8 @@ OutputPlayingSounds(
         while(TotalChunksToMix && !SoundFinished){
             loaded_sound* LoadedSound = GetSound(Assets, PlayingSound->ID);
             if(LoadedSound){
-                dda_sound* Info = GetSoundInfo(Assets, PlayingSound->ID);
-                PrefetchSound(Assets, Info->NextIDToPlay);
+                sound_id NextSoundInChain = GetNextSoundInChain(Assets, PlayingSound->ID);
+                PrefetchSound(Assets, NextSoundInChain);
 
                 volume_v2 Volume = PlayingSound->CurrentVolume;
                 volume_v2 dVolume = SecondsPerSample * PlayingSound->dCurrentVolume;
@@ -254,8 +254,8 @@ OutputPlayingSounds(
                 TotalChunksToMix -= ChunksToMix;
 
                 if(ChunksToMix == ChunksRemainingInSound){
-                    if(IsValid(Info->NextIDToPlay)){
-                        PlayingSound->ID = Info->NextIDToPlay;
+                    if(IsValid(NextSoundInChain)){
+                        PlayingSound->ID = NextSoundInChain;
                         Assert(PlayingSound->SamplesPlayed >= LoadedSound->SampleCount);
                         PlayingSound->SamplesPlayed -= (real32)LoadedSound->SampleCount;
                         if(PlayingSound->SamplesPlayed < 0){

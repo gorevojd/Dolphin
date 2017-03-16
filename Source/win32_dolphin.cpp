@@ -437,6 +437,7 @@ void BuildPathForFileInEXEDir(char* TargetFileName, char* FileName){
     TargetFileName[Count] = 0;
 }
 
+
 INTERNAL_FUNCTION void
 Win32InitXInput(){
     HINSTANCE XInputLib = LoadLibraryA("xinput1_3.dll");
@@ -866,12 +867,144 @@ Win32MakeQueue(platform_work_queue* Queue, int ThreadCount){
     }
 }
 
-
+#if 0
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(DoWorkerWork){
     char Buffer[256];
     sprintf(Buffer, "Thread %u: %s\n", GetCurrentThreadId(), (char*)Data);
     OutputDebugStringA(Buffer);
     Sleep(100);
+}
+#endif
+
+struct win32_platform_file_handle{
+    platform_file_handle D;
+    HANDLE Win32Handle;
+};
+
+struct win32_platform_file_group{
+    platform_file_group D;
+    HANDLE FindHandle;
+    WIN32_FIND_DATAA FindData;
+};
+
+INTERNAL_FUNCTION PLATFORM_GET_ALL_FILES_OF_TYPE_BEGIN(Win32GetAllFilesOfTypeBegin){
+    win32_platform_file_group* Win32FileGroup = (win32_platform_file_group*)VirtualAlloc(
+        0,
+        sizeof(win32_platform_file_group),
+        MEM_RESERVE | MEM_COMMIT,
+        PAGE_READWRITE);
+
+    char* TypeAt = Type;
+    char WildCard[32] = "../Data/*.";
+    for(uint32 WildCardIndex = strlen(WildCard);
+        WildCardIndex < sizeof(WildCard);
+        WildCardIndex++)
+    {
+        WildCard[WildCardIndex] = *TypeAt;
+        if(*TypeAt == 0){
+            break;
+        }
+
+        TypeAt++;
+    }
+    WildCard[sizeof(WildCard) - 1] = 0;
+
+    Win32FileGroup->D.FileCount = 0;
+
+    WIN32_FIND_DATAA FindData;
+    HANDLE FindHandle = FindFirstFileA(WildCard, &FindData);
+    while(FindHandle != INVALID_HANDLE_VALUE){
+        Win32FileGroup->D.FileCount++;
+
+        if(!FindNextFileA(FindHandle, &FindData)){
+            break;
+        }
+    }
+    FindClose(FindHandle);
+
+    Win32FileGroup->FindHandle = FindFirstFileA(WildCard, &Win32FileGroup->FindData);
+
+    return((platform_file_group*)Win32FileGroup);
+}
+
+INTERNAL_FUNCTION PLATFORM_GET_ALL_FILES_OF_TYPE_END(Win32GetAllFilesOfTypeEnd){
+    win32_platform_file_group* Win32FileGroup = (win32_platform_file_group*)FileGroup;
+    if(Win32FileGroup){
+        FindClose(Win32FileGroup->FindHandle);
+
+        VirtualFree(Win32FileGroup, 0, MEM_RELEASE);
+    }
+}
+
+INTERNAL_FUNCTION PLATFORM_OPEN_FILE(Win32OpenNextFile){
+
+    win32_platform_file_group* Win32FileGroup = (win32_platform_file_group*)FileGroup;
+    win32_platform_file_handle* Result = 0;
+
+    if(Win32FileGroup->FindHandle != INVALID_HANDLE_VALUE){
+        Result = (win32_platform_file_handle*)VirtualAlloc(
+            0,
+            sizeof(win32_platform_file_handle),
+            MEM_RESERVE | MEM_COMMIT,
+            PAGE_READWRITE);
+
+        if(Result){
+            char* FileName = Win32FileGroup->FindData.cFileName;
+            char TargetFileName[256];
+            char TargetDir[] = "../Data/";
+            int SourceLen = strlen(FileName);
+            int DirLen = strlen(TargetDir);
+            int it = 0;
+            for(it; it < DirLen; it++){
+                TargetFileName[it] = TargetDir[it];
+            }
+            for(it; it < DirLen + SourceLen; it++){
+                TargetFileName[it] = FileName[it - DirLen];
+            }
+            *(TargetFileName + it) = 0;
+
+            Result->Win32Handle = CreateFileA(TargetFileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+            Result->D.NoErrors = (Result->Win32Handle != INVALID_HANDLE_VALUE);
+        }
+
+        if(!FindNextFileA(Win32FileGroup->FindHandle, &Win32FileGroup->FindData)){
+            FindClose(Win32FileGroup->FindHandle);
+            Win32FileGroup->FindHandle = INVALID_HANDLE_VALUE;
+        }
+    }
+
+    return((platform_file_handle*)Result);
+}
+
+INTERNAL_FUNCTION PLATFORM_FILE_ERROR(Win32FileError){
+
+    Handle->NoErrors = false;
+}
+
+INTERNAL_FUNCTION PLATFORM_READ_DATA_FROM_FILE(Win32ReadDataFromFile){
+    if(PlatformNoFileErrors(Source)){
+        win32_platform_file_handle* Handle = (win32_platform_file_handle*)Source;
+        OVERLAPPED Overlapped = {};
+        Overlapped.Offset = (uint32)((Offset >> 0) & 0xFFFFFFFF);
+        Overlapped.OffsetHigh = (uint32)((Offset >> 32) & 0xFFFFFFFF);
+
+        uint32 FileSize32 = SafeTruncateUInt64(Size);
+
+        DWORD BytesRead;
+		BOOL FileHasBeenRead = ReadFile(Handle->Win32Handle, Dest, FileSize32, &BytesRead, &Overlapped);
+        if(FileHasBeenRead && (FileSize32 == BytesRead))
+        {
+
+        }
+        else{
+            #if 1
+            DWORD LastError = GetLastError();
+            LARGE_INTEGER FileSize;
+            GetFileSizeEx(Handle->Win32Handle, &FileSize);
+            #endif
+            Win32FileError(&Handle->D, "Error while reading the file");
+        }
+    }
 }
 
 LRESULT CALLBACK
@@ -947,13 +1080,21 @@ int WINAPI WinMain(
     void* MemoryBlock = VirtualAlloc(0, MemoryBlockSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     GameMemory.PermanentStorage = MemoryBlock;
     GameMemory.TransientStorage = (uint8*)MemoryBlock + GameMemory.PermanentStorageSize;
-    GameMemory.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
-    GameMemory.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;
-    GameMemory.DEBUGWriteEntireFile = DEBUGPlatformWriteEntireFile;
-    GameMemory.PlatformAddEntry = Win32AddEntry;
-    GameMemory.PlatformCompleteAllWork = Win32CompleteAllWork;
+    GameMemory.PlatformAPI.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
+    GameMemory.PlatformAPI.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;
+    GameMemory.PlatformAPI.DEBUGWriteEntireFile = DEBUGPlatformWriteEntireFile;
+    
+    GameMemory.PlatformAPI.AddEntry = Win32AddEntry;
+    GameMemory.PlatformAPI.CompleteAllWork = Win32CompleteAllWork;
+    
     GameMemory.HighPriorityQueue = &HighPriorityQueue;
     GameMemory.LowPriorityQueue = &LowPriorityQueue;
+
+    GameMemory.PlatformAPI.GetAllFilesOfTypeBegin = Win32GetAllFilesOfTypeBegin;
+    GameMemory.PlatformAPI.GetAllFilesOfTypeEnd = Win32GetAllFilesOfTypeEnd;
+    GameMemory.PlatformAPI.OpenNextFile = Win32OpenNextFile;
+    GameMemory.PlatformAPI.ReadDataFromFile = Win32ReadDataFromFile;
+    GameMemory.PlatformAPI.FileError = Win32FileError;
 
     GlobalScreen.Window = CreateWindowEx(
         0,

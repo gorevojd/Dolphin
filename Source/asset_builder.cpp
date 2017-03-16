@@ -272,7 +272,7 @@ LoadWAV(char* FileName, uint32 SectionFirstSampleIndex, uint32 SectionSampleCoun
         
         if(ChannelCount == 1){
 
-            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16));
+            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 8 * sizeof(int16));
 
             Result.Samples[0] = NewChannel0;
             Result.Samples[1] = NewChannel1;
@@ -287,8 +287,8 @@ LoadWAV(char* FileName, uint32 SectionFirstSampleIndex, uint32 SectionSampleCoun
         else if(ChannelCount == 2){
 
 
-            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16));
-            NewChannel1 = (int16*)malloc(SectionSampleCount * sizeof(int16));
+            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 16 * sizeof(int16));
+            NewChannel1 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 16 * sizeof(int16));
 
             Result.Samples[0] = NewChannel0;
             Result.Samples[1] = NewChannel1;       
@@ -385,7 +385,7 @@ AddSoundAsset(
 	DDA->FirstTagIndex = Assets->TagCount;
 	DDA->OnePastLastTagIndex = DDA->FirstTagIndex;
 	DDA->Sound.SampleCount = SampleCount;
-	DDA->Sound.NextIDToPlay.Value = 0;
+	DDA->Sound.Chain = DDASoundChain_None;
 
 	Source->Type = AssetType_Sound;
 	Source->FileName = FileName;
@@ -416,39 +416,107 @@ EndAssetType(game_assets* Assets){
 	Assets->AssetIndex = 0;
 }
 
-int main(int ArgCount, char** Args){
+INTERNAL_FUNCTION void
+WriteDDA(game_assets* Assets, char* FileName){
+    FILE* fp = fopen(FileName, "wb");
+    if(fp){
+        dda_header Header = {};
+        Header.MagicValue = DDA_MAGIC_VALUE;
+        Header.Version = DDA_VERSION;
+        Header.TagCount = Assets->TagCount;
+        Header.AssetTypeCount = Asset_Count;
+        Header.AssetCount = Assets->AssetCount;
 
-	game_assets Assets_;
-	game_assets* Assets = &Assets_;
+        uint32 TagArraySize = Header.TagCount * sizeof(dda_tag);
+        uint32 AssetTypeArraySize = Header.AssetTypeCount * sizeof(dda_asset_type);
+        uint32 AssetArraySize = Header.AssetCount * sizeof(dda_asset);
 
-	Assets->TagCount = 1;
-	Assets->AssetCount = 1;
-	Assets->DEBUGAssetType = 0;
-	Assets->AssetIndex = 0;
+        Header.TagOffset = sizeof(Header);
+        Header.AssetTypeOffset = Header.TagOffset + TagArraySize;
+        Header.AssetOffset = Header.AssetTypeOffset + AssetTypeArraySize;
 
-	BeginAssetType(Assets, Asset_Backdrop);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_background.bmp");
-    EndAssetType(Assets);
+        fwrite(&Header, sizeof(Header), 1, fp);
+        fwrite(Assets->Tags, TagArraySize, 1, fp);
+        fwrite(Assets->AssetTypes, AssetTypeArraySize, 1, fp);
+        fseek(fp, AssetArraySize, SEEK_CUR);
 
-    BeginAssetType(Assets, Asset_LastOfUs);
-    AddBitmapAsset(Assets, "../Data/Images/last.jpg");
-    EndAssetType(Assets);
+        for(uint32 AssetIndex = 1;
+            AssetIndex < Header.AssetCount;
+            AssetIndex++)
+        {
+            asset_source* Source = Assets->AssetSources + AssetIndex;
+            dda_asset* DDA = Assets->Assets + AssetIndex;
 
-    BeginAssetType(Assets, Asset_Tree);
-    AddBitmapAsset(Assets, "../Data/HH/test2/tree00.bmp", Vec2(0.5f, 0.3f));
-    EndAssetType(Assets);
+            DDA->DataOffset = ftell(fp);
 
-    BeginAssetType(Assets, Asset_StarWars);
-    AddBitmapAsset(Assets, "../Data/Images/star_wars.jpg");
-    EndAssetType(Assets);
+            switch(Source->Type){
+                case(AssetType_Sound):{
+                    loaded_sound WAV = LoadWAV(
+                        Source->FileName,
+                        Source->FirstSampleIndex,
+                        DDA->Sound.SampleCount);
 
-    BeginAssetType(Assets, Asset_Witcher);
-    AddBitmapAsset(Assets, "../Data/Images/witcher.jpg");
-    EndAssetType(Assets);
+                    DDA->Sound.SampleCount = WAV.SampleCount;
+                    DDA->Sound.ChannelCount = WAV.ChannelCount;
 
-    BeginAssetType(Assets, Asset_Assassin);
-    AddBitmapAsset(Assets, "../Data/Images/assassin.jpg");
-    EndAssetType(Assets);
+                    for(uint32 ChannelIndex = 0;
+                        ChannelIndex < WAV.ChannelCount;
+                        ChannelIndex++)
+                    {
+                        fwrite(WAV.Samples[ChannelIndex], DDA->Sound.SampleCount * sizeof(int16), 1, fp);
+                    }
+
+                    free(WAV.Free);
+                }break;
+
+                case(AssetType_Bitmap):{
+                    loaded_bitmap Bitmap = LoadBMP(Source->FileName);
+
+                    DDA->Bitmap.Dimension[0] = Bitmap.Width;
+                    DDA->Bitmap.Dimension[1] = Bitmap.Height;
+
+                    fwrite(Bitmap.Memory, Bitmap.Width * Bitmap.Height * 4, 1, fp);
+
+                    free(Bitmap.Free);
+                }break;
+
+                case(AssetType_Model):{
+
+                }break;
+
+                default:{
+                    INVALID_CODE_PATH;
+                }break;
+            }
+
+
+        }
+        
+        fseek(fp, (uint32)Header.AssetOffset, SEEK_SET);
+        fwrite(Assets->Assets, AssetArraySize, 1, fp);
+
+        fclose(fp);
+    }
+    else{
+        printf("Error while opening the file T_T\n");
+    }
+
+}
+
+INTERNAL_FUNCTION void Initialize(game_assets* Assets){
+    Assets->TagCount = 1;
+    Assets->AssetCount = 1;
+    Assets->DEBUGAssetType = 0;
+    Assets->AssetIndex = 0;
+
+    Assets->AssetTypeCount = Asset_Count;
+    memset(Assets->AssetTypes, 0, sizeof(Assets->AssetTypes));
+}
+
+INTERNAL_FUNCTION void WriteHero(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
 
     real32 AngleRight = 0.0f * DOLPHIN_MATH_TAU;
     real32 AngleBack = 0.25f * DOLPHIN_MATH_TAU;
@@ -490,6 +558,38 @@ int main(int ArgCount, char** Args){
     AddTag(Assets, Tag_FacingDirection, AngleFront);
     EndAssetType(Assets);
 
+    WriteDDA(Assets, "../Data/asset_pack_hero.dda");
+}
+
+INTERNAL_FUNCTION void WriteNonHero(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
+    BeginAssetType(Assets, Asset_Backdrop);
+    AddBitmapAsset(Assets, "../Data/HH/test/test_background.bmp");
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_LastOfUs);
+    AddBitmapAsset(Assets, "../Data/Images/last.jpg");
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Tree);
+    AddBitmapAsset(Assets, "../Data/HH/test2/tree00.bmp", Vec2(0.5f, 0.3f));
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_StarWars);
+    AddBitmapAsset(Assets, "../Data/Images/star_wars.jpg");
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Witcher);
+    AddBitmapAsset(Assets, "../Data/Images/witcher.jpg");
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Assassin);
+    AddBitmapAsset(Assets, "../Data/Images/assassin.jpg");
+    EndAssetType(Assets);
+
     BeginAssetType(Assets, Asset_Grass);
     AddBitmapAsset(Assets, "../Data/HH/Test2/grass00.bmp");
     AddBitmapAsset(Assets, "../Data/HH/Test2/grass01.bmp");
@@ -508,7 +608,14 @@ int main(int ArgCount, char** Args){
     AddBitmapAsset(Assets, "../Data/HH/Test2/tuft02.bmp");
     EndAssetType(Assets);
 
-    /*Loading sounds*/
+    WriteDDA(Assets, "../Data/asset_pack_non_hero.dda");
+}
+
+INTERNAL_FUNCTION void WriteSounds(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
     BeginAssetType(Assets, Asset_Bloop);
     AddSoundAsset(Assets, "../Data/HH/test3/bloop_00.wav");
     AddSoundAsset(Assets, "../Data/HH/test3/bloop_01.wav");
@@ -529,10 +636,14 @@ int main(int ArgCount, char** Args){
     AddSoundAsset(Assets, "../Data/HH/test3/glide_00.wav");
     EndAssetType(Assets);
 
+    BeginAssetType(Assets, Asset_Puhp);
+    AddSoundAsset(Assets, "../Data/HH/test3/puhp_00.wav");
+    AddSoundAsset(Assets, "../Data/HH/test3/puhp_01.wav");
+    EndAssetType(Assets);
+
     uint32 OneMusicChunk = 10 * 44100;
     uint32 TotalMusicSampleCount = 7468095;
     BeginAssetType(Assets, Asset_Music);
-    sound_id LastMusic = {0};
     for(uint32 FirstSampleIndex = 0;
         FirstSampleIndex < TotalMusicSampleCount;
         FirstSampleIndex += OneMusicChunk)
@@ -542,102 +653,20 @@ int main(int ArgCount, char** Args){
             SampleCount = OneMusicChunk;
         }
         sound_id ThisMusic = AddSoundAsset(Assets, "../Data/HH/test3/music_test.wav", FirstSampleIndex, SampleCount);
-        if(LastMusic.Value){
-            Assets->Assets[LastMusic.Value].Sound.NextIDToPlay = ThisMusic;
+        if((FirstSampleIndex + OneMusicChunk) < TotalMusicSampleCount){
+            Assets->Assets[ThisMusic.Value].Sound.Chain = DDASoundChain_Advance;
         }
-        LastMusic = ThisMusic;
     }
     EndAssetType(Assets);
 
-    BeginAssetType(Assets, Asset_Puhp);
-    AddSoundAsset(Assets, "../Data/HH/test3/puhp_00.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/puhp_01.wav");
-    EndAssetType(Assets);
+    WriteDDA(Assets, "../Data/asset_pack_sounds.dda");
+}
 
-	FILE* fp = fopen("../Data/test.dda", "wb");
-	if(fp){
+int main(int ArgCount, char** Args){
 
-		dda_header Header = {};
-		Header.MagicValue = DDA_MAGIC_VALUE;
-		Header.Version = DDA_VERSION;
-		Header.TagCount = Assets->TagCount;
-		Header.AssetTypeCount = Asset_Count;
-		Header.AssetCount = Assets->AssetCount;
-
-		uint32 TagArraySize = Header.TagCount * sizeof(dda_tag);
-		uint32 AssetTypeArraySize = Header.AssetTypeCount * sizeof(dda_asset_type);
-		uint32 AssetArraySize = Header.AssetCount * sizeof(dda_asset);
-
-		Header.TagOffset = sizeof(Header);
-		Header.AssetTypeOffset = Header.TagOffset + TagArraySize;
-		Header.AssetOffset = Header.AssetTypeOffset + AssetTypeArraySize;
-
-		fwrite(&Header, sizeof(Header), 1, fp);
-		fwrite(Assets->Tags, TagArraySize, 1, fp);
-		fwrite(Assets->AssetTypes, AssetTypeArraySize, 1, fp);
-		fseek(fp, AssetArraySize, SEEK_CUR);
-
-		for(uint32 AssetIndex = 1;
-			AssetIndex < Header.AssetCount;
-			AssetIndex++)
-		{
-			asset_source* Source = Assets->AssetSources + AssetIndex;
-			dda_asset* DDA = Assets->Assets + AssetIndex;
-
-			DDA->DataOffset = ftell(fp);
-
-			switch(Source->Type){
-				case(AssetType_Sound):{
-					loaded_sound WAV = LoadWAV(
-						Source->FileName,
-						Source->FirstSampleIndex,
-						DDA->Sound.SampleCount);
-
-					DDA->Sound.SampleCount = WAV.SampleCount;
-					DDA->Sound.ChannelCount = WAV.ChannelCount;
-
-					for(uint32 ChannelIndex = 0;
-						ChannelIndex < WAV.ChannelCount;
-						ChannelIndex++)
-					{
-						fwrite(WAV.Samples[ChannelIndex], DDA->Sound.SampleCount * sizeof(int16), 1, fp);
-					}
-
-					free(WAV.Free);
-				}break;
-
-				case(AssetType_Bitmap):{
-					loaded_bitmap Bitmap = LoadBMP(Source->FileName);
-
-					DDA->Bitmap.Dimension[0] = Bitmap.Width;
-					DDA->Bitmap.Dimension[1] = Bitmap.Height;
-
-					fwrite(Bitmap.Memory, Bitmap.Width * Bitmap.Height * 4, 1, fp);
-
-					free(Bitmap.Free);
-				}break;
-
-				case(AssetType_Model):{
-
-				}break;
-
-				default:{
-					INVALID_CODE_PATH;
-				}break;
-			}
-
-
-		}
-		
-		fseek(fp, (uint32)Header.AssetOffset, SEEK_SET);
-		fwrite(Assets->Assets, AssetArraySize, 1, fp);
-
-		fclose(fp);
-	}
-	else{
-		printf("Error while opening the file T_T\n");
-	}
-
+    WriteHero();
+    WriteNonHero();
+    WriteSounds();
 
 	return(0);
 }

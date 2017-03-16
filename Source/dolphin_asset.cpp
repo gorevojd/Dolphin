@@ -1,28 +1,37 @@
-struct load_bitmap_work{
-    game_assets* Assets;
-    bitmap_id ID;
+struct load_asset_work{
     task_with_memory* Task;
-    loaded_bitmap* Bitmap;
+    asset_slot* Slot;
+
+    platform_file_handle* Handle;
+    uint64 Offset;
+    uint64 Size;
+    void* Destination;
 };
 
-INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadBitmapWork){
-    load_bitmap_work* Work = (load_bitmap_work*)Data;
+INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadAssetWork){
+    load_asset_work* Work = (load_asset_work*)Data;
 
-    dda_asset* DDAAsset = &Work->Assets->Assets[Work->ID.Value];
-    dda_bitmap* Info = &DDAAsset->Bitmap;
-    loaded_bitmap* Bitmap = Work->Bitmap;
-
-    Bitmap->AlignPercentage = Vec2(Info->AlignPercentage[0], Info->AlignPercentage[1]);
-    Bitmap->WidthOverHeight = (float)Info->Dimension[0] / (float)Info->Dimension[1];
-    Bitmap->Width = Info->Dimension[0];
-    Bitmap->Height = Info->Dimension[1];
-    Bitmap->Memory = Work->Assets->DDAContents + DDAAsset->DataOffset;
+    Platform.ReadDataFromFile(Work->Handle, Work->Offset, Work->Size, Work->Destination);
 
     GD_COMPLETE_WRITES_BEFORE_FUTURE;
 
-    Work->Assets->Slots[Work->ID.Value].State = AssetState_Loaded;
-    Work->Assets->Slots[Work->ID.Value].Bitmap = Work->Bitmap;
+    if(PlatformNoFileErrors(Work->Handle))
+    {
+        Work->Slot->State = AssetState_Loaded;
+    }
+    else{
+        int a = 1;
+    }
+
     EndTaskWithMemory(Work->Task);
+}
+
+inline platform_file_handle*
+GetFileHandleFor(game_assets* Assets, uint32 FileIndex){
+    Assert(FileIndex < Assets->FileCount);
+    platform_file_handle* Result = Assets->Files[FileIndex].Handle;
+
+    return(Result);
 }
 
 INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID){
@@ -33,54 +42,32 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID){
     {
         task_with_memory* Task = BeginTaskWithMemory(Assets->TranState);
         if(Task){
-            load_bitmap_work *Work = PushStruct(&Task->Arena, load_bitmap_work);
+            asset* Asset = Assets->Assets + ID.Value;
+            dda_bitmap* Info = &Asset->DDA.Bitmap;
+            loaded_bitmap* Bitmap = PushStruct(&Assets->Arena, loaded_bitmap);
 
-            Work->Assets = Assets;
-            Work->ID = ID;
+            Bitmap->AlignPercentage = Vec2(Info->AlignPercentage[0], Info->AlignPercentage[1]);
+            Bitmap->WidthOverHeight = (float)Info->Dimension[0] / (float)Info->Dimension[1];
+            Bitmap->Width = Info->Dimension[0];
+            Bitmap->Height = Info->Dimension[1];
+            uint32 MemorySize = Bitmap->Width * Bitmap->Height * 4;
+            Bitmap->Memory = PushSize(&Assets->Arena, MemorySize);
+
+            load_asset_work* Work = PushStruct(&Task->Arena, load_asset_work);
             Work->Task = Task;
-            Work->Bitmap = PushStruct(&Assets->Arena, loaded_bitmap);
+            Work->Slot = Assets->Slots + ID.Value;
+            Work->Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+            Work->Offset = Asset->DDA.DataOffset;
+            Work->Size = MemorySize;
+            Work->Destination = Bitmap->Memory;
+            Work->Slot->Bitmap = Bitmap;
 
-            PlatformAddEntry(Assets->TranState->LowPriorityQueue, LoadBitmapWork, Work);
+            Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, Work);
         }
         else{
             Assets->Slots[ID.Value].State = AssetState_Unloaded;
         }
     }
-}
-
-struct load_sound_work
-{
-    game_assets* Assets;
-    sound_id ID;
-    task_with_memory* Task;
-    loaded_sound* Sound;
-};
-
-INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadSoundWork){
-    load_sound_work* Work = (load_sound_work*)Data;
-
-    dda_asset* DDAAsset = &Work->Assets->Assets[Work->ID.Value];
-    dda_sound* Info = &DDAAsset->Sound;
-    loaded_sound* Sound = Work->Sound;
-
-    Sound->SampleCount = Info->SampleCount;
-    Sound->ChannelCount = Info->ChannelCount;
-    Assert(Sound->ChannelCount <= ArrayCount(Sound->Samples));
-    uint64 SampleDataOffset = DDAAsset->DataOffset;
-    for(uint32 ChannelIndex = 0;
-        ChannelIndex < Sound->ChannelCount;
-        ChannelIndex++)
-    {
-        Sound->Samples[ChannelIndex] = (int16*)(Work->Assets->DDAContents + SampleDataOffset);
-        SampleDataOffset += Sound->SampleCount * sizeof(int16);
-    }
-
-    GD_COMPLETE_WRITES_BEFORE_FUTURE;
-
-    Work->Assets->Slots[Work->ID.Value].Sound = Work->Sound;
-    Work->Assets->Slots[Work->ID.Value].State = AssetState_Loaded;
-
-    EndTaskWithMemory(Work->Task);
 }
 
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
@@ -91,14 +78,37 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
     {
         task_with_memory* Task = BeginTaskWithMemory(Assets->TranState);
         if(Task){
-            load_sound_work* Work = PushStruct(&Task->Arena, load_sound_work);
 
-            Work->Assets = Assets;
-            Work->ID = ID;
+            asset* Asset = Assets->Assets + ID.Value;
+            dda_sound* Info = &Asset->DDA.Sound;
+
+            loaded_sound* Sound = PushStruct(&Assets->Arena, loaded_sound);
+            Sound->SampleCount = Info->SampleCount;
+            Sound->ChannelCount = Info->ChannelCount;
+            uint32 ChannelSize = Sound->SampleCount * sizeof(int16);
+            uint32 MemorySize = Sound->ChannelCount * ChannelSize;
+
+            void* Memory = PushSize(&Assets->Arena, MemorySize);
+
+            int16* SoundAt = (int16*)Memory;
+            for(uint32 ChannelIndex = 0;
+                ChannelIndex < Sound->ChannelCount;
+                ChannelIndex++)
+            {
+                Sound->Samples[ChannelIndex] = SoundAt;
+                SoundAt += ChannelSize;
+            }
+
+            load_asset_work* Work = PushStruct(&Task->Arena, load_asset_work);
             Work->Task = Task;
-            Work->Sound = PushStruct(&Assets->Arena, loaded_sound);
+            Work->Slot = Assets->Slots + ID.Value;
+            Work->Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+            Work->Offset = Asset->DDA.DataOffset;
+            Work->Size = MemorySize;
+            Work->Destination = Memory;
+            Work->Slot->Sound = Sound;
 
-            PlatformAddEntry(Assets->TranState->LowPriorityQueue, LoadSoundWork, Work);
+            Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, Work);
         }
         else{
             Assets->Slots[ID.Value].State = AssetState_Unloaded;
@@ -121,11 +131,11 @@ GetBestMatchAssetFrom(
         AssetIndex < Type->OnePastLastAssetIndex;
         AssetIndex++)
     {
-        dda_asset* Asset = Assets->Assets + AssetIndex;
+        asset* Asset = Assets->Assets + AssetIndex;
 
         real32 TotalWeightedDiff = 0.0;
-        for(uint32 TagIndex = Asset->FirstTagIndex;
-            TagIndex < Asset->OnePastLastTagIndex;
+        for(uint32 TagIndex = Asset->DDA.FirstTagIndex;
+            TagIndex < Asset->DDA.OnePastLastTagIndex;
             TagIndex++)
         {
             dda_tag* Tag = Assets->Tags + TagIndex;
@@ -236,43 +246,159 @@ AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState)
     }
     Assets->TagRange[Tag_FacingDirection] = DOLPHIN_MATH_TAU;
 
-    Assets->AssetCount = 2 * 256 * Asset_Count;
-    Assets->Assets = PushArray(Arena, Assets->AssetCount, dda_asset);
-    Assets->Slots = PushArray(Arena, Assets->AssetCount, asset_slot);
 
-    Assets->TagCount = 1024 * Asset_Count;
+#if 1
+    
+    Assets->TagCount = 1;
+    Assets->AssetCount = 1;
+
+    platform_file_group* FileGroup = Platform.GetAllFilesOfTypeBegin("dda");
+    Assets->FileCount = FileGroup->FileCount;
+    Assets->Files = PushArray(Arena, Assets->FileCount, asset_file);
+    
+    for(uint32 FileIndex = 0;
+        FileIndex < Assets->FileCount;
+        FileIndex++)
+    {
+        asset_file* File = Assets->Files + FileIndex;
+
+        File->TagBase = Assets->TagCount;
+
+        ZeroStruct(File->Header);
+        File->Handle = Platform.OpenNextFile(FileGroup, FileIndex);
+        Platform.ReadDataFromFile(File->Handle, 0, sizeof(File->Header), &File->Header);
+
+        uint32 AssetTypeArraySize = File->Header.AssetTypeCount * sizeof(dda_asset_type);
+        File->AssetTypeArray = (dda_asset_type*)PushSize(Arena, AssetTypeArraySize);
+        Platform.ReadDataFromFile(
+            File->Handle, 
+            File->Header.AssetTypeOffset, 
+            AssetTypeArraySize, 
+            File->AssetTypeArray);
+
+        /*Delete this*/
+        dda_asset TempAsset;
+        Platform.ReadDataFromFile(
+            File->Handle,
+            File->Header.AssetOffset,
+            sizeof(dda_asset),
+            &TempAsset);
+
+        if(File->Header.MagicValue != DDA_MAGIC_VALUE){
+            Platform.FileError(File->Handle, "DDA file has invalid magic value");
+        }
+
+        if(File->Header.Version > DDA_VERSION){
+            Platform.FileError(File->Handle, "DDA file has invalid version");
+        }
+
+        if(PlatformNoFileErrors(File->Handle)){
+            Assets->TagCount += (File->Header.TagCount - 1);
+            Assets->AssetCount += (File->Header.AssetCount - 1);
+        }
+        else{
+            INVALID_CODE_PATH;
+        }
+    }
+
+    Platform.GetAllFilesOfTypeEnd(FileGroup);
+
+    /*Allocating metadata*/
+    Assets->Assets = PushArray(Arena, Assets->AssetCount, asset);
+    Assets->Slots = PushArray(Arena, Assets->AssetCount, asset_slot);
     Assets->Tags = PushArray(Arena, Assets->TagCount, dda_tag);
 
-    debug_read_file_result ReadResult = PlatformReadEntireFile("../Data/test.dda");
-    if(ReadResult.ContentsSize != 0){
-        dda_header* Header = (dda_header*)ReadResult.Contents;
-        Assert(Header->MagicValue == DDA_MAGIC_VALUE);
-        Assert(Header->Version == DDA_VERSION);
+    /*Setting first tag as null*/
+    ZeroStruct(Assets->Tags[0]);
 
-        Assets->AssetCount = Header->AssetCount;
-        Assets->Assets = (dda_asset*)((uint8*)ReadResult.Contents + Header->AssetOffset);
-        Assets->Slots = PushArray(Arena, Assets->AssetCount, asset_slot);
+    /*Loading tags*/
+    for(uint32 FileIndex = 0;
+        FileIndex < Assets->FileCount;
+        FileIndex++)
+    {
+        asset_file* File = Assets->Files + FileIndex;
+        if(PlatformNoFileErrors(File->Handle)){
 
-        Assets->TagCount = Header->TagCount;
-        Assets->Tags = (dda_tag*)((uint8*)ReadResult.Contents + Header->TagOffset);
+            uint32 TagArraySize = sizeof(dda_tag) * (File->Header.TagCount - 1);
+            Platform.ReadDataFromFile(
+                File->Handle, 
+                File->Header.TagOffset + sizeof(dda_tag),
+                TagArraySize, 
+                Assets->Tags + File->TagBase);
+        }
+    }
 
-        dda_asset_type* DDATypes = (dda_asset_type*)((uint8*)ReadResult.Contents + Header->AssetTypeOffset);
-        for(uint32 TypeIndex = 0;
-            TypeIndex < Asset_Count;
-            TypeIndex++)
+
+    ZeroStruct(*(Assets->Assets));
+    uint32 AssetCount = 1;
+
+    /*Merging*/
+    for(uint32 DestTypeID = 0;
+        DestTypeID < Asset_Count;
+        DestTypeID++)
+    {
+        asset_type* DestType = Assets->AssetTypes + DestTypeID;
+        DestType->FirstAssetIndex = AssetCount;
+
+        for(uint32 FileIndex = 0;
+            FileIndex < Assets->FileCount;
+            FileIndex++)
         {
-            dda_asset_type* Source = DDATypes + TypeIndex;
+            asset_file* File = Assets->Files + FileIndex;
+            if(PlatformNoFileErrors(File->Handle)){
+                for(uint32 SourceIndex = 0;
+                    SourceIndex < File->Header.AssetTypeCount;
+                    SourceIndex++)
+                {
+                    dda_asset_type* SourceType = File->AssetTypeArray + SourceIndex;
 
-            if(Source->TypeID < Asset_Count){
-                asset_type* Dest = Assets->AssetTypes + Source->TypeID;
+                    if(SourceType->TypeID == DestTypeID){
+                        uint32 AssetCountForType = 
+                            (SourceType->OnePastLastAssetIndex - SourceType->FirstAssetIndex);
+                        
+                        temporary_memory TempMem = BeginTemporaryMemory(&TranState->TranArena);
+                        dda_asset* DDAAssetArray = PushArray(
+                            &TranState->TranArena,
+                            AssetCountForType,
+                            dda_asset);
 
-                Dest->FirstAssetIndex = Source->FirstAssetIndex;
-                Dest->OnePastLastAssetIndex = Source->OnePastLastAssetIndex;
+                        Platform.ReadDataFromFile(
+                            File->Handle,
+                            File->Header.AssetOffset + SourceType->FirstAssetIndex * sizeof(dda_asset),
+                            AssetCountForType * sizeof(dda_asset),
+                            DDAAssetArray);
+
+                        for(uint32 AssetIndex = 0;
+                            AssetIndex < AssetCountForType;
+                            AssetIndex++)
+                        {
+                            dda_asset* DDAAsset = DDAAssetArray + AssetIndex;
+
+                            Assert(AssetCount < Assets->AssetCount);
+                            asset* Asset = Assets->Assets + AssetCount++;
+
+                            Asset->FileIndex = FileIndex;
+                            Asset->DDA = *DDAAsset;
+                            if(Asset->DDA.FirstTagIndex == 0){
+                                Asset->DDA.FirstTagIndex = Asset->DDA.OnePastLastTagIndex = 0;
+                            }
+                            else{
+                                Asset->DDA.FirstTagIndex += (File->TagBase - 1);
+                                Asset->DDA.OnePastLastTagIndex += (File->TagBase - 1);
+                            }
+                        }
+
+                        EndTemporaryMemory(TempMem);
+                    }
+                }
             }
         }
 
-        Assets->DDAContents = (uint8*)ReadResult.Contents;
+        DestType->OnePastLastAssetIndex = AssetCount;
     }
+
+    Assert(AssetCount == Assets->AssetCount);
+#endif
 
     return(Assets);
 }

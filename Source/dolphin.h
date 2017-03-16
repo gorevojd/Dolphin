@@ -45,8 +45,6 @@ struct transient_state{
 	game_assets* Assets;
 };
 
-GLOBAL_VARIABLE debug_platform_read_entire_file *PlatformReadEntireFile;
-GLOBAL_VARIABLE debug_platform_free_file_memory *PlatformFreeFileMemory;
-
+GLOBAL_VARIABLE platform_api Platform;
 
 #endif

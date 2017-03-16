@@ -39,10 +39,16 @@ struct dda_bitmap{
 	real32 AlignPercentage[2];
 };
 
+enum dda_sound_chain{
+	DDASoundChain_None,
+	DDASoundChain_Loop,
+	DDASoundChain_Advance,
+};
+
 struct dda_sound{
 	uint32 SampleCount;
 	uint32 ChannelCount;
-	sound_id NextIDToPlay;
+	dda_sound_chain Chain;
 };
 
 struct dda_tag{

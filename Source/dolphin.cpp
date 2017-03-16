@@ -48,16 +48,23 @@ platform_add_entry* PlatformAddEntry;
 platform_complete_all_work* PlatformCompleteAllWork;
 
 GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
-    PlatformAddEntry = Memory->PlatformAddEntry;
-    PlatformCompleteAllWork = Memory->PlatformCompleteAllWork;
-    PlatformReadEntireFile = Memory->DEBUGReadEntireFile;
-    PlatformFreeFileMemory = Memory->DEBUGFreeFileMemory;
+    
+    Platform.AddEntry = Memory->PlatformAPI.AddEntry;
+    Platform.CompleteAllWork = Memory->PlatformAPI.CompleteAllWork;
+    
+    Platform.GetAllFilesOfTypeBegin = Memory->PlatformAPI.GetAllFilesOfTypeBegin;
+    Platform.GetAllFilesOfTypeEnd = Memory->PlatformAPI.GetAllFilesOfTypeEnd;
+    Platform.OpenNextFile = Memory->PlatformAPI.OpenNextFile;
+    Platform.ReadDataFromFile = Memory->PlatformAPI.ReadDataFromFile;
+    Platform.FileError = Memory->PlatformAPI.FileError;
+
+    Platform.DEBUGReadEntireFile = Memory->PlatformAPI.DEBUGReadEntireFile;
+    Platform.DEBUGFreeFileMemory = Memory->PlatformAPI.DEBUGFreeFileMemory;
+
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
 #endif
     game_state* GameState = (game_state*)Memory->PermanentStorage;
-
-
 
     if (!Memory->IsInitialized){
 
@@ -171,7 +178,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     }
 
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_StarWars), 4.0f, Vec3(0.0f));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Assassin), 4.0f, Vec3(0.0f));
 
     for (int i = 0; i < 5; i++){
         if (Input->MouseButtons[i].EndedDown){
@@ -204,9 +211,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     vec2 YAxis = 300.0f * Vec2(-Sin(Angle * AngleW), Cos(Angle * AngleW));
     real32 OffsetX = Cos(Angle * 0.4f) / 4.0f;
     
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Tree), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
 
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 
