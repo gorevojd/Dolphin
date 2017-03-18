@@ -1,9 +1,9 @@
-#ifndef DOLPHIN_RENDER_GROUP_H
-#define DOLPHIN_RENDER_GROUP_H
+#ifndef IVAN_RENDER_GROUP_H
+#define IVAN_RENDER_GROUP_H
 
-#include "dolphin_platform.h"
-#include "dolphin_intrinsics.h"
-#include "dolphin_render_math.h"
+#include "ivan_platform.h"
+#include "ivan_intrinsics.h"
+#include "ivan_render_math.h"
 
 struct loaded_bitmap{
 	void* Memory;

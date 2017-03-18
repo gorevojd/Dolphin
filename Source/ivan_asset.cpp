@@ -13,6 +13,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadAssetWork){
 
     Platform.ReadDataFromFile(Work->Handle, Work->Offset, Work->Size, Work->Destination);
 
+
     GD_COMPLETE_WRITES_BEFORE_FUTURE;
 
     if(PlatformNoFileErrors(Work->Handle))
@@ -142,8 +143,8 @@ GetBestMatchAssetFrom(
 
             real32 A = MatchVector->Data[Tag->ID];
             real32 B = Tag->Value;
-            real32 D0 = DOLPHIN_MATH_ABS(A - B);
-            real32 D1 = DOLPHIN_MATH_ABS((A - Assets->TagRange[Tag->ID] * DOLPHIN_MATH_SIGN(A)) - B);
+            real32 D0 = IVAN_MATH_ABS(A - B);
+            real32 D1 = IVAN_MATH_ABS((A - Assets->TagRange[Tag->ID] * IVAN_MATH_SIGN(A)) - B);
             real32 Diffrence = GD_MIN(D0, D1);
 
             real32 Weighted = WeightVector->Data[Tag->ID] * Diffrence;
@@ -244,7 +245,7 @@ AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState)
     {
         Assets->TagRange[TagType] = 1000000.0f;
     }
-    Assets->TagRange[Tag_FacingDirection] = DOLPHIN_MATH_TAU;
+    Assets->TagRange[Tag_FacingDirection] = IVAN_MATH_TAU;
 
 
 #if 1

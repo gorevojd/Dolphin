@@ -1,8 +1,10 @@
-#ifndef DOLPHIN_ASSET_IDS
-#define DOLPHIN_ASSET_IDS
+#ifndef IVAN_ASSET_IDS
+#define IVAN_ASSET_IDS
 
 enum asset_tag_id{	
 	Tag_FacingDirection,
+
+	Tag_Color,
 
 	Tag_Count,
 };
@@ -15,7 +17,14 @@ enum asset_type_id{
 	Asset_Witcher,
 	Asset_Assassin,
 	Asset_Tree,
-	Asset_Backdrop,
+	Asset_Backdrop,	
+
+	Asset_Particle,
+
+	Asset_Heart,
+	Asset_Diamond,
+	Asset_Book,
+	Asset_Bottle,
 
 	Asset_Grass,
 	Asset_Tuft,
@@ -36,4 +45,4 @@ enum asset_type_id{
 };
 
 
-#endif /*DOLPHIN_ASSET_IDS*/
+#endif /*IVAN_ASSET_IDS*/

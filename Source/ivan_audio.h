@@ -1,4 +1,4 @@
-#ifndef DOLPHIN_AUDIO_H
+#ifndef IVAN_AUDIO_H
 
 struct volume_v2{
 	float Data[2];
@@ -93,5 +93,5 @@ struct audio_state{
 	volume_v2 MasterVolume;
 };
 
-#define DOLPHIN_AUDIO_H
+#define IVAN_AUDIO_H
 #endif

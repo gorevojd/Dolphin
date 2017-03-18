@@ -1,5 +1,5 @@
-#ifndef DOLPHIN_RANDOM_H
-#define DOLPHIN_RANDOM_H
+#ifndef IVAN_RANDOM_H
+#define IVAN_RANDOM_H
 
 #define MIN_RANDOM_NUMBER 0x00037bf8
 #define MAX_RANDOM_NUMBER 0x3b94079c
@@ -546,6 +546,7 @@ inline uint32 RandomChoiceFromCount(random_series* Series, uint32 ChoiceCount){
 inline real32 RandomFromZeroToOne(random_series* Series){
 	real32 Divisor = 1.0f / (real32)MAX_RANDOM_NUMBER;
 	real32 Result = Divisor * (real32)NextRandomUInt32(Series);
+	return Result;
 }
 
 inline real32 RandomFromNegativeOneToOne(random_series* Series){

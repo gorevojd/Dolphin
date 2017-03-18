@@ -272,7 +272,7 @@ LoadWAV(char* FileName, uint32 SectionFirstSampleIndex, uint32 SectionSampleCoun
         
         if(ChannelCount == 1){
 
-            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 8 * sizeof(int16));
+            NewChannel0 = (int16*)malloc(SampleCount * sizeof(int16) + 8 * sizeof(int16));
 
             Result.Samples[0] = NewChannel0;
             Result.Samples[1] = NewChannel1;
@@ -287,8 +287,8 @@ LoadWAV(char* FileName, uint32 SectionFirstSampleIndex, uint32 SectionSampleCoun
         else if(ChannelCount == 2){
 
 
-            NewChannel0 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 16 * sizeof(int16));
-            NewChannel1 = (int16*)malloc(SectionSampleCount * sizeof(int16) + 16 * sizeof(int16));
+            NewChannel0 = (int16*)malloc(SampleCount * sizeof(int16) + 8 * sizeof(int16));
+            NewChannel1 = (int16*)malloc(SampleCount * sizeof(int16) + 8 * sizeof(int16));
 
             Result.Samples[0] = NewChannel0;
             Result.Samples[1] = NewChannel1;       
@@ -518,10 +518,10 @@ INTERNAL_FUNCTION void WriteHero(){
     game_assets* Assets = &Assets_;
     Initialize(Assets);
 
-    real32 AngleRight = 0.0f * DOLPHIN_MATH_TAU;
-    real32 AngleBack = 0.25f * DOLPHIN_MATH_TAU;
-    real32 AngleLeft = 0.5f * DOLPHIN_MATH_TAU;
-    real32 AngleFront = 0.75f * DOLPHIN_MATH_TAU;
+    real32 AngleRight = 0.0f * IVAN_MATH_TAU;
+    real32 AngleBack = 0.25f * IVAN_MATH_TAU;
+    real32 AngleLeft = 0.5f * IVAN_MATH_TAU;
+    real32 AngleFront = 0.75f * IVAN_MATH_TAU;
 
     vec2 HeroAlign = {0.5f, 0.156682029f};
 
@@ -608,6 +608,36 @@ INTERNAL_FUNCTION void WriteNonHero(){
     AddBitmapAsset(Assets, "../Data/HH/Test2/tuft02.bmp");
     EndAssetType(Assets);
 
+    BeginAssetType(Assets, Asset_Heart);
+    AddBitmapAsset(Assets, "../Data/Images/128/heart.png");
+    EndAssetType(Assets);
+
+    float ColorBlue = GetFloatRepresentOfColor(Vec3(0.0f, 0.0f, 1.0f));
+    float ColorGreen = GetFloatRepresentOfColor(Vec3(0.0f, 1.0f, 0.0f));
+    float ColorRed = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
+
+    BeginAssetType(Assets, Asset_Diamond);
+    AddBitmapAsset(Assets, "../Data/Images/128/gemBlue.png");
+    AddTag(Assets, Tag_Color, ColorBlue);
+    AddBitmapAsset(Assets, "../Data/Images/128/gemGreen.png");
+    AddTag(Assets, Tag_Color, ColorGreen);
+    AddBitmapAsset(Assets, "../Data/Images/128/gemRed.png");
+    AddTag(Assets, Tag_Color, ColorRed);
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Bottle);
+    AddBitmapAsset(Assets, "../Data/Images/128/potionBlue.png");
+    AddTag(Assets, Tag_Color, ColorBlue);
+    AddBitmapAsset(Assets, "../Data/Images/128/potionGreen.png");
+    AddTag(Assets, Tag_Color, ColorGreen);
+    AddBitmapAsset(Assets, "../Data/Images/128/potionRed.png");
+    AddTag(Assets, Tag_Color, ColorRed);
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Book);
+    AddBitmapAsset(Assets, "../Data/Images/128/tome.png");
+    EndAssetType(Assets);
+    
     WriteDDA(Assets, "../Data/asset_pack_non_hero.dda");
 }
 
@@ -648,10 +678,15 @@ INTERNAL_FUNCTION void WriteSounds(){
         FirstSampleIndex < TotalMusicSampleCount;
         FirstSampleIndex += OneMusicChunk)
     {
-        uint32 SampleCount = TotalMusicSampleCount - FirstSampleIndex;
-        if(SampleCount > OneMusicChunk){
+        uint32 SampleCount;
+        if(FirstSampleIndex + OneMusicChunk < TotalMusicSampleCount){
             SampleCount = OneMusicChunk;
         }
+        else{
+            SampleCount = TotalMusicSampleCount - FirstSampleIndex;
+        }
+
+
         sound_id ThisMusic = AddSoundAsset(Assets, "../Data/HH/test3/music_test.wav", FirstSampleIndex, SampleCount);
         if((FirstSampleIndex + OneMusicChunk) < TotalMusicSampleCount){
             Assets->Assets[ThisMusic.Value].Sound.Chain = DDASoundChain_Advance;

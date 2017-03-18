@@ -1,4 +1,4 @@
-#include "dolphin_render_group.h"
+#include "ivan_render_group.h"
 
 inline void RenderBitmap(
     loaded_bitmap* Buffer,
@@ -890,7 +890,8 @@ inline entity_basis_p_result GetRenderEntityBasisP(render_group_transform* Trans
     vec3 P = Add(Vec3(OriginalP.xy, 0.0f), Transform->OffsetP);
 
     if(Transform->Orthographic){
-        Result.P = Transform->ScreenCenter + Transform->MetersToPixels * P.xy;
+        //Result.P = Transform->ScreenCenter + Transform->MetersToPixels * P.xy;
+        Result.P = Transform->ScreenCenter + Transform->MetersToPixels * Vec2(P.x, P.y);
         Result.Scale = Transform->MetersToPixels;
         Result.Valid = true;
     }
@@ -968,7 +969,7 @@ inline void PushBitmap(
             PushedBitmap->Size = Basis.Scale * Dim.Size;
     
             /*This is for test*/
-            PushRectangle(RenderGroup, Offset, Vec2(0.02f));
+            //PushRectangle(RenderGroup, Offset, Vec2(0.02f));
         }
    }
 #else

@@ -1,5 +1,5 @@
-#ifndef DOLPHIN_INTRINSICS
-#define DOLPHIN_INTRINSICS
+#ifndef IVAN_INTRINSICS
+#define IVAN_INTRINSICS
 
 #include "math.h"
 #include <intrin.h>

@@ -1,8 +1,8 @@
-#ifndef DOLPHIN_ASSET_H
-#define DOLPHIN_ASSET_H
+#ifndef IVAN_ASSET_H
+#define IVAN_ASSET_H
 
-#include "dolphin_platform.h"
-#include "dolphin_intrinsics.h"
+#include "ivan_platform.h"
+#include "ivan_intrinsics.h"
 
 struct loaded_sound{
 	uint32 SampleCount;

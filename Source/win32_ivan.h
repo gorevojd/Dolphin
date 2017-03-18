@@ -1,7 +1,7 @@
-#ifndef WIN32_DOLPHIN_H
-#define WIN32_DOLPHIN_H
+#ifndef WIN32_IVAN_H
+#define WIN32_IVAN_H
 
-#include "dolphin.h"
+#include "ivan.h"
 
 struct win32_offscreen_buffer{
 	void* Memory;

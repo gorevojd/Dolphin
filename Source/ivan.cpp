@@ -1,23 +1,8 @@
-#include "dolphin.h"
-#include "dolphin_opengl.cpp"
-#include "dolphin_render_group.cpp"
-#include "dolphin_asset.cpp"
-#include "dolphin_audio.cpp"
-
-INTERNAL_FUNCTION loaded_bitmap
-MakeEmptyBitmap(memory_arena* Arena, int32 Width, int32 Height){
-    loaded_bitmap Result = {};
-
-    uint32 BytesPerPixel = 4;
-
-    Result.Memory = (uint8*)Arena->BaseAddress + Arena->MemoryUsed;
-    Result.Width = Width;
-    Result.Height = Height;
-
-    PushSize(Arena, Width * Height * BytesPerPixel);
-
-    return(Result);
-}
+#include "ivan.h"
+#include "ivan_opengl.cpp"
+#include "ivan_render_group.cpp"
+#include "ivan_asset.cpp"
+#include "ivan_audio.cpp"
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
 	task_with_memory* FoundTask = 0;
@@ -73,6 +58,8 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             Memory->PermanentStorageSize - sizeof(game_state),
             (uint8*)Memory->PermanentStorage + sizeof(game_state));
         
+        GameState->EffectsSeries = RandomSeed(1234);
+
         InitializeAudioState(&GameState->AudioState, &GameState->PermanentArena);
 
         uint32 Min = RandomNumberTable[0];
@@ -97,8 +84,6 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             Memory->TransientStorageSize - sizeof(transient_state),
             (uint8*)Memory->TransientStorage + sizeof(transient_state));
 
-        TranState->GroundBitmap = MakeEmptyBitmap(&GameState->PermanentArena, Buffer->Width, Buffer->Height);
-        //RenderGround(&TranState->GroundBitmap, GameState);
 
         TranState->LowPriorityQueue = Memory->LowPriorityQueue;
         TranState->HighPriorityQueue = Memory->HighPriorityQueue;
@@ -143,23 +128,23 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         if (Controller->MoveUp.EndedDown){
             ToneHz = 170;
             MoveVector.y -= 10;
-            GameState->HeroFacingDirection = 0.25f * DOLPHIN_MATH_TAU;
+            GameState->HeroFacingDirection = 0.25f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveDown.EndedDown){
             ToneHz = 400;
             MoveVector.y += 10;
-            GameState->HeroFacingDirection = 0.75f * DOLPHIN_MATH_TAU;
+            GameState->HeroFacingDirection = 0.75f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveRight.EndedDown){
             MoveVector.x += 10;
-            GameState->HeroFacingDirection = 0.0f * DOLPHIN_MATH_TAU;
+            GameState->HeroFacingDirection = 0.0f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveLeft.EndedDown){
             MoveVector.x -= 10;
-            GameState->HeroFacingDirection = 0.5f * DOLPHIN_MATH_TAU;
+            GameState->HeroFacingDirection = 0.5f * IVAN_MATH_TAU;
         }
 
         if(Controller->Space.EndedDown && Controller->Space.HalfTransitionCount == 0){
@@ -211,9 +196,77 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     vec2 YAxis = 300.0f * Vec2(-Sin(Angle * AngleW), Cos(Angle * AngleW));
     real32 OffsetX = Cos(Angle * 0.4f) / 4.0f;
     
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Head), 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, 0.1f, 0) + Vec3(OffsetX, 0, 0));
+    MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
+    WeightVector.Data[Tag_Color] = 1.0f;
+
+    bitmap_id ParticleBitmap = GetBestMatchBitmapFrom(TranState->Assets, Asset_Diamond, &MatchVector, &WeightVector);
+    //bitmap_id ParticleBitmap = GetFirstBitmapFrom(TranState->Assets, Asset_Diamond);
+#if 0
+    for(int i = 0; i < 10; i++){
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-1.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-1.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.8f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.6f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.4f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.8f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(1.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
+    }
+#else
+    for(uint32 ParticleSpawnIndex = 0;
+        ParticleSpawnIndex < 2;
+        ParticleSpawnIndex++)
+    {
+        particle* Particle = GameState->Particles + GameState->NextParticle++;
+        if(GameState->NextParticle >= ArrayCount(GameState->Particles)){
+            GameState->NextParticle = 0;
+        }
+
+        Particle->P = Vec3(RandomBetween(&GameState->EffectsSeries, -0.05f, 0.05f), 0.0f, 0.0f);
+        Particle->dP = Vec3(
+            RandomBetween(&GameState->EffectsSeries, -0.1f, 0.1f),
+            RandomBetween(&GameState->EffectsSeries, -1.0f, -1.4f), 0.0f);
+        Particle->ddP = Vec3(
+            0.0f, 0.89f, 0.0f);
+        Particle->Color = Vec4(1.0f, 1.0f, 1.0f, 2.0f);
+        Particle->dColor = Vec4(0, 0, 0, -0.5f);
+    }
+
+    for(uint32 ParticleIndex = 0;
+        ParticleIndex < ArrayCount(GameState->Particles);
+        ParticleIndex++)
+    {
+        particle* Particle = GameState->Particles + ParticleIndex;
+
+        Particle->P += Input->DeltaTime * Particle->dP + 0.5f * Particle->ddP * Input->DeltaTime * Input->DeltaTime;
+        Particle->dP += Input->DeltaTime * Particle->ddP;
+        Particle->Color += Input->DeltaTime * Particle->dColor;
+
+        vec4 Color;
+        Color.r = IVAN_MATH_CLAMP01(Particle->Color.r);
+        Color.g = IVAN_MATH_CLAMP01(Particle->Color.g);
+        Color.b = IVAN_MATH_CLAMP01(Particle->Color.b);
+        Color.a = IVAN_MATH_CLAMP01(Particle->Color.a);
+
+        if(Color.a > 0.9f){
+            Color.a = 0.9f * (1.0f - (Color.a - 1.0f) / (-0.1f));
+            //Color.a = 2.0f - Color.a;
+        }
+
+        float BounceCoefficient = 0.4f;
+        float FrictionCoefficient = 0.8f;
+        if(Particle->P.y >= 0.0f){
+            Particle->dP.y = -Particle->dP.y * BounceCoefficient;
+            Particle->dP.x = Particle->dP.x * FrictionCoefficient;
+        }
+
+        PushBitmap(RenderGroup, ParticleBitmap, 0.4f, Particle->P, Color);
+    }
+#endif
 
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 

@@ -13,7 +13,7 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
         ++SampleIndex)
     {
 
-        real32 Omega = 2.0f * DOLPHIN_MATH_PI * WaveFrequency;
+        real32 Omega = 2.0f * IVAN_MATH_PI * WaveFrequency;
         
         int16 SampleValue0 = (int16)(sinf(Phase) * Volume.Data[0]);
         int16 SampleValue1 = (int16)(sinf(Phase) * Volume.Data[1]);
@@ -22,8 +22,8 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
         *SampleOut++ = SampleValue1;
 
         Phase += Omega;
-        if (Phase > 2.0f * DOLPHIN_MATH_PI){
-            Phase -= 2.0f * DOLPHIN_MATH_PI;
+        if (Phase > 2.0f * IVAN_MATH_PI){
+            Phase -= 2.0f * IVAN_MATH_PI;
         }
     }
 }
@@ -191,7 +191,7 @@ OutputPlayingSounds(
                 {
                     real32 SamplePosition = BeginSamplePosition + LoopIndexC * (real32)RunIndex;
 
-#ifdef DOLPHIN_AUDIO_NO_PITCH_LERP
+#ifdef IVAN_AUDIO_NO_PITCH_LERP
                     __m128 SamplePos = _mm_setr_ps(
                         SamplePosition + 0.0f * dSample,
                         SamplePosition + 1.0f * dSample,

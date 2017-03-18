@@ -1,9 +1,9 @@
-#ifndef DOLPHIN_FILE_FORMATS_H
-#define DOLPHIN_FILE_FORMATS_H
+#ifndef IVAN_FILE_FORMATS_H
+#define IVAN_FILE_FORMATS_H
 
-#include "dolphin_asset_ids.h"
+#include "ivan_asset_ids.h"
 
-#define DOLPHIN_CODE(a, b, c, d) (((uint32)(a) << 0) | ((uint32)(b) << 8) | ((uint32)(c) << 16) | ((uint32)(d) << 24))
+#define IVAN_CODE(a, b, c, d) (((uint32)(a) << 0) | ((uint32)(b) << 8) | ((uint32)(c) << 16) | ((uint32)(d) << 24))
 
 #pragma pack(push, 1)
 
@@ -16,7 +16,7 @@ struct sound_id{
 };
 
 struct dda_header{
-#define DDA_MAGIC_VALUE DOLPHIN_CODE('d', 'd', 'a', ' ')
+#define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 
 
 #define DDA_VERSION 0
@@ -74,4 +74,4 @@ struct dda_asset_type{
 
 #pragma pack(pop)
 
-#endif /*DOLPHIN_FILE_FORMATS_H*/
+#endif /*IVAN_FILE_FORMATS_H*/

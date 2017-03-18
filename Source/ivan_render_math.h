@@ -25,4 +25,19 @@ inline vec4 Linear1ToSRGB255(vec4 v){
 	return(Result);
 }
 
+inline float GetFloatRepresentOfColor(vec3 Color){
+	float Result = 0;
+
+	vec4 TempV = Linear1ToSRGB255(Vec4(Color, 0.0f));
+
+	uint32 Temp = 
+		((uint32)(TempV.r) << 16) 	|
+		((uint32)(TempV.g) << 8) 	|
+		((uint32)(TempV.b) << 0);
+
+	Result = (float)Temp;
+
+	return(Result);
+}
+
 #endif

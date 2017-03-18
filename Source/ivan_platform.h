@@ -1,5 +1,5 @@
-#ifndef DOLPHIN_PLATFORM_H
-#define DOLPHIN_PLATFORM_H
+#ifndef IVAN_PLATFORM_H
+#define IVAN_PLATFORM_H
 
 #include <stdio.h>
 
@@ -24,7 +24,7 @@
 #include <x86intrin.h>
 #endif
 
-#include "dolphin_math.h"
+#include "ivan_math.h"
 
 /*Some memory and arenas stuff*/
 struct memory_arena{

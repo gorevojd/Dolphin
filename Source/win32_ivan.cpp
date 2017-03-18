@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <gl/GL.h>
 
-#include "win32_dolphin.h"
+#include "win32_ivan.h"
 
 #define WGL_SWAP_INTERVAL(name) BOOL WINAPI name(INT)
 typedef WGL_SWAP_INTERVAL(wgl_swap_interval);
@@ -1099,7 +1099,7 @@ int WINAPI WinMain(
     GlobalScreen.Window = CreateWindowEx(
         0,
         wcex.lpszClassName,
-        "DolphinEngine",
+        "IvanEngine",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         10,
         10,
@@ -1110,8 +1110,8 @@ int WINAPI WinMain(
         Instance,
         0);
 
-    char* SourceDLLName = "dolphin.dll";
-    char* TempDLLName = "dolphin_temp.dll";
+    char* SourceDLLName = "ivan.dll";
+    char* TempDLLName = "ivan_temp.dll";
 
     char SourceDLLFullPath[MAX_PATH];
     BuildPathForFileInEXEDir(SourceDLLFullPath, SourceDLLName);

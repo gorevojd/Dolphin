@@ -1,4 +1,4 @@
-#include "dolphin_render_group.h"
+#include "ivan_render_group.h"
 
 #if 0
 inline void RenderOpenGLRectangle(

@@ -1,17 +1,24 @@
-#ifndef DOLPHIN_H
-#define DOLPHIN_H
+#ifndef IVAN_H
+#define IVAN_H
 
-#include "dolphin_platform.h"
+#include "ivan_platform.h"
 
-#include "dolphin_intrinsics.h"
-#include "dolphin_render_group.h"
-#include "dolphin_file_formats.h"
-#include "dolphin_asset.h"
-#include "dolphin_random.h"
-#include "dolphin_audio.h"
+#include "ivan_intrinsics.h"
+#include "ivan_render_group.h"
+#include "ivan_file_formats.h"
+#include "ivan_asset.h"
+#include "ivan_random.h"
+#include "ivan_audio.h"
 
-struct hero_bitmap_ids
-{
+struct particle{
+	vec3 P;
+	vec3 dP;
+	vec3 ddP;
+	vec4 Color;
+	vec4 dColor;
+};
+
+struct hero_bitmap_ids{
     bitmap_id Head;
     bitmap_id Cape;
     bitmap_id Torso;
@@ -29,6 +36,11 @@ struct game_state{
 	audio_state AudioState;
 
 	real32 Time;
+
+	random_series EffectsSeries;
+
+	uint32 NextParticle;
+	particle Particles[256];
 };
 
 struct transient_state{
