@@ -3,6 +3,7 @@
 #include "ivan_render_group.cpp"
 #include "ivan_asset.cpp"
 #include "ivan_audio.cpp"
+#include "ivan_particle.cpp"
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
 	task_with_memory* FoundTask = 0;
@@ -98,11 +99,15 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
 
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState);
+        InitParticleCache(&GameState->FontainCache, TranState->Assets);
+
 
         PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
         TranState->IsInitialized = true;
     }
+    
+
 
     temporary_memory RenderMemory = BeginTemporaryMemory(&TranState->TranArena);
     render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10));
@@ -110,6 +115,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     real32 MetersToPixels = (real32)Buffer->Width / WidthOfMonitor / 8;
     //real32 MetersToPixels = 1;
     SetOrthographic(RenderGroup, Buffer->Width, Buffer->Height, MetersToPixels);
+
 
     int temp1 = ArrayCount(Input->Controllers[0].Buttons);
     Assert((&Input->Controllers[0].Terminator - &Input->Controllers[0].Buttons[0]) ==
@@ -127,13 +133,13 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         if (Controller->MoveUp.EndedDown){
             ToneHz = 170;
-            MoveVector.y -= 10;
+            MoveVector.y += 10;
             GameState->HeroFacingDirection = 0.25f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveDown.EndedDown){
             ToneHz = 400;
-            MoveVector.y += 10;
+            MoveVector.y -= 10;
             GameState->HeroFacingDirection = 0.75f * IVAN_MATH_TAU;
         }
 
@@ -199,7 +205,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
     WeightVector.Data[Tag_Color] = 1.0f;
 
-    bitmap_id ParticleBitmap = GetBestMatchBitmapFrom(TranState->Assets, Asset_Diamond, &MatchVector, &WeightVector);
+    bitmap_id ParticleBitmap = GetBestMatchBitmapFrom(TranState->Assets, Asset_Particle, &MatchVector, &WeightVector);
     //bitmap_id ParticleBitmap = GetFirstBitmapFrom(TranState->Assets, Asset_Diamond);
 #if 0
     for(int i = 0; i < 10; i++){
@@ -217,6 +223,8 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(1.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
     }
 #else
+
+#if 0
     for(uint32 ParticleSpawnIndex = 0;
         ParticleSpawnIndex < 2;
         ParticleSpawnIndex++)
@@ -254,20 +262,28 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         if(Color.a > 0.9f){
             Color.a = 0.9f * (1.0f - (Color.a - 1.0f) / (-0.1f));
-            //Color.a = 2.0f - Color.a;
         }
 
         float BounceCoefficient = 0.4f;
         float FrictionCoefficient = 0.8f;
-        if(Particle->P.y >= 0.0f){
+        if(Particle->P.y > 0.0f){
+            Particle->P.y = 0.0f;
             Particle->dP.y = -Particle->dP.y * BounceCoefficient;
             Particle->dP.x = Particle->dP.x * FrictionCoefficient;
         }
 
-        PushBitmap(RenderGroup, ParticleBitmap, 0.4f, Particle->P, Color);
+        PushBitmap(RenderGroup, ParticleBitmap, 0.2f, Particle->P, Color);
     }
+#else
+    SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.5f, 0.0f));    
+    SpawnFontain(&GameState->FontainCache, Vec3(1.0f, -0.5f, 0.0f));    
+    SpawnFontain(&GameState->FontainCache, Vec3(-1.0f, 0.0f, 0.0f));    
+
+    UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
+
 #endif
 
+#endif
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
 
     EndTemporaryMemory(RenderMemory);

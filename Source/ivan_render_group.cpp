@@ -237,6 +237,8 @@ inline void RenderRectangleQuickly(
     if (MaxX > ClipMaxX){ MaxX = ClipMaxX; }
     if (MaxY > ClipMaxY){ MaxY = ClipMaxY; }
 
+    Color.a = IVAN_MATH_CLAMP(Color.a, 0.0f, 1.0f);
+
     real32 OneOver255 = 1.0f / 255.0f;
     real32 PremultipliedXAxis_x = InvXAxisLengthSq * XAxis.x;
     real32 PremultipliedXAxis_y = InvXAxisLengthSq * XAxis.y;
@@ -274,9 +276,7 @@ inline void RenderRectangleQuickly(
 
     __m128i mMaskFF = _mm_set1_epi32(0xFF);
 
-#define mmSquare(value) _mm_mul_ps(value, value)
-#define M(a, i) ((float*)(&a))[i]
-#define Mi(a, i) ((int*)(&a))[i]
+
 
     uint32* Row = (uint32*)Buffer->Memory + MinY * Buffer->Width + MinX;
 
@@ -891,7 +891,7 @@ inline entity_basis_p_result GetRenderEntityBasisP(render_group_transform* Trans
 
     if(Transform->Orthographic){
         //Result.P = Transform->ScreenCenter + Transform->MetersToPixels * P.xy;
-        Result.P = Transform->ScreenCenter + Transform->MetersToPixels * Vec2(P.x, P.y);
+        Result.P = Transform->ScreenCenter + Transform->MetersToPixels * Vec2(P.x, -P.y);
         Result.Scale = Transform->MetersToPixels;
         Result.Valid = true;
     }
@@ -922,8 +922,12 @@ GetBitmapDim(render_group* RenderGroup, loaded_bitmap* Bitmap, real32 Height, ve
 
     Dim.Size = Vec2(Height * Bitmap->WidthOverHeight, Height);
     Dim.Align = CAlign * Hadamard(Bitmap->AlignPercentage, Dim.Size);
+#if 0
     Dim.P = Offset - Vec3(Dim.Align, 0);
-
+#else
+    Dim.P.x = Offset.x - Vec3(Dim.Align, 0).x;
+    Dim.P.y = Offset.y + Vec3(Dim.Align, 0).y;
+#endif
     return(Dim);
 }
 
@@ -933,8 +937,11 @@ inline void PushRectangle(
     vec2 Dim,
     vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f))
 {
-    vec3 P = Offset - (Vec3((0.5f * Dim), 0.0f));
-    entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Offset);
+    vec3 P = {};
+    P.x = Offset.x - Dim.x * 0.5f;
+    P.y = Offset.y + Dim.y * 0.5f;
+
+    entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, P);
     if(Basis.Valid){
         render_entry_rectangle* PushedRect = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_rectangle);
         if (PushedRect){

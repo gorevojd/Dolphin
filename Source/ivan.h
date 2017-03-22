@@ -2,13 +2,23 @@
 #define IVAN_H
 
 #include "ivan_platform.h"
+#include "ivan_memory.h"
 
 #include "ivan_intrinsics.h"
+#include "ivan_random.h"
+#include "ivan_simd.h"
 #include "ivan_render_group.h"
 #include "ivan_file_formats.h"
 #include "ivan_asset.h"
-#include "ivan_random.h"
 #include "ivan_audio.h"
+#include "ivan_particle.h"
+
+struct task_with_memory{
+    bool32 BeingUsed;
+    memory_arena Arena;
+
+    temporary_memory Memory;
+};
 
 struct particle{
 	vec3 P;
@@ -38,9 +48,10 @@ struct game_state{
 	real32 Time;
 
 	random_series EffectsSeries;
+	particle_cache FontainCache;
 
-	uint32 NextParticle;
 	particle Particles[256];
+	uint32 NextParticle;
 };
 
 struct transient_state{
@@ -58,5 +69,9 @@ struct transient_state{
 };
 
 GLOBAL_VARIABLE platform_api Platform;
+
+
+INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(struct transient_state* TranState);
+INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task);
 
 #endif

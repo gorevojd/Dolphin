@@ -359,7 +359,7 @@ AddBitmapAsset(
 	DDA->FirstTagIndex = Assets->TagCount;
 	DDA->OnePastLastTagIndex = DDA->FirstTagIndex;
 	DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
-	DDA->Bitmap.AlignPercentage[1] = 1.0f - AlignPercentage.y;
+	DDA->Bitmap.AlignPercentage[1] = AlignPercentage.y;
 
 	Source->Type = AssetType_Bitmap;
 	Source->FileName = FileName;
@@ -523,7 +523,7 @@ INTERNAL_FUNCTION void WriteHero(){
     real32 AngleLeft = 0.5f * IVAN_MATH_TAU;
     real32 AngleFront = 0.75f * IVAN_MATH_TAU;
 
-    vec2 HeroAlign = {0.5f, 0.156682029f};
+    vec2 HeroAlign = {0.5f, 1.0f - 0.156682029f};
 
     BeginAssetType(Assets, Asset_Head);
     AddBitmapAsset(Assets, "../Data/HH/test/test_hero_right_head.bmp", HeroAlign);
@@ -637,6 +637,10 @@ INTERNAL_FUNCTION void WriteNonHero(){
     BeginAssetType(Assets, Asset_Book);
     AddBitmapAsset(Assets, "../Data/Images/128/tome.png");
     EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Particle);
+    AddBitmapAsset(Assets, "../Data/Images/ShockSpell.png");
+    EndAssetType(Assets);
     
     WriteDDA(Assets, "../Data/asset_pack_non_hero.dda");
 }
@@ -703,5 +707,6 @@ int main(int ArgCount, char** Args){
     WriteNonHero();
     WriteSounds();
 
+    system("pause");
 	return(0);
 }
