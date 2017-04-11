@@ -18,6 +18,8 @@
 
 #define INTERNAL_BUILD
 
+typedef size_t memory_index;
+
 #if GD_COMPILER_MSVC
 #include <intrin.h>
 #else  
@@ -119,6 +121,12 @@ typedef PLATFORM_ADD_ENTRY(platform_add_entry);
 #define PLATFORM_COMPLETE_ALL_WORK(name) void name(platform_work_queue* Queue)
 typedef PLATFORM_COMPLETE_ALL_WORK(platform_complete_all_work);
 
+#define PLATFORM_ALLOCATE_MEMORY(name) void* name(size_t Size)
+typedef PLATFORM_ALLOCATE_MEMORY(platform_allocate_memory);
+
+#define PLATFORM_DEALLOCATE_MEMORY(name) void name(void* Memory)
+typedef PLATFORM_DEALLOCATE_MEMORY(platform_deallocate_memory);
+
 typedef struct platform_api{
     platform_add_entry* AddEntry;
     platform_complete_all_work* CompleteAllWork;
@@ -132,6 +140,9 @@ typedef struct platform_api{
     debug_platform_write_entire_file* DEBUGWriteEntireFile;
     debug_platform_read_entire_file* DEBUGReadEntireFile;
     debug_platform_free_file_memory* DEBUGFreeFileMemory;
+
+    platform_allocate_memory* AllocateMemory;
+    platform_deallocate_memory* DeallocateMemory;
 } platform_api;
 
 struct game_controller_input{

@@ -843,7 +843,8 @@ SetOrthographic(
 }
 
 INTERNAL_FUNCTION render_group*
-AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize){ 
+AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize)
+{ 
     render_group* Result = PushStruct(Arena, render_group);
     Result->PushBufferBase = (uint8*)PushSize(Arena, MaxPushBufferSize);
 

@@ -35,7 +35,7 @@ SpawnFontain(
         A->C.r = MM_SET_EXPR(1.0f);
         A->C.g = MM_SET_EXPR(1.0f);
         A->C.b = MM_SET_EXPR(1.0f);
-        A->C.a = MM_SET_EXPR(2.0f);
+        A->C.a = MM_SET_EXPR(4.0f);
 
         A->dC.r = MM_SET_EXPR(0.0f);
         A->dC.g = MM_SET_EXPR(0.0f);
@@ -84,6 +84,26 @@ UpdateAndRenderFontain(
         }
         */
 
+#if 1
+
+        __m128 temp = _mm_set1_ps(80.0f);
+
+        __m128 mmBounce = _mm_set1_ps(-0.4f);
+        __m128 mmFriction = _mm_set1_ps(0.8f);
+        __m128 mmBounceMask = _mm_cmplt_ps(A->P.y, _mm_set1_ps(0.0f));
+        __m128 mmOld = _mm_andnot_ps(mmBounceMask, A->P.y);
+
+        A->P.y = _mm_or_ps(
+            mmOld,
+            _mm_and_ps(mmBounceMask, _mm_set1_ps(0.0f)));
+        A->dP.y = _mm_or_ps(
+            _mm_andnot_ps(mmBounceMask, A->dP.y),
+            _mm_and_ps(mmBounceMask, _mm_mul_ps(A->dP.y, mmBounce)));
+        A->dP.x = _mm_or_ps(
+            _mm_andnot_ps(mmBounceMask, A->dP.x),
+            _mm_and_ps(mmBounceMask, _mm_mul_ps(A->dP.x, mmFriction)));
+#endif
+
         for(uint32 SubIndex = 0;
             SubIndex < 4;
             SubIndex++)
@@ -101,13 +121,13 @@ UpdateAndRenderFontain(
                 M(mmAlpha, SubIndex),
             };
 
-            float BounceCoefficient = 0.4f;
+/*            float BounceCoefficient = 0.4f;
             float FrictionCoefficient = 0.8f;
             if(M(A->P.y, SubIndex) < 0.0f){
                 M(A->P.y, SubIndex) = 0.0f;
                 M(A->dP.y, SubIndex) = -M(A->dP.y, SubIndex) * BounceCoefficient;
                 M(A->dP.x, SubIndex) = M(A->dP.x, SubIndex) * FrictionCoefficient;
-            }
+            }*/
 
             if(C.a > 0.0f){
                 PushBitmap(RenderGroup, System->BitmapID, 0.2f, P, C);

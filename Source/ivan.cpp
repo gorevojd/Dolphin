@@ -47,6 +47,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     Platform.DEBUGReadEntireFile = Memory->PlatformAPI.DEBUGReadEntireFile;
     Platform.DEBUGFreeFileMemory = Memory->PlatformAPI.DEBUGFreeFileMemory;
 
+    Platform.AllocateMemory = Memory->PlatformAPI.AllocateMemory;
+    Platform.DeallocateMemory = Memory->PlatformAPI.DeallocateMemory;
+
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
 #endif
@@ -275,9 +278,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         PushBitmap(RenderGroup, ParticleBitmap, 0.2f, Particle->P, Color);
     }
 #else
-    SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.5f, 0.0f));    
-    SpawnFontain(&GameState->FontainCache, Vec3(1.0f, -0.5f, 0.0f));    
-    SpawnFontain(&GameState->FontainCache, Vec3(-1.0f, 0.0f, 0.0f));    
+    SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
 
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
 

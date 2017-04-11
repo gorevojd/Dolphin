@@ -1007,6 +1007,19 @@ INTERNAL_FUNCTION PLATFORM_READ_DATA_FROM_FILE(Win32ReadDataFromFile){
     }
 }
 
+INTERNAL_FUNCTION PLATFORM_ALLOCATE_MEMORY(Win32AllocateMemory){
+    void* Result = VirtualAlloc(
+        0, Size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION PLATFORM_DEALLOCATE_MEMORY(Win32DeallocateMemory){
+    if(Memory){
+        VirtualFree(Memory, 0, MEM_RELEASE);
+    }
+}
+
 LRESULT CALLBACK
 Win32WindowProcessing(
     HWND Window,
@@ -1095,6 +1108,9 @@ int WINAPI WinMain(
     GameMemory.PlatformAPI.OpenNextFile = Win32OpenNextFile;
     GameMemory.PlatformAPI.ReadDataFromFile = Win32ReadDataFromFile;
     GameMemory.PlatformAPI.FileError = Win32FileError;
+
+    GameMemory.PlatformAPI.AllocateMemory = Win32AllocateMemory;
+    GameMemory.PlatformAPI.DeallocateMemory = Win32DeallocateMemory;
 
     GlobalScreen.Window = CreateWindowEx(
         0,
