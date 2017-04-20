@@ -15,6 +15,10 @@ struct sound_id{
 	unsigned int Value;
 };
 
+struct font_id{
+	unsigned int Value;
+};
+
 struct dda_header{
 #define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 
@@ -51,6 +55,19 @@ struct dda_sound{
 	dda_sound_chain Chain;
 };
 
+struct dda_font_glyph{
+	uint32 UnicodeCodePoint;
+	bitmap_id BitmapID;
+};
+
+struct dda_font{
+	uint32 OnePastHighestCodepoint;
+	uint32 GlyphCount;
+	float AscenderHeight;
+	float DescenderHeight;
+	float ExternalLeading;
+};
+
 struct dda_tag{
 	uint32 ID;
 	real32 Value;
@@ -63,6 +80,7 @@ struct dda_asset{
 	union{
 		dda_bitmap Bitmap;
 		dda_sound Sound;
+		dda_font Font;
 	};
 };
 

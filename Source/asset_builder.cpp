@@ -1,5 +1,9 @@
 #include "asset_builder.h"
 
+/*
+    NOTE(Dima): Images are stored in gamma-corrected premultiplied-alpha format
+*/
+
 #pragma pack(push, 1)
 struct bitmap_header{
     uint16 FileType; /*File type, always 4d42 ("BM")*/
@@ -160,6 +164,240 @@ LoadBMP(char* FileName, bool32 FlipOnLoad = false){
                 ((uint32)(Color.r + 0.5f) << 16) |
                 ((uint32)(Color.g + 0.5f) << 8) |
                 ((uint32)(Color.b + 0.5f) << 0));
+        }
+    }
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION loaded_font*
+LoadFont(char* FileName, char* FontName, int PixelHeight){
+    loaded_font* Font = (loaded_font*)malloc(sizeof(loaded_font));
+
+    AddFontResourceExA(FileName, FR_PRIVATE, 0);
+    Font->Win32Handle = CreateFontA(
+        PixelHeight,
+        0, 0, 0,
+        FW_NORMAL,
+        FALSE,
+        FALSE,
+        FALSE,
+        DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        ANTIALIASED_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE,
+        FontName);
+
+    SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
+    GetTextMetrics(GlobalFontDeviceContext, &Font->TextMetric);
+
+    Font->MinCodePoint = INT_MAX;
+    Font->MaxCodePoint = 0;
+
+    Font->MaxGlyphCount = 5000;
+    Font->GlyphCount = 0;
+
+    uint32 GlyphFromCodepointArraySize = ONE_PAST_MAX_FONT_CODEPOINT * sizeof(uint32);
+    Font->GlyphIndexFromCodePoint = (uint32*)malloc(GlyphFromCodepointArraySize);
+    memset(Font->GlyphIndexFromCodePoint, 0, GlyphFromCodepointArraySize);
+
+    Font->Glyphs = (dda_font_glyph*)malloc(sizeof(dda_font_glyph) * Font->MaxGlyphCount);
+    size_t HorizontalAdvanceArraySize = sizeof(float) * Font->MaxGlyphCount * Font->MaxGlyphCount;
+    Font->HorizontalAdvance = (float*)malloc(HorizontalAdvanceArraySize);
+    memset(Font->HorizontalAdvance, 0, HorizontalAdvanceArraySize);
+
+    Font->OnePastHighestCodepoint = 0;
+
+    Font->GlyphCount = 1;
+    Font->Glyphs[0].UnicodeCodePoint = 0;
+    Font->Glyphs[0].BitmapID.Value = 0;
+
+    return(Font);
+}
+
+INTERNAL_FUNCTION void
+FinalizeFontKerning(loaded_font* Font){
+    SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
+
+    DWORD KerningPairCount = GetKerningPairsW(GlobalFontDeviceContext, 0, 0);
+    KERNINGPAIR* KerningPairs = (KERNINGPAIR*)malloc(KerningPairCount * sizeof(KERNINGPAIR));
+    GetKerningPairsW(GlobalFontDeviceContext, KerningPairCount, KerningPairs);
+
+    for(DWORD KernPairIndex = 0;
+        KernPairIndex < KerningPairCount;
+        KernPairIndex++)
+    {
+        KERNINGPAIR* Pair = KerningPairs + KernPairIndex;
+        if((Pair->wFirst < ONE_PAST_MAX_FONT_CODEPOINT) &&
+            (Pair->wSecond < ONE_PAST_MAX_FONT_CODEPOINT))
+        {
+            uint32 First = Font->GlyphIndexFromCodePoint[Pair->wFirst];
+            uint32 Second = Font->GlyphIndexFromCodePoint[Pair->wSecond];
+            if((First != 0) && (Second != 0)){
+                Font->HorizontalAdvance[First * Font->MaxGlyphCount + Second] += (float)Pair->iKernAmount;
+            }
+        }
+    }
+
+    free(KerningPairs);
+}
+
+INTERNAL_FUNCTION void 
+FreeFont(loaded_font* Font){
+    if(Font){
+        DeleteObject(Font->Win32Handle);
+        free(Font->Glyphs);
+        free(Font->HorizontalAdvance);
+        free(Font->GlyphIndexFromCodePoint);
+        free(Font);
+    }
+}
+
+INTERNAL_FUNCTION void InitializeFontDC(){
+    GlobalFontDeviceContext = CreateCompatibleDC(GetDC(0));
+
+    BITMAPINFO Info = {};
+    Info.bmiHeader.biSize = sizeof(Info.bmiHeader);
+    Info.bmiHeader.biWidth = MAX_FONT_WIDTH;
+    Info.bmiHeader.biHeight = MAX_FONT_HEIGHT;
+    Info.bmiHeader.biPlanes = 1;
+    Info.bmiHeader.biBitCount = 32;
+    Info.bmiHeader.biCompression = BI_RGB;
+    Info.bmiHeader.biSizeImage = 0;
+    Info.bmiHeader.biXPelsPerMeter = 0;
+    Info.bmiHeader.biYPelsPerMeter = 0;
+    Info.bmiHeader.biClrUsed = 0;
+    Info.bmiHeader.biClrImportant = 0;
+    HBITMAP Bitmap = CreateDIBSection(GlobalFontDeviceContext, &Info, DIB_RGB_COLORS, &GlobalFontBits, 0, 0);
+    SelectObject(GlobalFontDeviceContext, Bitmap);
+    SetBkColor(GlobalFontDeviceContext, RGB(0, 0, 0));  
+}
+
+INTERNAL_FUNCTION loaded_bitmap
+LoadGlyphBitmap(loaded_font* Font, uint32 Codepoint, dda_asset* Asset){
+    loaded_bitmap Result = {};
+
+    uint32 GlyphIndex = Font->GlyphIndexFromCodePoint[Codepoint];
+
+    SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
+
+    memset(GlobalFontBits, 0x00, MAX_FONT_WIDTH * MAX_FONT_HEIGHT * sizeof(uint32));
+
+    wchar_t FakePoint = (wchar_t)Codepoint;
+
+    SIZE Size;
+    GetTextExtentPoint32W(GlobalFontDeviceContext, &FakePoint, 1, &Size);
+
+    int PreStepX = 128;
+
+    int BoundWidth = Size.cx + 2 * PreStepX;
+    if(BoundWidth > MAX_FONT_WIDTH){
+        BoundWidth = MAX_FONT_WIDTH;
+    }
+    int BoundHeight = Size.cy;
+    if(BoundHeight > MAX_FONT_HEIGHT){
+        BoundHeight = MAX_FONT_HEIGHT;
+    }
+
+    SetTextColor(GlobalFontDeviceContext, RGB(255, 255, 255));
+    TextOutW(GlobalFontDeviceContext, PreStepX, 0, &FakePoint, 1);
+
+    int MinX = 10000;
+    int MinY = 10000;
+    int MaxX = -10000;
+    int MaxY = -10000;
+
+    for(int j  = 0; j < BoundHeight; j++){
+
+        uint32 *Pixel = (uint32*)GlobalFontBits + (MAX_FONT_HEIGHT - 1 - j) * MAX_FONT_WIDTH;
+        
+        for(int i = 0; i < BoundWidth; i++){
+            if(*Pixel != 0)
+            {
+                if(MinX > i)
+                {
+                    MinX = i;                    
+                }
+
+                if(MinY > j)
+                {
+                    MinY = j;                    
+                }
+                
+                if(MaxX < i)
+                {
+                    MaxX = i;                    
+                }
+
+                if(MaxY < j)
+                {
+                    MaxY = j;                    
+                }
+            }
+
+            ++Pixel;
+        }
+    }
+
+    float KerningChange = 0;
+    if(MinX <= MaxX){
+        int Width = (MaxX - MinX) + 1;
+        int Height = (MaxY - MinY) + 1;
+
+        Result.Width = Width + 2;
+        Result.Height = Height + 2;
+        Result.Memory = malloc(Result.Height * Result.Width * 4);
+        Result.Free = Result.Memory;
+
+        memset(Result.Memory, 0, Result.Height * Result.Width * 4);
+
+        uint8* DestRow = (uint8*)Result.Memory + (Result.Height - 1 - 1) * Result.Width * 4;
+        uint32* SourceRow = (uint32*)GlobalFontBits + (MAX_FONT_HEIGHT - 1 - MinY) * MAX_FONT_WIDTH;
+        
+        for(int j = MinY; j < MaxY; j++){
+            
+            uint32* Source = (uint32*)SourceRow + MinX;
+            uint32* Dest = (uint32*)DestRow + 1;    
+
+            for(int i = MinX; i < MaxX; i++){
+                uint32 Pixel = *Source;
+
+                float Gray = (float)(Pixel & 0xFF);
+                vec4 Texel = {255.0f, 255.0f, 255.0f, Gray};
+                Texel = SRGB255ToLinear1(Texel);
+                Texel.rgb *= Texel.a;
+                Texel = Linear1ToSRGB255(Texel);
+
+               *Dest++ = (((uint32)(Texel.a + 0.5f) << 24) |
+                   ((uint32)(Texel.r + 0.5f) << 16) |
+                   ((uint32)(Texel.g + 0.5f) << 8) |
+                   ((uint32)(Texel.b + 0.5f) << 0));
+
+               Source++;
+            }
+
+            DestRow -= Result.Width * 4;
+            SourceRow -= MAX_FONT_WIDTH;
+        }
+
+        Asset->Bitmap.AlignPercentage[0] = (1.0f) / (float)Result.Width;
+        Asset->Bitmap.AlignPercentage[1] = (1.0f + (MaxY - (BoundHeight - Font->TextMetric.tmDescent))) / (float)Result.Height;
+    
+        KerningChange = (float)(MinX - PreStepX);
+    }
+
+    INT ThisWidth;
+    GetCharWidth32W(GlobalFontDeviceContext, Codepoint, Codepoint, &ThisWidth);
+    float CharAdvance = (float)ThisWidth;
+
+    for(uint32 OtherGlyphIndex = 0;
+        OtherGlyphIndex < Font->MaxGlyphCount;
+        OtherGlyphIndex++)
+    {
+        Font->HorizontalAdvance[GlyphIndex * Font->MaxGlyphCount + OtherGlyphIndex] += CharAdvance - KerningChange;
+        if(OtherGlyphIndex != 0){
+            Font->HorizontalAdvance[OtherGlyphIndex * Font->MaxGlyphCount + GlyphIndex] += KerningChange;
         }
     }
 
@@ -330,7 +568,6 @@ LoadWAV(char* FileName, uint32 SectionFirstSampleIndex, uint32 SectionSampleCoun
         Result.SampleCount = SampleCount;
     }
 
-
     return(Result);
 }
 
@@ -344,28 +581,72 @@ BeginAssetType(game_assets* Assets, asset_type_id TypeID){
 	Assets->DEBUGAssetType->OnePastLastAssetIndex = Assets->DEBUGAssetType->FirstAssetIndex;
 }
 
+struct added_asset{
+    uint32 ID;
+    dda_asset* DDA;
+    asset_source* Source;
+};
+
+INTERNAL_FUNCTION added_asset AddAsset(game_assets* Assets){
+    Assert(Assets->DEBUGAssetType);
+    Assert(Assets->DEBUGAssetType->OnePastLastAssetIndex < ArrayCount(Assets->Assets));
+
+    uint32 Index = Assets->DEBUGAssetType->OnePastLastAssetIndex++;
+    asset_source* Source = Assets->AssetSources + Index;
+    dda_asset* DDA = Assets->Assets + Index;
+    DDA->FirstTagIndex = Assets->TagCount;
+    DDA->OnePastLastTagIndex = DDA->FirstTagIndex;
+
+    Assets->AssetIndex = Index;
+
+    added_asset Result;
+    Result.ID = Index;
+    Result.DDA = DDA;
+    Result.Source = Source;
+    return(Result);
+}
+
+INTERNAL_FUNCTION bitmap_id 
+AddCharacterAsset(game_assets* Assets, loaded_font* Font, uint32 Codepoint){
+    added_asset Asset = AddAsset(Assets);
+    Asset.DDA->Bitmap.AlignPercentage[0] = 0.0f;
+    Asset.DDA->Bitmap.AlignPercentage[1] = 0.0f;
+    Asset.Source->Type = AssetType_FontGlyph;
+    Asset.Source->Glyph.Font = Font;
+    Asset.Source->Glyph.Codepoint = Codepoint;
+
+    bitmap_id Result = {Asset.ID};
+
+    Assert(Font->GlyphCount < Font->MaxGlyphCount);
+    uint32 GlyphIndex = Font->GlyphCount++;
+    dda_font_glyph* Glyph = Font->Glyphs + GlyphIndex;
+    Glyph->UnicodeCodePoint = Codepoint;
+    Glyph->BitmapID = Result;
+    Font->GlyphIndexFromCodePoint[Codepoint] = GlyphIndex;
+
+    if(Font->OnePastHighestCodepoint <= Codepoint){
+        Font->OnePastHighestCodepoint = Codepoint + 1;
+    }
+
+    return(Result);
+}
+
 INTERNAL_FUNCTION bitmap_id
 AddBitmapAsset(
 	game_assets* Assets,
 	char* FileName,
 	vec2 AlignPercentage = Vec2(0.5f))
 {
-	Assert(Assets->DEBUGAssetType);
-	Assert(Assets->DEBUGAssetType->OnePastLastAssetIndex < ArrayCount(Assets->Assets));
 
-	bitmap_id Result = {Assets->DEBUGAssetType->OnePastLastAssetIndex++};
-	asset_source* Source = Assets->AssetSources + Result.Value;
-	dda_asset* DDA = Assets->Assets + Result.Value;
-	DDA->FirstTagIndex = Assets->TagCount;
-	DDA->OnePastLastTagIndex = DDA->FirstTagIndex;
-	DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
-	DDA->Bitmap.AlignPercentage[1] = AlignPercentage.y;
+    added_asset Asset = AddAsset(Assets);
 
-	Source->Type = AssetType_Bitmap;
-	Source->FileName = FileName;
+	Asset.DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
+	Asset.DDA->Bitmap.AlignPercentage[1] = AlignPercentage.y;
 
-	Assets->AssetIndex = Result.Value;
+	Asset.Source->Type = AssetType_Bitmap;
+	Asset.Source->Bitmap.FileName = FileName;
 
+    bitmap_id Result = {Asset.ID};
 	return(Result);
 }
 
@@ -376,24 +657,32 @@ AddSoundAsset(
 	unsigned int FirstSampleIndex = 0,
 	unsigned int SampleCount = 0)
 {
-	Assert(Assets->DEBUGAssetType);
-	Assert(Assets->DEBUGAssetType->OnePastLastAssetIndex < ArrayCount(Assets->Assets));
+    added_asset Asset = AddAsset(Assets);
 
-	sound_id Result = {Assets->DEBUGAssetType->OnePastLastAssetIndex++};
-	asset_source* Source = Assets->AssetSources + Result.Value;
-	dda_asset* DDA = Assets->Assets + Result.Value;
-	DDA->FirstTagIndex = Assets->TagCount;
-	DDA->OnePastLastTagIndex = DDA->FirstTagIndex;
-	DDA->Sound.SampleCount = SampleCount;
-	DDA->Sound.Chain = DDASoundChain_None;
+	Asset.DDA->Sound.SampleCount = SampleCount;
+	Asset.DDA->Sound.Chain = DDASoundChain_None;
 
-	Source->Type = AssetType_Sound;
-	Source->FileName = FileName;
-	Source->FirstSampleIndex = FirstSampleIndex;
+	Asset.Source->Type = AssetType_Sound;
+	Asset.Source->Sound.FileName = FileName;
+	Asset.Source->Sound.FirstSampleIndex = FirstSampleIndex;
 
-	Assets->AssetIndex = Result.Value;
-
+    sound_id Result = {Asset.ID};
 	return(Result);
+}
+
+INTERNAL_FUNCTION font_id
+AddFontAsset(game_assets* Assets, loaded_font* Font){
+    added_asset Asset = AddAsset(Assets);
+    Asset.DDA->Font.OnePastHighestCodepoint = Font->OnePastHighestCodepoint;
+    Asset.DDA->Font.GlyphCount = Font->GlyphCount;
+    Asset.DDA->Font.AscenderHeight = (float)Font->TextMetric.tmAscent;
+    Asset.DDA->Font.DescenderHeight = (float)Font->TextMetric.tmDescent;
+    Asset.DDA->Font.ExternalLeading = (float)Font->TextMetric.tmExternalLeading;
+    Asset.Source->Type = AssetType_Font;
+    Asset.Source->Font.Font = Font;
+
+    font_id Result = {Asset.ID};
+    return(Result);
 }
 
 INTERNAL_FUNCTION void
@@ -452,8 +741,8 @@ WriteDDA(game_assets* Assets, char* FileName){
             switch(Source->Type){
                 case(AssetType_Sound):{
                     loaded_sound WAV = LoadWAV(
-                        Source->FileName,
-                        Source->FirstSampleIndex,
+                        Source->Sound.FileName,
+                        Source->Sound.FirstSampleIndex,
                         DDA->Sound.SampleCount);
 
                     DDA->Sound.SampleCount = WAV.SampleCount;
@@ -469,8 +758,18 @@ WriteDDA(game_assets* Assets, char* FileName){
                     free(WAV.Free);
                 }break;
 
+                case(AssetType_FontGlyph):
                 case(AssetType_Bitmap):{
-                    loaded_bitmap Bitmap = LoadBMP(Source->FileName);
+                    //loaded_bitmap Bitmap = LoadBMP(Source->FileName);
+
+                    loaded_bitmap Bitmap;
+                    if(Source->Type == AssetType_FontGlyph){
+                        Bitmap = LoadGlyphBitmap(Source->Glyph.Font, Source->Glyph.Codepoint, DDA);
+                    }
+                    else{
+                        Assert(Source->Type == AssetType_Bitmap);
+                        Bitmap = LoadBMP(Source->Bitmap.FileName);
+                    }
 
                     DDA->Bitmap.Dimension[0] = Bitmap.Width;
                     DDA->Bitmap.Dimension[1] = Bitmap.Height;
@@ -482,6 +781,26 @@ WriteDDA(game_assets* Assets, char* FileName){
 
                 case(AssetType_Model):{
 
+                }break;
+
+                case(AssetType_Font):{
+                    loaded_font* Font = Source->Font.Font;
+                    
+                    FinalizeFontKerning(Font);
+
+                    uint32 GlyphsSize = Font->GlyphCount * sizeof(dda_font_glyph);
+                    fwrite(Font->Glyphs, GlyphsSize, 1, fp);
+
+                    uint8* HorizontalAdvance = (uint8*)Font->HorizontalAdvance;
+                    for(uint32 GlyphIndex = 0;
+                        GlyphIndex < Font->GlyphCount;
+                        GlyphIndex++)
+                    {
+                        /*Here we write one row of horizontal advances for GlyphIndex*/
+                        uint32 HorizontalAdvanceSliceSize = sizeof(float) * Font->GlyphCount;
+                        fwrite(HorizontalAdvance, HorizontalAdvanceSliceSize, 1, fp);
+                        HorizontalAdvance += sizeof(float) * Font->MaxGlyphCount;
+                    }
                 }break;
 
                 default:{
@@ -511,6 +830,43 @@ INTERNAL_FUNCTION void Initialize(game_assets* Assets){
 
     Assets->AssetTypeCount = Asset_Count;
     memset(Assets->AssetTypes, 0, sizeof(Assets->AssetTypes));
+}
+
+INTERNAL_FUNCTION void WriteFonts(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
+    loaded_font *Fonts[] = {
+        LoadFont("c:/Windows/Fonts/arial.ttf", "Arial", 128),
+        LoadFont("c:/Windows/Fonts/LiberationMono-Regular.ttf", "Liberation Mono", 48),
+    };
+
+    BeginAssetType(Assets, Asset_FontGlyph);
+    for(uint32 FontIndex = 0;
+        FontIndex < ArrayCount(Fonts);
+        FontIndex++)
+    {
+        loaded_font* Font = Fonts[FontIndex];
+
+        AddCharacterAsset(Assets, Font, ' ');
+        for(uint32 Character = '!';
+            Character <= '~';
+            Character++)
+        {
+            AddCharacterAsset(Assets, Font, Character);
+        }
+    }
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_Font);
+    AddFontAsset(Assets, Fonts[0]);
+    AddTag(Assets, Tag_FontType, FontType_Default);
+    AddFontAsset(Assets, Fonts[1]);
+    AddTag(Assets, Tag_FontType, FontType_Debug);
+    EndAssetType(Assets);
+
+    WriteDDA(Assets, "../Data/asset_pack_fonts.dda");
 }
 
 INTERNAL_FUNCTION void WriteHero(){
@@ -703,9 +1059,12 @@ INTERNAL_FUNCTION void WriteSounds(){
 
 int main(int ArgCount, char** Args){
 
+    InitializeFontDC();
+
     WriteHero();
     WriteNonHero();
     WriteSounds();
+    WriteFonts();
 
     system("pause");
 	return(0);

@@ -1,9 +1,17 @@
+#include "ivan_platform.h"
+
+#include <Windows.h>
+#include <stdio.h>
+#include <malloc.h>
 #include <dsound.h>
 #include <Xinput.h>
-#include <Windows.h>
 #include <gl/GL.h>
 
 #include "win32_ivan.h"
+
+GLOBAL_VARIABLE GLuint OPENGL_DEFAULT_INTERNAL_TEXTURE_FORMAT;
+
+#include "ivan_opengl.cpp"
 
 #define WGL_SWAP_INTERVAL(name) BOOL WINAPI name(INT)
 typedef WGL_SWAP_INTERVAL(wgl_swap_interval);
@@ -1111,6 +1119,9 @@ int WINAPI WinMain(
 
     GameMemory.PlatformAPI.AllocateMemory = Win32AllocateMemory;
     GameMemory.PlatformAPI.DeallocateMemory = Win32DeallocateMemory;
+
+    GameMemory.PlatformAPI.AllocateTexture = AllocateTexture;
+    GameMemory.PlatformAPI.DeallocateTexture = DeallocateTexture;
 
     GlobalScreen.Window = CreateWindowEx(
         0,

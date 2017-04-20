@@ -1,10 +1,18 @@
 #ifndef IVAN_ASSET_IDS
 #define IVAN_ASSET_IDS
 
+enum asset_font_type{
+	FontType_Default = 0,
+	FontType_Debug = 10,
+};
+
 enum asset_tag_id{	
 	Tag_FacingDirection,
 
 	Tag_Color,
+
+	Tag_UnicodeCodepoint,
+	Tag_FontType,
 
 	Tag_Count,
 };
@@ -40,6 +48,9 @@ enum asset_type_id{
 	Asset_Glide,
 	Asset_Music,
 	Asset_Puhp,
+
+	Asset_Font,
+	Asset_FontGlyph,
 
 	Asset_Count,
 };

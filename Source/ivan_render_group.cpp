@@ -857,7 +857,30 @@ AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxP
     Result->Transform.OffsetP = Vec3(0.0f, 0.0f, 0.0f);
     Result->Transform.Scale = 1.0f;
 
+    Result->GenerationID = 0;
+    Result->InsideRender = false;
+
     return(Result);
+}
+
+INTERNAL_FUNCTION void BeginRender(render_group* RenderGroup){
+
+    if(RenderGroup){
+        RenderGroup->InsideRender = true;
+
+        RenderGroup->GenerationID = BeginGeneration(RenderGroup->Assets);
+    }
+}
+
+INTERNAL_FUNCTION void EndRender(render_group* RenderGroup){
+    if(RenderGroup){
+        Assert(RenderGroup->InsideRender);
+        RenderGroup->InsideRender = false;
+
+        EndGeneration(RenderGroup->Assets, RenderGroup->GenerationID);
+        RenderGroup->GenerationID = 0;
+        RenderGroup->PushBufferSize = 0;
+    }
 }
 
 #define PUSH_RENDER_ELEMENT(RenderGroup, type) (type*)PushRenderElement_(RenderGroup, sizeof(type), RenderGroupEntry_##type)
@@ -936,7 +959,8 @@ inline void PushRectangle(
     render_group* RenderGroup,
     vec3 Offset,
     vec2 Dim,
-    vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f))
+    vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    bool32 ScreenSpace = false)
 {
     vec3 P = {};
     P.x = Offset.x - Dim.x * 0.5f;
@@ -947,8 +971,15 @@ inline void PushRectangle(
         render_entry_rectangle* PushedRect = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_rectangle);
         if (PushedRect){
             PushedRect->Color = Color;
-            PushedRect->Dim = Dim * Basis.Scale;
-            PushedRect->P = Basis.P;
+
+            if(ScreenSpace == false){
+                PushedRect->Dim = Dim * Basis.Scale;
+                PushedRect->P = Basis.P;
+            }
+            else{
+                PushedRect->Dim = Dim * Basis.Scale;
+                PushedRect->P = Offset.xy;
+            }
         }
     }
 }
@@ -959,11 +990,12 @@ inline void PushBitmap(
     real32 Height,
     vec3 Offset,
     vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
     render_entry_bitmap* PushedBitmap = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_bitmap);
 
-    bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, Height, Offset, CAlign);
+    bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, IVAN_MATH_ABS(Height), Offset, CAlign);
 
 #if 1
     entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Dim.P);
@@ -971,13 +1003,22 @@ inline void PushBitmap(
         if (PushedBitmap){
             PushedBitmap->Bitmap = Bitmap;
     
-            PushedBitmap->P = Basis.P;
+            if(ScreenSpace == false){
+                PushedBitmap->P = Basis.P;
+                PushedBitmap->Size = Basis.Scale * Dim.Size;
+                //PushRectangle(RenderGroup, Offset, Vec2(0.02f));
+            }
+            else{
+                //PushedBitmap->P = Offset.xy;
+                PushedBitmap->P = Dim.P.xy;
+                PushedBitmap->Size = Vec2(Bitmap->WidthOverHeight * IVAN_MATH_ABS(Height), Height);
+                //PushRectangle(RenderGroup, Dim.P, Vec2(0.02f), Vec4(1.0f, 0.0f, 0.0f, 1.0f), true);
+                //PushRectangle(RenderGroup, Offset, Vec2(0.02f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), true);
+            }
  
             PushedBitmap->Color = Color * RenderGroup->GlobalAlphaChannel;
-            PushedBitmap->Size = Basis.Scale * Dim.Size;
     
             /*This is for test*/
-            //PushRectangle(RenderGroup, Offset, Vec2(0.02f));
         }
    }
 #else
@@ -995,22 +1036,35 @@ inline void PushBitmap(
 #endif    
 }
 
-extern void LoadBitmapAsset(game_assets* Assets, bitmap_id ID);
+//extern void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Immediate);
 inline void PushBitmap(
     render_group* RenderGroup,
     bitmap_id Id,
     real32 Height,
     vec3 Offset,
     vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+    bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
-    loaded_bitmap* BitmapToRender = GetBitmap(RenderGroup->Assets, Id);
+    loaded_bitmap* BitmapToRender = GetBitmap(RenderGroup->Assets, Id, RenderGroup->GenerationID);
     if (BitmapToRender){
-        PushBitmap(RenderGroup, BitmapToRender, Height, Offset, Color, CAlign);
+        PushBitmap(RenderGroup, BitmapToRender, Height, Offset, Color, ScreenSpace, CAlign);
     }
     else{
-        LoadBitmapAsset(RenderGroup->Assets, Id);
+        LoadBitmapAsset(RenderGroup->Assets, Id, false);
     }
+}
+
+inline loaded_font* PushFont(render_group* Group, font_id ID){
+    loaded_font* Font = GetFont(Group->Assets, ID, Group->GenerationID);
+    if(Font){
+
+    }
+    else{
+        LoadFontAsset(Group->Assets, ID, false);
+    }
+
+    return(Font);
 }
 
 inline void PushRectangleOutline(

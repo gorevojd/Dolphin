@@ -1,11 +1,10 @@
 #include "ivan.h"
-#include "ivan_opengl.cpp"
 #include "ivan_render_group.cpp"
 #include "ivan_asset.cpp"
 #include "ivan_audio.cpp"
 #include "ivan_particle.cpp"
 
-INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
+INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState, bool32 DependsOnGameMode){
 	task_with_memory* FoundTask = 0;
     
 	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
@@ -13,6 +12,7 @@ INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranSta
 		if (!Task->BeingUsed){
 			FoundTask = Task;
 			Task->BeingUsed = true;
+            Task->DependsOnGameMode = DependsOnGameMode;
 			Task->Memory = BeginTemporaryMemory(&Task->Arena);
 			break;
 		}
@@ -27,6 +27,87 @@ INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
 	Task->BeingUsed = false;
 }
 
+
+GLOBAL_VARIABLE float CursorY;
+GLOBAL_VARIABLE float FontScale;
+GLOBAL_VARIABLE font_id FontID;
+
+INTERNAL_FUNCTION void DEBUGTextReset(render_group* RenderGroup){
+    asset_vector MatchVector = {};
+    MatchVector.Data[Tag_FontType] = FontType_Debug;
+    asset_vector WeightVector = {};
+    WeightVector.Data[Tag_FontType] = 10.0f;
+    FontID = GetBestMatchFontFrom(RenderGroup->Assets, Asset_Font, &MatchVector, &WeightVector);
+    
+    FontScale = 0.5f;
+
+
+    dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
+    CursorY = GetStartingBaselineY(Info) * FontScale;
+}
+
+INTERNAL_FUNCTION void DEBUGTextOut(render_group* RenderGroup, char* String){
+
+    loaded_font* Font = PushFont(RenderGroup, FontID);
+    
+    if(Font){        
+
+        dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
+
+        float CharScale = FontScale;
+        float CursorX = 0;
+        uint32 PrevCodePoint = 0;
+        vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        char* Ptr = String;
+        while(*Ptr){
+
+            if((Ptr[0] == '\\') &&
+                (Ptr[1] == '#') &&
+                (Ptr[2] != 0) &&
+                (Ptr[3] != 0) &&
+                (Ptr[4] != 0))
+            {
+                float ColorScale = 1.0f / 9.0f;
+                Color = Vec4(
+                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[2] - '0')),
+                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[3] - '0')),
+                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[4] - '0')),
+                    1.0f);
+                Ptr += 5;
+            }
+            else if((Ptr[0] == '\\') &&
+                (Ptr[1] == '^') &&
+                (Ptr[2] != 0))
+            {
+                float ScaleScale = 1.0f / 9.0f;
+                CharScale = FontScale * IVAN_MATH_CLAMP01(ScaleScale * (float)(Ptr[2] - '0'));
+                Ptr += 3;
+            }
+            else{    
+                uint32 CodePoint = *Ptr;
+
+                float AdvanceX = CharScale * GetHorizontalAdvanceForPair(Info, Font, PrevCodePoint, CodePoint);
+                CursorX += AdvanceX;
+
+                if(CodePoint != ' '){
+
+                    bitmap_id BitmapID = GetBitmapForGlyph(RenderGroup->Assets, Info, Font, CodePoint);
+                    dda_bitmap* BitmapInfo = GetBitmapInfo(RenderGroup->Assets, BitmapID);
+
+                    PushBitmap(RenderGroup, BitmapID, -CharScale * (float)BitmapInfo->Dimension[1], Vec3(CursorX, CursorY, 0), Color, true);
+                }
+
+                PrevCodePoint = CodePoint;
+                Ptr++;
+            }
+
+        }
+
+        CursorY += GetLineAdvanceFor(Info) * CharScale;
+    }
+}
+
 #ifdef INTERNAL_BUILD
 game_memory* DebugGlobalMemory;
 #endif
@@ -35,6 +116,7 @@ platform_complete_all_work* PlatformCompleteAllWork;
 
 GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     
+#if 0
     Platform.AddEntry = Memory->PlatformAPI.AddEntry;
     Platform.CompleteAllWork = Memory->PlatformAPI.CompleteAllWork;
     
@@ -49,6 +131,13 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     Platform.AllocateMemory = Memory->PlatformAPI.AllocateMemory;
     Platform.DeallocateMemory = Memory->PlatformAPI.DeallocateMemory;
+
+    Platform.AllocateTexture = Memory->PlatformAPI.AllocateTexture;
+    Platform.DeallocateTexture = Memory->PlatformAPI.DeallocateTexture;
+#else
+    Platform = Memory->PlatformAPI;
+#endif
+
 
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
@@ -104,8 +193,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState);
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
-
-        PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
+        //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
         TranState->IsInitialized = true;
     }
@@ -114,6 +202,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     temporary_memory RenderMemory = BeginTemporaryMemory(&TranState->TranArena);
     render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10));
+    BeginRender(RenderGroup);
     real32 WidthOfMonitor = 0.635f;
     real32 MetersToPixels = (real32)Buffer->Width / WidthOfMonitor / 8;
     //real32 MetersToPixels = 1;
@@ -172,7 +261,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     }
 
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_Assassin), 4.0f, Vec3(0.0f));
+    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
     for (int i = 0; i < 5; i++){
         if (Input->MouseButtons[i].EndedDown){
@@ -208,84 +297,17 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
     WeightVector.Data[Tag_Color] = 1.0f;
 
-    bitmap_id ParticleBitmap = GetBestMatchBitmapFrom(TranState->Assets, Asset_Particle, &MatchVector, &WeightVector);
-    //bitmap_id ParticleBitmap = GetFirstBitmapFrom(TranState->Assets, Asset_Diamond);
-#if 0
-    for(int i = 0; i < 10; i++){
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-1.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-1.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.8f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.6f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.4f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(-0.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.2f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.4f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.6f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(0.8f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-        PushBitmap(RenderGroup, BitmapToPush, 0.5f + sinf(GameState->Time) / 5.0f, Vec3(1.0f, i * 0.1f - 0.5f, 0) + Vec3(OffsetX, 0, 0));
-    }
-#else
-
-#if 0
-    for(uint32 ParticleSpawnIndex = 0;
-        ParticleSpawnIndex < 2;
-        ParticleSpawnIndex++)
-    {
-        particle* Particle = GameState->Particles + GameState->NextParticle++;
-        if(GameState->NextParticle >= ArrayCount(GameState->Particles)){
-            GameState->NextParticle = 0;
-        }
-
-        Particle->P = Vec3(RandomBetween(&GameState->EffectsSeries, -0.05f, 0.05f), 0.0f, 0.0f);
-        Particle->dP = Vec3(
-            RandomBetween(&GameState->EffectsSeries, -0.1f, 0.1f),
-            RandomBetween(&GameState->EffectsSeries, -1.0f, -1.4f), 0.0f);
-        Particle->ddP = Vec3(
-            0.0f, 0.89f, 0.0f);
-        Particle->Color = Vec4(1.0f, 1.0f, 1.0f, 2.0f);
-        Particle->dColor = Vec4(0, 0, 0, -0.5f);
-    }
-
-    for(uint32 ParticleIndex = 0;
-        ParticleIndex < ArrayCount(GameState->Particles);
-        ParticleIndex++)
-    {
-        particle* Particle = GameState->Particles + ParticleIndex;
-
-        Particle->P += Input->DeltaTime * Particle->dP + 0.5f * Particle->ddP * Input->DeltaTime * Input->DeltaTime;
-        Particle->dP += Input->DeltaTime * Particle->ddP;
-        Particle->Color += Input->DeltaTime * Particle->dColor;
-
-        vec4 Color;
-        Color.r = IVAN_MATH_CLAMP01(Particle->Color.r);
-        Color.g = IVAN_MATH_CLAMP01(Particle->Color.g);
-        Color.b = IVAN_MATH_CLAMP01(Particle->Color.b);
-        Color.a = IVAN_MATH_CLAMP01(Particle->Color.a);
-
-        if(Color.a > 0.9f){
-            Color.a = 0.9f * (1.0f - (Color.a - 1.0f) / (-0.1f));
-        }
-
-        float BounceCoefficient = 0.4f;
-        float FrictionCoefficient = 0.8f;
-        if(Particle->P.y > 0.0f){
-            Particle->P.y = 0.0f;
-            Particle->dP.y = -Particle->dP.y * BounceCoefficient;
-            Particle->dP.x = Particle->dP.x * FrictionCoefficient;
-        }
-
-        PushBitmap(RenderGroup, ParticleBitmap, 0.2f, Particle->P, Color);
-    }
-#else
     SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
-
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
 
-#endif
+    DEBUGTextOut(RenderGroup, "\\^7That's not the shape of my heart");
+    DEBUGTextOut(RenderGroup, "\\#900That's not the shape of my heart");
+    DEBUGTextOut(RenderGroup, "That's not the shape of my heart");
 
-#endif
+    DEBUGTextReset(RenderGroup);
+
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
+    EndRender(RenderGroup);
 
     EndTemporaryMemory(RenderMemory);
 }

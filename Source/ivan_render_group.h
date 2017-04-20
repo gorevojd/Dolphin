@@ -12,6 +12,8 @@ struct loaded_bitmap{
 
 	real32 WidthOverHeight;
 	vec2 AlignPercentage;
+
+	void* TextureHandle;
 };
 
 enum render_group_entry_type{
@@ -81,6 +83,10 @@ struct render_group{
 	uint32 MaxPushBufferSize;
 	uint32 PushBufferSize;
 	uint8* PushBufferBase;
+
+	uint32 GenerationID;
+
+	bool32 InsideRender;
 };
 
 

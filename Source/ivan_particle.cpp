@@ -121,14 +121,6 @@ UpdateAndRenderFontain(
                 M(mmAlpha, SubIndex),
             };
 
-/*            float BounceCoefficient = 0.4f;
-            float FrictionCoefficient = 0.8f;
-            if(M(A->P.y, SubIndex) < 0.0f){
-                M(A->P.y, SubIndex) = 0.0f;
-                M(A->dP.y, SubIndex) = -M(A->dP.y, SubIndex) * BounceCoefficient;
-                M(A->dP.x, SubIndex) = M(A->dP.x, SubIndex) * FrictionCoefficient;
-            }*/
-
             if(C.a > 0.0f){
                 PushBitmap(RenderGroup, System->BitmapID, 0.2f, P, C);
             }
@@ -157,5 +149,10 @@ InitParticleCache(particle_cache* Cache, game_assets* Assets){
     ZeroStruct(*Cache);
     Cache->ParticleEntropy = RandomSeed(1234);
 
+#if 1
     Cache->FontainSystem.BitmapID = GetFirstBitmapFrom(Assets, Asset_Heart);
+#else
+    Cache->FontainSystem.BitmapID = GetFirstBitmapFrom(Assets, Asset_FontGlyph);
+#endif
+
 }

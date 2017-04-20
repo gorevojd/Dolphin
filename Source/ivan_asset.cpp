@@ -1,3 +1,14 @@
+/*
+    TODO(DIMA): 
+        Support for opengl texture allocation, deallocation
+*/
+
+enum finalize_asset_operation{
+    FinalizeAsset_None,
+    FinalizeAsset_Font,
+    FinalizeAsset_Bitmap,
+};
+
 struct load_asset_work{
     task_with_memory* Task;
     asset* Asset;
@@ -7,32 +18,70 @@ struct load_asset_work{
     uint64 Size;
     void* Destination;
 
+    finalize_asset_operation FinalizeOperation;
     uint32 FinalState;
 };
+
+INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
+    Platform.ReadDataFromFile(Work->Handle, Work->Offset, Work->Size, Work->Destination);
+    if(PlatformNoFileErrors(Work->Handle)){
+        switch(Work->FinalizeOperation){
+            case FinalizeAsset_None:{
+
+            }break;
+
+            case FinalizeAsset_Font:{
+                loaded_font* Font = &Work->Asset->Header->Font;
+                dda_font* DDA = &Work->Asset->DDA.Font;
+                for(uint32 GlyphIndex = 1;
+                    GlyphIndex < DDA->GlyphCount;
+                    GlyphIndex++)
+                {
+                    dda_font_glyph* Glyph = Font->Glyphs + GlyphIndex;
+
+                    Assert(Glyph->UnicodeCodePoint < DDA->OnePastHighestCodepoint);
+                    Assert((uint32)(uint16)GlyphIndex == GlyphIndex);
+                    Font->UnicodeMap[Glyph->UnicodeCodePoint] = (uint16)GlyphIndex;
+                }
+            }break;
+
+            case FinalizeAsset_Bitmap:{
+                loaded_bitmap* Bitmap = &Work->Asset->Header->Bitmap;
+                Bitmap->TextureHandle = 
+                    Platform.AllocateTexture(Bitmap->Width, Bitmap->Height, Bitmap->Memory);
+            }break;
+        }
+    }
+
+    GD_COMPLETE_WRITES_BEFORE_FUTURE;
+
+    if(!PlatformNoFileErrors(Work->Handle)){
+        ZeroSize(Work->Destination, Work->Size);
+    }
+
+    Work->Asset->State = Work->FinalState;
+}
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(LoadAssetWork){
     load_asset_work* Work = (load_asset_work*)Data;
 
-    Platform.ReadDataFromFile(Work->Handle, Work->Offset, Work->Size, Work->Destination);
-
-
-    GD_COMPLETE_WRITES_BEFORE_FUTURE;
-
-    if(PlatformNoFileErrors(Work->Handle))
-    {
-        Work->Asset->State = AssetState_Loaded;
-    }
-    else{
-        int a = 1;
-    }
+    LoadAssetWorkDirectly(Work);
 
     EndTaskWithMemory(Work->Task);
+}
+
+inline asset_file* 
+GetFile(game_assets* Assets, uint32 FileIndex){
+    Assert(FileIndex < Assets->FileCount);
+    asset_file* Result = Assets->Files + FileIndex;
+
+    return(Result);
 }
 
 inline platform_file_handle*
 GetFileHandleFor(game_assets* Assets, uint32 FileIndex){
     Assert(FileIndex < Assets->FileCount);
-    platform_file_handle* Result = Assets->Files[FileIndex].Handle;
+    platform_file_handle* Result = GetFile(Assets, FileIndex)->Handle;
 
     return(Result);
 }
@@ -48,32 +97,6 @@ InsertBlock(asset_memory_block* Prev, uint64 Size, void* Memory){
     Block->Prev->Next = Block;
     Block->Next->Prev = Block;
     return(Block);
-}
-
-inline void InsertAssetHeaderAtFront(game_assets* Assets, asset_memory_header* Header){
-    asset_memory_header* Sentinel = &Assets->LoadedAssetSentinel;
-
-    Header->Prev = Sentinel;
-    Header->Next = Sentinel->Next;
-
-    Header->Next->Prev = Header;
-    Header->Prev->Next = Header;
-}
-
-inline void RemoveAssetHeaderFromList(asset_memory_header* Header){
-    Header->Prev->Next = Header->Next;
-    Header->Next->Prev = Header->Prev;
-
-    Header->Next = Header->Prev = 0;
-}
-
-INTERNAL_FUNCTION void MoveHeaderToFront(game_assets* Assets, asset* Asset){
-    if(!IsLocked(Asset)){
-        asset_memory_header* Header = Asset->Header;
-
-        RemoveAssetHeaderFromList(Header);
-        InsertAssetHeaderAtFront(Assets, Header);
-    }
 }
 
 INTERNAL_FUNCTION asset_memory_block*
@@ -120,16 +143,34 @@ MergeIfPossible(game_assets* Assets, asset_memory_block* First, asset_memory_blo
     return(Result);
 }
 
-INTERNAL_FUNCTION void*
-RequestAssetMemory(game_assets* Assets, memory_index Size){
-    void* Result = 0;
+INTERNAL_FUNCTION bool32 GenerationHasCompleted(game_assets* Assets, uint32 CheckID){
+    bool32 Result = true;
+
+    for(uint32 Index = 0;
+        Index < Assets->InFlightGenerationCount;
+        Index++)
+    {
+        if(Assets->InFlightGenerations[Index] == CheckID){
+            Result = false;
+            break;
+        }
+    }
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION asset_memory_header*
+RequestAssetMemory(game_assets* Assets, uint32 Size, uint32 AssetIndex, asset_header_type AssetType){
+    asset_memory_header* Result = 0;
+
+    BeginAssetLock(Assets);
 
     asset_memory_block* Block = FindBlockForSize(Assets, Size);
     for(;;){
         if(Block && (Size <= Block->Size)){
             Block->Flags |= AssetMemory_Used;
 
-            Result = (uint8*)(Block + 1);
+            Result = (asset_memory_header*)(Block + 1);
 
             memory_index RemainingSize = Block->Size - Size;
             memory_index BlockSplitThreshold = 4096;
@@ -149,17 +190,22 @@ RequestAssetMemory(game_assets* Assets, memory_index Size){
                 Header = Header->Prev)
             {
                 asset* Asset = Assets->Assets + Header->AssetIndex;
-                if(GetState(Asset) >= AssetState_Loaded){
+                if((Asset->State >= AssetState_Loaded) && 
+                    (GenerationHasCompleted(Assets, Asset->Header->GenerationID)))
+                {
                     uint32 AssetIndex = Header->AssetIndex;
                     asset* Asset = Assets->Assets + AssetIndex;
 
-                    Assert(GetState(Asset) == AssetState_Loaded);
-                    Assert(!IsLocked(Asset));
+                    Assert(Asset->State == AssetState_Loaded);
 
                     RemoveAssetHeaderFromList(Header);
 
+                    if(Asset->Header->AssetType == AssetType_Bitmap){
+                        Platform.DeallocateTexture(Asset->Header->Bitmap.TextureHandle);
+                    }
+
                     Block = (asset_memory_block*)Asset->Header - 1;
-                    Block->Flags &= AssetMemory_Used;
+                    Block->Flags &= ~AssetMemory_Used;
 
                     if(MergeIfPossible(Assets, Block->Prev, Block)){
                         Block = Block->Prev;
@@ -175,9 +221,17 @@ RequestAssetMemory(game_assets* Assets, memory_index Size){
         }
     }
 
+    if(Result){
+        Result->AssetType = AssetType;
+        Result->AssetIndex = AssetIndex;
+        Result->TotalSize = Size;
+        InsertAssetHeaderAtFront(Assets, Result);
+    }
+
+    EndAssetLock(Assets);
+
     return(Result);
 }
-
 
 struct asset_memory_size{
     uint32 Total;
@@ -192,59 +246,86 @@ AddAssetHeaderToList(game_assets* Assets, uint32 AssetIndex, asset_memory_size S
     InsertAssetHeaderAtFront(Assets, Header);
 }
 
-INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID){
-    if(ID.Value && 
-        AtomicCompareExchangeUInt32((uint32 volatile *)&Assets->Assets[ID.Value].State,
+INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Immediate){
+    
+    asset* Asset = Assets->Assets + ID.Value;
+
+    if(ID.Value){
+        if(AtomicCompareExchangeUInt32((uint32 volatile *)&Assets->Assets[ID.Value].State,
             AssetState_Queued,
             AssetState_Unloaded) == AssetState_Unloaded)
-    {
-        task_with_memory* Task = BeginTaskWithMemory(Assets->TranState);
-        if(Task){
-            asset* Asset = Assets->Assets + ID.Value;
-            dda_bitmap* Info = &Asset->DDA.Bitmap;
-            
-            //loaded_bitmap* Bitmap = PushStruct(&Assets->Arena, loaded_bitmap);
-            asset_memory_size Size = {};
-            uint32 Width = Info->Dimension[0];
-            uint32 Height = Info->Dimension[1];
-            Size.Data = Height * Width * 4;
-            Size.Total = Size.Data + sizeof(asset_memory_header);
+        {
+            task_with_memory* Task = 0;
 
-            Asset->Header = (asset_memory_header*)RequestAssetMemory(Assets, Size.Total);
+            if(!Immediate){
+                Task = BeginTaskWithMemory(Assets->TranState, false);
+            }
 
-            loaded_bitmap* Bitmap = &Asset->Header->Bitmap;
-            Bitmap->AlignPercentage = Vec2(Info->AlignPercentage[0], Info->AlignPercentage[1]);
-            Bitmap->WidthOverHeight = (float)Info->Dimension[0] / (float)Info->Dimension[1];
-            Bitmap->Width = Info->Dimension[0];
-            Bitmap->Height = Info->Dimension[1];
-            Bitmap->Memory = (Asset->Header + 1);
+            if(Immediate || Task){
+                dda_bitmap* Info = &Asset->DDA.Bitmap;
+                
+                asset_memory_size Size = {};
+                uint32 Width = Info->Dimension[0];
+                uint32 Height = Info->Dimension[1];
+                Size.Data = Height * Width * 4;
+                Size.Total = Size.Data + sizeof(asset_memory_header);
 
-            load_asset_work* Work = PushStruct(&Task->Arena, load_asset_work);
-            Work->Task = Task;
-            Work->Asset = Assets->Assets + ID.Value;
-            Work->Handle = GetFileHandleFor(Assets, Asset->FileIndex);
-            Work->Offset = Asset->DDA.DataOffset;
-            Work->Size = Size.Data;
-            Work->Destination = Bitmap->Memory;
-            Work->FinalState = (AssetState_Loaded);
+                Asset->Header = (asset_memory_header*)RequestAssetMemory(Assets, Size.Total, ID.Value, AssetType_Bitmap);
 
-            AddAssetHeaderToList(Assets, ID.Value, Size);
+                loaded_bitmap* Bitmap = &Asset->Header->Bitmap;
+                Bitmap->AlignPercentage = Vec2(Info->AlignPercentage[0], Info->AlignPercentage[1]);
+                Bitmap->WidthOverHeight = (float)Info->Dimension[0] / (float)Info->Dimension[1];
+                Bitmap->Width = Info->Dimension[0];
+                Bitmap->Height = Info->Dimension[1];
+                Bitmap->TextureHandle = 0;
+                Bitmap->Memory = (Asset->Header + 1);
 
-            Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, Work);
+                load_asset_work Work;
+                Work.Task = Task;
+                Work.Asset = Assets->Assets + ID.Value;
+                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+                Work.Offset = Asset->DDA.DataOffset;
+                Work.Size = Size.Data;
+                Work.Destination = Bitmap->Memory;
+#if 0
+                Work.FinalizeOperation = FinalizeAsset_Bitmap;
+#else
+                Work.FinalizeOperation = FinalizeAsset_None;
+#endif
+
+                Work.FinalState = (AssetState_Loaded);
+
+                if(Task){
+                    load_asset_work* TaskWork = PushStruct(&Task->Arena, load_asset_work);
+                    *TaskWork = Work;
+                    Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, TaskWork);
+                }
+                else{
+                    LoadAssetWorkDirectly(&Work);
+                }
+            }
+            else{
+                Asset->State = AssetState_Unloaded;
+            }
         }
-        else{
-            Assets->Assets[ID.Value].State = AssetState_Unloaded;
+        else if(Immediate){
+            asset_state volatile* State = (asset_state volatile*)&Asset->State;
+            while(*State == AssetState_Queued){
+
+            }
         }
     }
 }
 
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
+    
+
     if(ID.Value &&
         AtomicCompareExchangeUInt32((uint32 volatile *)&Assets->Assets[ID.Value].State,
             AssetState_Queued,
             AssetState_Unloaded) == AssetState_Unloaded)
     {
-        task_with_memory* Task = BeginTaskWithMemory(Assets->TranState);
+        task_with_memory* Task = BeginTaskWithMemory(Assets->TranState, false);
         if(Task){
 
             asset* Asset = Assets->Assets + ID.Value;
@@ -254,10 +335,9 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
             Size.Data = Info->ChannelCount * Info->SampleCount * sizeof(int16);
             Size.Total = Size.Data + sizeof(asset_memory_header);
 
-            Asset->Header = (asset_memory_header*)RequestAssetMemory(Assets, Size.Total);
+            Asset->Header = (asset_memory_header*)RequestAssetMemory(Assets, Size.Total, ID.Value, AssetType_Sound);
             loaded_sound* Sound = &Asset->Header->Sound;
 
-            //loaded_sound* Sound = PushStruct(&Assets->Arena, loaded_sound);
             Sound->SampleCount = Info->SampleCount;
             Sound->ChannelCount = Info->ChannelCount;
 
@@ -280,7 +360,8 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
             Work->Offset = Asset->DDA.DataOffset;
             Work->Size = Size.Data;
             Work->Destination = Memory;
-            Work->FinalState = (AssetState_Loaded);
+            Work->FinalizeOperation = FinalizeAsset_None;
+            Work->FinalState = AssetState_Loaded;
 
             AddAssetHeaderToList(Assets, ID.Value, Size);
 
@@ -288,6 +369,74 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
         }
         else{
             Assets->Assets[ID.Value].State = AssetState_Unloaded;
+        }
+    }
+}
+
+INTERNAL_FUNCTION void
+LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
+    asset* Asset = Assets->Assets + ID.Value;
+    if(ID.Value){
+        if(AtomicCompareExchangeUInt32(
+            (uint32 *)&Asset->State,
+            AssetState_Queued, 
+            AssetState_Unloaded) == AssetState_Unloaded)
+        {
+            task_with_memory* Task = 0;
+
+            if(!Immediate){
+                Task = BeginTaskWithMemory(Assets->TranState, false);
+            }
+
+            if(Immediate || Task){
+                dda_font* Info = &Asset->DDA.Font;
+
+                uint32 HorizontalAdvanceSize = sizeof(float) * Info->GlyphCount * Info->GlyphCount;
+                uint32 GlyphsSize = Info->GlyphCount * sizeof(dda_font_glyph);
+                uint32 UnicodeMapSize = sizeof(uint16) * Info->OnePastHighestCodepoint;
+                uint32 SizeOfData = GlyphsSize + HorizontalAdvanceSize;
+                uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header) + UnicodeMapSize;
+
+                Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_Font);
+
+                loaded_font* Font = &Asset->Header->Font;
+                Font->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->FontBitmapIDOffset;
+                Font->Glyphs = (dda_font_glyph*)(Asset->Header + 1);
+                Font->HorizontalAdvance = (float*)((uint8*)Font->Glyphs + GlyphsSize);
+                Font->UnicodeMap = (uint16*)((uint8*)Font->HorizontalAdvance + HorizontalAdvanceSize);
+
+                ZeroSize(Font->UnicodeMap, UnicodeMapSize);
+
+                load_asset_work Work;
+                Work.Task = Task;
+                Work.Asset = Assets->Assets + ID.Value;
+                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+                Work.Offset = Asset->DDA.DataOffset;
+                Work.Size = SizeOfData;
+                Work.Destination = Font->Glyphs;
+                Work.FinalizeOperation = FinalizeAsset_Font;
+                Work.FinalState = AssetState_Loaded;
+                if(Task){
+                    load_asset_work* TaskWork = PushStruct(&Task->Arena, load_asset_work);
+                    *TaskWork = Work;
+                    Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, TaskWork);
+                }
+                else{
+                    LoadAssetWorkDirectly(&Work);
+                }
+
+                int a = 1;
+            }
+            else{
+                Asset->State = AssetState_Unloaded;
+            }
+
+        }
+        else if(Immediate){
+            asset_state volatile* State = (asset_state volatile*)&Asset->State;
+            while(*State == AssetState_Queued){
+
+            }
         }
     }
 }
@@ -408,10 +557,36 @@ GetRandomSoundFrom(game_assets* Assets, asset_type_id TypeID, random_series* Ser
     return(Result);
 }
 
+inline font_id
+GetFirstFontFrom(game_assets* Assets, asset_type_id TypeID){
+    font_id Result = {GetFirstAssetFrom(Assets, TypeID)};
+    return(Result);
+}
+
+inline font_id
+GetRandomFontFrom(game_assets* Assets, asset_type_id TypeID, random_series* Series){
+    font_id Result = {GetRandomAssetFrom(Assets, TypeID, Series)};
+    return(Result);
+}
+
+inline font_id
+GetBestMatchFontFrom(
+    game_assets* Assets,
+    asset_type_id TypeID,
+    asset_vector* MatchVector, asset_vector* WeightVector)
+{
+    font_id Result = {GetBestMatchAssetFrom(Assets, TypeID, MatchVector, WeightVector)};
+    return(Result);
+}
+
+
 INTERNAL_FUNCTION game_assets* 
 AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState){
     game_assets* Assets = PushStruct(Arena, game_assets);
     Assets->TranState = TranState;
+
+    Assets->NextGenerationID = 0;
+    Assets->InFlightGenerationCount = 0;
 
     Assets->MemorySentinel.Flags = 0;
     Assets->MemorySentinel.Size = 0;
@@ -446,6 +621,7 @@ AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState)
     {
         asset_file* File = Assets->Files + FileIndex;
 
+        File->FontBitmapIDOffset = 0;
         File->TagBase = Assets->TagCount;
 
         ZeroStruct(File->Header);
@@ -536,6 +712,11 @@ AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState)
                     dda_asset_type* SourceType = File->AssetTypeArray + SourceIndex;
 
                     if(SourceType->TypeID == DestTypeID){
+
+                        if(SourceType->TypeID == Asset_FontGlyph){
+                            File->FontBitmapIDOffset = AssetCount - SourceType->FirstAssetIndex;
+                        }
+
                         uint32 AssetCountForType = 
                             (SourceType->OnePastLastAssetIndex - SourceType->FirstAssetIndex);
                         
@@ -585,6 +766,49 @@ AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState)
     return(Assets);
 }
 
-inline void PrefetchBitmap(game_assets* Assets, bitmap_id ID){LoadBitmapAsset(Assets, ID);}
+inline void PrefetchBitmap(game_assets* Assets, bitmap_id ID){LoadBitmapAsset(Assets, ID, false);}
 inline void PrefetchSound(game_assets* Assets, sound_id ID){LoadSoundAsset(Assets, ID);}
+inline void PrefetchFont(game_assets* Assets, font_id ID){LoadFontAsset(Assets, ID, false);}
 
+inline uint32 GetGlyphFromCodePoint(dda_font* Info, loaded_font* Font, uint32 CodePoint){
+    uint32 Result = 0;
+    if(CodePoint < Info->OnePastHighestCodepoint){
+        Result = Font->UnicodeMap[CodePoint];
+        Assert(Result < Info->GlyphCount);
+    }
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION float 
+GetHorizontalAdvanceForPair(dda_font* Info, loaded_font* Font, uint32 PrevCodePoint, uint32 NextCodePoint){
+    uint32 PrevGlyph = GetGlyphFromCodePoint(Info, Font, PrevCodePoint);
+    uint32 NextGlyph = GetGlyphFromCodePoint(Info, Font, NextCodePoint);
+
+    float Result = Font->HorizontalAdvance[PrevGlyph * Info->GlyphCount + NextGlyph];
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION bitmap_id
+GetBitmapForGlyph(game_assets* Assets, dda_font* Info, loaded_font* Font, uint32 CodePoint){
+    uint32 Glyph = GetGlyphFromCodePoint(Info, Font, CodePoint);
+    bitmap_id Result = Font->Glyphs[Glyph].BitmapID;
+    Result.Value += Font->BitmapIDOffset;
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION float 
+GetLineAdvanceFor(dda_font* Info){
+    float Result = Info->AscenderHeight + Info->DescenderHeight + Info->ExternalLeading;
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION float 
+GetStartingBaselineY(dda_font* Info){
+    float Result = Info->AscenderHeight;
+
+    return(Result);
+}

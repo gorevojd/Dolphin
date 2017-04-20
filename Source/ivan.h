@@ -16,6 +16,7 @@
 struct task_with_memory{
     bool32 BeingUsed;
     memory_arena Arena;
+    bool32 DependsOnGameMode;
 
     temporary_memory Memory;
 };
@@ -71,7 +72,7 @@ struct transient_state{
 GLOBAL_VARIABLE platform_api Platform;
 
 
-INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(struct transient_state* TranState);
+INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(struct transient_state* TranState, bool32 DependsOnGameMode);
 INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task);
 
 #endif

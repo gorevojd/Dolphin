@@ -11,37 +11,38 @@ struct loaded_sound{
 	int16* Samples[2];
 };
 
+struct loaded_font{
+	dda_font_glyph* Glyphs;
+	float* HorizontalAdvance;
+	uint32 BitmapIDOffset;
+	uint16* UnicodeMap;
+};
+
+enum asset_header_type{
+	AssetType_None,
+	AssetType_Bitmap,
+	AssetType_Sound,
+	AssetType_Font,
+	AssetType_Model,
+};
+
 struct asset_memory_header{
 	asset_memory_header* Next;
 	asset_memory_header* Prev;
 
+	uint32 AssetType;
 	uint32 AssetIndex;
 	uint32 TotalSize;
+	uint32 GenerationID;
 
 	union{
 		loaded_sound Sound;
 		loaded_bitmap Bitmap;
+		loaded_font Font;
 	};
 };
 
-enum asset_memory_block_flags{
-	AssetMemory_Used = 0x1,
-};
-struct asset_memory_block{
-	asset_memory_block* Prev;
-	asset_memory_block* Next;
-	uint64 Flags;
-	size_t Size;
-};
 
-/*struct hero_bitmaps{
-	vec2 Align;
-
-	loaded_bitmap Head;
-	loaded_bitmap Torso;
-	loaded_bitmap Cape;
-};
-*/
 struct asset{
 	uint32 State;
 	asset_memory_header* Header;
@@ -75,9 +76,22 @@ struct asset_file{
 	dda_asset_type* AssetTypeArray;
 
 	uint32 TagBase;
+	int FontBitmapIDOffset;
+};
+
+enum asset_memory_block_flags{
+	AssetMemory_Used = 0x1,
+};
+struct asset_memory_block{
+	asset_memory_block* Prev;
+	asset_memory_block* Next;
+	uint64 Flags;
+	size_t Size;
 };
 
 struct game_assets{
+	uint32 NextGenerationID;
+
 	struct transient_state* TranState;
 
 	asset_memory_block MemorySentinel;
@@ -96,44 +110,87 @@ struct game_assets{
 	uint32 FileCount;
 	asset_file* Files;
 
-	uint8* DDAContents;
+	uint32 OperationLock;
+
+	uint32 InFlightGenerationCount;
+	uint32 InFlightGenerations[16];
 };
 
-inline bool32 IsLocked(asset* Asset){
-	bool32 Result = (Asset->State & AssetState_Lock);
-	return(Result);
+inline void BeginAssetLock(game_assets* Assets){
+	for(;;){
+		if(AtomicCompareExchangeUInt32(&Assets->OperationLock, 1, 0) == 0){
+			break;
+		}
+	}
 }
 
-inline uint32 GetState(asset* Asset){
-	uint32 Result = Asset->State & AssetState_StateMask;
-	return(Result);
+inline void EndAssetLock(game_assets* Assets){
+	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	Assets->OperationLock = 0;
 }
 
-extern void MoveHeaderToFront(game_assets* Assets, asset* Asset);
-inline loaded_bitmap* GetBitmap(game_assets* Assets, bitmap_id ID){
-	Assert(ID.Value <= Assets->AssetCount);
-	asset* Asset = Assets->Assets + ID.Value;
+inline void InsertAssetHeaderAtFront(game_assets* Assets, asset_memory_header* Header){
+    asset_memory_header* Sentinel = &Assets->LoadedAssetSentinel;
 
-	loaded_bitmap* Result = 0;
-	if(GetState(Asset) >= AssetState_Loaded){
-		GD_COMPLETE_READS_BEFORE_FUTURE;
-		Result = &Asset->Header->Bitmap;
-		MoveHeaderToFront(Assets, Asset);
+    Header->Prev = Sentinel;
+    Header->Next = Sentinel->Next;
+
+    Header->Next->Prev = Header;
+    Header->Prev->Next = Header;
+}
+
+inline void RemoveAssetHeaderFromList(asset_memory_header* Header){
+    Header->Prev->Next = Header->Next;
+    Header->Next->Prev = Header->Prev;
+
+    Header->Next = Header->Prev = 0;
+}
+
+inline asset_memory_header* GetAsset(game_assets* Assets, uint32 ID, uint32 GenerationID){
+	Assert(ID <= Assets->AssetCount);
+	asset* Asset = Assets->Assets  + ID;
+
+	asset_memory_header* Result = 0;
+
+	BeginAssetLock(Assets);
+
+	if(Asset->State == AssetState_Loaded){
+		Result = Asset->Header;
+		RemoveAssetHeaderFromList(Result);
+		InsertAssetHeaderAtFront(Assets, Result);
+
+		if(Asset->Header->GenerationID < GenerationID){
+			Asset->Header->GenerationID = GenerationID;
+		}
+
+		GD_COMPLETE_WRITES_BEFORE_FUTURE;
 	}
 
+	EndAssetLock(Assets);
+
 	return(Result);
 }
 
-inline loaded_sound* GetSound(game_assets* Assets, sound_id ID){
-	Assert(ID.Value <= Assets->AssetCount);
-	asset* Asset = Assets->Assets + ID.Value;
+inline loaded_bitmap* GetBitmap(game_assets* Assets, bitmap_id ID, uint32 GenerationID){
+	
+	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
 
-	loaded_sound* Result = 0;
-	if(GetState(Asset) >= AssetState_Loaded){
-		GD_COMPLETE_READS_BEFORE_FUTURE;
-		Result = &Asset->Header->Sound;
-		MoveHeaderToFront(Assets, Asset);
-	}
+	loaded_bitmap* Result = Header ? &Header->Bitmap : 0;
+
+	return(Result);
+}
+
+inline dda_bitmap* GetBitmapInfo(game_assets* Assets, bitmap_id ID){
+	Assert(ID.Value <= Assets->AssetCount);
+	dda_bitmap* Result = &Assets->Assets[ID.Value].DDA.Bitmap;
+
+	return(Result);
+}
+
+inline loaded_sound* GetSound(game_assets* Assets, sound_id ID, uint32 GenerationID){
+	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
+
+	loaded_sound* Result = Header ? &Header->Sound : 0;
 
 	return(Result);
 }
@@ -141,6 +198,21 @@ inline loaded_sound* GetSound(game_assets* Assets, sound_id ID){
 inline dda_sound* GetSoundInfo(game_assets* Assets, sound_id ID){
 	Assert(ID.Value <= Assets->AssetCount);
 	dda_sound* Result = &Assets->Assets[ID.Value].DDA.Sound;
+
+	return(Result);
+}
+
+inline loaded_font* GetFont(game_assets* Assets, font_id ID, uint32 GenerationID){
+	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
+
+	loaded_font* Result = Header ? &Header->Font : 0;
+
+	return(Result);
+}
+
+inline dda_font* GetFontInfo(game_assets* Assets, font_id ID){
+	Assert(ID.Value <= Assets->AssetCount);
+	dda_font* Result = &Assets->Assets[ID.Value].DDA.Font;
 
 	return(Result);
 }
@@ -155,8 +227,10 @@ inline bool32 IsValid(sound_id ID){
 	return(Result);
 }
 
-INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Locked);
+INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Immediate);
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID);
+INTERNAL_FUNCTION void LoadFontAsset(game_assets* Assets, font_id, bool32 Immediate);
+
 
 inline sound_id GetNextSoundInChain(game_assets* Assets, sound_id ID){
 	sound_id Result = {};
@@ -178,6 +252,35 @@ inline sound_id GetNextSoundInChain(game_assets* Assets, sound_id ID){
 	}
 
 	return(Result);
+}
+
+inline uint32 BeginGeneration(game_assets* Assets){
+	BeginAssetLock(Assets);
+
+	Assert(Assets->InFlightGenerationCount < ArrayCount(Assets->InFlightGenerations));
+	uint32 Result = Assets->NextGenerationID++;
+	Assets->InFlightGenerations[Assets->InFlightGenerationCount++] = Result;
+
+	EndAssetLock(Assets);
+
+	return(Result);
+}
+
+inline void EndGeneration(game_assets* Assets, uint32 GenerationID){
+	BeginAssetLock(Assets);
+
+	for(uint32 Index = 0;
+		Index < Assets->InFlightGenerationCount;
+		Index++)
+	{
+		if(Assets->InFlightGenerations[Index] == GenerationID){
+			Assets->InFlightGenerations[Index] = Assets->InFlightGenerations[--Assets->InFlightGenerationCount];
+
+			break;
+		}
+	}
+
+	EndAssetLock(Assets);
 }
 
 #endif

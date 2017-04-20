@@ -28,6 +28,9 @@ typedef size_t memory_index;
 
 #include "ivan_math.h"
 
+#define UINT32_FROM_POINTER(Pointer) ((uint32)(memory_index)(Pointer))
+#define POINTER_FROM_UINT32(type, Value) (type *)((memory_index)Value)
+
 /*Platform stuff*/
 inline uint32
 SafeTruncateUInt64(uint64 Value){
@@ -127,9 +130,18 @@ typedef PLATFORM_ALLOCATE_MEMORY(platform_allocate_memory);
 #define PLATFORM_DEALLOCATE_MEMORY(name) void name(void* Memory)
 typedef PLATFORM_DEALLOCATE_MEMORY(platform_deallocate_memory);
 
+#define PLATFORM_ALLOCATE_TEXTURE(name) void* name(uint32 Width, uint32 Height, void* Data)
+typedef PLATFORM_ALLOCATE_TEXTURE(platform_allocate_texture);
+
+#define PLATFORM_DEALLOCATE_TEXTURE(name) void name(void* Texture)
+typedef PLATFORM_DEALLOCATE_TEXTURE(platform_deallocate_texture);
+
 typedef struct platform_api{
     platform_add_entry* AddEntry;
     platform_complete_all_work* CompleteAllWork;
+
+    platform_allocate_texture* AllocateTexture;
+    platform_deallocate_texture* DeallocateTexture;
 
     platform_get_all_files_of_type_begin* GetAllFilesOfTypeBegin;
     platform_get_all_files_of_type_end* GetAllFilesOfTypeEnd;
