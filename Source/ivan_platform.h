@@ -6,6 +6,9 @@
 #define GD_IMPLEMENTATION
 #include "E:/Programming/MyProjects/GD_LIBS/gd.h"
 
+#define STB_SPRINTF_IMPLEMENTATION
+#include "stb_sprintf.h"
+
 #define GLOBAL_VARIABLE static
 #define LOCAL_PERSIST static
 #define INTERNAL_FUNCTION static
@@ -232,20 +235,6 @@ struct debug_cycle_counter{
     uint32 HitCount;
 };
 
-#ifdef _MSC_VER
-#define BEGIN_TIMED_BLOCK(func_name) uint64 Start_##func_name = __rdtsc();
-#define END_TIMED_BLOCK(func_name) DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].CycleCount += __rdtsc() - Start_##func_name;  \
-    DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].HitCount++;
-#define END_TIMED_BLOCK_COUNTED(func_name, Count) DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].CycleCount += __rdtsc() - Start_##func_name;   \
-    DebugGlobalMemory->Counters[DebugCycleCounter_##func_name].HitCount += (Count);
-#else
-#define BEGIN_TIMED_BLOCK()
-#define END_TIMED_BLOCK()
-#define END_TIMED_BLOCK_COUNTED()
-#endif
-
-
-
 
 //extern platform_add_entry* PlatformAddEntry;
 //extern platform_complete_all_work* PlatformCompleteAllWork;
@@ -283,6 +272,20 @@ inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, ui
     uint32 Result = _InterlockedCompareExchange((long volatile*)Value, New, Comparand);
     return(Result);
 }
+
+//NOTE(Dima): Returns the original value
+inline uint64 AtomicAddU64(uint64 volatile* Value, uint64 Addend){
+    uint64 Result = _InterlockedExchangeAdd64((__int64*)Value, Addend);
+    return(Result);
+}
+
+inline uint64 AtomicExchangeU64(uint64 volatile* Value, uint64 New){
+    uint64 Result = _InterlockedExchange64((__int64*)Value, New);
+    return(Result);
+}
+
+inline 
+
 #elif GD_COMPILER_GCC
 inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Comparand){
     uint32 Result = __sync_val_compare_and_swap(Value, Comparand, New);

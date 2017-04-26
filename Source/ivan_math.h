@@ -473,6 +473,20 @@ float Lerp(float a, float b, float t){
 	Res = Add(Res, a);					\
 	return(Res);
 
+/*Rectangle Functions*/
+inline int32 
+GetClampedRectArea(rectangle2 A){
+	float Width = (A.Max.x - A.Min.x);
+	float Height = (A.Max.y - A.Min.y);
+
+	float Result = 0.0f;
+	if((Width > 0) && (Height > 0)){
+		Result = Width * Height;
+	}
+
+	return(Result);
+}
+
 inline vec2 Lerp(vec2 a, vec2 b, float delta){ IVAN_VECTOR_LERP(2, a, b, delta); }
 inline vec3 Lerp(vec3 a, vec3 b, float delta){ IVAN_VECTOR_LERP(3, a, b, delta); }
 inline vec4 Lerp(vec4 a, vec4 b, float delta){ IVAN_VECTOR_LERP(4, a, b, delta); }

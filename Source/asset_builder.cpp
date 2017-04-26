@@ -4,6 +4,11 @@
     NOTE(Dima): Images are stored in gamma-corrected premultiplied-alpha format
 */
 
+/*
+    TODO(Dima): 
+        Font Atlas
+*/
+
 #pragma pack(push, 1)
 struct bitmap_header{
     uint16 FileType; /*File type, always 4d42 ("BM")*/
@@ -839,7 +844,7 @@ INTERNAL_FUNCTION void WriteFonts(){
 
     loaded_font *Fonts[] = {
         LoadFont("c:/Windows/Fonts/arial.ttf", "Arial", 128),
-        LoadFont("c:/Windows/Fonts/LiberationMono-Regular.ttf", "Liberation Mono", 48),
+        LoadFont("c:/Windows/Fonts/LiberationMono-Regular.ttf", "Liberation Mono", 20),
     };
 
     BeginAssetType(Assets, Asset_FontGlyph);

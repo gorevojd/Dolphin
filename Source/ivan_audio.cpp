@@ -30,6 +30,8 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
 
 INTERNAL_FUNCTION playing_sound*
 PlaySound(audio_state* AudioState, sound_id SoundID){
+    TIMED_BLOCK();
+
     if(!AudioState->FirstFreePlayingSound){
         AudioState->FirstFreePlayingSound = PushStruct(AudioState->PermArena, playing_sound);
         AudioState->FirstFreePlayingSound->Next = 0;
@@ -85,6 +87,8 @@ OutputPlayingSounds(
 	game_assets* Assets,
 	memory_arena* TempArena)
 {
+    TIMED_BLOCK();
+
 #define AUDIO_STATE_OUTPUT_CHANNEL_COUNT 2
 
     temporary_memory MixerMemory = BeginTemporaryMemory(TempArena);

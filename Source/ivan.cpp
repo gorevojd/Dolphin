@@ -4,6 +4,8 @@
 #include "ivan_audio.cpp"
 #include "ivan_particle.cpp"
 
+INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
+
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState, bool32 DependsOnGameMode){
 	task_with_memory* FoundTask = 0;
     
@@ -33,13 +35,15 @@ GLOBAL_VARIABLE float FontScale;
 GLOBAL_VARIABLE font_id FontID;
 
 INTERNAL_FUNCTION void DEBUGTextReset(render_group* RenderGroup){
+    TIMED_BLOCK();
+
     asset_vector MatchVector = {};
     MatchVector.Data[Tag_FontType] = FontType_Debug;
     asset_vector WeightVector = {};
     WeightVector.Data[Tag_FontType] = 10.0f;
     FontID = GetBestMatchFontFrom(RenderGroup->Assets, Asset_Font, &MatchVector, &WeightVector);
     
-    FontScale = 0.5f;
+    FontScale = 1.0f;
 
 
     dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
@@ -47,6 +51,7 @@ INTERNAL_FUNCTION void DEBUGTextReset(render_group* RenderGroup){
 }
 
 INTERNAL_FUNCTION void DEBUGTextOut(render_group* RenderGroup, char* String){
+    TIMED_BLOCK();
 
     loaded_font* Font = PushFont(RenderGroup, FontID);
     
@@ -115,7 +120,8 @@ platform_add_entry* PlatformAddEntry;
 platform_complete_all_work* PlatformCompleteAllWork;
 
 GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
-    
+    TIMED_BLOCK();
+
 #if 0
     Platform.AddEntry = Memory->PlatformAPI.AddEntry;
     Platform.CompleteAllWork = Memory->PlatformAPI.CompleteAllWork;
@@ -296,17 +302,25 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     
     MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
     WeightVector.Data[Tag_Color] = 1.0f;
-
+/*
     SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
-
-    DEBUGTextOut(RenderGroup, "\\^7That's not the shape of my heart");
-    DEBUGTextOut(RenderGroup, "\\#900That's not the shape of my heart");
-    DEBUGTextOut(RenderGroup, "That's not the shape of my heart");
+*/
+    OverlayCycleCounters(Memory, RenderGroup);
 
     DEBUGTextReset(RenderGroup);
 
+#if 1
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
+#else
+    rectangle2 ClipRect;
+    ClipRect.Min.x = 0;
+    ClipRect.Min.y = 0;
+    ClipRect.Max.x = Buffer->Width;
+    ClipRect.Max.y = Buffer->Height;
+
+    RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer, ClipRect);
+#endif
     EndRender(RenderGroup);
 
     EndTemporaryMemory(RenderMemory);
@@ -322,4 +336,47 @@ GD_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
     memory_arena* TempArena)
 */
     OutputPlayingSounds(&GameState->AudioState, SoundOutput, TranState->Assets, &GameState->PermanentArena);
+}
+
+debug_record DebugRecordArray[__COUNTER__];
+
+#include <stdio.h>
+
+INTERNAL_FUNCTION void 
+OutputDebugRecords(debug_record* Counters, uint32 CountersCount, render_group* RenderGroup){
+    for(int CounterIndex = 0;
+        CounterIndex < CountersCount;
+        CounterIndex++)
+    {
+        debug_record* Counter = Counters + CounterIndex;
+
+        uint64 HitCount_CycleCount = AtomicExchangeU64(&Counter->HitCount_CycleCount, 0);
+        uint32 HitCount = (uint32)(HitCount_CycleCount >> 32);
+        uint32 CycleCount = (uint32)(HitCount_CycleCount & 0xFFFFFFFF);
+
+        if(HitCount){
+            char TextBuffer[256];
+
+            stbsp_sprintf(TextBuffer, "%32s(%4d): %10ucy %8uh %10ucy/h",
+                Counter->FunctionName,
+                Counter->LineNumber,
+                CycleCount,
+                HitCount,
+                CycleCount / HitCount);
+
+            DEBUGTextOut(RenderGroup, TextBuffer);
+        }
+    }
+}
+
+INTERNAL_FUNCTION void
+OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup){
+#ifdef INTERNAL_BUILD
+    DEBUGTextOut(RenderGroup, "\\#900DEBUG \\#090CYCLE \\#990\\COUNTS");
+    
+    OutputDebugRecords(
+        DebugRecords_MainTranslationUnit, 
+        ArrayCount(DebugRecords_MainTranslationUnit), 
+        RenderGroup);
+#endif
 }

@@ -3,6 +3,7 @@
 
 #include "ivan_platform.h"
 #include "ivan_memory.h"
+#include "ivan_debug.h"
 
 #include "ivan_intrinsics.h"
 #include "ivan_random.h"
