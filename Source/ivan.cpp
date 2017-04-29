@@ -45,7 +45,6 @@ INTERNAL_FUNCTION void DEBUGTextReset(render_group* RenderGroup){
     
     FontScale = 1.0f;
 
-
     dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
     CursorY = GetStartingBaselineY(Info) * FontScale;
 }

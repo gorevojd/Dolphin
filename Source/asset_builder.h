@@ -10,9 +10,9 @@
 #include "ivan_file_formats.h"
 
 
-#define USE_WINAPI_FONTS 1
+#define USE_FONTS_FROM_WINDOWS 0
 
-#if USE_WINAPI_FONTS
+#if USE_FONTS_FROM_WINDOWS
 #include <Windows.h>
 #define MAX_FONT_WIDTH 1024
 #define MAX_FONT_HEIGHT 1024
@@ -36,8 +36,18 @@ enum asset_type{
 };
 
 struct loaded_font{
+
+#if USE_FONTS_FROM_WINDOWS
 	HFONT Win32Handle;
 	TEXTMETRIC TextMetric;
+#else
+	void* FileContents;
+	stbtt_fontinfo FontInfo;
+	float Scale;
+	float AscenderHeight;
+	float DescenderHeight;
+	float ExternalLeading;
+#endif
 	float LineAdvance;
 
 	dda_font_glyph* Glyphs;

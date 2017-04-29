@@ -43,4 +43,23 @@ struct win32_sound_input{
 	WORD BlockSize;
 	DWORD RunningSample;
 };
+
+struct platform_work_queue_entry{
+    platform_work_queue_callback* Callback;
+    void* Data;
+};
+
+struct platform_work_queue{
+    uint32 volatile EntryCount;
+    uint32 volatile FinishedEntries;
+    uint32 volatile NextEntryToWrite;
+    uint32 volatile NextEntryToRead;
+    HANDLE SemaphoreHandle;
+    platform_work_queue_entry Entries[256];
+};
+
+struct win32_thread_startup{
+	platform_work_queue* Queue;
+};
+
 #endif

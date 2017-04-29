@@ -2,6 +2,7 @@
 #define IVAN_H
 
 #include "ivan_platform.h"
+#include "ivan_shared.h"
 #include "ivan_memory.h"
 #include "ivan_debug.h"
 

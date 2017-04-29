@@ -283,9 +283,9 @@ inline void RenderRectangleQuickly(
 
     if((ClipMinX < ClipMaxX) && (ClipMinY < ClipMaxY)){
         
-        int32 FillRectWidth = (ClipMaxX - ClipMinX);
-        int32 FillRectHeight = (ClipMaxY - ClipMinY);
-        
+        int32 FillRectWidth = (MaxX - MinX);
+        int32 FillRectHeight = (MaxY - MinY);
+
         int32 RectPixelArea = 0;
 
         if(FillRectWidth > 0 && FillRectHeight > 0){

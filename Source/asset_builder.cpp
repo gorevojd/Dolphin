@@ -179,6 +179,7 @@ INTERNAL_FUNCTION loaded_font*
 LoadFont(char* FileName, char* FontName, int PixelHeight){
     loaded_font* Font = (loaded_font*)malloc(sizeof(loaded_font));
 
+#if USE_FONTS_FROM_WINDOWS
     AddFontResourceExA(FileName, FR_PRIVATE, 0);
     Font->Win32Handle = CreateFontA(
         PixelHeight,
@@ -196,6 +197,26 @@ LoadFont(char* FileName, char* FontName, int PixelHeight){
 
     SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
     GetTextMetrics(GlobalFontDeviceContext, &Font->TextMetric);
+#else
+    loaded_file TTFFile = ReadEntireFile(FileName);
+    Font->FileContents = TTFFile.Data;
+
+    if(TTFFile.DataSize != 0){
+        stbtt_InitFont(
+            &Font->FontInfo,
+            (uint8*)TTFFile.Data,
+            stbtt_GetFontOffsetForIndex((uint8*)TTFFile.Data, 0));
+
+        Font->Scale = stbtt_ScaleForPixelHeight(&Font->FontInfo, PixelHeight);
+
+        int Ascent, Descent, LineGap;
+        stbtt_GetFontVMetrics(&Font->FontInfo, &Ascent, &Descent, &LineGap);
+
+        Font->AscenderHeight = Font->Scale * Ascent;
+        Font->DescenderHeight = Font->Scale * -Descent;
+        Font->ExternalLeading = Font->Scale * LineGap;
+    }
+#endif
 
     Font->MinCodePoint = INT_MAX;
     Font->MaxCodePoint = 0;
@@ -223,6 +244,7 @@ LoadFont(char* FileName, char* FontName, int PixelHeight){
 
 INTERNAL_FUNCTION void
 FinalizeFontKerning(loaded_font* Font){
+#if USE_FONTS_FROM_WINDOWS
     SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
 
     DWORD KerningPairCount = GetKerningPairsW(GlobalFontDeviceContext, 0, 0);
@@ -246,12 +268,39 @@ FinalizeFontKerning(loaded_font* Font){
     }
 
     free(KerningPairs);
+
+#else
+    for(uint32 FirstGlyphIndex = 1;
+        FirstGlyphIndex < Font->GlyphCount;
+        FirstGlyphIndex++)
+    {
+        dda_font_glyph First = Font->Glyphs[FirstGlyphIndex];
+
+        for(uint32 SecondGlyphIndex = 1;
+            SecondGlyphIndex < Font->GlyphCount;
+            SecondGlyphIndex++)
+        {
+            dda_font_glyph Second = Font->Glyphs[SecondGlyphIndex];
+
+            float KernAdvance = Font->Scale * stbtt_GetCodepointKernAdvance(
+                &Font->FontInfo,
+                First.UnicodeCodePoint,
+                Second.UnicodeCodePoint);
+
+            Font->HorizontalAdvance[SecondGlyphIndex * Font->MaxGlyphCount + FirstGlyphIndex] += KernAdvance;
+        }
+    }
+#endif
 }
 
 INTERNAL_FUNCTION void 
 FreeFont(loaded_font* Font){
     if(Font){
+#if USE_FONTS_FROM_WINDOWS
         DeleteObject(Font->Win32Handle);
+#else
+        free(Font->FileContents);
+#endif
         free(Font->Glyphs);
         free(Font->HorizontalAdvance);
         free(Font->GlyphIndexFromCodePoint);
@@ -260,6 +309,8 @@ FreeFont(loaded_font* Font){
 }
 
 INTERNAL_FUNCTION void InitializeFontDC(){
+
+#if USE_FONTS_FROM_WINDOWS
     GlobalFontDeviceContext = CreateCompatibleDC(GetDC(0));
 
     BITMAPINFO Info = {};
@@ -277,6 +328,7 @@ INTERNAL_FUNCTION void InitializeFontDC(){
     HBITMAP Bitmap = CreateDIBSection(GlobalFontDeviceContext, &Info, DIB_RGB_COLORS, &GlobalFontBits, 0, 0);
     SelectObject(GlobalFontDeviceContext, Bitmap);
     SetBkColor(GlobalFontDeviceContext, RGB(0, 0, 0));  
+#endif
 }
 
 INTERNAL_FUNCTION loaded_bitmap
@@ -285,6 +337,7 @@ LoadGlyphBitmap(loaded_font* Font, uint32 Codepoint, dda_asset* Asset){
 
     uint32 GlyphIndex = Font->GlyphIndexFromCodePoint[Codepoint];
 
+#if USE_FONTS_FROM_WINDOWS
     SelectObject(GlobalFontDeviceContext, Font->Win32Handle);
 
     memset(GlobalFontBits, 0x00, MAX_FONT_WIDTH * MAX_FONT_HEIGHT * sizeof(uint32));
@@ -395,6 +448,61 @@ LoadGlyphBitmap(loaded_font* Font, uint32 Codepoint, dda_asset* Asset){
     INT ThisWidth;
     GetCharWidth32W(GlobalFontDeviceContext, Codepoint, Codepoint, &ThisWidth);
     float CharAdvance = (float)ThisWidth;
+
+#else
+    int Width, Height, XOffset, YOffset;
+    uint8* MonoBitmap = stbtt_GetCodepointBitmap(
+        &Font->FontInfo,
+        0,
+        Font->Scale,
+        Codepoint,
+        &Width,
+        &Height,
+        &XOffset,
+        &YOffset);
+
+    Result.Width = Width + 2;
+    Result.Height = Height + 2;
+    Result.Memory = malloc(Result.Width * Result.Height * 4);
+    Result.Free = Result.Memory;
+
+    memset(Result.Memory, 0, Result.Width * Result.Height * 4);
+
+    uint8* Source = MonoBitmap;
+    uint8* DestRow = (uint8*)Result.Memory + (Result.Height - 1 - 1) * Result.Width * 4;
+    for(int j = 0; j < Height; j++){
+        uint32* Dest = ((uint32*)DestRow) + 1;
+        for(int i = 0; i < Width; i++){
+            uint32 Pixel = *Source;
+
+            float Gray = (float)(Pixel & 0xFF);
+            vec4 Texel = {255.0f, 255.0f, 255.0f, Gray};
+            Texel = SRGB255ToLinear1(Texel);
+            Texel.rgb *= Texel.a;
+            Texel = Linear1ToSRGB255(Texel);
+
+           *Dest++ = (((uint32)(Texel.a + 0.5f) << 24) |
+               ((uint32)(Texel.r + 0.5f) << 16) |
+               ((uint32)(Texel.g + 0.5f) << 8) |
+               ((uint32)(Texel.b + 0.5f) << 0));
+
+           Source++;
+        }
+
+        DestRow -= Result.Width * 4;
+    }
+
+    stbtt_FreeBitmap(MonoBitmap, 0);
+
+    Asset->Bitmap.AlignPercentage[0] = (1.0f) / (float)Result.Width;
+    Asset->Bitmap.AlignPercentage[1] = (1.0f + (Height + YOffset)) / (float)Result.Height;
+
+    float KerningChange = (float)XOffset;
+
+    int Advance;
+    stbtt_GetCodepointHMetrics(&Font->FontInfo, Codepoint, &Advance, 0);
+    float CharAdvance = Font->Scale * (float)Advance;
+#endif
 
     for(uint32 OtherGlyphIndex = 0;
         OtherGlyphIndex < Font->MaxGlyphCount;
@@ -680,9 +788,15 @@ AddFontAsset(game_assets* Assets, loaded_font* Font){
     added_asset Asset = AddAsset(Assets);
     Asset.DDA->Font.OnePastHighestCodepoint = Font->OnePastHighestCodepoint;
     Asset.DDA->Font.GlyphCount = Font->GlyphCount;
+#if USE_FONTS_FROM_WINDOWS
     Asset.DDA->Font.AscenderHeight = (float)Font->TextMetric.tmAscent;
     Asset.DDA->Font.DescenderHeight = (float)Font->TextMetric.tmDescent;
     Asset.DDA->Font.ExternalLeading = (float)Font->TextMetric.tmExternalLeading;
+#else
+    Asset.DDA->Font.AscenderHeight = Font->AscenderHeight;
+    Asset.DDA->Font.DescenderHeight = Font->DescenderHeight;
+    Asset.DDA->Font.ExternalLeading = Font->ExternalLeading;
+#endif
     Asset.Source->Type = AssetType_Font;
     Asset.Source->Font.Font = Font;
 
@@ -843,7 +957,7 @@ INTERNAL_FUNCTION void WriteFonts(){
     Initialize(Assets);
 
     loaded_font *Fonts[] = {
-        LoadFont("c:/Windows/Fonts/arial.ttf", "Arial", 128),
+        LoadFont("c:/Windows/Fonts/arial.ttf", "Arial", 20),
         LoadFont("c:/Windows/Fonts/LiberationMono-Regular.ttf", "Liberation Mono", 20),
     };
 
@@ -872,6 +986,7 @@ INTERNAL_FUNCTION void WriteFonts(){
     EndAssetType(Assets);
 
     WriteDDA(Assets, "../Data/asset_pack_fonts.dda");
+	printf("Hero assets written successfully :D\n");
 }
 
 INTERNAL_FUNCTION void WriteHero(){
@@ -920,6 +1035,7 @@ INTERNAL_FUNCTION void WriteHero(){
     EndAssetType(Assets);
 
     WriteDDA(Assets, "../Data/asset_pack_hero.dda");
+	printf("Hero assets written successfully :D\n");
 }
 
 INTERNAL_FUNCTION void WriteNonHero(){
@@ -1004,6 +1120,7 @@ INTERNAL_FUNCTION void WriteNonHero(){
     EndAssetType(Assets);
     
     WriteDDA(Assets, "../Data/asset_pack_non_hero.dda");
+	printf("Non-hero assets written successfully :D\n");
 }
 
 INTERNAL_FUNCTION void WriteSounds(){
@@ -1060,6 +1177,7 @@ INTERNAL_FUNCTION void WriteSounds(){
     EndAssetType(Assets);
 
     WriteDDA(Assets, "../Data/asset_pack_sounds.dda");
+	printf("Sound assets written successfully :D\n");
 }
 
 int main(int ArgCount, char** Args){

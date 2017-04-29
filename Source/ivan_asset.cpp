@@ -1,8 +1,3 @@
-/*
-    TODO(DIMA): 
-        Support for opengl texture allocation, deallocation
-*/
-
 enum finalize_asset_operation{
     FinalizeAsset_None,
     FinalizeAsset_Font,
@@ -292,11 +287,7 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
                 Work.Offset = Asset->DDA.DataOffset;
                 Work.Size = Size.Data;
                 Work.Destination = Bitmap->Memory;
-#if 0
                 Work.FinalizeOperation = FinalizeAsset_Bitmap;
-#else
-                Work.FinalizeOperation = FinalizeAsset_None;
-#endif
 
                 Work.FinalState = (AssetState_Loaded);
 
