@@ -1,5 +1,36 @@
 #include "ivan_render_group.h"
 
+#define GL_TOSTR__(x) #x
+#define GL_TOSTR_(x) GL_TOSTR__(x)
+#define GL_ERR_LOC(ErrName) #ErrName ":"GL_TOSTR_(__LINE__)":" __FUNCTION__ "\n"
+
+
+#define GL_DEBUG_MARKER() {									    \
+    GLenum ErrCode = glGetError();								\
+    if(ErrCode != GL_NO_ERROR){								    \
+        switch(ErrCode){										\
+            case(GL_INVALID_ENUM):{								\
+                OutputDebugStringA(GL_ERR_LOC(GL_INVALID_ENUM));    \
+            }break;												\
+            case(GL_INVALID_VALUE):{							\
+                OutputDebugStringA(GL_ERR_LOC(GL_INVALID_VALUE));			\
+            }break;												\
+            case(GL_INVALID_OPERATION):{						\
+                OutputDebugStringA(GL_ERR_LOC(GL_INVALID_OPERATION));				\
+            }break;												\
+            case(GL_STACK_OVERFLOW):{							\
+                OutputDebugStringA(GL_ERR_LOC(GL_STACK_OVERFLOW));				\
+            }break;												\
+            case(GL_STACK_UNDERFLOW):{							\
+                OutputDebugStringA(GL_ERR_LOC(GL_STACK_UNDERFLOW));				\
+            }break;												\
+            case(GL_OUT_OF_MEMORY):{							\
+                OutputDebugStringA(GL_ERR_LOC(GL_OUT_OF_MEMORY));				\
+            }break;												\
+        }														\
+    }															\
+}
+
 /*Windows non-specific*/
 #define GL_NUM_EXTENSIONS                 0x821D
 
@@ -75,35 +106,164 @@
 #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB        0x00000001
 #define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
 
+GLOBAL_VARIABLE uint32 GlobalFramebufferCount = 0;
+GLOBAL_VARIABLE GLuint GlobalFramebufferHandles[256] = {0};
+GLOBAL_VARIABLE GLuint GlobalFramebufferTextures[256] = {0};
 
-inline void RenderOpenGLRectangle(
-    vec2 MinP,
-    vec2 MaxP,
+INTERNAL_FUNCTION void 
+OpenGLBindFramebuffer(uint32 TargetIndex, rectangle2i DrawRegion){
+    uint32 WindowWidth = GetWidth(DrawRegion);
+    uint32 WindowHeight = GetHeight(DrawRegion);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, GlobalFramebufferHandles[TargetIndex]);
+    glViewport(0, 0, WindowWidth, WindowHeight);
+}
+
+inline void OpenGLRenderRectangle(
+    vec3 MinP,
+    vec3 MaxP,
     vec4 PremultColor,
     vec2 MinUV = Vec2(0.0f, 0.0f),
     vec2 MaxUV = Vec2(1.0f, 1.0f))
 {
-    glBegin(GL_TRIANGLES);
+    GL_DEBUG_MARKER();
     
+    glBegin(GL_TRIANGLES);
+
+#if 1
+    
+
     glColor4f(PremultColor.r, PremultColor.g, PremultColor.b, PremultColor.a);
 
     /*Upper triangle*/
     glTexCoord2f(MinUV.x, MaxUV.y);
-    glVertex2f(MinP.x, MaxP.y);
+    glVertex3f(MinP.x, MaxP.y, MinP.z);
     glTexCoord2f(MaxUV.x, MaxUV.y);
-    glVertex2f(MaxP.x, MaxP.y);
+    glVertex3f(MaxP.x, MaxP.y, MinP.z);
     glTexCoord2f(MaxUV.x, MinUV.y);
-    glVertex2f(MaxP.x, MinP.y);
+    glVertex3f(MaxP.x, MinP.y, MinP.z);
 
     /*Lower triangle*/
     glTexCoord2f(MinUV.x, MaxUV.y);
-    glVertex2f(MinP.x, MaxP.y);
+    glVertex3f(MinP.x, MaxP.y, MinP.z);
     glTexCoord2f(MaxUV.x, MinUV.y);
-    glVertex2f(MaxP.x, MinP.y);
+    glVertex3f(MaxP.x, MinP.y, MinP.z);
     glTexCoord2f(MinUV.x, MinUV.y);
-    glVertex2f(MinP.x, MinP.y);
+    glVertex3f(MinP.x, MinP.y, MinP.z);
+#else
+    glColor4f(PremultColor.r, PremultColor.g, PremultColor.b, PremultColor.a);
+
+    // NOTE(casey): Lower triangle
+    glTexCoord2f(MinUV.x, MinUV.y);
+    glVertex3f(MinP.x, MinP.y, MinP.z);
+
+    glTexCoord2f(MaxUV.x, MinUV.y);
+    glVertex3f(MaxP.x, MinP.y, MinP.z);
+
+    glTexCoord2f(MaxUV.x, MaxUV.y);
+    glVertex3f(MaxP.x, MaxP.y, MinP.z);
+
+    // NOTE(casey): Upper triangle
+    glTexCoord2f(MinUV.x, MinUV.y);
+    glVertex3f(MinP.x, MinP.y, MinP.z);
+
+    glTexCoord2f(MaxUV.x, MaxUV.y);
+    glVertex3f(MaxP.x, MaxP.y, MinP.z);
+
+    glTexCoord2f(MinUV.x, MaxUV.y);
+    glVertex3f(MinP.x, MaxP.y, MinP.z);
+#endif
 
     glEnd();
+
+    GL_DEBUG_MARKER();
+}
+
+inline void OpenGLRenderBitmap(
+    int Width, 
+    int Height,
+    void* Memory,
+    rectangle2i DrawRegion,
+    vec4 ClearColor,
+    GLuint BlitTexture)
+{
+    GL_DEBUG_MARKER();
+
+    OpenGLBindFramebuffer(0, DrawRegion);
+    //glViewport(0, 0, Width, Height);
+
+    glDisable(GL_SCISSOR_TEST);
+    glDisable(GL_BLEND);
+
+    GL_DEBUG_MARKER();
+
+    glBindTexture(GL_TEXTURE_2D, BlitTexture);
+
+    glTexImage2D(
+        GL_TEXTURE_2D, 
+        0, 
+        GL_SRGB8_ALPHA8, 
+        //GL_RGBA8,
+        Width, 
+        Height,
+        0, 
+        GL_BGRA_EXT, 
+        //GL_RGBA,
+        GL_UNSIGNED_BYTE, 
+        Memory);
+
+    GL_DEBUG_MARKER();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    GL_DEBUG_MARKER();
+
+    glEnable(GL_TEXTURE_2D);
+
+    GL_DEBUG_MARKER();
+
+    glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    GL_DEBUG_MARKER();
+
+    glMatrixMode(GL_PROJECTION);
+
+    float a = SafeRatio1(2.0f, (float)Width);
+    float b = SafeRatio1(2.0f, (float)Height);
+    
+    float ProjectionMatrix[] =
+    {
+         a,  0,  0,  0,
+         0,  -b,  0,  0,
+         0,  0,  1,  0,
+        -1, 1,  0,  1,
+    };
+    glLoadMatrixf(ProjectionMatrix);
+
+    GL_DEBUG_MARKER();
+	
+    vec3 MinP = {0, 0, 0};
+    vec3 MaxP = {(float)Width, (float)Height, 0.0f};
+    vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    OpenGLRenderRectangle(MinP, MaxP, Color);
+    
+    GL_DEBUG_MARKER();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glEnable(GL_BLEND);
+
+    GL_DEBUG_MARKER();
 }
 
 INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
@@ -136,6 +296,9 @@ INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
             else if(StringsAreEqual(ExtName, "GL_EXT_framebuffer_sRGB")){Result.GL_EXT_framebuffer_sRGB = true;}
             else if(StringsAreEqual(ExtName, "GL_ARB_framebuffer_sRGB")){Result.GL_EXT_framebuffer_sRGB = true;}
             else if(StringsAreEqual(ExtName, "GL_ARB_framebuffer_object")){Result.GL_ARB_framebuffer_object = true;}
+            else if(StringsAreEqual(ExtName, "GL_ARB_compatibility")){
+                int a = 1;
+            }
         }
     }
 
@@ -166,10 +329,16 @@ INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
     return(Result);
 }
 
-PLATFORM_ALLOCATE_TEXTURE(AllocateTexture){
+INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void* Data){
+    
+    GL_DEBUG_MARKER();
+
     GLuint Handle;
     glGenTextures(1, &Handle);
     glBindTexture(GL_TEXTURE_2D, Handle);
+
+    GL_DEBUG_MARKER();
+
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
@@ -181,11 +350,13 @@ PLATFORM_ALLOCATE_TEXTURE(AllocateTexture){
         GL_UNSIGNED_BYTE, 
         Data);
 
+    GL_DEBUG_MARKER();
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -195,17 +366,33 @@ PLATFORM_ALLOCATE_TEXTURE(AllocateTexture){
     return(POINTER_FROM_UINT32(void, Handle));
 }
 
-PLATFORM_DEALLOCATE_TEXTURE(DeallocateTexture){
-    GLuint Handle = UINT32_FROM_POINTER(Texture);
-    glDeleteTextures(1, &Handle);
+INTERNAL_FUNCTION void
+OpenGLManageTextures(texture_op* First){
+    for(texture_op* Op = First; Op; Op = Op->Next){
+        if(Op->IsAllocate){
+            *Op->Allocate.ResultHandle = OpenGLAllocateTexture(
+                Op->Allocate.Width,
+                Op->Allocate.Height,
+                Op->Allocate.Data);
+        }
+        else{
+            GLuint Handle = UINT32_FROM_POINTER(Op->Deallocate.Handle);
+            glDeleteTextures(1, &Handle);
+        }
+    }
 }
 
 INTERNAL_FUNCTION void 
 OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
+
+    GL_DEBUG_MARKER();
+
     OpenGL.ShaderSimTexReadSRGB = true;
     OpenGL.ShaderSimTexWriteSRGB = true;
 
     glGenTextures(1, &OpenGL.ReservedBlitTexture);
+
+    GL_DEBUG_MARKER();
 
     glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &OpenGL.MaxMultiSampleCount);
     if(OpenGL.MaxMultiSampleCount > 16){
@@ -220,17 +407,22 @@ OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
         OpenGL.ShaderSimTexReadSRGB = false;
     }
 
+    GL_DEBUG_MARKER();
     if(FramebufferSupportsSRGB && Info.GL_EXT_framebuffer_sRGB){
         GLuint TestTexture;
         glGenTextures(1, &TestTexture);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TestTexture);
-        glGetError();
+        
+        GL_DEBUG_MARKER();
+
         glTexImage2DMultisample(
             GL_TEXTURE_2D_MULTISAMPLE, 
             OpenGL.MaxMultiSampleCount,
             GL_SRGB8_ALPHA8,
             1920, 1080,
             GL_FALSE);
+
+        GL_DEBUG_MARKER();
 
         if(glGetError() == GL_NO_ERROR){
             OpenGL.DefaultFramebufferTextureFormat = GL_SRGB8_ALPHA8;
@@ -241,6 +433,7 @@ OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
         glDeleteTextures(1, &TestTexture);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     }
+    GL_DEBUG_MARKER();
 
     for(int j = 0; j < 4; j++){
         for(int i = 0; i < 4; i++){
@@ -253,5 +446,7 @@ OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
     OpenGL.WhiteBitmap.WidthOverHeight = 1.0f;
     OpenGL.WhiteBitmap.Width = 4;
     OpenGL.WhiteBitmap.Height = 4;
-    OpenGL.WhiteBitmap.TextureHandle = AllocateTexture(1, 1, & OpenGL.White);
+    OpenGL.WhiteBitmap.TextureHandle = OpenGLAllocateTexture(1, 1, &OpenGL.White);
+
+    GL_DEBUG_MARKER();
 }

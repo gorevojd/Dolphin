@@ -70,6 +70,11 @@ struct rectangle2{
 	vec2 Max;
 };
 
+struct rectangle2i{
+	int32 MinX, MinY;
+	int32 MaxX, MaxY;
+};
+
 struct rectangle3{
 	vec3 Min;
 	vec3 Max;
@@ -474,6 +479,19 @@ float Lerp(float a, float b, float t){
 	return(Res);
 
 /*Rectangle Functions*/
+
+inline int32
+GetWidth(rectangle2i A){
+	int32 Result = A.MaxX - A.MinX;
+	return(Result);
+}
+
+inline int32 
+GetHeight(rectangle2i A){
+	int32 Result = A.MaxY - A.MinY;
+	return(Result);
+}
+
 inline int32 
 GetClampedRectArea(rectangle2 A){
 	float Width = (A.Max.x - A.Min.x);

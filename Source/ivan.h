@@ -9,6 +9,7 @@
 #include "ivan_intrinsics.h"
 #include "ivan_random.h"
 #include "ivan_simd.h"
+#include "ivan_render.h"
 #include "ivan_render_group.h"
 #include "ivan_file_formats.h"
 #include "ivan_asset.h"

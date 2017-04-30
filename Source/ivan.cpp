@@ -195,7 +195,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
         }
 
-        TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState);
+        TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));

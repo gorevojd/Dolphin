@@ -15,7 +15,30 @@ struct load_asset_work{
 
     finalize_asset_operation FinalizeOperation;
     uint32 FinalState;
+
+    platform_texture_op_queue* TextureOpQueue;
 };
+
+INTERNAL_FUNCTION void 
+AddOp(platform_texture_op_queue* Queue, texture_op* Source){
+    BeginTicketMutex(&Queue->Mutex);
+
+    Assert(Queue->FirstFree);
+    texture_op* Dest = Queue->FirstFree;
+    Queue->FirstFree = Dest->Next;
+
+    *Dest = *Source;
+    Assert(Dest->Next == 0);
+
+    if(Queue->Last){
+        Queue->Last = Queue->Last->Next = Dest;
+    }
+    else{
+        Queue->First = Queue->Last = Dest;
+    }
+
+    EndTicketMutex(&Queue->Mutex);
+}
 
 INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
     TIMED_BLOCK();
@@ -44,12 +67,17 @@ INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
 
             case FinalizeAsset_Bitmap:{
                 loaded_bitmap* Bitmap = &Work->Asset->Header->Bitmap;
-                Bitmap->TextureHandle = 
-                    Platform.AllocateTexture(Bitmap->Width, Bitmap->Height, Bitmap->Memory);
+                texture_op Op = {};
+                Op.IsAllocate = true;
+                Op.Allocate.Width = Bitmap->Width;
+                Op.Allocate.Height = Bitmap->Height;
+                Op.Allocate.Data = Bitmap->Memory;
+                Op.Allocate.ResultHandle = &Bitmap->TextureHandle;
+                AddOp(Work->TextureOpQueue, &Op);
             }break;
         }
     }
-
+	
     GD_COMPLETE_WRITES_BEFORE_FUTURE;
 
     if(!PlatformNoFileErrors(Work->Handle)){
@@ -200,7 +228,10 @@ RequestAssetMemory(game_assets* Assets, uint32 Size, uint32 AssetIndex, asset_he
                     RemoveAssetHeaderFromList(Header);
 
                     if(Asset->Header->AssetType == AssetType_Bitmap){
-                        Platform.DeallocateTexture(Asset->Header->Bitmap.TextureHandle);
+                        texture_op Op = {};
+                        Op.IsAllocate = false;
+                        Op.Deallocate.Handle = Asset->Header->Bitmap.TextureHandle;
+                        AddOp(Assets->TextureOpQueue, &Op);
                     }
 
                     Block = (asset_memory_block*)Asset->Header - 1;
@@ -288,6 +319,7 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
                 Work.Size = Size.Data;
                 Work.Destination = Bitmap->Memory;
                 Work.FinalizeOperation = FinalizeAsset_Bitmap;
+                Work.TextureOpQueue = Assets->TextureOpQueue;
 
                 Work.FinalState = (AssetState_Loaded);
 
@@ -585,9 +617,15 @@ GetBestMatchFontFrom(
 
 
 INTERNAL_FUNCTION game_assets* 
-AllocateGameAssets(memory_arena* Arena, size_t Size, transient_state* TranState){
+AllocateGameAssets(
+    memory_arena* Arena,
+    size_t Size, 
+    transient_state* TranState,
+    platform_texture_op_queue* TextureOpQueue)
+{
     game_assets* Assets = PushStruct(Arena, game_assets);
     Assets->TranState = TranState;
+    Assets->TextureOpQueue = TextureOpQueue;
 
     Assets->NextGenerationID = 0;
     Assets->InFlightGenerationCount = 0;

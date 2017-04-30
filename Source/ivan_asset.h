@@ -92,6 +92,7 @@ struct asset_memory_block{
 struct game_assets{
 	uint32 NextGenerationID;
 
+	platform_texture_op_queue* TextureOpQueue;
 	struct transient_state* TranState;
 
 	asset_memory_block MemorySentinel;

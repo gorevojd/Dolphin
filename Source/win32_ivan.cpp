@@ -741,6 +741,7 @@ Win32DisplayScreenBufferToWindow(
     int TargetHeight)
 {
 #if 0
+#if 0
     StretchDIBits(
         hdc,
         0, 0, TargetWidth, TargetHeight,
@@ -776,6 +777,30 @@ Win32DisplayScreenBufferToWindow(
             DIB_RGB_COLORS,
             SRCCOPY);
     }
+#endif
+#else
+    loaded_bitmap OutputTarget;
+    OutputTarget.Memory = Buffer->Memory;
+    OutputTarget.Width = Buffer->Width;
+    OutputTarget.Height = Buffer->Height;
+
+    win32_window_dimension WindowDim = Win32GetWindowDimension(GlobalScreen.Window);
+
+    rectangle2i DrawRegion;
+    DrawRegion.MinX = 0;
+    DrawRegion.MinY = 0;
+    DrawRegion.MaxX = WindowDim.Width;
+    DrawRegion.MaxY = WindowDim.Height;
+
+
+    OpenGLRenderBitmap(
+        OutputTarget.Width, 
+        OutputTarget.Height, 
+        OutputTarget.Memory,
+        DrawRegion, Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        OpenGL.ReservedBlitTexture);
+
+    SwapBuffers(hdc);
 #endif
 }
 
@@ -873,13 +898,16 @@ Win32ProcessPendingMessages(game_controller_input* Controller){
 int Win32OpenGLAttribs[] = 
 {
     WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-    WGL_CONTEXT_MINOR_VERSION_ARB, 0,
-    WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
-#if HANDMADE_INTERNAL
+    WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+
+    //NOTE(Dima): WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB can remove all deprecated features.
+    //So I should never actually use it here. LOL. 
+    WGL_CONTEXT_FLAGS_ARB, 0
+#ifdef INTERNAL_BUILD
     |WGL_CONTEXT_DEBUG_BIT_ARB
 #endif
     ,
-    WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+    WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB | WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
     0,
 };
 
@@ -911,7 +939,7 @@ Win32SetPixelFormat(HDC WindowDC){
             IntAttribList[10] = 0;
         }
 
-        wglChoosePixelFormatARB(
+        bool32 PFValid = wglChoosePixelFormatARB(
             WindowDC, 
             IntAttribList, 
             0, 
@@ -971,8 +999,11 @@ Win32LoadWGLExtensions(){
 
         HDC WindowDC = GetDC(Window);
         Win32SetPixelFormat(WindowDC);
+
         HGLRC OpenGLRC = wglCreateContext(WindowDC);
+        
         if(wglMakeCurrent(WindowDC, OpenGLRC)){
+        
             wglChoosePixelFormatARB = (wgl_choose_pixel_format_arb*)wglGetProcAddress("wglChoosePixelFormatARB");
             wglCreateContextAttribsARB = (wgl_create_context_attribs_arb*)wglGetProcAddress("wglCreateContextAttribsARB");
             wglGetExtensionsStringEXT = (wgl_get_extensions_string_ext*)wglGetProcAddress("wglGetExtensionsStringEXT");
@@ -1087,6 +1118,63 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
     return(OpenGLRC);
 }
 
+static void InitOpenGL2(win32_offscreen_buffer* buffer){
+    PIXELFORMATDESCRIPTOR pfd =
+    {
+        sizeof(PIXELFORMATDESCRIPTOR),
+        1,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
+        PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
+        32,                        //Colordepth of the framebuffer.
+        0, 0, 0, 0, 0, 0,
+        0,
+        0,
+        0,
+        0, 0, 0, 0,
+        24,                        //Number of bits for the depthbuffer
+        8,                        //Number of bits for the stencilbuffer
+        0,                        //Number of Aux buffers in the framebuffer.
+        PFD_MAIN_PLANE,
+        0,
+        0, 0, 0
+    };
+
+    HDC hdc = GetDC(buffer->Window);
+    int choosePFDresult = ChoosePixelFormat(hdc, &pfd);
+    bool setPFres = SetPixelFormat(hdc, choosePFDresult, &pfd);
+
+    HGLRC OpenGLRenderingContext = wglCreateContext(hdc);
+    wglMakeCurrent(hdc, OpenGLRenderingContext);
+
+    ReleaseDC(buffer->Window, hdc);
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
+    /*
+    GL_ALWAYS The depth test always passes.
+    GL_NEVER The depth test never passes.
+    GL_LESS Passes if the fragment�s depth value is less than the stored depth value.
+    GL_EQUAL Passes if the fragment�s depth value is equal to the stored depth value.
+    GL_LEQUAL   Passes if the fragment�s depth value is less than or equal to the stored depth value.
+    GL_GREATER Passes if the fragment�s depth value is greater than the stored depth value.
+    GL_NOTEQUAL Passes if the fragment�s depth value is not equal to the stored depth value.
+    GL_GEQUAL Passes if the fragment�s depth value is greater than or equal to the stored dept value.
+    */
+
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    //glStencilFunc(GL_EQUAL, 1, 0xFF);
+
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //glEnable(GL_FRAMEBUFFER_SRGB);
+
+}
 
 
 INTERNAL_FUNCTION void Win32AddEntry(platform_work_queue* Queue, platform_work_queue_callback* Callback, void* Data){
@@ -1406,6 +1494,7 @@ int WINAPI WinMain(
     HDC OpenGLDC = GetDC(GlobalScreen.Window);
     HGLRC OpenGLRC = 0;
     OpenGLRC = Win32InitOpenGL(OpenGLDC);
+    //InitOpenGL2(&GlobalScreen);
 
     win32_thread_startup HighPriStartups[6] = {};
     platform_work_queue HighPriorityQueue = {};
@@ -1444,9 +1533,17 @@ int WINAPI WinMain(
     GameMemory.PlatformAPI.AllocateMemory = Win32AllocateMemory;
     GameMemory.PlatformAPI.DeallocateMemory = Win32DeallocateMemory;
 
-    GameMemory.PlatformAPI.AllocateTexture = AllocateTexture;
-    GameMemory.PlatformAPI.DeallocateTexture = DeallocateTexture;
-
+    uint32 TextureOpCount = 1024;
+    platform_texture_op_queue* TextureOpQueue = &GameMemory.TextureOpQueue;
+    TextureOpQueue->FirstFree = (texture_op*)VirtualAlloc(0, sizeof(texture_op) * TextureOpCount,
+                                                            MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    for(uint32 TextureOpIndex = 0;
+        TextureOpIndex < (TextureOpCount - 1);
+        TextureOpIndex++)
+    {
+        texture_op* Op = TextureOpQueue->FirstFree + TextureOpIndex;
+        Op->Next = TextureOpQueue->FirstFree + TextureOpIndex + 1;
+    }
 
     char* SourceDLLName = "ivan.dll";
     char* TempDLLName = "ivan_temp.dll";
@@ -1703,6 +1800,21 @@ int WINAPI WinMain(
             Win32FillSoundBuffer(&SoundOutput, ByteToLock, BytesToLock, &GameSoundOutputBuffer);
         }
 
+        BeginTicketMutex(&TextureOpQueue->Mutex);
+        texture_op* FirstTextureOp = TextureOpQueue->First;
+        texture_op* LastTextureOp = TextureOpQueue->Last;
+        TextureOpQueue->Last = TextureOpQueue->First = 0;
+        EndTicketMutex(&TextureOpQueue->Mutex);
+
+        if(FirstTextureOp){
+            Assert(LastTextureOp);
+            OpenGLManageTextures(FirstTextureOp);
+            BeginTicketMutex(&TextureOpQueue->Mutex);
+            LastTextureOp->Next = TextureOpQueue->FirstFree;
+            TextureOpQueue->FirstFree = FirstTextureOp;
+            EndTicketMutex(&TextureOpQueue->Mutex);
+        }
+
         HDC hdc = GetDC(GlobalScreen.Window);
         Win32DisplayScreenBufferToWindow(hdc, &GlobalScreen, WindowDim.Width, WindowDim.Height);
         ReleaseDC(GlobalScreen.Window, hdc);
@@ -1723,7 +1835,7 @@ int WINAPI WinMain(
         char OutputStr[64];
         //sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
         sprintf_s(OutputStr, "FPS: %.2f\n", FPS);
-        OutputDebugStringA(OutputStr);
+        //OutputDebugStringA(OutputStr);
 
         LastCounter = EndCounter;
         LastCycleCount = EndCycleCount;

@@ -133,18 +133,21 @@ typedef PLATFORM_ALLOCATE_MEMORY(platform_allocate_memory);
 #define PLATFORM_DEALLOCATE_MEMORY(name) void name(void* Memory)
 typedef PLATFORM_DEALLOCATE_MEMORY(platform_deallocate_memory);
 
-#define PLATFORM_ALLOCATE_TEXTURE(name) void* name(uint32 Width, uint32 Height, void* Data)
-typedef PLATFORM_ALLOCATE_TEXTURE(platform_allocate_texture);
+struct ticket_mutex{
+    uint64 volatile Ticket;
+    uint64 volatile Serving;
+};
 
-#define PLATFORM_DEALLOCATE_TEXTURE(name) void name(void* Texture)
-typedef PLATFORM_DEALLOCATE_TEXTURE(platform_deallocate_texture);
+struct platform_texture_op_queue{
+    ticket_mutex Mutex;
+    struct texture_op* First;
+    texture_op* Last;
+    texture_op* FirstFree;
+};
 
 typedef struct platform_api{
     platform_add_entry* AddEntry;
     platform_complete_all_work* CompleteAllWork;
-
-    platform_allocate_texture* AllocateTexture;
-    platform_deallocate_texture* DeallocateTexture;
 
     platform_get_all_files_of_type_begin* GetAllFilesOfTypeBegin;
     platform_get_all_files_of_type_end* GetAllFilesOfTypeEnd;
@@ -251,6 +254,8 @@ typedef struct game_memory{
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;
 
+    platform_texture_op_queue TextureOpQueue;
+
     platform_api PlatformAPI;
 
 #ifdef INTERNAL_BUILD
@@ -305,5 +310,13 @@ GAME_GET_SOUND_SAMPLES(GameGetSoundSamplesStub){
 
 }
 
+inline void BeginTicketMutex(ticket_mutex* Mutex){
+    uint64 Ticket = AtomicAddU64(&Mutex->Ticket, 1);
+    while(Ticket != Mutex->Serving){_mm_pause();}
+}
+
+inline void EndTicketMutex(ticket_mutex* Mutex){
+    AtomicAddU64(&Mutex->Serving, 1);
+}
 
 #endif
