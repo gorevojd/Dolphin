@@ -1064,6 +1064,7 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
     if(wglMakeCurrent(WindowDC, OpenGLRC)){
 
 #define WIN32_GET_OPENGL_FUNCTION(Name) Name = (type_##Name*)wglGetProcAddress(#Name)
+
         WIN32_GET_OPENGL_FUNCTION(glEnableVertexAttribArray);
         WIN32_GET_OPENGL_FUNCTION(glDisableVertexAttribArray);
         WIN32_GET_OPENGL_FUNCTION(glGetAttribLocation);
@@ -1081,6 +1082,7 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         WIN32_GET_OPENGL_FUNCTION(glUniform3fv);
 
         opengl_info Info = OpenGLGetInfo(ModernContext);
+
         if(Info.GL_ARB_framebuffer_object){
             glBindFramebuffer = (gl_bind_framebuffer*)wglGetProcAddress("glBindFramebuffer");
             glGenFramebuffers = (gl_gen_framebuffers*)wglGetProcAddress("glGenFramebuffers");
@@ -1117,65 +1119,6 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
 
     return(OpenGLRC);
 }
-
-static void InitOpenGL2(win32_offscreen_buffer* buffer){
-    PIXELFORMATDESCRIPTOR pfd =
-    {
-        sizeof(PIXELFORMATDESCRIPTOR),
-        1,
-        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    //Flags
-        PFD_TYPE_RGBA,            //The kind of framebuffer. RGBA or palette.
-        32,                        //Colordepth of the framebuffer.
-        0, 0, 0, 0, 0, 0,
-        0,
-        0,
-        0,
-        0, 0, 0, 0,
-        24,                        //Number of bits for the depthbuffer
-        8,                        //Number of bits for the stencilbuffer
-        0,                        //Number of Aux buffers in the framebuffer.
-        PFD_MAIN_PLANE,
-        0,
-        0, 0, 0
-    };
-
-    HDC hdc = GetDC(buffer->Window);
-    int choosePFDresult = ChoosePixelFormat(hdc, &pfd);
-    bool setPFres = SetPixelFormat(hdc, choosePFDresult, &pfd);
-
-    HGLRC OpenGLRenderingContext = wglCreateContext(hdc);
-    wglMakeCurrent(hdc, OpenGLRenderingContext);
-
-    ReleaseDC(buffer->Window, hdc);
-
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
-    /*
-    GL_ALWAYS The depth test always passes.
-    GL_NEVER The depth test never passes.
-    GL_LESS Passes if the fragment�s depth value is less than the stored depth value.
-    GL_EQUAL Passes if the fragment�s depth value is equal to the stored depth value.
-    GL_LEQUAL   Passes if the fragment�s depth value is less than or equal to the stored depth value.
-    GL_GREATER Passes if the fragment�s depth value is greater than the stored depth value.
-    GL_NOTEQUAL Passes if the fragment�s depth value is not equal to the stored depth value.
-    GL_GEQUAL Passes if the fragment�s depth value is greater than or equal to the stored dept value.
-    */
-
-    glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    //glStencilFunc(GL_EQUAL, 1, 0xFF);
-
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    //glEnable(GL_FRAMEBUFFER_SRGB);
-
-}
-
 
 INTERNAL_FUNCTION void Win32AddEntry(platform_work_queue* Queue, platform_work_queue_callback* Callback, void* Data){
     int NewNextEntryToWrite = (Queue->NextEntryToWrite + 1) % ArrayCount(Queue->Entries);
@@ -1833,9 +1776,9 @@ int WINAPI WinMain(
         DeltaTime = SPF;
 
         char OutputStr[64];
-        //sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
-        sprintf_s(OutputStr, "FPS: %.2f\n", FPS);
-        //OutputDebugStringA(OutputStr);
+        sprintf_s(OutputStr, "MSPerFrame: %.2fms. FPS: %.2f\n", MSPerFrame, FPS);
+        //sprintf_s(OutputStr, "FPS: %.2f\n", FPS);
+        OutputDebugStringA(OutputStr);
 
         LastCounter = EndCounter;
         LastCycleCount = EndCycleCount;

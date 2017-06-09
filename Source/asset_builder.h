@@ -33,6 +33,7 @@ enum asset_type{
 	AssetType_Model,
 	AssetType_Font,
 	AssetType_FontGlyph,
+	AssetType_VoxelTextureAtlas,
 };
 
 struct loaded_font{
@@ -85,6 +86,10 @@ struct asset_source_model{
 	char* FileName;
 };
 
+struct asset_source_voxel_texture_atlas{
+	char* FileName;
+};
+
 struct asset_source{
 	asset_type Type;
 	union{
@@ -93,6 +98,7 @@ struct asset_source{
 		asset_source_font Font;
 		asset_source_font_glyph Glyph;
 		asset_source_model Model;
+		asset_source_voxel_texture_atlas* VoxelTextureAtlas;
 	};
 };
 

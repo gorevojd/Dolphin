@@ -19,6 +19,10 @@ struct font_id{
 	unsigned int Value;
 };
 
+struct voxel_texture_atlas_id{
+	unsigned int Value;
+};
+
 struct dda_header{
 #define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 
@@ -66,6 +70,10 @@ struct dda_font{
 	float AscenderHeight;
 	float DescenderHeight;
 	float ExternalLeading;
+};
+
+struct dda_voxel_texture_atlas{
+	bitmap_id BitmapID;
 };
 
 struct dda_tag{

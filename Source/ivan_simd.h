@@ -41,6 +41,8 @@ struct vec4_4x{
 };
 
 #define mmSquare(value) _mm_mul_ps(value, value)
+#define mmAdd3(value1, value2, value3) (_mm_add_ps(value1, _mm_add_ps(value2, value3)))
+
 #define M(a, i) ((float*)(&a))[i]
 #define Mi(a, i) ((int*)(&a))[i]
 

@@ -744,43 +744,58 @@ AddCharacterAsset(game_assets* Assets, loaded_font* Font, uint32 Codepoint){
     return(Result);
 }
 
+INTERNAL_FUNCTION voxel_texture_atlas_id
+AddVoxelTextureAtlasAsset(game_assets* Assets, char* FileName){
+    added_asset Asset = AddAsset(Assets);
+    Asset.DDA->Bitmap.AlignPercentage[0] = 0.0f;
+    Asset.DDA->Bitmap.AlignPercentage[1] = 0.0f;
+    Asset.Source->FileName = FileName;
+
+    bitmap_id Result = {Asset.ID}
+    dda_voxel_texture_atlas* Atlas = Assets + 
+
+
+    voxel_texture_atlas_id Result; = {Asset.ID};
+    return(Result);
+}
+
 INTERNAL_FUNCTION bitmap_id
 AddBitmapAsset(
-	game_assets* Assets,
-	char* FileName,
-	vec2 AlignPercentage = Vec2(0.5f))
+    game_assets* Assets,
+    char* FileName,
+    vec2 AlignPercentage = Vec2(0.5f))
 {
 
     added_asset Asset = AddAsset(Assets);
 
-	Asset.DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
-	Asset.DDA->Bitmap.AlignPercentage[1] = AlignPercentage.y;
+    Asset.DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
+    Asset.DDA->Bitmap.AlignPercentage[1] = AlignPercentage.y;
 
-	Asset.Source->Type = AssetType_Bitmap;
-	Asset.Source->Bitmap.FileName = FileName;
+    Asset.Source->Type = AssetType_Bitmap;
+    Asset.Source->Bitmap.FileName = FileName;
 
     bitmap_id Result = {Asset.ID};
-	return(Result);
+    return(Result);
 }
 
 INTERNAL_FUNCTION sound_id
 AddSoundAsset(
-	game_assets* Assets,
-	char* FileName,
-	unsigned int FirstSampleIndex = 0,
-	unsigned int SampleCount = 0)
+    game_assets* Assets,
+    char* FileName,
+    unsigned int FirstSampleIndex = 0,
+    unsigned int SampleCount = 0)
 {
     added_asset Asset = AddAsset(Assets);
 
-	Asset.DDA->Sound.SampleCount = SampleCount;
-	Asset.DDA->Sound.Chain = DDASoundChain_None;
+    Asset.DDA->Sound.SampleCount = SampleCount;
+    Asset.DDA->Sound.Chain = DDASoundChain_None;
 
-	Asset.Source->Type = AssetType_Sound;
-	Asset.Source->Sound.FileName = FileName;
-	Asset.Source->Sound.FirstSampleIndex = FirstSampleIndex;
+    Asset.Source->Type = AssetType_Sound;
+    Asset.Source->Sound.FileName = FileName;
+    Asset.Source->Sound.FirstSampleIndex = FirstSampleIndex;
 
     sound_id Result = {Asset.ID};
-	return(Result);
+    return(Result);
 }
 
 INTERNAL_FUNCTION font_id
@@ -803,6 +818,7 @@ AddFontAsset(game_assets* Assets, loaded_font* Font){
     font_id Result = {Asset.ID};
     return(Result);
 }
+
 
 INTERNAL_FUNCTION void
 AddTag(game_assets* Assets, asset_tag_id ID, float Value){
@@ -902,6 +918,14 @@ WriteDDA(game_assets* Assets, char* FileName){
 
                 }break;
 
+                case(AssetType_VoxelTextureAtlas){
+                    loaded_bitmap Bitmap = LoadBMP(Source->FileName);
+                    fwrite(Bitmap.Memory, Bitmap.Width * Bitmap.Height * 4, 1, fp);
+                    free(Bitmap.Free);
+
+
+                }break;
+
                 case(AssetType_Font):{
                     loaded_font* Font = Source->Font.Font;
                     
@@ -959,6 +983,7 @@ INTERNAL_FUNCTION void WriteFonts(){
     loaded_font *Fonts[] = {
         LoadFont("c:/Windows/Fonts/arial.ttf", "Arial", 20),
         LoadFont("c:/Windows/Fonts/LiberationMono-Regular.ttf", "Liberation Mono", 20),
+        LoadFont("c:/Windows/Fonts/Antique-Olive-Std-Nord-Italic.ttf", "Antique Olive Std Nord", 20),
     };
 
     BeginAssetType(Assets, Asset_FontGlyph);
@@ -983,10 +1008,12 @@ INTERNAL_FUNCTION void WriteFonts(){
     AddTag(Assets, Tag_FontType, FontType_Default);
     AddFontAsset(Assets, Fonts[1]);
     AddTag(Assets, Tag_FontType, FontType_Debug);
+    AddFontAsset(Assets, Fonts[2]);
+    AddTag(Assets, Tag_FontType, FontType_Forsazh);
     EndAssetType(Assets);
 
     WriteDDA(Assets, "../Data/asset_pack_fonts.dda");
-	printf("Hero assets written successfully :D\n");
+	printf("Font assets written successfully :D\n");
 }
 
 INTERNAL_FUNCTION void WriteHero(){
@@ -1178,6 +1205,19 @@ INTERNAL_FUNCTION void WriteSounds(){
 
     WriteDDA(Assets, "../Data/asset_pack_sounds.dda");
 	printf("Sound assets written successfully :D\n");
+}
+
+INTERNAL_FUNCTION void WriteVoxelTextureAtlas(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
+    BeginAssetType(Assets, Asset_VoxelTextureAtlas);
+
+    EndAssetType(Assets);
+
+    WriteDDA(Assets, "../Data/asset_pack_voxel_texture_atlas.dda");
+    printf("Voxel Texture Atlas written successfully :D\n");
 }
 
 int main(int ArgCount, char** Args){

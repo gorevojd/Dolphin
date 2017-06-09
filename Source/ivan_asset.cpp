@@ -132,7 +132,8 @@ FindBlockForSize(game_assets* Assets, memory_index Size){
         Block != &Assets->MemorySentinel;
         Block = Block->Next)
     {
-        if(!(Block->Flags & AssetMemory_Used)){
+
+		if(!(Block->Flags & AssetMemory_Used)){
             if(Block->Size >= Size){
                 Result = Block;
                 break;

@@ -93,7 +93,6 @@
 
 
 /*Windows specific*/
-// NOTE(casey): Windows-specific
 #define WGL_CONTEXT_MAJOR_VERSION_ARB           0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB           0x2092
 #define WGL_CONTEXT_LAYER_PLANE_ARB             0x2093
@@ -111,12 +110,9 @@ GLOBAL_VARIABLE GLuint GlobalFramebufferHandles[256] = {0};
 GLOBAL_VARIABLE GLuint GlobalFramebufferTextures[256] = {0};
 
 INTERNAL_FUNCTION void 
-OpenGLBindFramebuffer(uint32 TargetIndex, rectangle2i DrawRegion){
-    uint32 WindowWidth = GetWidth(DrawRegion);
-    uint32 WindowHeight = GetHeight(DrawRegion);
-
+OpenGLBindFramebuffer(uint32 TargetIndex, uint32 RenderWidth, uint32 RenderHeight){
     glBindFramebuffer(GL_FRAMEBUFFER, GlobalFramebufferHandles[TargetIndex]);
-    glViewport(0, 0, WindowWidth, WindowHeight);
+    glViewport(0, 0, RenderWidth, RenderHeight);
 }
 
 inline void OpenGLRenderRectangle(
@@ -153,7 +149,6 @@ inline void OpenGLRenderRectangle(
 #else
     glColor4f(PremultColor.r, PremultColor.g, PremultColor.b, PremultColor.a);
 
-    // NOTE(casey): Lower triangle
     glTexCoord2f(MinUV.x, MinUV.y);
     glVertex3f(MinP.x, MinP.y, MinP.z);
 
@@ -163,7 +158,6 @@ inline void OpenGLRenderRectangle(
     glTexCoord2f(MaxUV.x, MaxUV.y);
     glVertex3f(MaxP.x, MaxP.y, MinP.z);
 
-    // NOTE(casey): Upper triangle
     glTexCoord2f(MinUV.x, MinUV.y);
     glVertex3f(MinP.x, MinP.y, MinP.z);
 
@@ -189,7 +183,7 @@ inline void OpenGLRenderBitmap(
 {
     GL_DEBUG_MARKER();
 
-    OpenGLBindFramebuffer(0, DrawRegion);
+    OpenGLBindFramebuffer(0, GetWidth(DrawRegion), GetHeight(DrawRegion));
     //glViewport(0, 0, Width, Height);
 
     glDisable(GL_SCISSOR_TEST);

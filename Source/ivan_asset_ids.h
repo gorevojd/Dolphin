@@ -4,6 +4,7 @@
 enum asset_font_type{
 	FontType_Default = 0,
 	FontType_Debug = 10,
+	FontType_Forsazh = 20,
 };
 
 enum asset_tag_id{	
@@ -51,6 +52,8 @@ enum asset_type_id{
 
 	Asset_Font,
 	Asset_FontGlyph,
+
+	Asset_VoxelTextureAtlas,
 
 	Asset_Count,
 };

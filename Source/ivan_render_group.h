@@ -89,6 +89,4 @@ struct render_group{
 	bool32 InsideRender;
 };
 
-
-
 #endif

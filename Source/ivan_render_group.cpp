@@ -44,10 +44,7 @@ inline void RenderBitmap(
         uint32* SourcePtr = SourceRow;
         for (int32 i = MinX; i < MaxX; i++){
 
-#if 1
-            
-            
-            
+#if 1   
 #if 0
             vec4 Source = {
                 (real32)((*SourcePtr >> RedShift) & 0xFF),
@@ -126,7 +123,7 @@ inline void RenderRectangle(
     vec2 MinP,
     vec2 MaxP,
     vec4 Color, 
-    rectangle2 ClipRect)
+    rectangle2i ClipRect)
 {
     TIMED_BLOCK();
 
@@ -148,10 +145,10 @@ inline void RenderRectangle(
         MaxY = Buffer->Height;
     }
 
-    int ClipMinX = ClipRect.Min.x;
-    int ClipMinY = ClipRect.Min.y;
-    int ClipMaxX = ClipRect.Max.x;
-    int ClipMaxY = ClipRect.Max.y;
+    int ClipMinX = ClipRect.MinX;
+    int ClipMinY = ClipRect.MinY;
+    int ClipMaxX = ClipRect.MaxX;
+    int ClipMaxY = ClipRect.MaxY;
 
     if (MinX < ClipMinX){ MinX = ClipMinX; }
     if (MinY < ClipMinY){ MinY = ClipMinY; }
@@ -186,7 +183,7 @@ inline void RenderRectangleQuickly(
     vec2 YAxis,
     loaded_bitmap* Texture,
     vec4 Color,
-    rectangle2 ClipRect)
+    rectangle2i ClipRect)
 {
     TIMED_BLOCK();
 
@@ -230,10 +227,10 @@ inline void RenderRectangleQuickly(
         MaxY = HeightMax;
     }
 
-    int ClipMinX = ClipRect.Min.x;
-    int ClipMinY = ClipRect.Min.y;
-    int ClipMaxX = ClipRect.Max.x;
-    int ClipMaxY = ClipRect.Max.y;
+    int ClipMinX = ClipRect.MinX;
+    int ClipMinY = ClipRect.MinY;
+    int ClipMaxX = ClipRect.MaxX;
+    int ClipMaxY = ClipRect.MaxY;
 
     if (MinX < ClipMinX){ MinX = ClipMinX; }
     if (MinY < ClipMinY){ MinY = ClipMinY; }
@@ -514,6 +511,166 @@ inline void RenderRectangleQuickly(
     }
 }
 
+inline void DesaturateBitmapQuickly(loaded_bitmap* Texture){
+    TIMED_BLOCK();
+
+    int PixelCount = Texture->Width * Texture->Height;
+
+    __m128 mOneThird = _mm_set1_ps(1.0f / 3.0f);
+    __m128i mWidthI = _mm_set1_epi32(Texture->Width);
+    __m128i mMaskFF = _mm_set1_epi32(0xFF);
+    __m128 mOneOver255 = _mm_set1_ps(1.0f / 255.0f);
+    __m128 mOne255 = _mm_set1_ps(255.0f);
+
+    for(int j = 0; j < Texture->Height; j++){
+
+        uint32* DestPixel = (uint32*)Texture->Memory + Texture->Width * j;
+
+        for(int i = 0; i < Texture->Width; i+=4){
+            __m128i mPixelPosition_x = _mm_setr_epi32(i, i + 1, i + 2, i + 3);
+            __m128i mPixelPosition_y = _mm_set1_epi32(j);
+            __m128i mWidthI = _mm_set1_epi32(Texture->Width);
+
+            mPixelPosition_y = _mm_or_si128(
+                _mm_mullo_epi16(mWidthI, mPixelPosition_y),
+                _mm_slli_epi32(_mm_mulhi_epi16(mWidthI, mPixelPosition_y), 16));
+            __m128i mSourcePos = _mm_add_epi32(mPixelPosition_y, mPixelPosition_x);
+
+            uint32* Pixel0Ptr = (uint32*)Texture->Memory + Mi(mSourcePos, 0);
+            uint32* Pixel1Ptr = (uint32*)Texture->Memory + Mi(mSourcePos, 1);
+            uint32* Pixel2Ptr = (uint32*)Texture->Memory + Mi(mSourcePos, 2);
+            uint32* Pixel3Ptr = (uint32*)Texture->Memory + Mi(mSourcePos, 3);
+
+            __m128i mTexel = _mm_setr_epi32(
+                *Pixel0Ptr,
+                *Pixel1Ptr,
+                *Pixel2Ptr,
+                *Pixel3Ptr);
+
+            __m128 mTexel_r = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mTexel, 16), mMaskFF));
+            __m128 mTexel_g = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mTexel, 8), mMaskFF));
+            __m128 mTexel_b = _mm_cvtepi32_ps(_mm_and_si128(mTexel, mMaskFF));
+            __m128 mTexel_a = _mm_cvtepi32_ps(_mm_and_si128(_mm_srli_epi32(mTexel, 24), mMaskFF));
+
+            /*Converting texel from sRGB 255 space to linear 0-1 space*/
+            mTexel_r = mmSquare(_mm_mul_ps(mOneOver255, mTexel_r));
+            mTexel_g = mmSquare(_mm_mul_ps(mOneOver255, mTexel_g));
+            mTexel_b = mmSquare(_mm_mul_ps(mOneOver255, mTexel_b));
+            mTexel_a = _mm_mul_ps(mOneOver255, mTexel_a);
+
+            /*Calculating result gray color*/
+            __m128 mChannelValue = _mm_mul_ps(mmAdd3(mTexel_r, mTexel_g, mTexel_b), mOneThird);
+
+            __m128 mResultColor_r = mChannelValue;
+            __m128 mResultColor_g = mChannelValue;
+            __m128 mResultColor_b = mChannelValue;
+            __m128 mResultColor_a = mTexel_a;
+
+            /*Converting result color from linear 0-1 space to sRGB space*/
+            mResultColor_r = _mm_mul_ps(mOne255, _mm_sqrt_ps(mResultColor_r));
+            mResultColor_g = _mm_mul_ps(mOne255, _mm_sqrt_ps(mResultColor_g));
+            mResultColor_b = _mm_mul_ps(mOne255, _mm_sqrt_ps(mResultColor_b));
+            mResultColor_a = _mm_mul_ps(mOne255, mResultColor_a);
+
+            /*Shifting and converting*/
+            __m128i mResultColor_r_epi32 = _mm_cvtps_epi32(mResultColor_r);
+            __m128i mResultColor_g_epi32 = _mm_cvtps_epi32(mResultColor_g);
+            __m128i mResultColor_b_epi32 = _mm_cvtps_epi32(mResultColor_b);
+            __m128i mResultColor_a_epi32 = _mm_cvtps_epi32(mResultColor_a);
+
+            __m128i mResultColor_r_shifted = _mm_slli_epi32(mResultColor_r_epi32, 16);
+            __m128i mResultColor_g_shifted = _mm_slli_epi32(mResultColor_g_epi32, 8);
+            __m128i mResultColor_b_shifted = mResultColor_b_epi32;
+            __m128i mResultColor_a_shifted = _mm_slli_epi32(mResultColor_a_epi32, 24);
+
+            __m128i mResultColorPacked = _mm_or_si128(
+                _mm_or_si128(mResultColor_r_shifted, mResultColor_g_shifted),
+                _mm_or_si128(mResultColor_b_shifted, mResultColor_a_shifted));
+
+            __m128 mEndScreenMask = _mm_cmplt_ps(_mm_cvtepi32_ps(mPixelPosition_x), _mm_set1_ps(Texture->Width));
+            __m128i mEndScreenMaskI = _mm_castps_si128(mEndScreenMask);
+
+            /*Masking*/
+            __m128i mOriginalDest = _mm_loadu_si128((__m128i*)DestPixel);
+            __m128i mOutMasked = _mm_or_si128(
+                _mm_and_si128(mResultColorPacked, mEndScreenMaskI),
+                _mm_andnot_si128(mEndScreenMaskI, mOriginalDest));
+
+            /*Storing*/
+            _mm_storeu_si128((__m128i*)DestPixel, mOutMasked);
+
+            DestPixel += 4;
+        }
+    }
+}
+
+inline void DesaturateBitmapSlowly(loaded_bitmap* Texture){
+
+    TIMED_BLOCK();
+
+    real32 OneThird = 1.0f / 3.0f;
+
+    for(int j = 0; j < Texture->Height; j++){
+        
+        uint32* TexelPtr = (uint32*)Texture->Memory + Texture->Width * j;
+        
+        for(int i = 0; i < Texture->Width; i++){
+            vec4 Texel = {
+                (real32)((*TexelPtr >> 16) & 0xFF),
+                (real32)((*TexelPtr >> 8) & 0xFF),
+                (real32)((*TexelPtr >> 0) & 0xFF),
+                (real32)((*TexelPtr >> 24) & 0xFF)};
+            
+            Texel = SRGB255ToLinear1(Texel);
+
+            real32 ChannelValue = (Texel.r + Texel.g + Texel.b) * OneThird;
+            vec4 ResultColor = Vec4(ChannelValue, ChannelValue, ChannelValue, Texel.a);
+
+            ResultColor = Linear1ToSRGB255(ResultColor);
+
+            *TexelPtr++ = ((uint32)(ResultColor.a + 0.5f) << 24) |
+                     ((uint32)(ResultColor.r + 0.5f) << 16) |
+                     ((uint32)(ResultColor.g + 0.5f) << 8) |
+                     ((uint32)(ResultColor.b + 0.5f) << 0);
+        }
+    }
+}
+
+inline void ChangeBitmapSaturation(loaded_bitmap* Texture, real32 Level){
+    
+    TIMED_BLOCK();
+
+    real32 OneThird = 1.0f / 3.0f;
+
+    for(int j = 0; j < Texture->Height; j++){
+        
+        uint32* TexelPtr = (uint32*)Texture->Memory + Texture->Width * j;
+        
+        for(int i = 0; i < Texture->Width; i++){
+            vec4 Texel = {
+                (real32)((*TexelPtr >> 16) & 0xFF),
+                (real32)((*TexelPtr >> 8) & 0xFF),
+                (real32)((*TexelPtr >> 0) & 0xFF),
+                (real32)((*TexelPtr >> 24) & 0xFF)};
+            
+            Texel = SRGB255ToLinear1(Texel);
+
+            float ChannelValue = (Texel.r + Texel.g + Texel.b) * OneThird;
+
+            vec3 Average = Vec3(ChannelValue);
+            vec3 Delta = Texel.rgb - Average;
+
+            vec4 ResultColor = Vec4(Average  + Delta * Level, Texel.a);
+
+            ResultColor = Linear1ToSRGB255(ResultColor);
+
+            *TexelPtr++ = ((uint32)(ResultColor.a + 0.5f) << 24) |
+                     ((uint32)(ResultColor.r + 0.5f) << 16) |
+                     ((uint32)(ResultColor.g + 0.5f) << 8) |
+                     ((uint32)(ResultColor.b + 0.5f) << 0);
+        }
+    }
+}
 
 inline void RenderRectangleSlowly(
     loaded_bitmap* Buffer,
@@ -581,6 +738,17 @@ inline void RenderRectangleSlowly(
         (RoundReal32ToUInt32(255.0f * Color.x) << 16) |
         (RoundReal32ToUInt32(255.0f * Color.y) << 8) |
         (RoundReal32ToUInt32(255.0f * Color.z) << 0));
+
+    int32 FillRectWidth = (MaxX - MinX);
+    int32 FillRectHeight = (MaxY - MinY);
+
+    int32 RectPixelArea = 0;
+
+    if(FillRectWidth > 0 && FillRectHeight > 0){
+        RectPixelArea = FillRectHeight * FillRectWidth;
+    }
+
+    TIMED_BLOCK(RectPixelArea);
 
     for (int Y = MinY; Y < MaxY; Y++){
         for (int X = MinX; X < MaxX; X++){
@@ -697,7 +865,7 @@ inline void RenderRectangleSlowly(
 }
 
 INTERNAL_FUNCTION void 
-RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rectangle2 ClipRect)
+RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rectangle2i ClipRect)
 {
     TIMED_BLOCK();
 
@@ -780,7 +948,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
 struct tile_render_work{
     render_group* RenderGroup;
     loaded_bitmap* OutputTarget;
-    rectangle2 ClipRect;
+    rectangle2i ClipRect;
 };
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(DoTiledRenderWork){
@@ -812,24 +980,24 @@ TiledRenderGroupToOutput(
         for (int TileX = 0; TileX < TileCountX; TileX++){
             tile_render_work* Work = WorkArray + WorkCount++;
 
-            rectangle2 ClipRect;
+            rectangle2i ClipRect;
 #if 0
-            ClipRect.Min.x = TileX * TileWidth + 4;
-            ClipRect.Min.y = TileY * TileHeight + 4;
-            ClipRect.Max.x = TileX * TileWidth + TileWidth - 4;
-            ClipRect.Max.y = TileY * TileHeight + TileHeight - 4;
+            ClipRect.MinX = TileX * TileWidth + 4;
+            ClipRect.MinY = TileY * TileHeight + 4;
+            ClipRect.MaxX = TileX * TileWidth + TileWidth - 4;
+            ClipRect.MaxY = TileY * TileHeight + TileHeight - 4;
 #else
-            ClipRect.Min.x = TileX * TileWidth;
-            ClipRect.Min.y = TileY * TileHeight;
-            ClipRect.Max.x = TileX * TileWidth + TileWidth;
-            ClipRect.Max.y = TileY * TileHeight + TileHeight;
+            ClipRect.MinX = TileX * TileWidth;
+            ClipRect.MinY = TileY * TileHeight;
+            ClipRect.MaxX = TileX * TileWidth + TileWidth;
+            ClipRect.MaxY = TileY * TileHeight + TileHeight;
 #endif
 
             if (TileX == (TileCountX - 1)){
-                ClipRect.Max.x = OutputTarget->Width;
+                ClipRect.MaxX = OutputTarget->Width;
             }
             if (TileY == (TileCountY - 1)){
-                ClipRect.Max.y = OutputTarget->Height;
+                ClipRect.MaxY = OutputTarget->Height;
             }
 
             Work->RenderGroup = RenderGroup;
@@ -1027,6 +1195,8 @@ inline void PushBitmap(
     bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
+    TIMED_BLOCK();
+
     render_entry_bitmap* PushedBitmap = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_bitmap);
 
     bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, IVAN_MATH_ABS(Height), Offset, CAlign);
@@ -1080,6 +1250,8 @@ inline void PushBitmap(
     bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
+    TIMED_BLOCK();
+
     loaded_bitmap* BitmapToRender = GetBitmap(RenderGroup->Assets, Id, RenderGroup->GenerationID);
     if (BitmapToRender){
         PushBitmap(RenderGroup, BitmapToRender, Height, Offset, Color, ScreenSpace, CAlign);

@@ -311,6 +311,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
 #if 1
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
+    //DesaturateBitmapQuickly((loaded_bitmap*)Buffer);
 #else
     rectangle2 ClipRect;
     ClipRect.Min.x = 0;
