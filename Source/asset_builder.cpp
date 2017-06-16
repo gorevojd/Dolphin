@@ -7,6 +7,9 @@
 /*
     TODO(Dima): 
         Font Atlas
+        Voxel texture atlas
+
+    
 */
 
 #pragma pack(push, 1)
@@ -240,6 +243,52 @@ LoadFont(char* FileName, char* FontName, int PixelHeight){
     Font->Glyphs[0].BitmapID.Value = 0;
 
     return(Font);
+}
+
+INTERNAL_FUNCTION loaded_voxel_atlas*
+LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
+{
+    /*AtlasWidth must be multiple of OneTextureWidth*/
+    Assert((AtlasWidth & (OneTextureWidth - 1)) == 0);
+
+    loaded_voxel_atlas* Atlas = (loaded_voxel_atlas*)malloc(sizeof(loaded_voxel_atlas));
+
+    uint32 TexturesByWidth = AtlasWidth / OneTextureWidth;
+    Atlas->MaxTextureCount = TexturesByWidth * TexturesByWidth;
+    Atlas->TextureCount = 0;
+
+    Atlas->AtlasWidth = AtlasWidth;
+    Atlas->OneTextureWidth = OneTextureWidth;
+
+    Atlas->TextureFileName = FileName;
+
+/*
+    uint32 TexturesInfoArraySize = sizeof(dda_voxel_atlas_texture) * MaxTextureCount;
+    Atlas->TexturesInfo = (dda_voxel_atlas_texture*)malloc(TexturesInfoArraySize);
+    memset(Atlas->TexturesInfo, 0, TexturesInfoArraySize);
+*/
+
+    float UVOneTextureDelta = (float)OneTextureWidth / (float)AtlasWidth;
+
+    voxel_face_tex_coords_set DefaultSet;
+    DefaultSet.T0 = Vec2(0.0f, 0.0f);
+    DefaultSet.T1 = Vec2(UVOneTextureDelta, 0.0f);
+    DefaultSet.T2 = Vec2(UVOneTextureDelta);
+    DefaultSet.T3 = Vec2(0.0f, UVOneTextureDelta);
+
+    for(int MaterialIndex = 0;
+        MaterialIndex < VoxelMaterial_Count;
+        MaterialIndex++)
+    {
+        for(int i = 0;
+            i < VoxelFaceTypeIndex_Count;
+            i++)
+        {
+            Atlas->Materials[MaterialIndex].Sets[i] = DefaultSet;
+        }
+    }
+
+    return(Atlas);
 }
 
 INTERNAL_FUNCTION void
@@ -744,19 +793,141 @@ AddCharacterAsset(game_assets* Assets, loaded_font* Font, uint32 Codepoint){
     return(Result);
 }
 
-INTERNAL_FUNCTION voxel_texture_atlas_id
-AddVoxelTextureAtlasAsset(game_assets* Assets, char* FileName){
+INTERNAL_FUNCTION bitmap_id
+AddVoxelAtlasTextureAsset(game_assets* Assets, loaded_voxel_atlas* Atlas){
     added_asset Asset = AddAsset(Assets);
+
     Asset.DDA->Bitmap.AlignPercentage[0] = 0.0f;
     Asset.DDA->Bitmap.AlignPercentage[1] = 0.0f;
-    Asset.Source->FileName = FileName;
 
-    bitmap_id Result = {Asset.ID}
-    dda_voxel_texture_atlas* Atlas = Assets + 
+    Asset.Source->Type = AssetType_VoxelAtlasTexture;
+    Asset.Source->VoxelAtlasTexture.Atlas = Atlas;
+    Asset.Source->VoxelAtlasTexture.FileName = Atlas->TextureFileName;
 
+    bitmap_id Result = {Asset.ID};
 
-    voxel_texture_atlas_id Result; = {Asset.ID};
+    Atlas->AtlasTexture.BitmapID = Result;
+
     return(Result);
+}
+
+INTERNAL_FUNCTION voxel_atlas_id
+AddVoxelAtlasAsset(
+    game_assets* Assets,
+    loaded_voxel_atlas* Atlas)
+{
+    added_asset Asset = AddAsset(Assets);
+
+    //TODO
+    Asset.Source->Type = AssetType_VoxelAtlas;
+    Asset.Source->VoxelAtlas.Atlas = Atlas;
+
+    Asset.DDA->VoxelAtlas.AtlasWidth = Atlas->AtlasWidth;
+    Asset.DDA->VoxelAtlas.OneTextureWidth = Atlas->OneTextureWidth;
+
+    voxel_atlas_id Result = {Asset.ID};
+    return(Result);
+}
+
+inline void 
+DescribeVoxelAtlasTexture(
+    loaded_voxel_atlas* Atlas, 
+    uint32 MaterialType,
+    uint32 FaceTypeIndex,
+    int CurrTextureIndex)
+{
+    uint32 TexturesByWidth = Atlas->AtlasWidth / Atlas->OneTextureWidth;
+
+    Assert(CurrTextureIndex < Atlas->MaxTextureCount);
+
+    uint32 CurrTextureIndexX = (TexturesByWidth - 1) & CurrTextureIndex;
+    uint32 CurrTextureIndexY = CurrTextureIndex / TexturesByWidth;
+
+    float UVOneTextureDelta = (float)Atlas->OneTextureWidth / (float)Atlas->AtlasWidth;
+    vec2 StartUV = 
+        {(float)CurrTextureIndexX * UVOneTextureDelta,
+        (float)CurrTextureIndexY * UVOneTextureDelta};
+
+    voxel_face_tex_coords_set TexSet;
+    TexSet.T0 = StartUV;
+    TexSet.T1 = Vec2(StartUV.x + UVOneTextureDelta, StartUV.y);
+    TexSet.T2 = Vec2(StartUV.x + UVOneTextureDelta, StartUV.y + UVOneTextureDelta);
+    TexSet.T3 = Vec2(StartUV.x, StartUV.y + UVOneTextureDelta);
+
+    voxel_tex_coords_set* MatTexSet = &Atlas->Materials[MaterialType];
+
+    MatTexSet->Index = (voxel_face_type_index)FaceTypeIndex;
+    MatTexSet->Sets[FaceTypeIndex] = TexSet;
+
+    switch(FaceTypeIndex){
+        case(VoxelFaceTypeIndex_Top):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_Bottom):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_Left):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;            
+        }break;
+
+        case(VoxelFaceTypeIndex_Right):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_Front):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_Back):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_All):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_Side):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+        }break;
+
+        case(VoxelFaceTypeIndex_TopBottom):{
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
+        }break;
+
+    }
+}
+
+INTERNAL_FUNCTION void 
+AtlasCurrTextureDesc(
+    loaded_voxel_atlas* Atlas,
+    uint32 MaterialType, 
+    uint32 FaceTypeIndex)
+{
+    int CurrTextureIndex = Atlas->TextureCount;
+
+    DescribeVoxelAtlasTexture(Atlas, MaterialType, FaceTypeIndex, CurrTextureIndex);
+}
+
+INTERNAL_FUNCTION void 
+AtlasNextTextureDesc(
+    loaded_voxel_atlas* Atlas,
+    uint32 MaterialType, 
+    uint32 FaceTypeIndex)
+{
+    int CurrTextureIndex = Atlas->TextureCount++;
+
+    DescribeVoxelAtlasTexture(Atlas, MaterialType, FaceTypeIndex, CurrTextureIndex);
 }
 
 INTERNAL_FUNCTION bitmap_id
@@ -765,7 +936,6 @@ AddBitmapAsset(
     char* FileName,
     vec2 AlignPercentage = Vec2(0.5f))
 {
-
     added_asset Asset = AddAsset(Assets);
 
     Asset.DDA->Bitmap.AlignPercentage[0] = AlignPercentage.x;
@@ -893,6 +1063,7 @@ WriteDDA(game_assets* Assets, char* FileName){
                     free(WAV.Free);
                 }break;
 
+                case(AssetType_VoxelAtlasTexture):
                 case(AssetType_FontGlyph):
                 case(AssetType_Bitmap):{
                     //loaded_bitmap Bitmap = LoadBMP(Source->FileName);
@@ -900,6 +1071,9 @@ WriteDDA(game_assets* Assets, char* FileName){
                     loaded_bitmap Bitmap;
                     if(Source->Type == AssetType_FontGlyph){
                         Bitmap = LoadGlyphBitmap(Source->Glyph.Font, Source->Glyph.Codepoint, DDA);
+                    }
+                    else if(Source->Type = AssetType_VoxelAtlasTexture){
+                        Bitmap = LoadBMP(Source->VoxelAtlasTexture.FileName);
                     }
                     else{
                         Assert(Source->Type == AssetType_Bitmap);
@@ -918,12 +1092,11 @@ WriteDDA(game_assets* Assets, char* FileName){
 
                 }break;
 
-                case(AssetType_VoxelTextureAtlas){
-                    loaded_bitmap Bitmap = LoadBMP(Source->FileName);
-                    fwrite(Bitmap.Memory, Bitmap.Width * Bitmap.Height * 4, 1, fp);
-                    free(Bitmap.Free);
+                case(AssetType_VoxelAtlas):{
+                    loaded_voxel_atlas* Atlas = Source->VoxelAtlas.Atlas;
 
-
+                    uint32 MaterialsSize = VoxelMaterial_Count * sizeof(voxel_tex_coords_set);
+                    fwrite(Atlas->Materials, MaterialsSize, 1, fp);
                 }break;
 
                 case(AssetType_Font):{
@@ -1014,6 +1187,42 @@ INTERNAL_FUNCTION void WriteFonts(){
 
     WriteDDA(Assets, "../Data/asset_pack_fonts.dda");
 	printf("Font assets written successfully :D\n");
+}
+
+INTERNAL_FUNCTION void WriteVoxelTextureAtlases(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
+    //LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
+
+    loaded_voxel_atlas* Atlases[] = {
+        LoadVoxelAtlas("../Data/Images/terrain.png", 256, 16),
+    };
+
+    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
+    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_None, VoxelFaceTypeIndex_All);
+    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
+    AtlasCurrTextureDesc(Atlases[0], VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
+    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
+    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_Logs, VoxelFaceTypeIndex_All);
+
+    BeginAssetType(Assets, Asset_VoxelAtlasTexture);
+    for(uint32 VoxelAtlasIndex = 0;
+        VoxelAtlasIndex < ArrayCount(Atlases);
+        VoxelAtlasIndex++)
+    {
+        AddVoxelAtlasTextureAsset(Assets, Atlases[VoxelAtlasIndex]);
+    }
+    EndAssetType(Assets);
+
+    BeginAssetType(Assets, Asset_VoxelAtlas);
+    AddVoxelAtlasAsset(Assets, Atlases[0]);
+    AddTag(Assets, Tag_VoxelAtlasType, VoxelAtlasType_Default);
+    EndAssetType(Assets);
+
+    WriteDDA(Assets, "../Data/asset_pack_voxel_texture_atlas.dda");
+    printf("Voxel Texture Atlas written successfully :D\n");
 }
 
 INTERNAL_FUNCTION void WriteHero(){
@@ -1207,19 +1416,6 @@ INTERNAL_FUNCTION void WriteSounds(){
 	printf("Sound assets written successfully :D\n");
 }
 
-INTERNAL_FUNCTION void WriteVoxelTextureAtlas(){
-    game_assets Assets_;
-    game_assets* Assets = &Assets_;
-    Initialize(Assets);
-
-    BeginAssetType(Assets, Asset_VoxelTextureAtlas);
-
-    EndAssetType(Assets);
-
-    WriteDDA(Assets, "../Data/asset_pack_voxel_texture_atlas.dda");
-    printf("Voxel Texture Atlas written successfully :D\n");
-}
-
 int main(int ArgCount, char** Args){
 
     InitializeFontDC();
@@ -1228,6 +1424,7 @@ int main(int ArgCount, char** Args){
     WriteNonHero();
     WriteSounds();
     WriteFonts();
+    WriteVoxelTextureAtlases();
 
     system("pause");
 	return(0);

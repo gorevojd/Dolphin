@@ -4,6 +4,8 @@
 #include "ivan_platform.h"
 #include "ivan_intrinsics.h"
 
+#include "ivan_voxel_shared.h"
+
 struct loaded_sound{
 	uint32 SampleCount;
 	uint32 ChannelCount;
@@ -18,12 +20,19 @@ struct loaded_font{
 	uint16* UnicodeMap;
 };
 
+struct loaded_voxel_atlas{
+	uint32 BitmapIDOffset;
+
+	voxel_tex_coords_set* Materials;
+};
+
 enum asset_header_type{
 	AssetType_None,
 	AssetType_Bitmap,
 	AssetType_Sound,
 	AssetType_Font,
 	AssetType_Model,
+	AssetType_VoxelAtlas,
 };
 
 struct asset_memory_header{
@@ -39,6 +48,7 @@ struct asset_memory_header{
 		loaded_sound Sound;
 		loaded_bitmap Bitmap;
 		loaded_font Font;
+		loaded_voxel_atlas VoxelAtlas;
 	};
 };
 
@@ -77,6 +87,7 @@ struct asset_file{
 
 	uint32 TagBase;
 	int FontBitmapIDOffset;
+	int VoxelAtlasBitmapIDOffset;
 };
 
 enum asset_memory_block_flags{
@@ -168,6 +179,14 @@ inline asset_memory_header* GetAsset(game_assets* Assets, uint32 ID, uint32 Gene
 	}
 
 	EndAssetLock(Assets);
+
+	return(Result);
+}
+
+inline loaded_voxel_atlas* GetVoxelAtlas(game_assets* Assets, voxel_atlas_id ID, uint32 GenerationID){
+	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
+
+	loaded_voxel_atlas* Result = Header ? &Header->VoxelAtlas : 0;
 
 	return(Result);
 }

@@ -9,6 +9,7 @@
 #define STB_SPRINTF_IMPLEMENTATION
 #include "stb_sprintf.h"
 
+
 #define GLOBAL_VARIABLE static
 #define LOCAL_PERSIST static
 #define INTERNAL_FUNCTION static

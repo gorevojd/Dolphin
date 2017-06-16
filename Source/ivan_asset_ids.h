@@ -7,6 +7,10 @@ enum asset_font_type{
 	FontType_Forsazh = 20,
 };
 
+enum asset_voxel_atlas_type{
+	VoxelAtlasType_Default = 0,
+};
+
 enum asset_tag_id{	
 	Tag_FacingDirection,
 
@@ -14,6 +18,8 @@ enum asset_tag_id{
 
 	Tag_UnicodeCodepoint,
 	Tag_FontType,
+
+	Tag_VoxelAtlasType,
 
 	Tag_Count,
 };
@@ -53,7 +59,8 @@ enum asset_type_id{
 	Asset_Font,
 	Asset_FontGlyph,
 
-	Asset_VoxelTextureAtlas,
+	Asset_VoxelAtlas,
+	Asset_VoxelAtlasTexture,
 
 	Asset_Count,
 };

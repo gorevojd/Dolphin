@@ -472,6 +472,100 @@ LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
     }
 }
 
+INTERNAL_FUNCTION void
+LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
+    TIMED_BLOCK();
+
+    asset* Asset = Assets->Assets + ID.Value;
+    if(ID.Value){
+        if(AtomicCompareExchangeUInt32(
+            (uint32 *)&Asset->State,
+            AssetState_Queued, 
+            AssetState_Unloaded) == AssetState_Unloaded)
+        {
+            task_with_memory* Task = 0;
+
+            if(!Immediate){
+                Task = BeginTaskWithMemory(Assets->TranState, false);
+            }
+
+            if(Immediate || Task){
+
+                /*
+                dda_font* Info = &Asset->DDA.Font;
+
+                uint32 HorizontalAdvanceSize = sizeof(float) * Info->GlyphCount * Info->GlyphCount;
+                uint32 GlyphsSize = Info->GlyphCount * sizeof(dda_font_glyph);
+                uint32 UnicodeMapSize = sizeof(uint16) * Info->OnePastHighestCodepoint;
+                uint32 SizeOfData = GlyphsSize + HorizontalAdvanceSize;
+                uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header) + UnicodeMapSize;
+
+                Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_Font);
+
+                loaded_font* Font = &Asset->Header->Font;
+                Font->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->FontBitmapIDOffset;
+                Font->Glyphs = (dda_font_glyph*)(Asset->Header + 1);
+                Font->HorizontalAdvance = (float*)((uint8*)Font->Glyphs + GlyphsSize);
+                Font->UnicodeMap = (uint16*)((uint8*)Font->HorizontalAdvance + HorizontalAdvanceSize);
+
+                ZeroSize(Font->UnicodeMap, UnicodeMapSize);
+
+                load_asset_work Work;
+                Work.Task = Task;
+                Work.Asset = Assets->Assets + ID.Value;
+                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+                Work.Offset = Asset->DDA.DataOffset;
+                Work.Size = SizeOfData;
+                Work.Destination = Font->Glyphs;
+                Work.FinalizeOperation = FinalizeAsset_Font;
+                Work.FinalState = AssetState_Loaded;
+                */
+
+                dda_voxel_atlas* Info = &Asset->DDA.VoxelAtlas;
+
+                uint32 MaterialsSize = VoxelMaterial_Count * sizeof(voxel_tex_coords_set);
+                uint32 SizeOfData = MaterialsSize;
+                uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header);
+
+                Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_VoxelAtlas);
+
+                loaded_voxel_atlas* Atlas = &Asset->Header->VoxelAtlas;
+                Atlas->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->VoxelAtlasBitmapIDOffset;
+                Atlas->Materials = (voxel_tex_coords_set*)(Asset->Header + 1);
+
+                load_asset_work Work;
+                Work.Task = Task;
+                Work.Asset = Assets->Assets + ID.Value;
+                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+                Work.Offset = Asset->DDA.DataOffset;
+                Work.Size = SizeOfData;
+                Work.Destination = Atlas->Materials;
+                Work.FinalizeOperation = FinalizeAsset_None;
+                Work.FinalState = AssetState_Loaded;
+
+                if(Task){
+                    load_asset_work* TaskWork = PushStruct(&Task->Arena, load_asset_work);
+                    *TaskWork = Work;
+                    Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, TaskWork);
+                }
+                else{
+                    LoadAssetWorkDirectly(&Work);
+                }
+            }
+            else{
+                Asset->State = AssetState_Unloaded;
+            }
+
+        }
+        else if(Immediate){
+            asset_state volatile* State = (asset_state volatile*)&Asset->State;
+            while(*State == AssetState_Queued){
+
+            }
+        }
+    }
+}
+
 INTERNAL_FUNCTION uint32 
 GetBestMatchAssetFrom(
     game_assets* Assets,
@@ -665,6 +759,7 @@ AllocateGameAssets(
         asset_file* File = Assets->Files + FileIndex;
 
         File->FontBitmapIDOffset = 0;
+        File->VoxelAtlasBitmapIDOffset = 0;
         File->TagBase = Assets->TagCount;
 
         ZeroStruct(File->Header);
@@ -758,6 +853,10 @@ AllocateGameAssets(
 
                         if(SourceType->TypeID == Asset_FontGlyph){
                             File->FontBitmapIDOffset = AssetCount - SourceType->FirstAssetIndex;
+                        }
+
+                        if(SourceType->TypeID == Asset_VoxelAtlasTexture){
+                            File->VoxelAtlasBitmapIDOffset = AssetCount - SourceType->FirstAssetIndex;
                         }
 
                         uint32 AssetCountForType = 

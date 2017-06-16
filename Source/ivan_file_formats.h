@@ -19,7 +19,7 @@ struct font_id{
 	unsigned int Value;
 };
 
-struct voxel_texture_atlas_id{
+struct voxel_atlas_id{
 	unsigned int Value;
 };
 
@@ -72,8 +72,13 @@ struct dda_font{
 	float ExternalLeading;
 };
 
-struct dda_voxel_texture_atlas{
+struct dda_voxel_atlas_texture{
 	bitmap_id BitmapID;
+};
+
+struct dda_voxel_atlas{	
+	uint32 AtlasWidth;
+	uint32 OneTextureWidth;
 };
 
 struct dda_tag{
@@ -89,6 +94,7 @@ struct dda_asset{
 		dda_bitmap Bitmap;
 		dda_sound Sound;
 		dda_font Font;
+		dda_voxel_atlas VoxelAtlas;
 	};
 };
 

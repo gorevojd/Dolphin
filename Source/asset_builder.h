@@ -9,6 +9,7 @@
 #include "ivan_intrinsics.h"
 #include "ivan_file_formats.h"
 
+#include "ivan_voxel_shared.h"
 
 #define USE_FONTS_FROM_WINDOWS 0
 
@@ -33,7 +34,8 @@ enum asset_type{
 	AssetType_Model,
 	AssetType_Font,
 	AssetType_FontGlyph,
-	AssetType_VoxelTextureAtlas,
+	AssetType_VoxelAtlas,
+	AssetType_VoxelAtlasTexture,
 };
 
 struct loaded_font{
@@ -64,6 +66,19 @@ struct loaded_font{
 	uint32 OnePastHighestCodepoint;
 };
 
+struct loaded_voxel_atlas{
+	dda_voxel_atlas_texture AtlasTexture;
+	voxel_tex_coords_set Materials[VoxelMaterial_Count];
+
+	char* TextureFileName;
+
+	uint32 TextureCount;
+	uint32 MaxTextureCount;
+
+	uint32 AtlasWidth;
+	uint32 OneTextureWidth;
+};
+
 struct asset_source_font{
 	loaded_font* Font;
 };
@@ -86,8 +101,14 @@ struct asset_source_model{
 	char* FileName;
 };
 
-struct asset_source_voxel_texture_atlas{
+struct asset_source_voxel_atlas{
+	loaded_voxel_atlas* Atlas;
+};
+
+struct asset_source_voxel_atlas_texture{
 	char* FileName;
+
+	loaded_voxel_atlas* Atlas;
 };
 
 struct asset_source{
@@ -98,7 +119,8 @@ struct asset_source{
 		asset_source_font Font;
 		asset_source_font_glyph Glyph;
 		asset_source_model Model;
-		asset_source_voxel_texture_atlas* VoxelTextureAtlas;
+		asset_source_voxel_atlas VoxelAtlas;
+		asset_source_voxel_atlas_texture VoxelAtlasTexture;
 	};
 };
 
