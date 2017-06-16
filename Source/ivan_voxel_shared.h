@@ -24,7 +24,8 @@ enum voxel_mat_type{
 	VoxelMaterial_Brick,
 	VoxelMaterial_Logs,
 
-	VoxelMaterial_Count
+	VoxelMaterial_Count,
+	VoxelMaterial_CountTest,
 };
 
 /*
@@ -57,7 +58,7 @@ enum voxel_texture_face_type{
 };
 
 enum voxel_face_type_index{
-	VoxelFaceTypeIndex_Top,
+	VoxelFaceTypeIndex_Top = 0,
 	VoxelFaceTypeIndex_Bottom,
 	VoxelFaceTypeIndex_Left,
 	VoxelFaceTypeIndex_Right,
@@ -72,9 +73,6 @@ enum voxel_face_type_index{
 };
 
 struct voxel_tex_coords_set{
-	//voxel_texture_face_type Type;
-	voxel_face_type_index Index;
-
 	union {
 		struct{
 			union{

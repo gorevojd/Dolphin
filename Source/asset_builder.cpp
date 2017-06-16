@@ -268,6 +268,12 @@ LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
     memset(Atlas->TexturesInfo, 0, TexturesInfoArraySize);
 */
 
+/*    
+    Atlas->MaterialsCount = VoxelMaterial_Count;
+    Atlas->Materials = (voxel_tex_coords_set*)
+        malloc(sizeof(voxel_tex_coords_set) * Atlas->MaterialsCount);
+*/
+
     float UVOneTextureDelta = (float)OneTextureWidth / (float)AtlasWidth;
 
     voxel_face_tex_coords_set DefaultSet;
@@ -832,8 +838,8 @@ AddVoxelAtlasAsset(
 inline void 
 DescribeVoxelAtlasTexture(
     loaded_voxel_atlas* Atlas, 
-    uint32 MaterialType,
-    uint32 FaceTypeIndex,
+    voxel_mat_type MaterialType,
+    voxel_face_type_index FaceTypeIndex,
     int CurrTextureIndex)
 {
     uint32 TexturesByWidth = Atlas->AtlasWidth / Atlas->OneTextureWidth;
@@ -855,9 +861,6 @@ DescribeVoxelAtlasTexture(
     TexSet.T3 = Vec2(StartUV.x, StartUV.y + UVOneTextureDelta);
 
     voxel_tex_coords_set* MatTexSet = &Atlas->Materials[MaterialType];
-
-    MatTexSet->Index = (voxel_face_type_index)FaceTypeIndex;
-    MatTexSet->Sets[FaceTypeIndex] = TexSet;
 
     switch(FaceTypeIndex){
         case(VoxelFaceTypeIndex_Top):{
@@ -905,14 +908,17 @@ DescribeVoxelAtlasTexture(
             MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
         }break;
 
+        default:{
+            INVALID_CODE_PATH;
+        }break;
     }
 }
 
 INTERNAL_FUNCTION void 
 AtlasCurrTextureDesc(
     loaded_voxel_atlas* Atlas,
-    uint32 MaterialType, 
-    uint32 FaceTypeIndex)
+    voxel_mat_type MaterialType,
+    voxel_face_type_index FaceTypeIndex)
 {
     int CurrTextureIndex = Atlas->TextureCount;
 
@@ -922,8 +928,8 @@ AtlasCurrTextureDesc(
 INTERNAL_FUNCTION void 
 AtlasNextTextureDesc(
     loaded_voxel_atlas* Atlas,
-    uint32 MaterialType, 
-    uint32 FaceTypeIndex)
+    voxel_mat_type MaterialType,
+    voxel_face_type_index FaceTypeIndex)
 {
     int CurrTextureIndex = Atlas->TextureCount++;
 
@@ -1189,24 +1195,24 @@ INTERNAL_FUNCTION void WriteFonts(){
 	printf("Font assets written successfully :D\n");
 }
 
-INTERNAL_FUNCTION void WriteVoxelTextureAtlases(){
+INTERNAL_FUNCTION void WriteVoxelAtlases(){
     game_assets Assets_;
     game_assets* Assets = &Assets_;
     Initialize(Assets);
-
-    //LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
 
     loaded_voxel_atlas* Atlases[] = {
         LoadVoxelAtlas("../Data/Images/terrain.png", 256, 16),
     };
 
-    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
-    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_None, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
-    AtlasCurrTextureDesc(Atlases[0], VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
-    AtlasNextTextureDesc(Atlases[0], VoxelMaterial_Logs, VoxelFaceTypeIndex_All);
+    loaded_voxel_atlas* Atlas = Atlases[0];
 
+    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
+    AtlasNextTextureDesc(Atlas, VoxelMaterial_None, VoxelFaceTypeIndex_All);
+    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
+    AtlasCurrTextureDesc(Atlas, VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
+    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
+    AtlasNextTextureDesc(Atlas, VoxelMaterial_Logs, VoxelFaceTypeIndex_All);
+ 
     BeginAssetType(Assets, Asset_VoxelAtlasTexture);
     for(uint32 VoxelAtlasIndex = 0;
         VoxelAtlasIndex < ArrayCount(Atlases);
@@ -1221,7 +1227,7 @@ INTERNAL_FUNCTION void WriteVoxelTextureAtlases(){
     AddTag(Assets, Tag_VoxelAtlasType, VoxelAtlasType_Default);
     EndAssetType(Assets);
 
-    WriteDDA(Assets, "../Data/asset_pack_voxel_texture_atlas.dda");
+	WriteDDA(Assets, "../Data/asset_pack_voxatl.dda");
     printf("Voxel Texture Atlas written successfully :D\n");
 }
 
@@ -1424,7 +1430,7 @@ int main(int ArgCount, char** Args){
     WriteNonHero();
     WriteSounds();
     WriteFonts();
-    WriteVoxelTextureAtlases();
+    WriteVoxelAtlases();
 
     system("pause");
 	return(0);

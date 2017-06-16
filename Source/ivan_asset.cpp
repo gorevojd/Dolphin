@@ -490,37 +490,6 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
             }
 
             if(Immediate || Task){
-
-                /*
-                dda_font* Info = &Asset->DDA.Font;
-
-                uint32 HorizontalAdvanceSize = sizeof(float) * Info->GlyphCount * Info->GlyphCount;
-                uint32 GlyphsSize = Info->GlyphCount * sizeof(dda_font_glyph);
-                uint32 UnicodeMapSize = sizeof(uint16) * Info->OnePastHighestCodepoint;
-                uint32 SizeOfData = GlyphsSize + HorizontalAdvanceSize;
-                uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header) + UnicodeMapSize;
-
-                Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_Font);
-
-                loaded_font* Font = &Asset->Header->Font;
-                Font->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->FontBitmapIDOffset;
-                Font->Glyphs = (dda_font_glyph*)(Asset->Header + 1);
-                Font->HorizontalAdvance = (float*)((uint8*)Font->Glyphs + GlyphsSize);
-                Font->UnicodeMap = (uint16*)((uint8*)Font->HorizontalAdvance + HorizontalAdvanceSize);
-
-                ZeroSize(Font->UnicodeMap, UnicodeMapSize);
-
-                load_asset_work Work;
-                Work.Task = Task;
-                Work.Asset = Assets->Assets + ID.Value;
-                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
-                Work.Offset = Asset->DDA.DataOffset;
-                Work.Size = SizeOfData;
-                Work.Destination = Font->Glyphs;
-                Work.FinalizeOperation = FinalizeAsset_Font;
-                Work.FinalState = AssetState_Loaded;
-                */
-
                 dda_voxel_atlas* Info = &Asset->DDA.VoxelAtlas;
 
                 uint32 MaterialsSize = VoxelMaterial_Count * sizeof(voxel_tex_coords_set);
