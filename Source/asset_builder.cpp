@@ -5,11 +5,9 @@
 */
 
 /*
-    TODO(Dima): 
+    TODO(Dima):
         Font Atlas
         Voxel texture atlas
-
-    
 */
 
 #pragma pack(push, 1)
@@ -1409,7 +1407,6 @@ INTERNAL_FUNCTION void WriteSounds(){
         else{
             SampleCount = TotalMusicSampleCount - FirstSampleIndex;
         }
-
 
         sound_id ThisMusic = AddSoundAsset(Assets, "../Data/HH/test3/music_test.wav", FirstSampleIndex, SampleCount);
         if((FirstSampleIndex + OneMusicChunk) < TotalMusicSampleCount){

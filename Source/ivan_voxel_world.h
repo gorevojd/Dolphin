@@ -41,49 +41,46 @@ struct voxel_chunk{
 	Y - Top-down chunk order number
 	Z - Front-Back chunk order number
 */
-voxel_chunk* GenerateVoxelChunk(memory_arena* Arena, int32_t X, int32_t Y, int32_t Z){
-	voxel_chunk Chunk;
-
+void GenerateVoxelChunk(memory_arena* Arena, voxel_chunk* Chunk, int32_t X, int32_t Y, int32_t Z){
 	float OneOverWidth = 1.0f / (float)IVAN_VOXEL_CHUNK_WIDTH;
 	float OneOverHeight = 1.0f / (float)IVAN_VOXEL_CHUNK_HEIGHT;
 
-	temprorary_memory TempMem = BeginTemporaryMemory(Arena);
+	temporary_memory TempMem = BeginTemporaryMemory(Arena);
 
-	Chunk.VoxelCount = IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_HEIGHT;
-	Chunk.Voxels = (voxel*)PushSize(TempMem.Arena, VoxelCount * sizeof(voxel));
+	Chunk->VoxelsCount = IVAN_MAX_VOXELS_IN_CHUNK;
+	Chunk->Voxels = (voxel*)PushSize(TempMem.Arena, Chunk->VoxelsCount * sizeof(voxel));
 
 	float PosX = (float)X * (float)IVAN_VOXEL_CHUNK_WIDTH;
 	float PosY = (float)Y * (float)IVAN_VOXEL_CHUNK_HEIGHT;
 	float PosZ = (float)Z * (float)IVAN_VOXEL_CHUNK_WIDTH;
 
-	Chunk.Pos = Vec3(PosX, PosY, PosZ);
+	Chunk->Pos = Vec3(PosX, PosY, PosZ);
 
 	float StartHeight = 50.0f;
 
 	//TODO(Dima): Check cache-friendly variations of this loop
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
-			float RandHeight = stb_perlin_noise3(PosX + i, PosY, PosZ + j) + StartHeight;
+			float RandHeight = stb_perlin_noise3(PosX + i, PosY, PosZ + j, 0, 0, 0) + StartHeight;
 			uint32_t RandHeightU32 = (uint32_t)(RandHeight + 0.5f);
 
 			//NOTE(Dima): Do not change IsAir sence because of this
 			int32_t TempFlag = 0;
 			for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT; k++){
-				voxel* TempVoxel = &Chunk.Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)];
+				voxel* TempVoxel = &Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)];
 				if(k == RandHeightU32){
 					TempVoxel->IsAir = TempFlag;
-					TempVoxel->Type = IVAN_VOXEL_MAT_GRASSY_GROUND;
+					TempVoxel->Type = VoxelMaterial_GrassyGround;
 					TempFlag = 1;					
 				}
 				else{
 					TempVoxel->IsAir = TempFlag;
-					TempVoxel->Type = IVAN_VOXEL_MAT_GROUND;
+					TempVoxel->Type = VoxelMaterial_Ground;
 				}
 			}
 		}
 	}
-
-	EndTemporaryMemory(TempMem);
+	//EndTemporaryMemory(TempMem);
 }
 
 

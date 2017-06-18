@@ -3,6 +3,11 @@
 #include "ivan_asset.cpp"
 #include "ivan_audio.cpp"
 #include "ivan_particle.cpp"
+#include "ivan_render.cpp"
+
+#include "ivan_voxel_world.h"
+#include "ivan_voxel_mesh.h"
+
 
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
@@ -199,7 +204,85 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
+#if 0
+        voxel_chunk VoxelChunk;
+        VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
+        GenerateVoxelChunk(&TranState->TranArena, &VoxelChunk, 0, 0, 0);
+        voxel_chunk_mesh MeshResult;
+        MeshResult.Positions = (vec3*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec3));
+        MeshResult.TexCoords = (vec2*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec2));
+        MeshResult.Normals = (vec3*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec3));
+        MeshResult.Indices = (uint32_t*)malloc(IVAN_MAX_MESH_CHUNK_FACE_COUNT * sizeof(uint32_t));
 
+        voxel_atlas_id VoxelAtlasID = GetFirstVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas);
+
+        GenerateVoxelMeshForChunk(
+            &MeshResult, 
+            &VoxelChunk, 
+            TranState->Assets,
+            VoxelAtlasID);
+
+#if 1
+        GLuint MeshVAO;
+        GLuint MeshVertsVBO;
+        GLuint MeshNormsVBO;
+        GLuint MeshUVsVBO;
+        GLuint MeshEBO;
+
+        glGenVertexArrays(1, &MeshVAO);
+        glGenBuffers(1, &MeshEBO);
+        glGenBuffers(1, &MeshVertsVBO);
+        glGenBuffers(1, &MeshNormsVBO);
+        glGenBuffers(1, &MeshUVsVBO);
+
+        glBindVertexArray(MeshVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec3), Mesh->Positions, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
+        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec3), Mesh->Normals, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
+        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec2), Mesh->TexCoords, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mesh->IndicesCount * sizeof(uint32_t), Mesh->Indices, GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+        glEnableVertexAttribArray(Program.VertPID);
+        glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
+        glEnableVertexAttribArray(Program.VertNID);
+        glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
+        glEnableVertexAttribArray(Program.VertUVID);
+        glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);
+
+#else
+        GLuint MeshVAO;
+        GLuint MeshEBO;
+        GLuint MeshVBO;
+
+        glGenVertexArrays(1, &MeshVAO);
+        glGenBuffers(1, &MeshEBO);
+        glGenBuffers(1, &MeshVBO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+
+        glEnableVertexAttribArray(Program.VertPID);
+        glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, P));
+
+        glEnableVertexAttribArray(Program.VertNID);
+        glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, N));
+
+        glEnableVertexAttribArray(Program.VertUVID);
+        glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, UV));
+#endif
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindVertexArray(0);
+#endif
         TranState->IsInitialized = true;
     }
     
@@ -264,6 +347,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
         */
     }
+
 
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
     PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));

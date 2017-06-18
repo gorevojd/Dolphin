@@ -1,7 +1,13 @@
 #ifndef IVAN_OPENGL_H
 #define IVAN_OPENGL_H
 
-#include "ivan_opengl.h"
+struct opengl_program_common{
+    GLuint ProgramHandle;
+
+    GLuint VertPID;
+    GLuint VertNID;
+    GLuint VertUVID;
+};
 
 struct opengl_info{
     bool32 ModernContext;

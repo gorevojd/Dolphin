@@ -65,6 +65,16 @@ union vec4{
     float data[4];
 };
 
+struct quat{
+	union{
+		struct {
+			float x, y, z, w;
+		};
+		vec3 xyz;
+		vec4 xyzw;
+	};
+};
+
 struct rectangle2{
 	vec2 Min;
 	vec2 Max;
@@ -240,6 +250,102 @@ inline vec4 Vec4(vec3 InitVector, float w){
 	return(Result);
 }
 
+/*Quaternion constructors and operations*/
+inline quat Quat(vec3 axis, float theta){
+	quat Result;
+
+	float HalfTheta = theta * 0.5f;
+	float SinScalar = Sin(HalfTheta);
+	float OneOverAxisLen = 1.0f / Sqrt((axis.x * axis.x + axis.y * axis.y + axis.z * axis.z));
+	Result.x = OneOverAxisLen * axis.x * SinScalar;
+	Result.y = OneOverAxisLen * axis.y * SinScalar;
+	Result.z = OneOverAxisLen * axis.z * SinScalar;
+	Result.w = Cos(HalfTheta);
+
+	return(Result);
+}
+
+inline quat Quat(float x, float y, float z, float theta){
+	quat Result;
+
+	float HalfTheta = theta * 0.5f;
+	float SinScalar = Sin(HalfTheta);
+	float OneOverAxisLen = 1.0f / Sqrt((x * x + y * y + z * z));
+	Result.x = x * OneOverAxisLen * SinScalar;
+	Result.y = y * OneOverAxisLen * SinScalar;
+	Result.z = z * OneOverAxisLen * SinScalar;
+	Result.w = Cos(HalfTheta);
+
+	return(Result);
+}
+
+inline quat Mul(quat q1, quat q2){
+    quat q;
+    q.x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y;
+    q.y = q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x;
+    q.z = q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w;
+    q.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
+    return(q);
+}
+
+inline quat Quat(float Yaw, float Pitch, float Roll){
+	quat q1 = Quat(1.0f, 0.0f, 0.0f, Pitch);
+	quat q2 = Quat(0.0f, 1.0f, 0.0f, Yaw);
+	quat q3 = Quat(0.0f, 0.0f, 1.0f, Roll);
+
+	quat Result = Mul(q2, q1);
+	Result = Mul(Result, q3);
+	return(Result);
+}
+
+inline quat QuatIdentity(){
+	quat Result;
+
+	Result.x = 0.0f;
+	Result.y = 0.0f;
+	Result.z = 0.0f;
+	Result.w = 1.0f;
+
+	return(Result);
+}
+
+inline quat Conjugate(quat q){
+	quat Result;
+
+	Result.x = -q.x;
+	Result.y = -q.y;
+	Result.z = -q.z;
+	Result.w = q.w;
+
+	return(Result);
+}
+
+inline float Dot(quat q1, quat q2){
+	float Result = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
+
+	return(Result);
+}
+
+inline quat Div(quat q, float s){
+	quat Result;
+	float OneOverS = 1.0f / s;
+	Result.x = q.x * OneOverS;
+	Result.y = q.y * OneOverS;
+	Result.z = q.z * OneOverS;
+	Result.w = q.w * OneOverS;
+
+	return(Result);
+}
+
+inline quat Inverse(quat q){
+	quat Result;
+
+	Result = Conjugate(q);
+	Result = Div(Result, Dot(q, q));
+
+	return(Result);
+}
+
 /*Add operation*/
 inline vec2 Add(vec2 a, vec2 b){
 	a.x += b.x;
@@ -394,8 +500,6 @@ inline vec4 &operator-=(vec4& a, vec4 b){return(a = a - b);}
 inline vec4 &operator*=(vec4& a, float s){return(a = a * s);}
 inline vec4 &operator/=(vec4& a, float s){return(a = a / s);}
 
-
-
 /*Dot product*/
 inline float Dot(vec2 v0, vec2 v1){ return v0.x * v1.x + v0.y * v1.y; }
 inline float Dot(vec3 v0, vec3 v1){ return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z; }
@@ -478,8 +582,13 @@ float Lerp(float a, float b, float t){
 	Res = Add(Res, a);					\
 	return(Res);
 
-/*Rectangle Functions*/
+inline vec2 Lerp(vec2 a, vec2 b, float delta){ IVAN_VECTOR_LERP(2, a, b, delta); }
+inline vec3 Lerp(vec3 a, vec3 b, float delta){ IVAN_VECTOR_LERP(3, a, b, delta); }
+inline vec4 Lerp(vec4 a, vec4 b, float delta){ IVAN_VECTOR_LERP(4, a, b, delta); }
+#undef IVAN_VECTOR_LERP
 
+
+/*Rectangle Functions*/
 inline int32
 GetWidth(rectangle2i A){
 	int32 Result = A.MaxX - A.MinX;
@@ -504,10 +613,5 @@ GetClampedRectArea(rectangle2 A){
 
 	return(Result);
 }
-
-inline vec2 Lerp(vec2 a, vec2 b, float delta){ IVAN_VECTOR_LERP(2, a, b, delta); }
-inline vec3 Lerp(vec3 a, vec3 b, float delta){ IVAN_VECTOR_LERP(3, a, b, delta); }
-inline vec4 Lerp(vec4 a, vec4 b, float delta){ IVAN_VECTOR_LERP(4, a, b, delta); }
-#undef IVAN_VECTOR_LERP
 
 #endif

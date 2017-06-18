@@ -69,8 +69,6 @@ struct loaded_font{
 struct loaded_voxel_atlas{
 	dda_voxel_atlas_texture AtlasTexture;
 	voxel_tex_coords_set Materials[VoxelMaterial_Count];
-	//voxel_tex_coords_set* Materials;
-	//int MaterialsCount;
 
 	char* TextureFileName;
 

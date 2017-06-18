@@ -15,7 +15,7 @@
 #include "ivan_asset.h"
 #include "ivan_audio.h"
 #include "ivan_particle.h"
-
+#include "ivan_render.h"
 
 struct task_with_memory{
     bool32 BeingUsed;
@@ -64,7 +64,7 @@ struct transient_state{
 	bool32 IsInitialized;
 	memory_arena TranArena;
 	
-	task_with_memory Tasks[4];
+	task_with_memory Tasks[16];
 
 	loaded_bitmap GroundBitmap;
 	platform_work_queue* HighPriorityQueue;

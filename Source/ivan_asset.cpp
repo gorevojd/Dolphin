@@ -679,6 +679,29 @@ GetBestMatchFontFrom(
     return(Result);
 }
 
+inline voxel_atlas_id
+GetFirstVoxelAtlasFrom(game_assets* Assets, asset_type_id TypeID){
+    voxel_atlas_id Result = {GetFirstAssetFrom(Assets, TypeID)};
+    return(Result);
+}
+
+inline voxel_atlas_id
+GetRandomVoxelAtlasFrom(game_assets* Assets, asset_type_id TypeID, random_series* Series){
+    voxel_atlas_id Result = {GetRandomAssetFrom(Assets, TypeID, Series)};
+    return(Result);
+}
+
+inline voxel_atlas_id
+GetBestMatchVoxelAtlasFrom(
+    game_assets* Assets,
+    asset_type_id TypeID,
+    asset_vector* MatchVector, asset_vector* WeightVector)
+{
+    voxel_atlas_id Result = {GetBestMatchAssetFrom(Assets, TypeID, MatchVector, WeightVector)};
+    return(Result);
+}
+
+
 
 INTERNAL_FUNCTION game_assets* 
 AllocateGameAssets(

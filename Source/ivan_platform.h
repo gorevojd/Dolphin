@@ -35,6 +35,8 @@ typedef size_t memory_index;
 #define UINT32_FROM_POINTER(Pointer) ((uint32)(memory_index)(Pointer))
 #define POINTER_FROM_UINT32(type, Value) (type *)((memory_index)Value)
 
+#define OffsetOf(type, Member) (uintptr_t)&(((type *)0)->Member)
+
 /*Platform stuff*/
 inline uint32
 SafeTruncateUInt64(uint64 Value){

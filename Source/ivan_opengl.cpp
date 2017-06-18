@@ -109,6 +109,170 @@ GLOBAL_VARIABLE uint32 GlobalFramebufferCount = 0;
 GLOBAL_VARIABLE GLuint GlobalFramebufferHandles[256] = {0};
 GLOBAL_VARIABLE GLuint GlobalFramebufferTextures[256] = {0};
 
+INTERNAL_FUNCTION GLuint
+OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common* Common){
+
+    GLint VertexShaderCompiled = 0;
+    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLchar* VertexShaderCode[] = {
+        VertexCode,
+    };
+    glShaderSource(VertexShaderID, ArrayCount(VertexShaderCode), VertexShaderCode, 0);
+    glCompileShader(VertexShaderID);
+    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &VertexShaderCompiled);
+    if(!VertexShaderCompiled){
+        GLsizei Ignored;
+        char VertexErrors[4096];
+        glGetShaderInfoLog(VertexShaderID, sizeof(VertexErrors), &Ignored, VertexErrors);
+        
+        INVALID_CODE_PATH;
+    }
+
+    GLint FragmentShaderCompiled = 0;
+    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    GLchar* FragmentShaderCode[] = {
+        FragmentCode,
+    };
+    glShaderSource(FragmentShaderID, ArrayCount(FragmentShaderCode), FragmentShaderCode, 0);
+    glCompileShader(FragmentShaderID);
+    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &FragmentShaderCompiled);
+    if(!FragmentShaderCompiled){
+        GLsizei Ignored;
+        char FragmentErrors[4096];
+        glGetShaderInfoLog(FragmentShaderID, sizeof(FragmentErrors), &Ignored, FragmentErrors);
+
+        INVALID_CODE_PATH;
+    }
+
+    GLuint ProgramID = glCreateProgram();
+    glAttachShader(ProgramID, VertexShaderID);
+    glAttachShader(ProgramID, FragmentShaderID);
+    glLinkProgram(ProgramID);
+
+    glValidateProgram(ProgramID);
+    GLint ProgramLinked = false;
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &ProgramLinked);
+    if(!ProgramLinked){
+        GLsizei Ignored;
+        char ProgramErrors[4096];
+        glGetShaderInfoLog(ProgramID, sizeof(ProgramErrors), &Ignored, ProgramErrors);
+
+        INVALID_CODE_PATH;
+    }
+
+    Common->ProgramHandle = ProgramID;
+    Common->VertPID = glGetAttribLocation(ProgramID, "VertP");
+    Common->VertNID = glGetAttribLocation(ProgramID, "VertN");
+    Common->VertUVID = glGetAttribLocation(ProgramID, "VertUV");
+
+    glDeleteShader(VertexShaderID);
+    glDeleteShader(FragmentShaderID);
+
+    return(ProgramID);
+}
+
+INTERNAL_FUNCTION GLuint 
+OpenGLLoadProgram(
+    char* VertexPath, 
+    char* FragmentPath, 
+    opengl_program_common* Common,
+    debug_platform_read_entire_file* DEBUGReadEntireFile,
+    debug_platform_free_file_memory* DEBUGFreeFileMemory)
+{
+    debug_read_file_result VertResult = DEBUGReadEntireFile(VertexPath);
+    debug_read_file_result FragResult = DEBUGReadEntireFile(FragmentPath);
+
+    if(VertResult.ContentsSize == 0){        
+        INVALID_CODE_PATH;
+    }
+
+    if(FragResult.ContentsSize == 0){
+        INVALID_CODE_PATH;
+    }
+
+    OpenGLCreateProgram(
+        (char*)VertResult.Contents, 
+        (char*)FragResult.Contents,
+        Common);
+
+    DEBUGFreeFileMemory(VertResult.Contents);
+    DEBUGFreeFileMemory(FragResult.Contents);
+}
+
+INTERNAL_FUNCTION bool32 
+IsValidArray(GLuint ArrayID){
+    bool32 Result = false;
+
+    if(ArrayID != -1){
+        Result = true;
+    }
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION void 
+UseProgramBegin(opengl_program_common* Program){
+    glUseProgram(Program->ProgramHandle);
+
+    GLuint PArray = Program->VertPID;
+    GLuint NArray = Program->VertNID;
+    GLuint UVArray = Program->VertUVID;
+
+    if(IsValidArray(PArray)){
+        glEnableVertexAttribArray(PArray);
+        glVertexAttribPointer(
+            PArray, 
+            3, 
+            GL_FLOAT, 
+            false, 
+            sizeof(textured_vertex),
+            (void*)OffsetOf(textured_vertex, P));        
+    }
+
+    if(IsValidArray(NArray)){
+        glEnableVertexAttribArray(NArray);
+        glVertexAttribPointer(
+            NArray,
+            3,
+            GL_FLOAT,
+            false,
+            sizeof(textured_vertex),
+            (void*)OffsetOf(textured_vertex, N));
+    }
+
+    if(IsValidArray(UVArray)){
+        glEnableVertexAttribArray(UVArray);
+        glVertexAttribPointer(
+            UVArray, 
+            2,
+            GL_FLOAT,
+            false,
+            sizeof(textured_vertex),
+            (void*)OffsetOf(textured_vertex, UV));
+    }
+}
+
+INTERNAL_FUNCTION void 
+UseProgramEnd(opengl_program_common* Program){
+    glUseProgram(0);
+
+    GLuint PArray = Program->VertPID;
+    GLuint NArray = Program->VertNID;
+    GLuint UVArray = Program->VertUVID;
+
+    if(IsValidArray(PArray)){
+        glDisableVertexAttribArray(PArray);
+    }
+
+    if(IsValidArray(NArray)){
+        glDisableVertexAttribArray(NArray);
+    }
+
+    if(IsValidArray(UVArray)){
+        glDisableVertexAttribArray(UVArray);
+    }
+}
+
 INTERNAL_FUNCTION void 
 OpenGLBindFramebuffer(uint32 TargetIndex, uint32 RenderWidth, uint32 RenderHeight){
     glBindFramebuffer(GL_FRAMEBUFFER, GlobalFramebufferHandles[TargetIndex]);
@@ -125,9 +289,6 @@ inline void OpenGLRenderRectangle(
     GL_DEBUG_MARKER();
     
     glBegin(GL_TRIANGLES);
-
-#if 1
-    
 
     glColor4f(PremultColor.r, PremultColor.g, PremultColor.b, PremultColor.a);
 
@@ -146,27 +307,6 @@ inline void OpenGLRenderRectangle(
     glVertex3f(MaxP.x, MinP.y, MinP.z);
     glTexCoord2f(MinUV.x, MinUV.y);
     glVertex3f(MinP.x, MinP.y, MinP.z);
-#else
-    glColor4f(PremultColor.r, PremultColor.g, PremultColor.b, PremultColor.a);
-
-    glTexCoord2f(MinUV.x, MinUV.y);
-    glVertex3f(MinP.x, MinP.y, MinP.z);
-
-    glTexCoord2f(MaxUV.x, MinUV.y);
-    glVertex3f(MaxP.x, MinP.y, MinP.z);
-
-    glTexCoord2f(MaxUV.x, MaxUV.y);
-    glVertex3f(MaxP.x, MaxP.y, MinP.z);
-
-    glTexCoord2f(MinUV.x, MinUV.y);
-    glVertex3f(MinP.x, MinP.y, MinP.z);
-
-    glTexCoord2f(MaxUV.x, MaxUV.y);
-    glVertex3f(MaxP.x, MaxP.y, MinP.z);
-
-    glTexCoord2f(MinUV.x, MaxUV.y);
-    glVertex3f(MinP.x, MaxP.y, MinP.z);
-#endif
 
     glEnd();
 
@@ -181,15 +321,11 @@ inline void OpenGLRenderBitmap(
     vec4 ClearColor,
     GLuint BlitTexture)
 {
-    GL_DEBUG_MARKER();
-
     OpenGLBindFramebuffer(0, GetWidth(DrawRegion), GetHeight(DrawRegion));
     //glViewport(0, 0, Width, Height);
 
     glDisable(GL_SCISSOR_TEST);
     glDisable(GL_BLEND);
-
-    GL_DEBUG_MARKER();
 
     glBindTexture(GL_TEXTURE_2D, BlitTexture);
 
@@ -206,18 +342,12 @@ inline void OpenGLRenderBitmap(
         GL_UNSIGNED_BYTE, 
         Memory);
 
-    GL_DEBUG_MARKER();
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    GL_DEBUG_MARKER();
-
     glEnable(GL_TEXTURE_2D);
-
-    GL_DEBUG_MARKER();
 
     glClearColor(ClearColor.r, ClearColor.g, ClearColor.b, ClearColor.a);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -227,8 +357,6 @@ inline void OpenGLRenderBitmap(
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    GL_DEBUG_MARKER();
 
     glMatrixMode(GL_PROJECTION);
 
@@ -244,20 +372,14 @@ inline void OpenGLRenderBitmap(
     };
     glLoadMatrixf(ProjectionMatrix);
 
-    GL_DEBUG_MARKER();
-	
     vec3 MinP = {0, 0, 0};
     vec3 MaxP = {(float)Width, (float)Height, 0.0f};
     vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
 
     OpenGLRenderRectangle(MinP, MaxP, Color);
     
-    GL_DEBUG_MARKER();
-
     glBindTexture(GL_TEXTURE_2D, 0);
     glEnable(GL_BLEND);
-
-    GL_DEBUG_MARKER();
 }
 
 INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
@@ -325,13 +447,9 @@ INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
 
 INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void* Data){
     
-    GL_DEBUG_MARKER();
-
     GLuint Handle;
     glGenTextures(1, &Handle);
     glBindTexture(GL_TEXTURE_2D, Handle);
-
-    GL_DEBUG_MARKER();
 
     glTexImage2D(
         GL_TEXTURE_2D,
@@ -343,8 +461,6 @@ INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void*
         GL_BGRA_EXT, 
         GL_UNSIGNED_BYTE, 
         Data);
-
-    GL_DEBUG_MARKER();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

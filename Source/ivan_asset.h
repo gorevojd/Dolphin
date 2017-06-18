@@ -250,6 +250,7 @@ inline bool32 IsValid(sound_id ID){
 INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Immediate);
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID);
 INTERNAL_FUNCTION void LoadFontAsset(game_assets* Assets, font_id, bool32 Immediate);
+INTERNAL_FUNCTION void LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id, bool32 Immediate);
 
 
 inline sound_id GetNextSoundInChain(game_assets* Assets, sound_id ID){

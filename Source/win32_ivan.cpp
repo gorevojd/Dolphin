@@ -83,6 +83,7 @@ typedef void WINAPI gl_get_program_info_log(GLuint program, GLsizei bufSize, GLs
 typedef void WINAPI gl_get_shader_info_log(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 typedef void WINAPI gl_validate_program(GLuint program);
 typedef void WINAPI gl_get_program_iv(GLuint program, GLenum pname, GLint *params);
+typedef void WINAPI gl_get_shader_iv(GLuint shader, GLenum pname, GLint *params);
 typedef GLint WINAPI gl_get_uniform_location (GLuint program, const GLchar *name);
 typedef void WINAPI gl_uniform_4fv(GLint location, GLsizei count, const GLfloat *value);
 typedef void WINAPI gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
@@ -101,6 +102,10 @@ typedef void WINAPI type_glGenVertexArrays(GLsizei n, GLuint *arrays);
 typedef void WINAPI type_glBindBuffer (GLenum target, GLuint buffer);
 typedef void WINAPI type_glGenBuffers (GLsizei n, GLuint *buffers);
 typedef void WINAPI type_glBufferData (GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+typedef void WINAPI type_glActiveTexture(GLenum texture);
+typedef void WINAPI type_glDeleteShader(GLuint shader);
+typedef void WINAPI type_glDeleteProgram(GLuint program);
+typedef void WINAPI type_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers);
 
 #define GL_DEBUG_CALLBACK(Name) void WINAPI Name(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
 typedef GL_DEBUG_CALLBACK(GLDEBUGPROC);
@@ -125,6 +130,7 @@ GLOBAL_VARIABLE gl_get_program_info_log *glGetProgramInfoLog;
 GLOBAL_VARIABLE gl_get_shader_info_log *glGetShaderInfoLog;
 GLOBAL_VARIABLE gl_validate_program *glValidateProgram;
 GLOBAL_VARIABLE gl_get_program_iv *glGetProgramiv;
+GLOBAL_VARIABLE gl_get_shader_iv *glGetShaderiv;
 GLOBAL_VARIABLE gl_get_uniform_location *glGetUniformLocation;
 GLOBAL_VARIABLE gl_uniform_4fv *glUniform4fv;
 GLOBAL_VARIABLE gl_uniform_matrix_4fv *glUniformMatrix4fv;
@@ -145,6 +151,10 @@ OPENGL_GLOBAL_FUNCTION(glBindBuffer);
 OPENGL_GLOBAL_FUNCTION(glGenBuffers);
 OPENGL_GLOBAL_FUNCTION(glBufferData);
 OPENGL_GLOBAL_FUNCTION(glGetStringi);
+OPENGL_GLOBAL_FUNCTION(glActiveTexture);
+OPENGL_GLOBAL_FUNCTION(glDeleteProgram);
+OPENGL_GLOBAL_FUNCTION(glDeleteShader);
+OPENGL_GLOBAL_FUNCTION(glDeleteFramebuffers);
 
 #include "ivan_opengl.h"
 GLOBAL_VARIABLE open_gl OpenGL;
@@ -1076,6 +1086,10 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         WIN32_GET_OPENGL_FUNCTION(glGenBuffers);
         WIN32_GET_OPENGL_FUNCTION(glBufferData);
         WIN32_GET_OPENGL_FUNCTION(glGetStringi);
+        WIN32_GET_OPENGL_FUNCTION(glActiveTexture);
+        WIN32_GET_OPENGL_FUNCTION(glDeleteShader);
+        WIN32_GET_OPENGL_FUNCTION(glDeleteProgram);
+        WIN32_GET_OPENGL_FUNCTION(glDeleteFramebuffers);
 
         WIN32_GET_OPENGL_FUNCTION(glUniform1f);
         WIN32_GET_OPENGL_FUNCTION(glUniform2fv);
@@ -1104,6 +1118,7 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         glGetShaderInfoLog = (gl_get_shader_info_log *)wglGetProcAddress("glGetShaderInfoLog");
         glValidateProgram = (gl_validate_program *)wglGetProcAddress("glValidateProgram");
         glGetProgramiv = (gl_get_program_iv *)wglGetProcAddress("glGetProgramiv");
+        glGetShaderiv = (gl_get_shader_iv *)wglGetProcAddress("glGetShaderiv");
         glGetUniformLocation = (gl_get_uniform_location *)wglGetProcAddress("glGetUniformLocation");
         glUniform4fv = (gl_uniform_4fv *)wglGetProcAddress("glUniform4fv");
         glUniformMatrix4fv = (gl_uniform_matrix_4fv *)wglGetProcAddress("glUniformMatrix4fv");
