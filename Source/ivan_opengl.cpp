@@ -171,6 +171,12 @@ OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common*
     return(ProgramID);
 }
 
+INTERNAL_FUNCTION void
+OpenGLFreeProgram(opengl_program_common* Common){
+    glDeleteProgram(Common->ProgramHandle);
+    Common->ProgramHandle = 0;
+}
+
 INTERNAL_FUNCTION GLuint 
 OpenGLLoadProgram(
     char* VertexPath, 

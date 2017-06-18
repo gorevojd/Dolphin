@@ -1,6 +1,6 @@
  ivan
 
- Timestamp is 5946a2fb (Sun Jun 18 19:57:47 2017)
+ Timestamp is 5946c87b (Sun Jun 18 22:37:47 2017)
 
  Preferred load address is 0000000180000000
 
@@ -1128,7 +1128,7 @@
  0002:000002d0       __xp_z                     00000001800462d0     LIBCMTD:initializers.obj
  0002:000002d8       __xt_a                     00000001800462d8     LIBCMTD:initializers.obj
  0002:000002e0       __xt_z                     00000001800462e0     LIBCMTD:initializers.obj
- 0002:00000f70       ??_C@_0BD@JDBJLMOD@PushRenderElement_?$AA@ 0000000180046f70     ivan.obj
+ 0002:00000f78       ??_C@_0BD@JDBJLMOD@PushRenderElement_?$AA@ 0000000180046f78     ivan.obj
  0002:00000f90       ??_C@_0EC@ICKDGNAC@e?3?2programming?2myprojects?2ivanen@ 0000000180046f90     ivan.obj
  0002:00000fd8       ??_C@_0BD@NBFNAMCM@Invalid?5code?5path?$CB?$AA@ 0000000180046fd8     ivan.obj
  0002:00000ff0       ??_C@_0BG@DFGAMOK@GetRenderEntityBasisP?$AA@ 0000000180046ff0     ivan.obj
@@ -2717,8 +2717,8 @@
  0001:0003f170       ?common_lseek_do_seek_nolock@@YA_JQEAX_JH@Z 0000000180040170 f   libucrtd:lseek.obj
  0001:0003f570       _log_special_common        0000000180040570 f   libucrtd:log_special.obj
  0001:0003f750       ??R<lambda_a8f98972ebaa5f7148d35bffe53bd70d>@@QEBAHXZ 0000000180040750 f   libucrtd:close.obj
- 0001:0003f800       ??R<lambda_6262c464c96e4c69799ed44814c7c457>@@QEBAXXZ 0000000180040800 f   libucrtd:commit.obj
  0001:0003f800       ??R<lambda_f6ca65dda28655a1cf758c1c4e38e52a>@@QEBAXXZ 0000000180040800 f   libucrtd:close.obj
+ 0001:0003f800       ??R<lambda_6262c464c96e4c69799ed44814c7c457>@@QEBAXXZ 0000000180040800 f   libucrtd:commit.obj
  0001:0003f820       ?close_os_handle_nolock@@YAKH@Z 0000000180040820 f   libucrtd:close.obj
  0001:00040060       $$000000                   0000000180041060     libvcruntimed:memcpy.obj
  0001:00040107       MoveSmall                  0000000180041107     libvcruntimed:memcpy.obj
@@ -2792,70 +2792,70 @@
  0001:000447d0       __DestructExceptionObject$filt$0 00000001800457d0 f   libvcruntimed:frame.obj
  0001:00044800       __FrameUnwindToState$filt$0 0000000180045800 f   libvcruntimed:frame.obj
  0001:00044821       __FrameUnwindToState$fin$1 0000000180045821 f   libvcruntimed:frame.obj
- 0002:000002f0       $SG19459                   00000001800462f0     ivan.obj
- 0002:00000318       $SG17449                   0000000180046318     ivan.obj
- 0002:00000324       $SG7213                    0000000180046324     ivan.obj
- 0002:00000328       $SG17450                   0000000180046328     ivan.obj
- 0002:00000364       $SG7214                    0000000180046364     ivan.obj
- 0002:00000368       $SG17613                   0000000180046368     ivan.obj
- 0002:0000037c       $SG17349                   000000018004637c     ivan.obj
- 0002:00000380       $SG17614                   0000000180046380     ivan.obj
- 0002:000003c0       $SG16609                   00000001800463c0     ivan.obj
- 0002:000003d0       $SG16610                   00000001800463d0     ivan.obj
- 0002:00000418       $SG16617                   0000000180046418     ivan.obj
- 0002:00000428       $SG18689                   0000000180046428     ivan.obj
- 0002:00000440       $SG16618                   0000000180046440     ivan.obj
- 0002:00000488       $SG17665                   0000000180046488     ivan.obj
- 0002:00000498       $SG18690                   0000000180046498     ivan.obj
- 0002:000004d8       $SG17666                   00000001800464d8     ivan.obj
- 0002:00000518       $SG18697                   0000000180046518     ivan.obj
- 0002:00000530       $SG18740                   0000000180046530     ivan.obj
- 0002:00000550       $SG18741                   0000000180046550     ivan.obj
- 0002:00000590       $SG17745                   0000000180046590     ivan.obj
- 0002:000005a8       $SG17746                   00000001800465a8     ivan.obj
- 0002:000005e8       $SG17755                   00000001800465e8     ivan.obj
- 0002:00000608       $SG17756                   0000000180046608     ivan.obj
- 0002:00000648       $SG17764                   0000000180046648     ivan.obj
- 0002:00000660       $SG17765                   0000000180046660     ivan.obj
- 0002:000006a0       $SG16861                   00000001800466a0     ivan.obj
- 0002:000006b8       $SG16862                   00000001800466b8     ivan.obj
- 0002:000006f4       $SG6625                    00000001800466f4     ivan.obj
- 0002:000006fc       $SG6718                    00000001800466fc     ivan.obj
- 0002:00000704       $SG6719                    0000000180046704     ivan.obj
- 0002:00000710       $SG16962                   0000000180046710     ivan.obj
- 0002:00000728       $SG16963                   0000000180046728     ivan.obj
- 0002:00000768       $SG17020                   0000000180046768     ivan.obj
- 0002:00000778       $SG17021                   0000000180046778     ivan.obj
- 0002:000007b8       $SG17058                   00000001800467b8     ivan.obj
- 0002:000007c8       $SG17059                   00000001800467c8     ivan.obj
- 0002:00000808       $SG17097                   0000000180046808     ivan.obj
- 0002:00000818       $SG17098                   0000000180046818     ivan.obj
- 0002:00000858       $SG17134                   0000000180046858     ivan.obj
- 0002:00000870       $SG17135                   0000000180046870     ivan.obj
- 0002:000008b0       ?stbsp__bot@@3QBNB         00000001800468b0     ivan.obj
- 0002:00000968       $SG17173                   0000000180046968     ivan.obj
- 0002:00000980       ?stbsp__negbot@@3QBNB      0000000180046980     ivan.obj
- 0002:00000a30       ?stbsp__negboterr@@3QBNB   0000000180046a30     ivan.obj
- 0002:00000ae0       ?stbsp__top@@3QBNB         0000000180046ae0     ivan.obj
- 0002:00000b48       $SG17187                   0000000180046b48     ivan.obj
+ 0002:000002f0       $SG17449                   00000001800462f0     ivan.obj
+ 0002:00000300       $SG17450                   0000000180046300     ivan.obj
+ 0002:0000033c       $SG7213                    000000018004633c     ivan.obj
+ 0002:00000340       $SG7214                    0000000180046340     ivan.obj
+ 0002:00000344       $SG17349                   0000000180046344     ivan.obj
+ 0002:00000348       $SG17613                   0000000180046348     ivan.obj
+ 0002:00000360       $SG17614                   0000000180046360     ivan.obj
+ 0002:000003a0       $SG16609                   00000001800463a0     ivan.obj
+ 0002:000003b0       $SG16610                   00000001800463b0     ivan.obj
+ 0002:000003f8       $SG16617                   00000001800463f8     ivan.obj
+ 0002:00000408       $SG18689                   0000000180046408     ivan.obj
+ 0002:00000420       $SG16618                   0000000180046420     ivan.obj
+ 0002:00000468       $SG17665                   0000000180046468     ivan.obj
+ 0002:00000478       $SG18690                   0000000180046478     ivan.obj
+ 0002:000004b8       $SG17666                   00000001800464b8     ivan.obj
+ 0002:000004f8       $SG18697                   00000001800464f8     ivan.obj
+ 0002:00000510       $SG18740                   0000000180046510     ivan.obj
+ 0002:00000530       $SG18741                   0000000180046530     ivan.obj
+ 0002:00000570       $SG17745                   0000000180046570     ivan.obj
+ 0002:00000588       $SG17746                   0000000180046588     ivan.obj
+ 0002:000005c8       $SG17755                   00000001800465c8     ivan.obj
+ 0002:000005e8       $SG17756                   00000001800465e8     ivan.obj
+ 0002:00000628       $SG17764                   0000000180046628     ivan.obj
+ 0002:00000640       $SG17765                   0000000180046640     ivan.obj
+ 0002:00000680       $SG16861                   0000000180046680     ivan.obj
+ 0002:00000698       $SG16862                   0000000180046698     ivan.obj
+ 0002:000006d4       $SG6625                    00000001800466d4     ivan.obj
+ 0002:000006dc       $SG6718                    00000001800466dc     ivan.obj
+ 0002:000006e4       $SG6719                    00000001800466e4     ivan.obj
+ 0002:000006f0       $SG16962                   00000001800466f0     ivan.obj
+ 0002:00000708       $SG16963                   0000000180046708     ivan.obj
+ 0002:00000748       $SG17020                   0000000180046748     ivan.obj
+ 0002:00000758       $SG17021                   0000000180046758     ivan.obj
+ 0002:00000798       $SG17058                   0000000180046798     ivan.obj
+ 0002:000007a8       $SG17059                   00000001800467a8     ivan.obj
+ 0002:000007e8       $SG17097                   00000001800467e8     ivan.obj
+ 0002:000007f8       $SG17098                   00000001800467f8     ivan.obj
+ 0002:00000838       $SG17134                   0000000180046838     ivan.obj
+ 0002:00000850       $SG17135                   0000000180046850     ivan.obj
+ 0002:00000890       ?stbsp__bot@@3QBNB         0000000180046890     ivan.obj
+ 0002:00000948       $SG17173                   0000000180046948     ivan.obj
+ 0002:00000960       ?stbsp__negbot@@3QBNB      0000000180046960     ivan.obj
+ 0002:00000a10       ?stbsp__negboterr@@3QBNB   0000000180046a10     ivan.obj
+ 0002:00000ac0       ?stbsp__top@@3QBNB         0000000180046ac0     ivan.obj
+ 0002:00000b28       $SG19223                   0000000180046b28     ivan.obj
  0002:00000b60       ?stbsp__negtop@@3QBNB      0000000180046b60     ivan.obj
- 0002:00000bc8       $SG17198                   0000000180046bc8     ivan.obj
+ 0002:00000bc8       $SG17187                   0000000180046bc8     ivan.obj
  0002:00000be0       ?stbsp__toperr@@3QBNB      0000000180046be0     ivan.obj
- 0002:00000c48       $SG19272                   0000000180046c48     ivan.obj
- 0002:00000c80       ?stbsp__negtoperr@@3QBNB   0000000180046c80     ivan.obj
- 0002:00000ce8       $SG19315                   0000000180046ce8     ivan.obj
- 0002:00000d20       ?stbsp__powten@@3QB_KB     0000000180046d20     ivan.obj
- 0002:00000dc0       $SG17174                   0000000180046dc0     ivan.obj
- 0002:00000e00       $SG17188                   0000000180046e00     ivan.obj
- 0002:00000e40       $SG17199                   0000000180046e40     ivan.obj
- 0002:00000e80       $SG19271                   0000000180046e80     ivan.obj
- 0002:00000e90       $SG19314                   0000000180046e90     ivan.obj
- 0002:00000ea0       $SG17351                   0000000180046ea0     ivan.obj
- 0002:00000ec8       $SG17353                   0000000180046ec8     ivan.obj
- 0002:00000ee8       $SG17357                   0000000180046ee8     ivan.obj
- 0002:00000f00       $SG19416                   0000000180046f00     ivan.obj
- 0002:00000f18       $SG19417                   0000000180046f18     ivan.obj
- 0002:00000f50       $SG19454                   0000000180046f50     ivan.obj
+ 0002:00000c48       $SG17198                   0000000180046c48     ivan.obj
+ 0002:00000c60       ?stbsp__negtoperr@@3QBNB   0000000180046c60     ivan.obj
+ 0002:00000cc8       $SG19266                   0000000180046cc8     ivan.obj
+ 0002:00000d00       ?stbsp__powten@@3QB_KB     0000000180046d00     ivan.obj
+ 0002:00000da0       $SG19222                   0000000180046da0     ivan.obj
+ 0002:00000db0       $SG17174                   0000000180046db0     ivan.obj
+ 0002:00000df0       $SG17188                   0000000180046df0     ivan.obj
+ 0002:00000e30       $SG17199                   0000000180046e30     ivan.obj
+ 0002:00000e70       $SG19265                   0000000180046e70     ivan.obj
+ 0002:00000e80       $SG19367                   0000000180046e80     ivan.obj
+ 0002:00000e98       $SG19368                   0000000180046e98     ivan.obj
+ 0002:00000ed0       $SG17351                   0000000180046ed0     ivan.obj
+ 0002:00000ef8       $SG17353                   0000000180046ef8     ivan.obj
+ 0002:00000f18       $SG19405                   0000000180046f18     ivan.obj
+ 0002:00000f38       $SG17357                   0000000180046f38     ivan.obj
+ 0002:00000f50       $SG19410                   0000000180046f50     ivan.obj
  0002:000011a0       GS_ExceptionPointers       00000001800471a0     LIBCMTD:gs_report.obj
  0002:000011f8       ?module_names@?A0x679b24ab@@3QBQEB_WB 00000001800471f8     libvcruntimed:winapi_downlevel.obj
  0002:00001460       ?candidate_modules@?1??try_get_FlsAlloc@@YAP6AKP6AXPEAX@Z@ZXZ@4QBW4module_id@?A0x679b24ab@@B 0000000180047460     libvcruntimed:winapi_downlevel.obj

@@ -1,7 +1,10 @@
-//TODO(DIMA): Think about how to allocate memory for mesh
-//TODO(DIMA): Voxel atlas texture extraction
+//TODO(DIMA): 
+//TODO(DIMA): 
 
 /*
+	TODO(DIMA): 
+		Think about how to allocate memory for mesh
+
 	IDEAS ABOUT OPTIMIZATION:
 		1) Send per-vertex index of normal in normal array. 
 		Extract it in the shader and assign. It will cost 3
@@ -25,22 +28,9 @@
 struct voxel_chunk_mesh{
 #define VOXEL_CHUNK_MESH_SOA 0
 	/*Vertices*/
-#if VOXEL_CHUNK_MESH_SOA
-	float PositionsX[];
-	float PositionsY[];
-	float PositionsZ[];
-
-	float TexCoordsX[];
-	float TexCoordsY[];
-
-	float NormalsX[];
-	float NormalsY[];
-	float NormalsZ[];
-#else
 	vec3* Positions;
 	vec2* TexCoords;
 	vec3* Normals;
-#endif
 
 	uint32_t VerticesCount;
 	uint32_t ActiveVertexIndex;
@@ -51,39 +41,6 @@ struct voxel_chunk_mesh{
 	uint32_t IndicesCount;
 	uint32_t ActiveIndexIndex;
 };
-
-enum voxel_push_face_work_type{
-	VOXEL_PUSH_AT_TOP,
-	VOXEL_PUSH_AT_BOTTOM,
-	VOXEL_PUSH_AT_LEFT,
-	VOXEL_PUSH_AT_RIGHT,
-	VOXEL_PUSH_AT_FRONT,
-	VOXEL_PUSH_AT_BACK,
-};
-
-struct voxel_push_face_work_queue{
-	voxel_push_face_work_queue* Sentinel;
-	voxel_push_face_work_queue* Next;
-
-	voxel_face_tex_coords_set* Set;
-
-	vec3 Pos;
-};
-
-inline void PushFaceWork(
-	voxel_push_face_work_queue* Queue, 
-	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT,
-	memory_arena* Arena)
-{
-	voxel_push_face_work_queue* NewEntry = PushStruct(Arena, voxel_push_face_work_queue);
-	
-	NewEntry->Pos = Pos;
-	NewEntry->Set = FaceT;
-
-	NewEntry->Next = Queue->Sentinel->Next;
-	Queue->Sentinel->Next = NewEntry;
-}
 
 inline void PushVoxelMeshChunkFace(
 	voxel_chunk_mesh* Mesh,
@@ -96,54 +53,6 @@ inline void PushVoxelMeshChunkFace(
 	uint32_t Index = Mesh->ActiveVertexIndex;
 	uint32_t IndexIndex = Mesh->ActiveIndexIndex;
 
-#if VOXEL_CHUNK_MESH_SOA
-	/*Positions*/
-	Mesh->PositionsX[Index] = P0.x;
-	Mesh->PositionsY[Index] = P0.y;
-	Mesh->PositionsZ[Index] = P0.z;
-
-	Mesh->PositionsX[Index + 1] = P1.x;
-	Mesh->PositionsY[Index + 1] = P1.y;
-	Mesh->PositionsZ[Index + 1] = P1.z;
-
-	Mesh->PositionsX[Index + 2] = P2.x;
-	Mesh->PositionsY[Index + 2] = P2.y;
-	Mesh->PositionsZ[Index + 2] = P2.z;
-
-	Mesh->PositionsX[Index + 3] = P3.x;
-	Mesh->PositionsY[Index + 3] = P3.y;
-	Mesh->PositionsZ[Index + 3] = P3.z;
-
-	/*Normals*/
-	Mesh->NormalsX[Index] = N.x;
-	Mesh->NormalsY[Index] = N.y;
-	Mesh->NormalsZ[Index] = N.z;
-
-	Mesh->NormalsX[Index + 1] = N.x;
-	Mesh->NormalsY[Index + 1] = N.y;
-	Mesh->NormalsZ[Index + 1] = N.z;
-
-	Mesh->NormalsX[Index + 2] = N.x;
-	Mesh->NormalsY[Index + 2] = N.y;
-	Mesh->NormalsZ[Index + 2] = N.z;
-
-	Mesh->NormalsX[Index + 3] = N.x;
-	Mesh->NormalsY[Index + 3] = N.y;
-	Mesh->NormalsZ[Index + 3] = N.z;
-
-	/*TextureCoords*/
-	Mesh->TexCoordsX[Index] = T0.x;
-	Mesh->TexCoordsY[Index] = T0.y;
-
-	Mesh->TexCoordsX[Index + 1] = T1.x;
-	Mesh->TexCoordsY[Index + 1] = T1.y;
-
-	Mesh->TexCoordsX[Index + 2] = T2.x;
-	Mesh->TexCoordsY[Index + 2] = T2.y;
-	
-	Mesh->TexCoordsX[Index + 3] = T3.x;
-	Mesh->TexCoordsY[Index + 3] = T3.y;
-#else
 	/*Positions*/
 	Mesh->Positions[Index] = P0;
 	Mesh->Positions[Index + 1] = P1;
@@ -161,8 +70,7 @@ inline void PushVoxelMeshChunkFace(
 	Mesh->TexCoords[Index + 1] = T1;
 	Mesh->TexCoords[Index + 2] = T2;
 	Mesh->TexCoords[Index + 3] = T3;
-#endif
-	
+
 	/*Indices*/
 	Mesh->Indices[IndexIndex] = Index;
 	Mesh->Indices[IndexIndex + 1] = Index + 1;
@@ -177,109 +85,88 @@ inline void PushVoxelMeshChunkFace(
 	Mesh->ActiveIndexIndex += 6; 
 }
 
-inline voxel_push_face_work_queue* MakePushFaceQueue(voxel_push_face_work_queue* NewQueue){
-
-	voxel_push_face_work_queue* PNewQueue = NewQueue;
-	
-	PNewQueue->Sentinel = PNewQueue;
-	PNewQueue->Next = 0;
-
-	return(PNewQueue);
+inline void DoFaceWorkAtFront(
+	voxel_chunk_mesh* Mesh,
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
+{
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
+		Vec3(0.0f, 0.0f, 1.0f));	
 }
 
-inline void DoPushFaceQueueWork(
-	voxel_push_face_work_queue* Queue,
+inline void DoFaceWorkAtBack(
 	voxel_chunk_mesh* Mesh,
-	voxel_push_face_work_type QueueType)
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
 {
-	voxel_push_face_work_queue* Temp = 0;
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
+		Vec3(0.0f, 0.0f, -1.0f));
+}
 
-	switch(QueueType){
-		case(VOXEL_PUSH_AT_FRONT):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T3,
-					Vec3(0.0f, 0.0f, 1.0f));				
-			}
-		}break;
-		case(VOXEL_PUSH_AT_BACK):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T3,
-					Vec3(0.0f, 0.0f, -1.0f));
-			}
-		}break;
-		case(VOXEL_PUSH_AT_TOP):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T3,
-					Vec3(0.0f, 1.0f, 0.0f));
-			}
-		}break;
-		case(VOXEL_PUSH_AT_BOTTOM):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T3,
-					Vec3(0.0f, -1.0f, 0.0f));				
-			}
-		}break;
-		case(VOXEL_PUSH_AT_LEFT):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x - 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T3,
-					Vec3(-1.0f, 0.0f, 0.0f));
-			}
-		}break;
-		case(VOXEL_PUSH_AT_RIGHT):{
-			for(Temp = Queue->Sentinel->Next;
-				Temp != 0;
-				Temp = Temp->Next)
-			{	
-				PushVoxelMeshChunkFace(
-					Mesh,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T0,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y + 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T1,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z - 0.5f), Temp->Set->T2,
-					Vec3(Temp->Pos.x + 0.5f, Temp->Pos.y - 0.5f, Temp->Pos.z + 0.5f), Temp->Set->T3,
-					Vec3(1.0f, 0.0f, 0.0f));
-			}
-		}break;
-	}
+inline void DoFaceWorkAtLeft(
+	voxel_chunk_mesh* Mesh,
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
+{
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
+		Vec3(-1.0f, 0.0f, 0.0f));	
+}
+
+inline void DoFaceWorkAtRight(
+	voxel_chunk_mesh* Mesh,
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
+{
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
+		Vec3(1.0f, 0.0f, 0.0f));
+}
+
+inline void DoFaceWorkAtTop(
+	voxel_chunk_mesh* Mesh,
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
+{
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T2,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T3,
+		Vec3(0.0f, 1.0f, 0.0f));	
+}
+
+inline void DoFaceWorkAtBottom(
+	voxel_chunk_mesh* Mesh,
+	vec3 Pos,
+	voxel_face_tex_coords_set* FaceT)
+{
+	PushVoxelMeshChunkFace(
+		Mesh,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T0,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T1,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
+		Vec3(0.0f, -1.0f, 0.0f));	
 }
 
 inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t j, int32_t k){
@@ -304,14 +191,13 @@ inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t 
 }
 
 inline void PushFaceWorkForDownVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh,
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -319,19 +205,18 @@ inline void PushFaceWorkForDownVoxel(
 		InitY - 1,
 		InitZ))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtBottom(Mesh, VoxelPos, FaceT);
 	}
 }
 
 inline void PushFaceWorkForUpperVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh, 
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -339,19 +224,18 @@ inline void PushFaceWorkForUpperVoxel(
 		InitY + 1,
 		InitZ))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtTop(Mesh, VoxelPos, FaceT);
 	}
 }
 
 inline void PushFaceWorkForLeftVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh, 
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -359,19 +243,18 @@ inline void PushFaceWorkForLeftVoxel(
 		InitY,
 		InitZ))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtLeft(Mesh, VoxelPos, FaceT);
 	}
 }
 
 inline void PushFaceWorkForRightVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh, 
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -379,19 +262,18 @@ inline void PushFaceWorkForRightVoxel(
 		InitY,
 		InitZ))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtRight(Mesh, VoxelPos, FaceT);
 	}
 }
 
 inline void PushFaceWorkForFrontVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh, 
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -399,19 +281,18 @@ inline void PushFaceWorkForFrontVoxel(
 		InitY,
 		InitZ + 1))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtFront(Mesh, VoxelPos, FaceT);
 	}
 }
 
 inline void PushFaceWorkForBackVoxel(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
+	voxel_chunk_mesh* Mesh, 
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	voxel_face_tex_coords_set* FaceT,
-	voxel_push_face_work_queue* Queue,
-	vec3 VoxelPos,
-	memory_arena* Arena)
+	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
@@ -419,7 +300,7 @@ inline void PushFaceWorkForBackVoxel(
 		InitY,
 		InitZ - 1))
 	{
-		PushFaceWork(Queue, VoxelPos, FaceT, Arena);
+		DoFaceWorkAtBack(Mesh, VoxelPos, FaceT);
 	}
 }
 
@@ -435,22 +316,6 @@ inline void GenerateVoxelMeshForChunk(
 	LoadVoxelAtlasAsset(Assets, VoxelAtlasID, true);
 	loaded_voxel_atlas* Atlas = GetVoxelAtlas(Assets, VoxelAtlasID, GenerationID);
 
-	task_with_memory* Task = BeginTaskWithMemory(Assets->TranState, false);
-
-	voxel_push_face_work_queue TopQueue_;
-	voxel_push_face_work_queue BottomQueue_;
-	voxel_push_face_work_queue LeftQueue_;
-	voxel_push_face_work_queue RightQueue_;
-	voxel_push_face_work_queue FrontQueue_;
-	voxel_push_face_work_queue BackQueue_;
-
-	voxel_push_face_work_queue* TopQueue = MakePushFaceQueue(&TopQueue_);
-	voxel_push_face_work_queue* BottomQueue = MakePushFaceQueue(&BottomQueue_);
-	voxel_push_face_work_queue* LeftQueue = MakePushFaceQueue(&LeftQueue_);
-	voxel_push_face_work_queue* RightQueue = MakePushFaceQueue(&RightQueue_);
-	voxel_push_face_work_queue* FrontQueue = MakePushFaceQueue(&FrontQueue_);
-	voxel_push_face_work_queue* BackQueue = MakePushFaceQueue(&BackQueue_);
-	
 	for(int32_t k = 1; k < IVAN_VOXEL_CHUNK_HEIGHT - 1; k++){
 		for(int32_t j = 1; j < IVAN_VOXEL_CHUNK_WIDTH - 1; j++){
 			for(int32_t i = 1; i < IVAN_VOXEL_CHUNK_WIDTH - 1; i++){
@@ -480,151 +345,97 @@ inline void GenerateVoxelMeshForChunk(
 						voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
 						voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];
 
-						/*
-							VoxelFaceTypeIndex_Top,
-							VoxelFaceTypeIndex_Bottom,
-							VoxelFaceTypeIndex_Left,
-							VoxelFaceTypeIndex_Right,
-							VoxelFaceTypeIndex_Front,
-							VoxelFaceTypeIndex_Back,
-						*/
-
 						if(UpVoxel.IsAir){
-							PushFaceWork(
-								TopQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Top], 
-								Task->Memory.Arena);
+							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 
 						if(DownVoxel.IsAir){
-							PushFaceWork(
-								BottomQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
-								Task->Memory.Arena);
+							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(RightVoxel.IsAir){
-							PushFaceWork(
-								RightQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Right], 
-								Task->Memory.Arena);
+							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
 						}
 
 						if(LeftVoxel.IsAir){
-							PushFaceWork(
-								LeftQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Left], 
-								Task->Memory.Arena);
+							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
 						}
 
 						if(FrontVoxel.IsAir){
-							PushFaceWork(
-								FrontQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Front], 
-								Task->Memory.Arena);
+							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
 						}
 
 						if(BackVoxel.IsAir){
-							PushFaceWork(
-								BackQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Back], 
-								Task->Memory.Arena);
+							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
 						}
 					}
 					else{
 
 						if(i == 0){
-							PushFaceWork(
-								LeftQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Left], 
-								Task->Memory.Arena);
+							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
 						}
 
 						if(i == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							PushFaceWork(
-								RightQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Right], 
-								Task->Memory.Arena);
+							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
 						}
 
 						if(j == 0){
-							PushFaceWork(
-								FrontQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Front], 
-								Task->Memory.Arena);
+							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
 						}
 
 						if(j == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							PushFaceWork(
-								BackQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Back], 
-								Task->Memory.Arena);
+							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
 						}
 
 						if(k == 0){
-							PushFaceWork(
-								BottomQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
-								Task->Memory.Arena);
+							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(k == (IVAN_VOXEL_CHUNK_HEIGHT - 1)){
-							PushFaceWork(
-								TopQueue, VoxelPos,  
-								&TexSet->Sets[VoxelFaceTypeIndex_Top], 
-								Task->Memory.Arena);
+							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 
 						PushFaceWorkForRightVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Right], 
-							RightQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 						PushFaceWorkForLeftVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Left], 
-							LeftQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 						PushFaceWorkForUpperVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Top], 
-							TopQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 						PushFaceWorkForDownVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
-							BottomQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 						PushFaceWorkForFrontVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Front], 
-							FrontQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 						PushFaceWorkForBackVoxel(
-							Chunk, 
+							Chunk, Result, 
 							i, k, j, 
 							&TexSet->Sets[VoxelFaceTypeIndex_Back], 
-							BackQueue, VoxelPos, Task->Memory.Arena);
+							VoxelPos);
 
 					}
 				}
 			}
 		}
 	}
-
-	DoPushFaceQueueWork(TopQueue, Result, VOXEL_PUSH_AT_TOP);
-	DoPushFaceQueueWork(BottomQueue, Result, VOXEL_PUSH_AT_BOTTOM);
-	DoPushFaceQueueWork(LeftQueue, Result, VOXEL_PUSH_AT_LEFT);
-	DoPushFaceQueueWork(RightQueue, Result, VOXEL_PUSH_AT_RIGHT);
-	DoPushFaceQueueWork(FrontQueue, Result, VOXEL_PUSH_AT_FRONT);
-	DoPushFaceQueueWork(BackQueue, Result, VOXEL_PUSH_AT_BACK);
-
-	EndTaskWithMemory(Task);
 
 	EndGeneration(Assets, GenerationID);
 }
