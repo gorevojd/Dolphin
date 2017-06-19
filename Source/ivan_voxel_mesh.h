@@ -14,10 +14,21 @@
 		and extract it there. MAYBE. Almost 10 - 16 bits will
 		be enough instead of 8 bytes = 64 bits.
 
-		3) Send x, y, z indices of the chunk to shader
+		3) SUPER STUPID: Send x, y, z indices of the chunk to shader
 		and calculate position there. MAYBE. Stupid idea.
 		Because floats takes the same memory space as 
 		integers xD
+
+		4) We don't need to send floats per tex coord. 
+		We can send index of texture in voxel atlas.
+		1 byte instead of 8.
+		
+		5) We don't actually need to send 12 bytes of 
+		vertex position data. We only can send lets say
+		7 bits per x, 9 bits per y, 7 bits per z.
+		If we want to say that we will never change 
+		chunk default metrics, than we should store 
+		4 bits per x and z and 7 bits per y;
 */
 
 #ifndef IVAN_VOXEL_MESH_H

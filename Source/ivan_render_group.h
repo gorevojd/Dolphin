@@ -25,6 +25,8 @@ enum render_group_entry_type{
 
 struct render_group_entry_header{
 	render_group_entry_type Type;
+
+	uint32 Index;
 };
 
 struct render_entry_coordinate_system{
@@ -72,7 +74,6 @@ struct render_group_transform{
 };
 
 struct render_group{
-
 	struct game_assets* Assets;
 	real32 GlobalAlphaChannel;
 

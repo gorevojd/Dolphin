@@ -77,6 +77,7 @@ inline void* PushRenderElement_(
     if (RenderGroup->PushBufferSize + Size < RenderGroup->MaxPushBufferSize){
         render_group_entry_header* Header = (render_group_entry_header*)(RenderGroup->PushBufferBase + RenderGroup->PushBufferSize);
         Header->Type = Type;
+        Header->Index = RenderGroup->PushBufferSize;
         RenderGroup->PushBufferSize += (Size  + sizeof(render_group_entry_header));
         Result = (uint8*)Header + sizeof(render_group_entry_header);
     }

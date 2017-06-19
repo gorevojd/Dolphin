@@ -220,6 +220,7 @@ INTERNAL_FUNCTION void
 UseProgramBegin(opengl_program_common* Program){
     glUseProgram(Program->ProgramHandle);
 
+#if 0
     GLuint PArray = Program->VertPID;
     GLuint NArray = Program->VertNID;
     GLuint UVArray = Program->VertUVID;
@@ -256,12 +257,14 @@ UseProgramBegin(opengl_program_common* Program){
             sizeof(textured_vertex),
             (void*)OffsetOf(textured_vertex, UV));
     }
+#endif
 }
 
 INTERNAL_FUNCTION void 
 UseProgramEnd(opengl_program_common* Program){
     glUseProgram(0);
 
+#if 0
     GLuint PArray = Program->VertPID;
     GLuint NArray = Program->VertNID;
     GLuint UVArray = Program->VertUVID;
@@ -277,6 +280,7 @@ UseProgramEnd(opengl_program_common* Program){
     if(IsValidArray(UVArray)){
         glDisableVertexAttribArray(UVArray);
     }
+#endif
 }
 
 INTERNAL_FUNCTION void 
@@ -286,8 +290,8 @@ OpenGLBindFramebuffer(uint32 TargetIndex, uint32 RenderWidth, uint32 RenderHeigh
 }
 
 inline void OpenGLRenderRectangle(
-    vec3 MinP,
-    vec3 MaxP,
+    vec2 MinP,
+    vec2 MaxP,
     vec4 PremultColor,
     vec2 MinUV = Vec2(0.0f, 0.0f),
     vec2 MaxUV = Vec2(1.0f, 1.0f))
@@ -300,23 +304,42 @@ inline void OpenGLRenderRectangle(
 
     /*Upper triangle*/
     glTexCoord2f(MinUV.x, MaxUV.y);
-    glVertex3f(MinP.x, MaxP.y, MinP.z);
+    glVertex2f(MinP.x, MaxP.y);
     glTexCoord2f(MaxUV.x, MaxUV.y);
-    glVertex3f(MaxP.x, MaxP.y, MinP.z);
+    glVertex2f(MaxP.x, MaxP.y);
     glTexCoord2f(MaxUV.x, MinUV.y);
-    glVertex3f(MaxP.x, MinP.y, MinP.z);
+    glVertex2f(MaxP.x, MinP.y);
 
     /*Lower triangle*/
     glTexCoord2f(MinUV.x, MaxUV.y);
-    glVertex3f(MinP.x, MaxP.y, MinP.z);
+    glVertex2f(MinP.x, MaxP.y);
     glTexCoord2f(MaxUV.x, MinUV.y);
-    glVertex3f(MaxP.x, MinP.y, MinP.z);
+    glVertex2f(MaxP.x, MinP.y);
     glTexCoord2f(MinUV.x, MinUV.y);
-    glVertex3f(MinP.x, MinP.y, MinP.z);
+    glVertex2f(MinP.x, MinP.y);
 
     glEnd();
 
     GL_DEBUG_MARKER();
+}
+
+inline void OpenGLSetScreenSpace(int Width, int Height){
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glMatrixMode(GL_PROJECTION);
+
+    float a = SafeRatio1(2.0f, (float)Width);
+    float b = SafeRatio1(2.0f, (float)Height);
+    
+    float ProjectionMatrix[] =
+    {
+         a,  0,  0,  0,
+         0,  -b,  0,  0,
+         0,  0,  1,  0,
+        -1, 1,  0,  1,
+    };
+    glLoadMatrixf(ProjectionMatrix);
 }
 
 inline void OpenGLRenderBitmap(
@@ -378,8 +401,8 @@ inline void OpenGLRenderBitmap(
     };
     glLoadMatrixf(ProjectionMatrix);
 
-    vec3 MinP = {0, 0, 0};
-    vec3 MaxP = {(float)Width, (float)Height, 0.0f};
+    vec2 MinP = {0, 0};
+    vec2 MaxP = {(float)Width, (float)Height};
     vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
 
     OpenGLRenderRectangle(MinP, MaxP, Color);
@@ -565,4 +588,108 @@ OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
     OpenGL.WhiteBitmap.TextureHandle = OpenGLAllocateTexture(1, 1, &OpenGL.White);
 
     GL_DEBUG_MARKER();
+}
+
+INTERNAL_FUNCTION void
+OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
+{
+    TIMED_BLOCK();
+
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
+
+    OpenGLSetScreenSpace(Width, Height);
+
+    for(int Base = 0; Base < RenderGroup->PushBufferSize;)
+    {
+        render_group_entry_header* Header = (render_group_entry_header*)
+            (RenderGroup->PushBufferBase + Base);
+        void* EntryData = (uint8*)Header + sizeof(render_group_entry_header);
+        Base += sizeof(render_group_entry_header);
+        
+        switch(Header->Type){
+            case RenderGroupEntry_render_entry_clear:{
+                render_entry_clear* EntryClear = (render_entry_clear*)EntryData;
+
+                /*Check if it is premultiplied and correct for our framebuffer*/
+                glClearColor(
+                    EntryClear->Color.x,
+                    EntryClear->Color.y,
+                    EntryClear->Color.z,
+                    EntryClear->Color.w);
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                Base += sizeof(*EntryClear);
+            }break;
+            case RenderGroupEntry_render_entry_rectangle:{
+                render_entry_rectangle* EntryRect = (render_entry_rectangle*)EntryData;
+
+                glDisable(GL_TEXTURE_2D);
+                OpenGLRenderRectangle(
+                    EntryRect->P, 
+                    EntryRect->P + EntryRect->Dim,
+                    EntryRect->Color);
+                glEnable(GL_TEXTURE_2D);
+
+                Base += sizeof(*EntryRect);
+            }break;
+            case RenderGroupEntry_render_entry_bitmap:{
+                render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
+
+                if(EntryBitmap->Bitmap->Width && EntryBitmap->Bitmap->Height){
+                    
+                    vec2 XAxis = { 1.0f, 0.0f };
+                    vec2 YAxis = { 0.0f, 1.0f };
+
+                    vec2 MinXMinY = EntryBitmap->P;
+                    vec2 MinXMaxY = EntryBitmap->P + YAxis * EntryBitmap->Bitmap->Height;
+                    vec2 MaxXMinY = EntryBitmap->P + XAxis * EntryBitmap->Bitmap->Width;
+                    vec2 MaxXMaxY = 
+                        EntryBitmap->P + 
+                        YAxis * EntryBitmap->Bitmap->Height +
+                        XAxis * EntryBitmap->Bitmap->Width;
+
+                    glBindTexture(GL_TEXTURE_2D, (GLuint)UINT32_FROM_POINTER(EntryBitmap->Bitmap->TextureHandle));
+
+                    float TexelDeltaU = 1.0f / (float)EntryBitmap->Bitmap->Width;
+                    float TexelDeltaV = 1.0f / (float)EntryBitmap->Bitmap->Height;
+
+                    vec2 MinUV = Vec2(TexelDeltaU, TexelDeltaV);
+                    vec2 MaxUV = Vec2(1.0f - TexelDeltaU, 1.0f - TexelDeltaV);
+
+                    glBegin(GL_TRIANGLES);
+                    glColor4fv(
+                        EntryBitmap->Color.E);
+
+                    glTexCoord2f(MinUV.x, MaxUV.y);
+                    glVertex2fv(MinXMaxY.E);
+                    glTexCoord2f(MaxUV.x, MaxUV.y);
+                    glVertex2fv(MaxXMaxY.E);
+                    glTexCoord2f(MaxUV.x, MinUV.y);
+                    glVertex2fv(MaxXMinY.E);
+
+                    glTexCoord2f(MinUV.x, MaxUV.y);
+                    glVertex2fv(MinXMaxY.E);
+                    glTexCoord2f(MaxUV.x, MinUV.y);
+                    glVertex2fv(MaxXMinY.E);
+                    glTexCoord2f(MinUV.x, MinUV.y);
+                    glVertex2fv(MinXMinY.E);
+
+                    glEnd();
+                }
+
+                Base += sizeof(*EntryBitmap);
+            }break;
+
+            case RenderGroupEntry_render_entry_coordinate_system:{
+                render_entry_coordinate_system* EntryCS = (render_entry_coordinate_system*)EntryData;
+
+                
+
+                Base += sizeof(*EntryCS);
+            }break;
+            
+            INVALID_DEFAULT_CASE;
+        }
+    }
 }

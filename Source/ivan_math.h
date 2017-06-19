@@ -35,7 +35,7 @@ union vec2{
 	struct{
 		float x, y;
 	};
-	float data[2];
+	float E[2];
 };
 
 union vec3{
@@ -46,7 +46,7 @@ union vec3{
         float r, g, b;
     };
     vec2 xy;
-    float data[3];
+    float E[3];
 };
 
 union vec4{
@@ -62,7 +62,7 @@ union vec4{
         float a; 
     };
     struct{ vec2 xy; vec2 zw; };
-    float data[4];
+    float E[4];
 };
 
 struct quat{

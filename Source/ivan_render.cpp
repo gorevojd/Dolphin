@@ -870,7 +870,8 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
     TIMED_BLOCK();
 
     for (int Base = 0; Base < RenderGroup->PushBufferSize;){
-        render_group_entry_header* Header = (render_group_entry_header*)(RenderGroup->PushBufferBase + Base);
+        render_group_entry_header* Header = 
+            (render_group_entry_header*)(RenderGroup->PushBufferBase + Base);
         void* EntryData = (uint8*)Header + sizeof(render_group_entry_header);
         Base += sizeof(render_group_entry_header);
         switch (Header->Type){
