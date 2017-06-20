@@ -828,6 +828,7 @@ AddVoxelAtlasAsset(
 
     Asset.DDA->VoxelAtlas.AtlasWidth = Atlas->AtlasWidth;
     Asset.DDA->VoxelAtlas.OneTextureWidth = Atlas->OneTextureWidth;
+    Asset.DDA->VoxelAtlas.BitmapID = Atlas->AtlasTexture.BitmapID;
 
     voxel_atlas_id Result = {Asset.ID};
     return(Result);

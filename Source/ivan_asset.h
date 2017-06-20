@@ -24,6 +24,8 @@ struct loaded_voxel_atlas{
 	uint32 BitmapIDOffset;
 
 	voxel_tex_coords_set* Materials;
+
+	bitmap_id BitmapID;
 };
 
 enum asset_header_type{
@@ -251,7 +253,6 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID);
 INTERNAL_FUNCTION void LoadFontAsset(game_assets* Assets, font_id, bool32 Immediate);
 INTERNAL_FUNCTION void LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id, bool32 Immediate);
-
 
 inline sound_id GetNextSoundInChain(game_assets* Assets, sound_id ID){
 	sound_id Result = {};

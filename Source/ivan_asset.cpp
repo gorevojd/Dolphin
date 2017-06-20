@@ -501,6 +501,7 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
                 loaded_voxel_atlas* Atlas = &Asset->Header->VoxelAtlas;
                 Atlas->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->VoxelAtlasBitmapIDOffset;
                 Atlas->Materials = (voxel_tex_coords_set*)(Asset->Header + 1);
+                Atlas->BitmapID = Info->BitmapID;
 
                 load_asset_work Work;
                 Work.Task = Task;
@@ -929,6 +930,14 @@ GetBitmapForGlyph(game_assets* Assets, dda_font* Info, loaded_font* Font, uint32
     uint32 Glyph = GetGlyphFromCodePoint(Info, Font, CodePoint);
     bitmap_id Result = Font->Glyphs[Glyph].BitmapID;
     Result.Value += Font->BitmapIDOffset;
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION bitmap_id
+GetBitmapForVoxelAtlas(game_assets* Assets, loaded_voxel_atlas* Atlas){
+    bitmap_id Result = Atlas->BitmapID;
+    Result.Value += Atlas->BitmapIDOffset;
 
     return(Result);
 }

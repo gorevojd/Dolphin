@@ -5,10 +5,6 @@
 #include "ivan_particle.cpp"
 #include "ivan_render.cpp"
 
-#include "ivan_voxel_world.h"
-#include "ivan_voxel_mesh.h"
-
-
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState, bool32 DependsOnGameMode){
@@ -221,67 +217,6 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             &VoxelChunk, 
             TranState->Assets,
             VoxelAtlasID);
-
-#if 1
-        GLuint MeshVAO;
-        GLuint MeshVertsVBO;
-        GLuint MeshNormsVBO;
-        GLuint MeshUVsVBO;
-        GLuint MeshEBO;
-
-        glGenVertexArrays(1, &MeshVAO);
-        glGenBuffers(1, &MeshEBO);
-        glGenBuffers(1, &MeshVertsVBO);
-        glGenBuffers(1, &MeshNormsVBO);
-        glGenBuffers(1, &MeshUVsVBO);
-
-        glBindVertexArray(MeshVAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec3), Mesh->Positions, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
-        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec3), Mesh->Normals, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
-        glBufferData(GL_ARRAY_BUFFER, Mesh->VerticesCount * sizeof(vec2), Mesh->TexCoords, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshEBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Mesh->IndicesCount * sizeof(uint32_t), Mesh->Indices, GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-        glEnableVertexAttribArray(Program.VertPID);
-        glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
-        glEnableVertexAttribArray(Program.VertNID);
-        glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
-        glEnableVertexAttribArray(Program.VertUVID);
-        glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);
-
-#else
-        GLuint MeshVAO;
-        GLuint MeshEBO;
-        GLuint MeshVBO;
-
-        glGenVertexArrays(1, &MeshVAO);
-        glGenBuffers(1, &MeshEBO);
-        glGenBuffers(1, &MeshVBO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-
-        glEnableVertexAttribArray(Program.VertPID);
-        glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, P));
-
-        glEnableVertexAttribArray(Program.VertNID);
-        glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, N));
-
-        glEnableVertexAttribArray(Program.VertUVID);
-        glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, UV));
-#endif
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glBindVertexArray(0);
 #endif
         TranState->IsInitialized = true;
     }
@@ -385,6 +320,15 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     
     MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
     WeightVector.Data[Tag_Color] = 1.0f;
+
+#if 0
+    voxel_atlas_id VoxelAtlasID = GetFirstVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas);
+    loaded_bitmap* VoxAtlBmp = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
+    if(VoxAtlBmp){
+        
+    }
+#endif
+
 /*
     SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
@@ -395,7 +339,6 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
 #if 1
     TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
-    //DesaturateBitmapQuickly((loaded_bitmap*)Buffer);
 #else
     rectangle2 ClipRect;
     ClipRect.Min.x = 0;

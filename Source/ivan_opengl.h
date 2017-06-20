@@ -9,6 +9,19 @@ struct opengl_program_common{
     GLuint VertUVID;
 };
 
+struct voxel_shader_program{
+    opengl_program_common Common;
+
+    GLint ProjectionLoc;
+    GLint ViewLoc;
+    GLint ModelLoc;
+    GLint DiffuseMapLoc;
+    GLint DirLightDirectionLoc;
+    GLint DirLightDiffuseLoc;
+    GLint DirLightAmbientLoc;
+    GLint ViewPositionLoc;
+};
+
 struct opengl_info{
     bool32 ModernContext;
 
@@ -38,6 +51,11 @@ struct open_gl{
 
 	loaded_bitmap WhiteBitmap;
 	uint32 White[4][4];
+
+    debug_platform_read_entire_file* DEBUGReadEntireFile;
+    debug_platform_free_file_memory* DEBUGFreeFileMemory;
+
+    voxel_shader_program VoxelShaderProgram;
 };
 
 #endif

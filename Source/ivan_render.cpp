@@ -940,6 +940,12 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
 
                 Base += sizeof(*EntryCS);
             }break;
+
+            case RenderGroupEntry_render_entry_voxel_mesh:{
+                render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
+
+                Base += sizeof(*EntryVoxelMesh);
+            }break;
             
             INVALID_DEFAULT_CASE;
         }

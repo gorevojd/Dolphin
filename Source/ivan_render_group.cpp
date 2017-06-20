@@ -186,7 +186,6 @@ inline void PushBitmap(
 
     bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, IVAN_MATH_ABS(Height), Offset, CAlign);
 
-#if 1
     entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Dim.P);
     if(Basis.Valid){
         if (PushedBitmap){
@@ -195,32 +194,15 @@ inline void PushBitmap(
             if(ScreenSpace == false){
                 PushedBitmap->P = Basis.P;
                 PushedBitmap->Size = Basis.Scale * Dim.Size;
-                //PushRectangle(RenderGroup, Offset, Vec2(0.02f));
             }
             else{
-                //PushedBitmap->P = Offset.xy;
                 PushedBitmap->P = Dim.P.xy;
                 PushedBitmap->Size = Vec2(Bitmap->WidthOverHeight * IVAN_MATH_ABS(Height), Height);
-                //PushRectangle(RenderGroup, Dim.P, Vec2(0.02f), Vec4(1.0f, 0.0f, 0.0f, 1.0f), true);
-                //PushRectangle(RenderGroup, Offset, Vec2(0.02f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), true);
             }
  
             PushedBitmap->Color = Color * RenderGroup->GlobalAlphaChannel;
         }
    }
-#else
-    if (PushedBitmap){
-        PushedBitmap->Bitmap = Bitmap;
-    
-        PushedBitmap->P = Offset.xy;
- 
-        PushedBitmap->Color = Color * RenderGroup->GlobalAlphaChannel;
-        PushedBitmap->Size = Dim.Size * 1000;
-
-        /*This is for test*/
-        PushRectangle(RenderGroup, Offset, Vec2(0.02f));
-    }
-#endif    
 }
 
 inline void PushBitmap(
@@ -253,6 +235,52 @@ inline loaded_font* PushFont(render_group* Group, font_id ID){
     }
 
     return(Font);
+}
+
+extern bitmap_id GetBitmapForVoxelAtlas(game_assets* Assets, loaded_voxel_atlas* Atlas);
+//extern void LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate);
+inline loaded_bitmap*
+PushVoxelAtlas(
+    render_group* RenderGroup, 
+    voxel_atlas_id ID)
+{
+    TIMED_BLOCK();
+
+    loaded_bitmap* Result = 0;
+
+#if 0
+    loaded_voxel_atlas* Atlas = GetVoxelAtlas(RenderGroup->Assets, ID, RenderGroup->GenerationID);
+    if(Atlas){
+        bitmap_id BmpID = GetBitmapForVoxelAtlas(RenderGroup->Assets, Atlas);
+        Result = GetBitmap(RenderGroup->Assets, BmpID, RenderGroup->GenerationID);
+		if (Result) {
+            
+        }
+		else {
+			LoadBitmapAsset(RenderGroup->Assets, BmpID, false);
+		}
+    }
+    else{
+        LoadVoxelAtlasAsset(RenderGroup->Assets, ID, false);
+    }
+#endif
+
+    return(Result);
+}
+
+inline void PushVoxelChunkMesh(
+    render_group* RenderGroup,
+    voxel_chunk_mesh* Mesh,
+    voxel_atlas_id VoxelAtlasID,
+    vec3 Pos)
+{
+    render_entry_voxel_mesh* PushedMesh = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_voxel_mesh);
+
+    if(PushedMesh){
+        PushedMesh->Mesh = Mesh;
+        PushedMesh->Bitmap = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
+        PushedMesh->P = Pos;
+    }
 }
 
 inline void PushRectangleOutline(

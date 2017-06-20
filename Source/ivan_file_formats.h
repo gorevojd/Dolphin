@@ -79,6 +79,7 @@ struct dda_voxel_atlas_texture{
 struct dda_voxel_atlas{	
 	uint32 AtlasWidth;
 	uint32 OneTextureWidth;
+	bitmap_id BitmapID;
 };
 
 struct dda_tag{

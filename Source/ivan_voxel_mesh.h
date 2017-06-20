@@ -1,6 +1,3 @@
-//TODO(DIMA): 
-//TODO(DIMA): 
-
 /*
 	TODO(DIMA): 
 		Think about how to allocate memory for mesh
@@ -14,21 +11,18 @@
 		and extract it there. MAYBE. Almost 10 - 16 bits will
 		be enough instead of 8 bytes = 64 bits.
 
-		3) SUPER STUPID: Send x, y, z indices of the chunk to shader
-		and calculate position there. MAYBE. Stupid idea.
-		Because floats takes the same memory space as 
-		integers xD
-
-		4) We don't need to send floats per tex coord. 
+		3) We don't need to send floats per tex coord. 
 		We can send index of texture in voxel atlas.
 		1 byte instead of 8.
 		
-		5) We don't actually need to send 12 bytes of 
+		4) We don't actually need to send 12 bytes of 
 		vertex position data. We only can send lets say
 		7 bits per x, 9 bits per y, 7 bits per z.
 		If we want to say that we will never change 
 		chunk default metrics, than we should store 
-		4 bits per x and z and 7 bits per y;
+		4 bits per x and z and 7 bits per y. So after
+		building mesh we can apply model transform
+		matrix to transpose our chunk to needed place.
 */
 
 #ifndef IVAN_VOXEL_MESH_H
@@ -314,141 +308,4 @@ inline void PushFaceWorkForBackVoxel(
 		DoFaceWorkAtBack(Mesh, VoxelPos, FaceT);
 	}
 }
-
-//TODO(Dima): How do I actually want to allocate MESH result???? And where???
-inline void GenerateVoxelMeshForChunk(
-	voxel_chunk_mesh* Result, 
-	voxel_chunk* Chunk, 
-	game_assets* Assets,
-	voxel_atlas_id VoxelAtlasID)
-{
-	uint32_t GenerationID = BeginGeneration(Assets);
-	
-	LoadVoxelAtlasAsset(Assets, VoxelAtlasID, true);
-	loaded_voxel_atlas* Atlas = GetVoxelAtlas(Assets, VoxelAtlasID, GenerationID);
-
-	for(int32_t k = 1; k < IVAN_VOXEL_CHUNK_HEIGHT - 1; k++){
-		for(int32_t j = 1; j < IVAN_VOXEL_CHUNK_WIDTH - 1; j++){
-			for(int32_t i = 1; i < IVAN_VOXEL_CHUNK_WIDTH - 1; i++){
-
-				voxel ToCheck = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)];
-
-				vec3 VoxelPos;
-				VoxelPos.x = i + 0.5f;
-				VoxelPos.y = k + 0.5f;
-				VoxelPos.z = j + 0.5f;
-				
-				voxel_tex_coords_set* TexSet = 0;
-				if(Atlas){
-					TexSet = &Atlas->Materials[ToCheck.Type];
-				}
-
-				if(!ToCheck.IsAir && TexSet){
-
-					if((i >= 1 && i < (IVAN_VOXEL_CHUNK_WIDTH - 1)) &&
-						(j >= 1 && j < (IVAN_VOXEL_CHUNK_WIDTH - 1)) &&
-						(k >= 1 && k < (IVAN_VOXEL_CHUNK_HEIGHT - 1)))
-					{
-						voxel UpVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k + 1)];
-						voxel DownVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k - 1)];
-						voxel RightVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i + 1, j, k)];
-						voxel LeftVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i - 1, j, k)];
-						voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
-						voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];
-
-						if(UpVoxel.IsAir){
-							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
-						}
-
-						if(DownVoxel.IsAir){
-							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
-						}
-
-						if(RightVoxel.IsAir){
-							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
-						}
-
-						if(LeftVoxel.IsAir){
-							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
-						}
-
-						if(FrontVoxel.IsAir){
-							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
-						}
-
-						if(BackVoxel.IsAir){
-							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
-						}
-					}
-					else{
-
-						if(i == 0){
-							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
-						}
-
-						if(i == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
-						}
-
-						if(j == 0){
-							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
-						}
-
-						if(j == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
-						}
-
-						if(k == 0){
-							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
-						}
-
-						if(k == (IVAN_VOXEL_CHUNK_HEIGHT - 1)){
-							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
-						}
-
-						PushFaceWorkForRightVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Right], 
-							VoxelPos);
-
-						PushFaceWorkForLeftVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Left], 
-							VoxelPos);
-
-						PushFaceWorkForUpperVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Top], 
-							VoxelPos);
-
-						PushFaceWorkForDownVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
-							VoxelPos);
-
-						PushFaceWorkForFrontVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Front], 
-							VoxelPos);
-
-						PushFaceWorkForBackVoxel(
-							Chunk, Result, 
-							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Back], 
-							VoxelPos);
-
-					}
-				}
-			}
-		}
-	}
-
-	EndGeneration(Assets, GenerationID);
-}
-
 #endif

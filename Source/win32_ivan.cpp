@@ -1129,7 +1129,9 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
             wglSwapIntervalEXT(1);
         }
 
-        OpenGLInit(Info, OpenGL.SupportsSRGBFramebuffer);
+        OpenGLInit(Info, OpenGL.SupportsSRGBFramebuffer, 
+            DEBUGPlatformReadEntireFile, 
+            DEBUGPlatformFreeFileMemory);
     }
 
     return(OpenGLRC);

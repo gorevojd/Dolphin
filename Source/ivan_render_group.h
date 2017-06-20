@@ -21,6 +21,7 @@ enum render_group_entry_type{
 	RenderGroupEntry_render_entry_rectangle,
 	RenderGroupEntry_render_entry_bitmap,
 	RenderGroupEntry_render_entry_coordinate_system,
+	RenderGroupEntry_render_entry_voxel_mesh,
 };
 
 struct render_group_entry_header{
@@ -54,6 +55,15 @@ struct render_entry_bitmap{
 	vec2 Size;
 };
 
+struct voxel_chunk_mesh;
+struct render_entry_voxel_mesh{
+	voxel_chunk_mesh* Mesh;
+
+	loaded_bitmap* Bitmap;
+
+	vec3 P;
+};
+
 struct bitmap_dimension{
 	vec2 Size;
 	vec2 Align;
@@ -71,6 +81,10 @@ struct render_group_transform{
 
 	vec3 OffsetP;
 	real32 Scale;
+};
+
+struct render_setup{
+	
 };
 
 struct render_group{

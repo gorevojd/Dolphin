@@ -17,6 +17,9 @@
 #include "ivan_particle.h"
 #include "ivan_render.h"
 
+#include "ivan_voxel_world.h"
+#include "ivan_voxel_mesh.h"
+
 struct task_with_memory{
     bool32 BeingUsed;
     memory_arena Arena;

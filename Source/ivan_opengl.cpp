@@ -1,4 +1,5 @@
 #include "ivan_render_group.h"
+#include "ivan_voxel_mesh.h"
 
 #define GL_TOSTR__(x) #x
 #define GL_TOSTR_(x) GL_TOSTR__(x)
@@ -44,6 +45,7 @@
 
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS       0x8242
 #define GL_ARRAY_BUFFER                   0x8892
+#define GL_ELEMENT_ARRAY_BUFFER           0x8893
 #define GL_STREAM_DRAW                    0x88E0
 #define GL_STREAM_READ                    0x88E1
 #define GL_STREAM_COPY                    0x88E2
@@ -149,7 +151,7 @@ OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common*
     glAttachShader(ProgramID, FragmentShaderID);
     glLinkProgram(ProgramID);
 
-    glValidateProgram(ProgramID);
+    //glValidateProgram(ProgramID);
     GLint ProgramLinked = false;
     glGetProgramiv(ProgramID, GL_LINK_STATUS, &ProgramLinked);
     if(!ProgramLinked){
@@ -161,8 +163,8 @@ OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common*
     }
 
     Common->ProgramHandle = ProgramID;
-    Common->VertPID = glGetAttribLocation(ProgramID, "VertP");
-    Common->VertNID = glGetAttribLocation(ProgramID, "VertN");
+    Common->VertPID = glGetAttribLocation(ProgramID, "VertPos");
+    Common->VertNID = glGetAttribLocation(ProgramID, "VertNorm");
     Common->VertUVID = glGetAttribLocation(ProgramID, "VertUV");
 
     glDeleteShader(VertexShaderID);
@@ -181,12 +183,10 @@ INTERNAL_FUNCTION GLuint
 OpenGLLoadProgram(
     char* VertexPath, 
     char* FragmentPath, 
-    opengl_program_common* Common,
-    debug_platform_read_entire_file* DEBUGReadEntireFile,
-    debug_platform_free_file_memory* DEBUGFreeFileMemory)
+    opengl_program_common* Common)
 {
-    debug_read_file_result VertResult = DEBUGReadEntireFile(VertexPath);
-    debug_read_file_result FragResult = DEBUGReadEntireFile(FragmentPath);
+    debug_read_file_result VertResult = OpenGL.DEBUGReadEntireFile(VertexPath);
+    debug_read_file_result FragResult = OpenGL.DEBUGReadEntireFile(FragmentPath);
 
     if(VertResult.ContentsSize == 0){        
         INVALID_CODE_PATH;
@@ -201,8 +201,28 @@ OpenGLLoadProgram(
         (char*)FragResult.Contents,
         Common);
 
-    DEBUGFreeFileMemory(VertResult.Contents);
-    DEBUGFreeFileMemory(FragResult.Contents);
+    OpenGL.DEBUGFreeFileMemory(VertResult.Contents);
+    OpenGL.DEBUGFreeFileMemory(FragResult.Contents);
+
+    return(Common->ProgramHandle);
+}
+
+INTERNAL_FUNCTION void
+OpenGLCompileVoxelShaderProgram(voxel_shader_program* Result)
+{
+    GLuint Prog = OpenGLLoadProgram(
+        "../Data/Shaders/voxel_shader.vert",
+        "../Data/Shaders/voxel_shader.frag",
+        &Result->Common);
+
+    Result->ProjectionLoc = glGetUniformLocation(Prog, "Projection");
+    Result->ViewLoc = glGetUniformLocation(Prog, "View");
+    Result->ModelLoc = glGetUniformLocation(Prog, "Model");
+    Result->ViewPositionLoc = glGetUniformLocation(Prog, "ViewPosition");
+    Result->DiffuseMapLoc = glGetUniformLocation(Prog, "DiffuseMap");
+    Result->DirLightDirectionLoc = glGetUniformLocation(Prog, "DirLight.Direction");
+    Result->DirLightDiffuseLoc = glGetUniformLocation(Prog, "DirLight.Diffuse");
+    Result->DirLightAmbientLoc = glGetUniformLocation(Prog, "DirLight.Ambient");
 }
 
 INTERNAL_FUNCTION bool32 
@@ -281,6 +301,11 @@ UseProgramEnd(opengl_program_common* Program){
         glDisableVertexAttribArray(UVArray);
     }
 #endif
+}
+
+INTERNAL_FUNCTION void 
+UseProgramBegin(voxel_shader_program* Program){
+
 }
 
 INTERNAL_FUNCTION void 
@@ -522,12 +547,20 @@ OpenGLManageTextures(texture_op* First){
 }
 
 INTERNAL_FUNCTION void 
-OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
+OpenGLInit(
+    opengl_info Info, 
+    bool32 FramebufferSupportsSRGB,
+    debug_platform_read_entire_file* DEBUGReadEntireFile,
+    debug_platform_free_file_memory* DEBUGFreeFileMemory)
+{
 
     GL_DEBUG_MARKER();
 
     OpenGL.ShaderSimTexReadSRGB = true;
     OpenGL.ShaderSimTexWriteSRGB = true;
+
+    OpenGL.DEBUGReadEntireFile = DEBUGReadEntireFile;
+    OpenGL.DEBUGFreeFileMemory = DEBUGFreeFileMemory;
 
     glGenTextures(1, &OpenGL.ReservedBlitTexture);
 
@@ -586,6 +619,9 @@ OpenGLInit(opengl_info Info, bool32 FramebufferSupportsSRGB){
     OpenGL.WhiteBitmap.Width = 4;
     OpenGL.WhiteBitmap.Height = 4;
     OpenGL.WhiteBitmap.TextureHandle = OpenGLAllocateTexture(1, 1, &OpenGL.White);
+
+    OpenGLFreeProgram(&OpenGL.VoxelShaderProgram.Common);
+    OpenGLCompileVoxelShaderProgram(&OpenGL.VoxelShaderProgram);
 
     GL_DEBUG_MARKER();
 }
@@ -658,8 +694,7 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                     vec2 MaxUV = Vec2(1.0f - TexelDeltaU, 1.0f - TexelDeltaV);
 
                     glBegin(GL_TRIANGLES);
-                    glColor4fv(
-                        EntryBitmap->Color.E);
+                    glColor4fv(EntryBitmap->Color.E);
 
                     glTexCoord2f(MinUV.x, MaxUV.y);
                     glVertex2fv(MinXMaxY.E);
@@ -687,6 +722,98 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                 
 
                 Base += sizeof(*EntryCS);
+            }break;
+
+            case RenderGroupEntry_render_entry_voxel_mesh:{
+                render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
+
+                voxel_shader_program* Program = &OpenGL.VoxelShaderProgram;
+                opengl_program_common* Common = &Program->Common;
+#if 0
+#if 1
+                GLuint MeshVAO;
+                GLuint MeshVertsVBO;
+                GLuint MeshNormsVBO;
+                GLuint MeshUVsVBO;
+                GLuint MeshEBO;
+
+                glGenVertexArrays(1, &MeshVAO);
+                glGenBuffers(1, &MeshEBO);
+                glGenBuffers(1, &MeshVertsVBO);
+                glGenBuffers(1, &MeshNormsVBO);
+                glGenBuffers(1, &MeshUVsVBO);
+
+                glBindVertexArray(MeshVAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+                glBufferData(GL_ARRAY_BUFFER, 
+                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec3), 
+                    EntryVoxelMesh->Mesh->Positions, GL_DYNAMIC_DRAW);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
+                glBufferData(GL_ARRAY_BUFFER, 
+                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec3), 
+                    EntryVoxelMesh->Mesh->Normals, GL_DYNAMIC_DRAW);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
+                glBufferData(GL_ARRAY_BUFFER, 
+                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec2), 
+                    EntryVoxelMesh->Mesh->TexCoords, GL_DYNAMIC_DRAW);
+                
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshEBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+                    EntryVoxelMesh->Mesh->IndicesCount * sizeof(uint32_t), 
+                    EntryVoxelMesh->Mesh->Indices, GL_DYNAMIC_DRAW);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+                glEnableVertexAttribArray(Common->VertPID);
+                glVertexAttribPointer(Common->VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
+                glEnableVertexAttribArray(Common->VertNID);
+                glVertexAttribPointer(Common->VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
+                glEnableVertexAttribArray(Common->VertUVID);
+                glVertexAttribPointer(Common->VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);  
+#else
+                GLuint MeshVAO;
+                GLuint MeshEBO;
+                GLuint MeshVBO;
+
+                glGenVertexArrays(1, &MeshVAO);
+                glGenBuffers(1, &MeshEBO);
+                glGenBuffers(1, &MeshVBO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+
+                glEnableVertexAttribArray(Program.VertPID);
+                glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, P));
+
+                glEnableVertexAttribArray(Program.VertNID);
+                glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, N));
+
+                glEnableVertexAttribArray(Program.VertUVID);
+                glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, UV));
+#endif
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+
+                glBindVertexArray(MeshVAO);
+
+                UseProgramBegin(*Program);
+
+                glDrawElements(
+                    GL_TRIANGLES, 
+                    EntryVoxelMesh->IndicesCount, 
+                    GL_UNSIGNED_INT, 
+                    EntryVoxelMesh->Indices);
+
+                UseProgramEnd(*Program);
+
+                glBindVertexArray(0);
+#endif
+                Base += sizeof(*EntryVoxelMesh);
             }break;
             
             INVALID_DEFAULT_CASE;
