@@ -66,33 +66,31 @@ typedef char GLchar;
 typedef ptrdiff_t GLsizeiptr;
 typedef ptrdiff_t GLintptr;
 
-typedef void WINAPI gl_tex_image_2d_multisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
-typedef void WINAPI gl_bind_framebuffer(GLenum target, GLuint framebuffer);
-typedef void WINAPI gl_gen_framebuffers(GLsizei n, GLuint *framebuffers);
-typedef void WINAPI gl_framebuffer_texture_2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-typedef GLenum WINAPI gl_check_framebuffer_status(GLenum target);
-typedef void WINAPI gl_blit_framebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
-typedef void WINAPI gl_attach_shader(GLuint program, GLuint shader);
-typedef void WINAPI gl_compile_shader(GLuint shader);
-typedef GLuint WINAPI gl_create_program(void);
-typedef GLuint WINAPI gl_create_shader(GLenum type);
-typedef void WINAPI gl_link_program(GLuint program);
-typedef void WINAPI gl_shader_source(GLuint shader, GLsizei count, GLchar **string, GLint *length);
-typedef void WINAPI gl_use_program(GLuint program);
-typedef void WINAPI gl_get_program_info_log(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-typedef void WINAPI gl_get_shader_info_log(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-typedef void WINAPI gl_validate_program(GLuint program);
-typedef void WINAPI gl_get_program_iv(GLuint program, GLenum pname, GLint *params);
-typedef void WINAPI gl_get_shader_iv(GLuint shader, GLenum pname, GLint *params);
-typedef GLint WINAPI gl_get_uniform_location (GLuint program, const GLchar *name);
-typedef void WINAPI gl_uniform_4fv(GLint location, GLsizei count, const GLfloat *value);
-typedef void WINAPI gl_uniform_matrix_4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-typedef void WINAPI gl_uniform_1i(GLint location, GLint v0);
-
+typedef void WINAPI type_glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
+typedef void WINAPI type_glBindFramebuffer(GLenum target, GLuint framebuffer);
+typedef void WINAPI type_glGenFramebuffers(GLsizei n, GLuint *framebuffers);
+typedef void WINAPI type_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef GLenum WINAPI type_glCheckFramebufferStatus(GLenum target);
+typedef void WINAPI type_glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+typedef void WINAPI type_glAttachShader(GLuint program, GLuint shader);
+typedef void WINAPI type_glCompileShader(GLuint shader);
+typedef GLuint WINAPI type_glCreateProgram(void);
+typedef GLuint WINAPI type_glCreateShader(GLenum type);
+typedef void WINAPI type_glLinkProgram(GLuint program);
+typedef void WINAPI type_glShaderSource(GLuint shader, GLsizei count, GLchar **string, GLint *length);
+typedef void WINAPI type_glUseProgram(GLuint program);
+typedef void WINAPI type_glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+typedef void WINAPI type_glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+typedef void WINAPI type_glValidateProgram(GLuint program);
+typedef void WINAPI type_glGetProgramiv(GLuint program, GLenum pname, GLint *params);
+typedef void WINAPI type_glGetShaderiv(GLuint shader, GLenum pname, GLint *params);
+typedef GLint WINAPI type_glGetUniformLocation (GLuint program, const GLchar *name);
+typedef void WINAPI type_glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
+typedef void WINAPI type_glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+typedef void WINAPI type_glUniform1i(GLint location, GLint v0);
 typedef void WINAPI type_glUniform1f(GLint location, GLfloat v0);
 typedef void WINAPI type_glUniform2fv(GLint location, GLsizei count, const GLfloat *value);
 typedef void WINAPI type_glUniform3fv(GLint location, GLsizei count, const GLfloat *value);
-
 typedef void WINAPI type_glEnableVertexAttribArray(GLuint index);
 typedef void WINAPI type_glDisableVertexAttribArray(GLuint index);
 typedef GLint WINAPI type_glGetAttribLocation(GLuint program, const GLchar *name);
@@ -106,35 +104,14 @@ typedef void WINAPI type_glActiveTexture(GLenum texture);
 typedef void WINAPI type_glDeleteShader(GLuint shader);
 typedef void WINAPI type_glDeleteProgram(GLuint program);
 typedef void WINAPI type_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers);
+typedef const GLubyte * WINAPI type_glGetStringi(GLenum name, GLuint index);
+typedef void WINAPI type_glUniform2f(GLint location, GLfloat v0, GLfloat v1);
+typedef void WINAPI type_glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+typedef void WINAPI type_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
 
 #define GL_DEBUG_CALLBACK(Name) void WINAPI Name(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
 typedef GL_DEBUG_CALLBACK(GLDEBUGPROC);
 typedef void WINAPI type_glDebugMessageCallbackARB(GLDEBUGPROC *callback, const void *userParam);
-
-typedef const GLubyte * WINAPI type_glGetStringi(GLenum name, GLuint index);
-
-GLOBAL_VARIABLE gl_tex_image_2d_multisample *glTexImage2DMultisample;
-GLOBAL_VARIABLE gl_bind_framebuffer *glBindFramebuffer;
-GLOBAL_VARIABLE gl_gen_framebuffers *glGenFramebuffers;
-GLOBAL_VARIABLE gl_framebuffer_texture_2D *glFramebufferTexture2D;
-GLOBAL_VARIABLE gl_check_framebuffer_status *glCheckFramebufferStatus;
-GLOBAL_VARIABLE gl_blit_framebuffer *glBlitFramebuffer;
-GLOBAL_VARIABLE gl_attach_shader *glAttachShader;
-GLOBAL_VARIABLE gl_compile_shader *glCompileShader;
-GLOBAL_VARIABLE gl_create_program *glCreateProgram;
-GLOBAL_VARIABLE gl_create_shader *glCreateShader;
-GLOBAL_VARIABLE gl_link_program *glLinkProgram;
-GLOBAL_VARIABLE gl_shader_source *glShaderSource;
-GLOBAL_VARIABLE gl_use_program *glUseProgram;
-GLOBAL_VARIABLE gl_get_program_info_log *glGetProgramInfoLog;
-GLOBAL_VARIABLE gl_get_shader_info_log *glGetShaderInfoLog;
-GLOBAL_VARIABLE gl_validate_program *glValidateProgram;
-GLOBAL_VARIABLE gl_get_program_iv *glGetProgramiv;
-GLOBAL_VARIABLE gl_get_shader_iv *glGetShaderiv;
-GLOBAL_VARIABLE gl_get_uniform_location *glGetUniformLocation;
-GLOBAL_VARIABLE gl_uniform_4fv *glUniform4fv;
-GLOBAL_VARIABLE gl_uniform_matrix_4fv *glUniformMatrix4fv;
-GLOBAL_VARIABLE gl_uniform_1i *glUniform1i;
 
 #define OPENGL_GLOBAL_FUNCTION(Name) GLOBAL_VARIABLE type_##Name* Name;
 OPENGL_GLOBAL_FUNCTION(glUniform1f);
@@ -155,6 +132,31 @@ OPENGL_GLOBAL_FUNCTION(glActiveTexture);
 OPENGL_GLOBAL_FUNCTION(glDeleteProgram);
 OPENGL_GLOBAL_FUNCTION(glDeleteShader);
 OPENGL_GLOBAL_FUNCTION(glDeleteFramebuffers);
+OPENGL_GLOBAL_FUNCTION(glTexImage2DMultisample);
+OPENGL_GLOBAL_FUNCTION(glBindFramebuffer);
+OPENGL_GLOBAL_FUNCTION(glGenFramebuffers);
+OPENGL_GLOBAL_FUNCTION(glFramebufferTexture2D);
+OPENGL_GLOBAL_FUNCTION(glCheckFramebufferStatus);
+OPENGL_GLOBAL_FUNCTION(glBlitFramebuffer);
+OPENGL_GLOBAL_FUNCTION(glAttachShader);
+OPENGL_GLOBAL_FUNCTION(glCompileShader);
+OPENGL_GLOBAL_FUNCTION(glCreateProgram);
+OPENGL_GLOBAL_FUNCTION(glCreateShader);
+OPENGL_GLOBAL_FUNCTION(glLinkProgram);
+OPENGL_GLOBAL_FUNCTION(glShaderSource);
+OPENGL_GLOBAL_FUNCTION(glUseProgram);
+OPENGL_GLOBAL_FUNCTION(glGetProgramInfoLog);
+OPENGL_GLOBAL_FUNCTION(glGetShaderInfoLog);
+OPENGL_GLOBAL_FUNCTION(glValidateProgram);
+OPENGL_GLOBAL_FUNCTION(glGetProgramiv);
+OPENGL_GLOBAL_FUNCTION(glGetShaderiv);
+OPENGL_GLOBAL_FUNCTION(glGetUniformLocation);
+OPENGL_GLOBAL_FUNCTION(glUniform4fv);
+OPENGL_GLOBAL_FUNCTION(glUniformMatrix4fv);
+OPENGL_GLOBAL_FUNCTION(glUniform1i);
+OPENGL_GLOBAL_FUNCTION(glUniform2f);
+OPENGL_GLOBAL_FUNCTION(glUniform3f);
+OPENGL_GLOBAL_FUNCTION(glUniform4f);
 
 #include "ivan_opengl.h"
 GLOBAL_VARIABLE open_gl OpenGL;
@@ -665,10 +667,6 @@ HandleDebugCycleCounter(game_memory* Memory){
 INTERNAL_FUNCTION void
 Win32ToggleFullscreen(HWND Window)
 {
-    // NOTE(casey): This follows Raymond Chen's prescription
-    // for fullscreen toggling, see:
-    // http://blogs.msdn.com/b/oldnewthing/archive/2010/04/12/9994016.aspx
-
     DWORD Style = GetWindowLong(Window, GWL_STYLE);
     if (Style & WS_OVERLAPPEDWINDOW)
     {
@@ -745,6 +743,7 @@ Win32InitScreenBuffer(win32_offscreen_buffer* Buffer, int Width, int Height){
 
 INTERNAL_FUNCTION void
 Win32DisplayScreenBufferToWindow(
+    game_render_commands* Commands,
     HDC hdc,
     win32_offscreen_buffer* Buffer,
     int TargetWidth,
@@ -802,13 +801,16 @@ Win32DisplayScreenBufferToWindow(
     DrawRegion.MaxX = WindowDim.Width;
     DrawRegion.MaxY = WindowDim.Height;
 
-
+#if 0
     OpenGLRenderBitmap(
         OutputTarget.Width, 
         OutputTarget.Height, 
         OutputTarget.Memory,
         DrawRegion, Vec4(1.0f, 1.0f, 1.0f, 1.0f),
         OpenGL.ReservedBlitTexture);
+#else
+    OpenGLGroupToOutput(Commands, DrawRegion, Buffer->Width, Buffer->Height);
+#endif
 
     SwapBuffers(hdc);
 #endif
@@ -1090,41 +1092,42 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         WIN32_GET_OPENGL_FUNCTION(glDeleteShader);
         WIN32_GET_OPENGL_FUNCTION(glDeleteProgram);
         WIN32_GET_OPENGL_FUNCTION(glDeleteFramebuffers);
-
+        WIN32_GET_OPENGL_FUNCTION(glTexImage2DMultisample);
+        WIN32_GET_OPENGL_FUNCTION(glBlitFramebuffer);
+        WIN32_GET_OPENGL_FUNCTION(glAttachShader);
+        WIN32_GET_OPENGL_FUNCTION(glCompileShader);
+        WIN32_GET_OPENGL_FUNCTION(glCreateProgram);
+        WIN32_GET_OPENGL_FUNCTION(glCreateShader);
+        WIN32_GET_OPENGL_FUNCTION(glLinkProgram);
+        WIN32_GET_OPENGL_FUNCTION(glShaderSource);
+        WIN32_GET_OPENGL_FUNCTION(glUseProgram);
+        WIN32_GET_OPENGL_FUNCTION(glGetProgramInfoLog);
+        WIN32_GET_OPENGL_FUNCTION(glGetShaderInfoLog);
+        WIN32_GET_OPENGL_FUNCTION(glValidateProgram);
+        WIN32_GET_OPENGL_FUNCTION(glGetProgramiv);
+        WIN32_GET_OPENGL_FUNCTION(glGetShaderiv);
+        WIN32_GET_OPENGL_FUNCTION(glGetUniformLocation);
+        WIN32_GET_OPENGL_FUNCTION(glUniform4fv);
+        WIN32_GET_OPENGL_FUNCTION(glUniformMatrix4fv);
+        WIN32_GET_OPENGL_FUNCTION(glUniform1i);
         WIN32_GET_OPENGL_FUNCTION(glUniform1f);
         WIN32_GET_OPENGL_FUNCTION(glUniform2fv);
         WIN32_GET_OPENGL_FUNCTION(glUniform3fv);
+        WIN32_GET_OPENGL_FUNCTION(glUniform2f);
+        WIN32_GET_OPENGL_FUNCTION(glUniform3f);
+        WIN32_GET_OPENGL_FUNCTION(glUniform4f);
 
         opengl_info Info = OpenGLGetInfo(ModernContext);
 
         if(Info.GL_ARB_framebuffer_object){
-            glBindFramebuffer = (gl_bind_framebuffer*)wglGetProcAddress("glBindFramebuffer");
-            glGenFramebuffers = (gl_gen_framebuffers*)wglGetProcAddress("glGenFramebuffers");
-            glFramebufferTexture2D = (gl_framebuffer_texture_2D*)wglGetProcAddress("glFramebufferTexture2D");
-            glCheckFramebufferStatus = (gl_check_framebuffer_status*)wglGetProcAddress("glCheckFramebufferStatus");
+            WIN32_GET_OPENGL_FUNCTION(glBindFramebuffer);
+            WIN32_GET_OPENGL_FUNCTION(glGenFramebuffers);
+            WIN32_GET_OPENGL_FUNCTION(glFramebufferTexture2D);
+            WIN32_GET_OPENGL_FUNCTION(glCheckFramebufferStatus);
         }
-
-        glTexImage2DMultisample = (gl_tex_image_2d_multisample *)wglGetProcAddress("glTexImage2DMultisample");
-        glBlitFramebuffer = (gl_blit_framebuffer *)wglGetProcAddress("glBlitFramebuffer");
         
-        glAttachShader = (gl_attach_shader *)wglGetProcAddress("glAttachShader");
-        glCompileShader = (gl_compile_shader *)wglGetProcAddress("glCompileShader");
-        glCreateProgram = (gl_create_program *)wglGetProcAddress("glCreateProgram");
-        glCreateShader = (gl_create_shader *)wglGetProcAddress("glCreateShader");
-        glLinkProgram = (gl_link_program *)wglGetProcAddress("glLinkProgram");
-        glShaderSource = (gl_shader_source *)wglGetProcAddress("glShaderSource");
-        glUseProgram = (gl_use_program *)wglGetProcAddress("glUseProgram");
-        glGetProgramInfoLog = (gl_get_program_info_log *)wglGetProcAddress("glGetProgramInfoLog");
-        glGetShaderInfoLog = (gl_get_shader_info_log *)wglGetProcAddress("glGetShaderInfoLog");
-        glValidateProgram = (gl_validate_program *)wglGetProcAddress("glValidateProgram");
-        glGetProgramiv = (gl_get_program_iv *)wglGetProcAddress("glGetProgramiv");
-        glGetShaderiv = (gl_get_shader_iv *)wglGetProcAddress("glGetShaderiv");
-        glGetUniformLocation = (gl_get_uniform_location *)wglGetProcAddress("glGetUniformLocation");
-        glUniform4fv = (gl_uniform_4fv *)wglGetProcAddress("glUniform4fv");
-        glUniformMatrix4fv = (gl_uniform_matrix_4fv *)wglGetProcAddress("glUniformMatrix4fv");
-        glUniform1i = (gl_uniform_1i *)wglGetProcAddress("glUniform1i");
+        wgl_swap_interval_ext* wglSwapIntervalEXT = (wgl_swap_interval_ext*)wglGetProcAddress("wglSwapIntervalEXT");
 
-        wglSwapIntervalEXT = (wgl_swap_interval_ext*)wglGetProcAddress("wglSwapIntervalEXT");
         if(wglSwapIntervalEXT){
             wglSwapIntervalEXT(1);
         }
@@ -1464,7 +1467,6 @@ int WINAPI WinMain(
     platform_work_queue LowPriorityQueue = {};
     Win32MakeQueue(&LowPriorityQueue, ArrayCount(LowPriStartups), LowPriStartups);
 
-
     game_memory GameMemory = {};
     GameMemory.PermanentStorageSize = GD_MEGABYTES(200);
     GameMemory.TransientStorageSize = GD_MEGABYTES(800);
@@ -1504,6 +1506,16 @@ int WINAPI WinMain(
         texture_op* Op = TextureOpQueue->FirstFree + TextureOpIndex;
         Op->Next = TextureOpQueue->FirstFree + TextureOpIndex + 1;
     }
+
+    uint32 PushBufferSize = GD_MEGABYTES(5);
+    uint8* PushBuffer = (uint8*)VirtualAlloc(0, PushBufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
+    game_render_commands RenderCommands = DefaultRenderCommands(
+        PushBufferSize,
+        PushBuffer,
+        (uint32)GlobalScreen.Width,
+        (uint32)GlobalScreen.Height);
+
 
     char* SourceDLLName = "ivan.dll";
     char* TempDLLName = "ivan_temp.dll";
@@ -1749,12 +1761,14 @@ int WINAPI WinMain(
         GameBuffer.Height = GlobalScreen.Height;
 
         if(Game.GameUpdateAndRender){
-            Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &GameSoundOutputBuffer);
+            Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &RenderCommands);
         }
         if(Game.GameGetSoundSamples){
             Game.GameGetSoundSamples(&GameMemory, &GameSoundOutputBuffer);
         }
         HandleDebugCycleCounter(&GameMemory);
+
+
 
         if (SoundIsValid){
             Win32FillSoundBuffer(&SoundOutput, ByteToLock, BytesToLock, &GameSoundOutputBuffer);
@@ -1776,8 +1790,10 @@ int WINAPI WinMain(
         }
 
         HDC hdc = GetDC(GlobalScreen.Window);
-        Win32DisplayScreenBufferToWindow(hdc, &GlobalScreen, WindowDim.Width, WindowDim.Height);
+        Win32DisplayScreenBufferToWindow(&RenderCommands, hdc, &GlobalScreen, WindowDim.Width, WindowDim.Height);
         ReleaseDC(GlobalScreen.Window, hdc);
+
+        RenderCommands.PushBufferDataAt = RenderCommands.PushBufferBase;
 
         //PROCESS COUNTERS AND CYCLES
         uint64 EndCycleCount = __rdtsc();

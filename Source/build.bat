@@ -1,6 +1,6 @@
 @echo off
 
-set CommonCompilerFlags=-O2 -MTd -nologo -fp:fast -fp:except- -Gm- -GR- -EHa- -Zo -Oi -WX -wd4201 -Wv:18
+set CommonCompilerFlags=-Od -MTd -nologo -fp:fast -fp:except- -Gm- -GR- -EHa- -Zo -Oi -WX -wd4201 -Wv:18
 set CommonCompilerFlags=%CommonCompilerFlags% -wd4201 -wd4100 -wd4189 -wd4505 -wd4127 -FC -Z7
 
 set CommonLinkerFlags=-incremental:no -opt:ref opengl32.lib user32.lib gdi32.lib winmm.lib

@@ -1,6 +1,7 @@
-#include "ivan_voxel_mesh.h"
+//#include "ivan_voxel_mesh.h"
 
 //TODO(Dima): How do I actually want to allocate MESH result???? And where???
+
 INTERNAL_FUNCTION void 
 GenerateVoxelMeshForChunk(
 	voxel_chunk_mesh* Result, 

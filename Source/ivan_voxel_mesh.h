@@ -308,4 +308,9 @@ inline void PushFaceWorkForBackVoxel(
 		DoFaceWorkAtBack(Mesh, VoxelPos, FaceT);
 	}
 }
+
+INTERNAL_FUNCTION void 
+GenerateVoxelMeshForChunk(
+	voxel_chunk_mesh* Result, voxel_chunk* Chunk, 
+	game_assets* Assets, voxel_atlas_id VoxelAtlasID);
 #endif

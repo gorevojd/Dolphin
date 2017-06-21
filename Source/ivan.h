@@ -73,6 +73,8 @@ struct transient_state{
 	platform_work_queue* HighPriorityQueue;
 	platform_work_queue* LowPriorityQueue;
 
+	uint32 MainGenerationID;
+
 	game_assets* Assets;
 };
 

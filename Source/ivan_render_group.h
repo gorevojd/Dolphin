@@ -26,8 +26,10 @@ enum render_group_entry_type{
 
 struct render_group_entry_header{
 	render_group_entry_type Type;
+};
 
-	uint32 Index;
+struct push_buffer_result{
+	render_group_entry_header* Header;
 };
 
 struct render_entry_coordinate_system{
@@ -83,25 +85,16 @@ struct render_group_transform{
 	real32 Scale;
 };
 
-struct render_setup{
-	
-};
-
 struct render_group{
 	struct game_assets* Assets;
 	real32 GlobalAlphaChannel;
 
 	vec2 MonitorHalfDimInMeters;
-
+	bool32 InsideRender;
 	render_group_transform Transform;
 
-	uint32 MaxPushBufferSize;
-	uint32 PushBufferSize;
-	uint8* PushBufferBase;
-
+	game_render_commands* Commands;
 	uint32 GenerationID;
-
-	bool32 InsideRender;
 };
 
 #endif

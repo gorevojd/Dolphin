@@ -1,5 +1,22 @@
 #include "ivan_render_group.h"
 
+inline push_buffer_result PushBuffer(render_group* RenderGroup, uint32 DataSize){
+    game_render_commands* Commands = RenderGroup->Commands;
+
+    push_buffer_result Result = {};
+
+    uint8* PushBufferEnd = Commands->PushBufferBase + Commands->MaxPushBufferSize;
+    if((Commands->PushBufferDataAt + DataSize) <= PushBufferEnd){
+        Result.Header = (render_group_entry_header*)Commands->PushBufferDataAt;
+        Commands->PushBufferDataAt += DataSize;
+    }
+    else{
+        INVALID_CODE_PATH;
+    }
+
+    return(Result);
+}
+
 inline void 
 SetOrthographic(
     render_group* RenderGroup,
@@ -20,6 +37,7 @@ SetOrthographic(
     RenderGroup->Transform.Orthographic = true;
 }
 
+#if 0
 INTERNAL_FUNCTION render_group*
 AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize)
 { 
@@ -40,29 +58,29 @@ AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxP
 
     return(Result);
 }
+#endif
 
-INTERNAL_FUNCTION void BeginRender(render_group* RenderGroup){
-    TIMED_BLOCK();
+inline render_group
+BeginRenderGroup(
+    game_assets* Assets, 
+    game_render_commands* Commands,
+    uint32 GenerationID)
+{
+    render_group Result = {};
 
-    if(RenderGroup){
-        RenderGroup->InsideRender = true;
+    Result.Assets = Assets;
+    Result.GenerationID = GenerationID;
+    Result.Commands = Commands;
 
-        RenderGroup->GenerationID = BeginGeneration(RenderGroup->Assets);
-    }
+    Result.Transform.OffsetP = Vec3(0.0f, 0.0f, 0.0f);
+    Result.Transform.Scale = 1.0f;
+    Result.GlobalAlphaChannel = 1.0f;
+
+    return(Result);
 }
 
-INTERNAL_FUNCTION void EndRender(render_group* RenderGroup){
-    
-    TIMED_BLOCK();
+inline void EndRenderGroup(render_group* RenderGroup){
 
-    if(RenderGroup){
-        Assert(RenderGroup->InsideRender);
-        RenderGroup->InsideRender = false;
-
-        EndGeneration(RenderGroup->Assets, RenderGroup->GenerationID);
-        RenderGroup->GenerationID = 0;
-        RenderGroup->PushBufferSize = 0;
-    }
 }
 
 #define PUSH_RENDER_ELEMENT(RenderGroup, type) (type*)PushRenderElement_(RenderGroup, sizeof(type), RenderGroupEntry_##type)
@@ -71,19 +89,22 @@ inline void* PushRenderElement_(
     uint32 Size,
     render_group_entry_type Type)
 {
-    TIMED_BLOCK();
+
+    game_render_commands* Commands = RenderGroup->Commands;
 
     void* Result = 0;
-    if (RenderGroup->PushBufferSize + Size < RenderGroup->MaxPushBufferSize){
-        render_group_entry_header* Header = (render_group_entry_header*)(RenderGroup->PushBufferBase + RenderGroup->PushBufferSize);
+
+    Size += sizeof(render_group_entry_header);
+    push_buffer_result Push = PushBuffer(RenderGroup, Size);
+    if(Push.Header){
+        render_group_entry_header* Header = Push.Header;
         Header->Type = Type;
-        Header->Index = RenderGroup->PushBufferSize;
-        RenderGroup->PushBufferSize += (Size  + sizeof(render_group_entry_header));
-        Result = (uint8*)Header + sizeof(render_group_entry_header);
+        Result = (uint8*)Header + sizeof(*Header);
     }
     else{
         INVALID_CODE_PATH;
     }
+
     return(Result);
 }
 
@@ -185,6 +206,7 @@ inline void PushBitmap(
     render_entry_bitmap* PushedBitmap = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_bitmap);
 
     bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, IVAN_MATH_ABS(Height), Offset, CAlign);
+    //bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, Height, Offset, CAlign);
 
     entity_basis_p_result Basis = GetRenderEntityBasisP(&RenderGroup->Transform, Dim.P);
     if(Basis.Valid){
@@ -248,7 +270,7 @@ PushVoxelAtlas(
 
     loaded_bitmap* Result = 0;
 
-#if 0
+#if 1
     loaded_voxel_atlas* Atlas = GetVoxelAtlas(RenderGroup->Assets, ID, RenderGroup->GenerationID);
     if(Atlas){
         bitmap_id BmpID = GetBitmapForVoxelAtlas(RenderGroup->Assets, Atlas);

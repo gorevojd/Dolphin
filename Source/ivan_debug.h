@@ -4,6 +4,7 @@
 #define TIMED_BLOCK__(Number, ...) timed_block TimedBlock_##Number(__COUNTER__, __FILE__, __LINE__, __FUNCTION__, ## __VA_ARGS__)
 #define TIMED_BLOCK_(Number, ...) TIMED_BLOCK__(Number, ## __VA_ARGS__)
 #define TIMED_BLOCK(...) TIMED_BLOCK_(__LINE__, ## __VA_ARGS__)
+//#define TIMED_BLOCK(...)
 
 struct debug_record{
 	char* FileName;

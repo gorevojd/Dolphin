@@ -4,6 +4,7 @@
 #include "ivan_audio.cpp"
 #include "ivan_particle.cpp"
 #include "ivan_render.cpp"
+#include "ivan_voxel_mesh.cpp"
 
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
@@ -29,7 +30,6 @@ INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
 	GD_COMPLETE_WRITES_BEFORE_FUTURE;
 	Task->BeingUsed = false;
 }
-
 
 GLOBAL_VARIABLE float CursorY;
 GLOBAL_VARIABLE float FontScale;
@@ -122,34 +122,13 @@ platform_complete_all_work* PlatformCompleteAllWork;
 GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     TIMED_BLOCK();
 
-#if 0
-    Platform.AddEntry = Memory->PlatformAPI.AddEntry;
-    Platform.CompleteAllWork = Memory->PlatformAPI.CompleteAllWork;
-    
-    Platform.GetAllFilesOfTypeBegin = Memory->PlatformAPI.GetAllFilesOfTypeBegin;
-    Platform.GetAllFilesOfTypeEnd = Memory->PlatformAPI.GetAllFilesOfTypeEnd;
-    Platform.OpenNextFile = Memory->PlatformAPI.OpenNextFile;
-    Platform.ReadDataFromFile = Memory->PlatformAPI.ReadDataFromFile;
-    Platform.FileError = Memory->PlatformAPI.FileError;
-
-    Platform.DEBUGReadEntireFile = Memory->PlatformAPI.DEBUGReadEntireFile;
-    Platform.DEBUGFreeFileMemory = Memory->PlatformAPI.DEBUGFreeFileMemory;
-
-    Platform.AllocateMemory = Memory->PlatformAPI.AllocateMemory;
-    Platform.DeallocateMemory = Memory->PlatformAPI.DeallocateMemory;
-
-    Platform.AllocateTexture = Memory->PlatformAPI.AllocateTexture;
-    Platform.DeallocateTexture = Memory->PlatformAPI.DeallocateTexture;
-#else
     Platform = Memory->PlatformAPI;
-#endif
-
 
 #ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
 #endif
-    game_state* GameState = (game_state*)Memory->PermanentStorage;
 
+    game_state* GameState = (game_state*)Memory->PermanentStorage;
     if (!Memory->IsInitialized){
 
         InitializeMemoryArena(
@@ -204,39 +183,43 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         voxel_chunk VoxelChunk;
         VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
         GenerateVoxelChunk(&TranState->TranArena, &VoxelChunk, 0, 0, 0);
+        
         voxel_chunk_mesh MeshResult;
-        MeshResult.Positions = (vec3*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec3));
-        MeshResult.TexCoords = (vec2*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec2));
-        MeshResult.Normals = (vec3*)malloc(IVAN_MAX_MESH_CHUNK_VERTEX_COUNT * sizeof(vec3));
-        MeshResult.Indices = (uint32_t*)malloc(IVAN_MAX_MESH_CHUNK_FACE_COUNT * sizeof(uint32_t));
+        MeshResult.Positions = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
+        MeshResult.TexCoords = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec2);
+        MeshResult.Normals = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
+        MeshResult.Indices = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT, uint32_t);
 
         voxel_atlas_id VoxelAtlasID = GetFirstVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas);
-
         GenerateVoxelMeshForChunk(
             &MeshResult, 
             &VoxelChunk, 
             TranState->Assets,
             VoxelAtlasID);
 #endif
+
         TranState->IsInitialized = true;
     }
-    
 
+    if(TranState->MainGenerationID){
+        EndGeneration(TranState->Assets, TranState->MainGenerationID);
+    }
+    TranState->MainGenerationID = BeginGeneration(TranState->Assets);
 
     temporary_memory RenderMemory = BeginTemporaryMemory(&TranState->TranArena);
-    render_group* RenderGroup = AllocateRenderGroup(TranState->Assets, &TranState->TranArena, GD_MEGABYTES(10));
-    BeginRender(RenderGroup);
+    render_group RenderGroup_ = BeginRenderGroup(
+        TranState->Assets,
+        RenderCommands,
+        TranState->MainGenerationID);
+    render_group* RenderGroup = &RenderGroup_;    
+
     real32 WidthOfMonitor = 0.635f;
     real32 MetersToPixels = (real32)Buffer->Width / WidthOfMonitor / 8;
-    //real32 MetersToPixels = 1;
     SetOrthographic(RenderGroup, Buffer->Width, Buffer->Height, MetersToPixels);
-
 
     int temp1 = ArrayCount(Input->Controllers[0].Buttons);
     Assert((&Input->Controllers[0].Terminator - &Input->Controllers[0].Buttons[0]) ==
         (ArrayCount(Input->Controllers[0].Buttons)));
-
-    int ToneHz = 256;
 
     vec2 MoveVector = Vec2(0.0f);
 
@@ -247,13 +230,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         game_controller_input* Controller = &Input->Controllers[ControllerIndex];
 
         if (Controller->MoveUp.EndedDown){
-            ToneHz = 170;
             MoveVector.y += 10;
             GameState->HeroFacingDirection = 0.25f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveDown.EndedDown){
-            ToneHz = 400;
             MoveVector.y -= 10;
             GameState->HeroFacingDirection = 0.75f * IVAN_MATH_TAU;
         }
@@ -274,18 +255,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         real32 PlayerSpeed = 0.4f;
         GameState->PlayerPos = GameState->PlayerPos + Normalize0(MoveVector) * Input->DeltaTime * PlayerSpeed;
-
-        /*
-        if (Controller->IsAnalog){
-            OffsetX -= Controller->StickAverageX * 10;
-            OffsetY += Controller->StickAverageY * 10;
-        }
-        */
     }
 
 
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
-    PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
+    //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
     for (int i = 0; i < 5; i++){
         if (Input->MouseButtons[i].EndedDown){
@@ -303,7 +277,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     HeroBitmaps.Cape = GetBestMatchBitmapFrom(TranState->Assets, Asset_Cape, &MatchVector, &WeightVector);
     HeroBitmaps.Torso = GetBestMatchBitmapFrom(TranState->Assets, Asset_Torso, &MatchVector, &WeightVector);
 
-    real32 PlayerSizeConst = 1.0f;
+    real32 PlayerSizeConst = 0.8f;
     PushBitmap(RenderGroup, HeroBitmaps.Torso, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
     PushBitmap(RenderGroup, HeroBitmaps.Cape, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
     PushBitmap(RenderGroup, HeroBitmaps.Head, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
@@ -318,17 +292,6 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     vec2 YAxis = 300.0f * Vec2(-Sin(Angle * AngleW), Cos(Angle * AngleW));
     real32 OffsetX = Cos(Angle * 0.4f) / 4.0f;
     
-    MatchVector.Data[Tag_Color] = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
-    WeightVector.Data[Tag_Color] = 1.0f;
-
-#if 0
-    voxel_atlas_id VoxelAtlasID = GetFirstVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas);
-    loaded_bitmap* VoxAtlBmp = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
-    if(VoxAtlBmp){
-        
-    }
-#endif
-
 /*
     SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
@@ -337,31 +300,15 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     DEBUGTextReset(RenderGroup);
 
-#if 1
-    TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup, (loaded_bitmap*)Buffer);
-#else
-    rectangle2 ClipRect;
-    ClipRect.Min.x = 0;
-    ClipRect.Min.y = 0;
-    ClipRect.Max.x = Buffer->Width;
-    ClipRect.Max.y = Buffer->Height;
-
-    RenderGroupToOutput(RenderGroup, (loaded_bitmap*)Buffer, ClipRect);
-#endif
-    EndRender(RenderGroup);
-
+    //TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup->Commands, (loaded_bitmap*)Buffer);
+    
     EndTemporaryMemory(RenderMemory);
 }
 
 GD_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
     game_state* GameState = (game_state*)Memory->PermanentStorage;
     transient_state* TranState = (transient_state*)Memory->TransientStorage;
-/*
-    audio_state* AudioState,
-    game_sound_output_buffer* SoundOutput,
-    game_assets* Assets,
-    memory_arena* TempArena)
-*/
+
     OutputPlayingSounds(&GameState->AudioState, SoundOutput, TranState->Assets, &GameState->PermanentArena);
 }
 

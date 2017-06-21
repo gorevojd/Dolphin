@@ -71,6 +71,37 @@ typedef struct game_offscreen_buffer{
     int32 Height;
 }game_offscreen_buffer;
 
+typedef struct game_render_commands{
+    uint32 Width;
+    uint32 Height;
+
+    uint32 MaxPushBufferSize;
+    uint8* PushBufferBase;
+    uint8* PushBufferDataAt;
+
+    uint32 PushBufferElementCount;
+} game_render_commands;
+
+inline game_render_commands DefaultRenderCommands(
+    uint32 MaxPushBufferSize,
+    uint8* PushBufferBase,
+    uint32 Width,
+    uint32 Height)
+{
+    game_render_commands Commands;
+
+    Commands.Width = Width;
+    Commands.Height = Height;
+
+    Commands.MaxPushBufferSize = MaxPushBufferSize;
+    Commands.PushBufferBase = PushBufferBase;
+    Commands.PushBufferDataAt = PushBufferBase;
+
+    Commands.PushBufferElementCount = 0;
+
+    return(Commands);
+}
+
 struct game_sound_output_buffer{
     int SamplesPerSecond;
     int SampleCount;
@@ -301,7 +332,7 @@ inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, ui
 }
 #endif
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_memory* Memory, game_input* Input, game_offscreen_buffer* Buffer, game_sound_output_buffer* SoundOutput)
+#define GAME_UPDATE_AND_RENDER(name) void name(game_memory* Memory, game_input* Input, game_offscreen_buffer* Buffer, game_render_commands* RenderCommands)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
 GAME_UPDATE_AND_RENDER(GameUpdateAndRenderStub){
 

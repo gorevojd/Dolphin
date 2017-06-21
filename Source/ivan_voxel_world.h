@@ -1,5 +1,13 @@
-//TODO(DIMA): Least Resently Used algorithm for chunks
-//TODO(DIMA): Dynamic chunk load from asset file
+
+/*
+	TODO(DIMA):
+
+		1) Least Resently Used algorithm for chunks
+
+		2) Dynamic chunk load from asset file
+
+		3) Frustrum culling for voxel chunks
+*/
 
 #ifndef IVAN_VOXEL_WORLD_H
 #define IVAN_VOXEL_WORLD_H

@@ -1,6 +1,14 @@
 #include "ivan_render_group.h"
 #include "ivan_voxel_mesh.h"
 
+/*
+    WHAT I HAPPENDED TO LEARN:
+
+        1) OpenGL can optimize out uniform variables and
+        set glGetUniformLocation result to -1 if it has not
+        been used;
+*/
+
 #define GL_TOSTR__(x) #x
 #define GL_TOSTR_(x) GL_TOSTR__(x)
 #define GL_ERR_LOC(ErrName) #ErrName ":"GL_TOSTR_(__LINE__)":" __FUNCTION__ "\n"
@@ -218,6 +226,7 @@ OpenGLCompileVoxelShaderProgram(voxel_shader_program* Result)
     Result->ProjectionLoc = glGetUniformLocation(Prog, "Projection");
     Result->ViewLoc = glGetUniformLocation(Prog, "View");
     Result->ModelLoc = glGetUniformLocation(Prog, "Model");
+
     Result->ViewPositionLoc = glGetUniformLocation(Prog, "ViewPosition");
     Result->DiffuseMapLoc = glGetUniformLocation(Prog, "DiffuseMap");
     Result->DirLightDirectionLoc = glGetUniformLocation(Prog, "DirLight.Direction");
@@ -305,7 +314,9 @@ UseProgramEnd(opengl_program_common* Program){
 
 INTERNAL_FUNCTION void 
 UseProgramBegin(voxel_shader_program* Program){
+    UseProgramBegin(&Program->Common);
 
+    //TODO(DIMA):
 }
 
 INTERNAL_FUNCTION void 
@@ -605,6 +616,7 @@ OpenGLInit(
         glDeleteTextures(1, &TestTexture);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     }
+
     GL_DEBUG_MARKER();
 
     for(int j = 0; j < 4; j++){
@@ -627,22 +639,28 @@ OpenGLInit(
 }
 
 INTERNAL_FUNCTION void
-OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
+OpenGLGroupToOutput(
+    game_render_commands* Commands, 
+    rectangle2i DrawRegion, 
+    int32 Width, int32 Height)
 {
-    TIMED_BLOCK();
+    glViewport(0, 0, GetWidth(DrawRegion), GetHeight(DrawRegion));
 
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     OpenGLSetScreenSpace(Width, Height);
 
-    for(int Base = 0; Base < RenderGroup->PushBufferSize;)
+    for(uint8* HeaderAt = Commands->PushBufferBase;
+        HeaderAt < Commands->PushBufferDataAt;
+        HeaderAt += sizeof(render_group_entry_header))
     {
-        render_group_entry_header* Header = (render_group_entry_header*)
-            (RenderGroup->PushBufferBase + Base);
-        void* EntryData = (uint8*)Header + sizeof(render_group_entry_header);
-        Base += sizeof(render_group_entry_header);
-        
+        render_group_entry_header* Header = (render_group_entry_header*)HeaderAt;
+        void* EntryData = (uint8*)Header + sizeof(*Header);
+
         switch(Header->Type){
             case RenderGroupEntry_render_entry_clear:{
                 render_entry_clear* EntryClear = (render_entry_clear*)EntryData;
@@ -655,7 +673,7 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                     EntryClear->Color.w);
                 glClear(GL_COLOR_BUFFER_BIT);
 
-                Base += sizeof(*EntryClear);
+                HeaderAt += sizeof(*EntryClear);
             }break;
             case RenderGroupEntry_render_entry_rectangle:{
                 render_entry_rectangle* EntryRect = (render_entry_rectangle*)EntryData;
@@ -667,7 +685,7 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                     EntryRect->Color);
                 glEnable(GL_TEXTURE_2D);
 
-                Base += sizeof(*EntryRect);
+                HeaderAt += sizeof(*EntryRect);
             }break;
             case RenderGroupEntry_render_entry_bitmap:{
                 render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
@@ -677,6 +695,10 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                     vec2 XAxis = { 1.0f, 0.0f };
                     vec2 YAxis = { 0.0f, 1.0f };
 
+                    XAxis *= EntryBitmap->Size.x;
+                    YAxis *= EntryBitmap->Size.y;
+
+#if 0
                     vec2 MinXMinY = EntryBitmap->P;
                     vec2 MinXMaxY = EntryBitmap->P + YAxis * EntryBitmap->Bitmap->Height;
                     vec2 MaxXMinY = EntryBitmap->P + XAxis * EntryBitmap->Bitmap->Width;
@@ -684,8 +706,14 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                         EntryBitmap->P + 
                         YAxis * EntryBitmap->Bitmap->Height +
                         XAxis * EntryBitmap->Bitmap->Width;
-
-                    glBindTexture(GL_TEXTURE_2D, (GLuint)UINT32_FROM_POINTER(EntryBitmap->Bitmap->TextureHandle));
+#else
+                    vec2 MinXMinY = EntryBitmap->P;
+                    vec2 MinXMaxY = EntryBitmap->P + YAxis;
+                    vec2 MaxXMinY = EntryBitmap->P + XAxis;
+                    vec2 MaxXMaxY = EntryBitmap->P + YAxis + XAxis;
+#endif
+                    GLuint TextureToBind = (GLuint)UINT32_FROM_POINTER(EntryBitmap->Bitmap->TextureHandle);
+                    glBindTexture(GL_TEXTURE_2D, TextureToBind);
 
                     float TexelDeltaU = 1.0f / (float)EntryBitmap->Bitmap->Width;
                     float TexelDeltaV = 1.0f / (float)EntryBitmap->Bitmap->Height;
@@ -713,15 +741,13 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
                     glEnd();
                 }
 
-                Base += sizeof(*EntryBitmap);
+                HeaderAt += sizeof(*EntryBitmap);
             }break;
 
             case RenderGroupEntry_render_entry_coordinate_system:{
                 render_entry_coordinate_system* EntryCS = (render_entry_coordinate_system*)EntryData;
 
-                
-
-                Base += sizeof(*EntryCS);
+                HeaderAt += sizeof(*EntryCS);
             }break;
 
             case RenderGroupEntry_render_entry_voxel_mesh:{
@@ -801,7 +827,7 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
 
                 glBindVertexArray(MeshVAO);
 
-                UseProgramBegin(*Program);
+                UseProgramBegin(Program);
 
                 glDrawElements(
                     GL_TRIANGLES, 
@@ -813,7 +839,8 @@ OpenGLGroupToOutput(render_group* RenderGroup, int32 Width, int32 Height)
 
                 glBindVertexArray(0);
 #endif
-                Base += sizeof(*EntryVoxelMesh);
+
+                HeaderAt += sizeof(*EntryVoxelMesh);
             }break;
             
             INVALID_DEFAULT_CASE;

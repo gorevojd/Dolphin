@@ -865,15 +865,17 @@ inline void RenderRectangleSlowly(
 }
 
 INTERNAL_FUNCTION void 
-RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rectangle2i ClipRect)
+RenderGroupToOutput(game_render_commands* Commands, loaded_bitmap* OutputTarget, rectangle2i ClipRect)
 {
     TIMED_BLOCK();
 
-    for (int Base = 0; Base < RenderGroup->PushBufferSize;){
-        render_group_entry_header* Header = 
-            (render_group_entry_header*)(RenderGroup->PushBufferBase + Base);
-        void* EntryData = (uint8*)Header + sizeof(render_group_entry_header);
-        Base += sizeof(render_group_entry_header);
+    for(uint8* HeaderAt = Commands->PushBufferBase;
+        HeaderAt < Commands->PushBufferDataAt;
+        HeaderAt += sizeof(render_group_entry_header))
+    {
+        render_group_entry_header* Header = (render_group_entry_header*)HeaderAt;
+        void* EntryData = (uint8*)Header + sizeof(*Header);
+
         switch (Header->Type){
             case RenderGroupEntry_render_entry_clear:{
                 render_entry_clear* EntryClear = (render_entry_clear*)EntryData;
@@ -885,7 +887,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
                     EntryClear->Color,
                     ClipRect);
 
-                Base += sizeof(*EntryClear);
+                HeaderAt += sizeof(*EntryClear);
             }break;
             case RenderGroupEntry_render_entry_rectangle:{
                 render_entry_rectangle* EntryRect = (render_entry_rectangle*)EntryData;
@@ -897,8 +899,9 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
                     EntryRect->Color,
                     ClipRect);
 
-                Base += sizeof(*EntryRect);
+                HeaderAt += sizeof(*EntryRect);
             }break;
+            
             case RenderGroupEntry_render_entry_bitmap:{
                 render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
                 
@@ -912,7 +915,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
                     YAxis * EntryBitmap->Size.y,
                     EntryBitmap->Bitmap,
                     EntryBitmap->Color,
-	                ClipRect);
+                    ClipRect);
 #else
                 RenderRectangleSlowly( 
                     OutputTarget,
@@ -921,9 +924,9 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
                     YAxis * EntryBitmap->Size.y,
                     EntryBitmap->Bitmap,
                     EntryBitmap->Color);
-
 #endif
-                Base += sizeof(*EntryBitmap);
+
+                HeaderAt += sizeof(*EntryBitmap);
             }break;
 
             case RenderGroupEntry_render_entry_coordinate_system:{
@@ -938,13 +941,13 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
                     EntryCS->Color,
                     ClipRect);
 
-                Base += sizeof(*EntryCS);
+                HeaderAt += sizeof(*EntryCS);
             }break;
 
             case RenderGroupEntry_render_entry_voxel_mesh:{
                 render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
 
-                Base += sizeof(*EntryVoxelMesh);
+                HeaderAt += sizeof(*EntryVoxelMesh);
             }break;
             
             INVALID_DEFAULT_CASE;
@@ -953,7 +956,7 @@ RenderGroupToOutput(render_group* RenderGroup, loaded_bitmap* OutputTarget, rect
 }
 
 struct tile_render_work{
-    render_group* RenderGroup;
+    game_render_commands* Commands;
     loaded_bitmap* OutputTarget;
     rectangle2i ClipRect;
 };
@@ -961,13 +964,13 @@ struct tile_render_work{
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(DoTiledRenderWork){
     tile_render_work* Work = (tile_render_work*)Data;
 
-    RenderGroupToOutput(Work->RenderGroup, Work->OutputTarget, Work->ClipRect);
+    RenderGroupToOutput(Work->Commands, Work->OutputTarget, Work->ClipRect);
 }
 
 INTERNAL_FUNCTION void
 TiledRenderGroupToOutput(
     platform_work_queue* RenderQueue,
-    render_group* RenderGroup,
+    game_render_commands* Commands,
     loaded_bitmap* OutputTarget)
 {
     TIMED_BLOCK();
@@ -1006,7 +1009,7 @@ TiledRenderGroupToOutput(
                 ClipRect.MaxY = OutputTarget->Height;
             }
 
-            Work->RenderGroup = RenderGroup;
+            Work->Commands = Commands;
             Work->OutputTarget = OutputTarget;
             Work->ClipRect = ClipRect;
 
