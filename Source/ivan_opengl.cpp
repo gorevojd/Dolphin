@@ -43,6 +43,11 @@
 /*Windows non-specific*/
 #define GL_NUM_EXTENSIONS                 0x821D
 
+#define GL_TEXTURE0                       0x84C0
+#define GL_TEXTURE1                       0x84C1
+#define GL_TEXTURE2                       0x84C2
+#define GL_TEXTURE3                       0x84C3
+
 #define GL_DEBUG_SEVERITY_HIGH            0x9146
 #define GL_DEBUG_SEVERITY_MEDIUM          0x9147
 #define GL_DEBUG_SEVERITY_LOW             0x9148
@@ -313,10 +318,29 @@ UseProgramEnd(opengl_program_common* Program){
 }
 
 INTERNAL_FUNCTION void 
-UseProgramBegin(voxel_shader_program* Program){
+UseProgramBegin(voxel_shader_program* Program, render_setup* Setup, mat4 ModelTransform, uint32 AtlasTextureGLId)
+{
     UseProgramBegin(&Program->Common);
 
-    //TODO(DIMA):
+    glUniformMatrix4fv(Program->ProjectionLoc, 1, GL_TRUE, Setup->Projection.E);
+    glUniformMatrix4fv(Program->ViewLoc, 1, GL_TRUE, Setup->CameraTransform.E);
+    glUniformMatrix4fv(Program->ModelLoc, 1, GL_TRUE, ModelTransform.E);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, AtlasTextureGLId);
+    glUniform1i(Program->DiffuseMapLoc, 0);
+    glUniform3fv(Program->ViewPositionLoc, 1, Setup->CameraP.E);
+    glUniform3fv(Program->DirLightDirectionLoc, 1, Setup->DirLightDirection.E);
+    glUniform3fv(Program->DirLightDiffuseLoc, 1, Setup->DirLightDiffuse.E);
+    glUniform3fv(Program->DirLightAmbientLoc, 1, Setup->DirLightAmbient.E);
+}
+
+INTERNAL_FUNCTION void
+UseProgramEnd(voxel_shader_program* Program){
+    UseProgramEnd(&Program->Common);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 INTERNAL_FUNCTION void 
@@ -510,8 +534,14 @@ INTERNAL_FUNCTION opengl_info OpenGLGetInfo(bool32 ModernContext){
     return(Result);
 }
 
-INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void* Data){
-    
+
+INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void* Data, uint32 Flags)
+{
+    GLuint FilterMode = GL_LINEAR;
+    if(Flags & AllocateTexture_FilterNearest){
+        FilterMode = GL_NEAREST;
+    }
+
     GLuint Handle;
     glGenTextures(1, &Handle);
     glBindTexture(GL_TEXTURE_2D, Handle);
@@ -527,11 +557,12 @@ INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void*
         GL_UNSIGNED_BYTE, 
         Data);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterMode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterMode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -548,7 +579,8 @@ OpenGLManageTextures(texture_op* First){
             *Op->Allocate.ResultHandle = OpenGLAllocateTexture(
                 Op->Allocate.Width,
                 Op->Allocate.Height,
-                Op->Allocate.Data);
+                Op->Allocate.Data,
+                Op->Allocate.Flags);
         }
         else{
             GLuint Handle = UINT32_FROM_POINTER(Op->Deallocate.Handle);
@@ -630,7 +662,7 @@ OpenGLInit(
     OpenGL.WhiteBitmap.WidthOverHeight = 1.0f;
     OpenGL.WhiteBitmap.Width = 4;
     OpenGL.WhiteBitmap.Height = 4;
-    OpenGL.WhiteBitmap.TextureHandle = OpenGLAllocateTexture(1, 1, &OpenGL.White);
+    OpenGL.WhiteBitmap.TextureHandle = OpenGLAllocateTexture(1, 1, &OpenGL.White, 0);
 
     OpenGLFreeProgram(&OpenGL.VoxelShaderProgram.Common);
     OpenGLCompileVoxelShaderProgram(&OpenGL.VoxelShaderProgram);
@@ -646,8 +678,8 @@ OpenGLGroupToOutput(
 {
     glViewport(0, 0, GetWidth(DrawRegion), GetHeight(DrawRegion));
 
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
-    //glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -671,25 +703,28 @@ OpenGLGroupToOutput(
                     EntryClear->Color.y,
                     EntryClear->Color.z,
                     EntryClear->Color.w);
-                glClear(GL_COLOR_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 HeaderAt += sizeof(*EntryClear);
             }break;
             case RenderGroupEntry_render_entry_rectangle:{
                 render_entry_rectangle* EntryRect = (render_entry_rectangle*)EntryData;
 
+                glDisable(GL_DEPTH_TEST);
                 glDisable(GL_TEXTURE_2D);
                 OpenGLRenderRectangle(
                     EntryRect->P, 
                     EntryRect->P + EntryRect->Dim,
                     EntryRect->Color);
                 glEnable(GL_TEXTURE_2D);
+                glEnable(GL_DEPTH_TEST);
 
                 HeaderAt += sizeof(*EntryRect);
             }break;
             case RenderGroupEntry_render_entry_bitmap:{
                 render_entry_bitmap* EntryBitmap = (render_entry_bitmap*)EntryData;
 
+                glDisable(GL_DEPTH_TEST);
                 if(EntryBitmap->Bitmap->Width && EntryBitmap->Bitmap->Height){
                     
                     vec2 XAxis = { 1.0f, 0.0f };
@@ -698,20 +733,11 @@ OpenGLGroupToOutput(
                     XAxis *= EntryBitmap->Size.x;
                     YAxis *= EntryBitmap->Size.y;
 
-#if 0
-                    vec2 MinXMinY = EntryBitmap->P;
-                    vec2 MinXMaxY = EntryBitmap->P + YAxis * EntryBitmap->Bitmap->Height;
-                    vec2 MaxXMinY = EntryBitmap->P + XAxis * EntryBitmap->Bitmap->Width;
-                    vec2 MaxXMaxY = 
-                        EntryBitmap->P + 
-                        YAxis * EntryBitmap->Bitmap->Height +
-                        XAxis * EntryBitmap->Bitmap->Width;
-#else
                     vec2 MinXMinY = EntryBitmap->P;
                     vec2 MinXMaxY = EntryBitmap->P + YAxis;
                     vec2 MaxXMinY = EntryBitmap->P + XAxis;
                     vec2 MaxXMaxY = EntryBitmap->P + YAxis + XAxis;
-#endif
+
                     GLuint TextureToBind = (GLuint)UINT32_FROM_POINTER(EntryBitmap->Bitmap->TextureHandle);
                     glBindTexture(GL_TEXTURE_2D, TextureToBind);
 
@@ -740,6 +766,7 @@ OpenGLGroupToOutput(
 
                     glEnd();
                 }
+                glEnable(GL_DEPTH_TEST);
 
                 HeaderAt += sizeof(*EntryBitmap);
             }break;
@@ -753,9 +780,19 @@ OpenGLGroupToOutput(
             case RenderGroupEntry_render_entry_voxel_mesh:{
                 render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
 
+#if 1
                 voxel_shader_program* Program = &OpenGL.VoxelShaderProgram;
                 opengl_program_common* Common = &Program->Common;
-#if 0
+
+                render_setup* Setup = &EntryVoxelMesh->Setup;
+                mat4 ModelTransform = Translate(Identity(), EntryVoxelMesh->P);
+                
+                uint32 TextureToBind = 0;
+                if(EntryVoxelMesh->Bitmap){
+                    TextureToBind = UINT32_FROM_POINTER(EntryVoxelMesh->Bitmap->TextureHandle);
+                }
+
+                GL_DEBUG_MARKER();
 #if 1
                 GLuint MeshVAO;
                 GLuint MeshVertsVBO;
@@ -791,17 +828,27 @@ OpenGLGroupToOutput(
                     EntryVoxelMesh->Mesh->IndicesCount * sizeof(uint32_t), 
                     EntryVoxelMesh->Mesh->Indices, GL_DYNAMIC_DRAW);
 
-                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-                glEnableVertexAttribArray(Common->VertPID);
-                glVertexAttribPointer(Common->VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+                GL_DEBUG_MARKER();
 
-                glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
-                glEnableVertexAttribArray(Common->VertNID);
-                glVertexAttribPointer(Common->VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+                if(IsValidArray(Common->VertPID)){
+                    glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+                    glEnableVertexAttribArray(Common->VertPID);
+                    glVertexAttribPointer(Common->VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+                }
 
-                glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
-                glEnableVertexAttribArray(Common->VertUVID);
-                glVertexAttribPointer(Common->VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);  
+                if(IsValidArray(Common->VertNID)){
+                    glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
+                    glEnableVertexAttribArray(Common->VertNID);
+                    glVertexAttribPointer(Common->VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
+                }
+
+                if(IsValidArray(Common->VertUVID)){
+                    glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
+                    glEnableVertexAttribArray(Common->VertUVID);
+                    glVertexAttribPointer(Common->VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);  
+                }
+
+                GL_DEBUG_MARKER();
 #else
                 GLuint MeshVAO;
                 GLuint MeshEBO;
@@ -822,20 +869,28 @@ OpenGLGroupToOutput(
                 glEnableVertexAttribArray(Program.VertUVID);
                 glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, UV));
 #endif
+
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
 
+                UseProgramBegin(Program, Setup, ModelTransform, TextureToBind);
+                
                 glBindVertexArray(MeshVAO);
 
-                UseProgramBegin(Program);
-
+                voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
                 glDrawElements(
                     GL_TRIANGLES, 
-                    EntryVoxelMesh->IndicesCount, 
+                    Mesh->IndicesCount, 
                     GL_UNSIGNED_INT, 
-                    EntryVoxelMesh->Indices);
+                    0);
 
-                UseProgramEnd(*Program);
+                UseProgramEnd(&Program->Common);
+
+                glDeleteVertexArrays(1, &MeshVAO);
+                glDeleteBuffers(1, &MeshVertsVBO);
+                glDeleteBuffers(1, &MeshNormsVBO);
+                glDeleteBuffers(1, &MeshUVsVBO);
+                glDeleteBuffers(1, &MeshEBO);
 
                 glBindVertexArray(0);
 #endif

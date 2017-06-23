@@ -67,11 +67,19 @@ INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
 
             case FinalizeAsset_Bitmap:{
                 loaded_bitmap* Bitmap = &Work->Asset->Header->Bitmap;
+                dda_bitmap* DDA = &Work->Asset->DDA.Bitmap;
+
+                uint32 Flags = 0;
+                if(DDA->BitmapType == DDABitmap_VoxelAtlas){
+                    Flags |= AllocateTexture_FilterNearest;
+                }
+
                 texture_op Op = {};
                 Op.IsAllocate = true;
                 Op.Allocate.Width = Bitmap->Width;
                 Op.Allocate.Height = Bitmap->Height;
                 Op.Allocate.Data = Bitmap->Memory;
+                Op.Allocate.Flags = Flags;
                 Op.Allocate.ResultHandle = &Bitmap->TextureHandle;
                 AddOp(Work->TextureOpQueue, &Op);
             }break;

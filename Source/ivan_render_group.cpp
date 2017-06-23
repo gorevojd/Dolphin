@@ -37,28 +37,64 @@ SetOrthographic(
     RenderGroup->Transform.Orthographic = true;
 }
 
+inline void SetCameraTransform(
+    render_group* RenderGroup,
+    uint32 Flags, vec3 CameraP, 
+    vec3 CameraX = Vec3(1.0f, 0.0f, 0.0f),
+    vec3 CameraY = Vec3(0.0f, 1.0f, 0.0f),
+    vec3 CameraZ = Vec3(0.0f, 0.0f, 1.0f),
+    float NearClipPlane = 0.1f,
+    float FarClipPlane = 1000.0f,
+    float FOV = 45.0f)
+{
+    TIMED_BLOCK();
+
+    bool32 IsOrthographic = (bool32)(Flags & CameraTransform_IsOrthographic);
+    bool32 IsInfiniteOrthographic = (bool32)(Flags & CameraTransform_IsInfiniteOrthographic);
+    bool32 IsInfinitePerspective = (bool32)(Flags & CameraTransform_IsInfinitePerspective);
+
+    mat4 ProjectionMatrix;
+    if(IsOrthographic){
+        if(IsInfiniteOrthographic){
+            ProjectionMatrix = OrthographicProjection(
+                RenderGroup->Commands->Width, 
+                RenderGroup->Commands->Height);
+        }
+        else{
+            ProjectionMatrix = OrthographicProjection(
+                RenderGroup->Commands->Width, 
+                RenderGroup->Commands->Height,
+                FarClipPlane, 
+                NearClipPlane);
+        }
+    }
+    else{
 #if 0
-INTERNAL_FUNCTION render_group*
-AllocateRenderGroup(struct game_assets* Assets, memory_arena* Arena, uint32 MaxPushBufferSize)
-{ 
-    render_group* Result = PushStruct(Arena, render_group);
-    Result->PushBufferBase = (uint8*)PushSize(Arena, MaxPushBufferSize);
-
-    Result->Assets = Assets;
-    Result->GlobalAlphaChannel = 1.0f;
-
-    Result->MaxPushBufferSize = MaxPushBufferSize;
-    Result->PushBufferSize = 0;
-
-    Result->Transform.OffsetP = Vec3(0.0f, 0.0f, 0.0f);
-    Result->Transform.Scale = 1.0f;
-
-    Result->GenerationID = 0;
-    Result->InsideRender = false;
-
-    return(Result);
-}
+        ProjectionMatrix = OrthographicProjection(
+                RenderGroup->Commands->Width, 
+                RenderGroup->Commands->Height);
+        
+#else
+        ProjectionMatrix = PerspectiveProjection(
+            RenderGroup->Commands->Width,
+            RenderGroup->Commands->Height,
+            FOV,
+            FarClipPlane,
+            NearClipPlane);
 #endif
+    }
+
+    render_setup NewSetup;
+    NewSetup.CameraP = CameraP;
+    NewSetup.CameraTransform = CameraTransform(CameraP, CameraX, CameraY, CameraZ);
+    NewSetup.Projection = ProjectionMatrix;
+
+    NewSetup.DirLightDirection = Normalize(Vec3(0.5f, -0.5f, 0.5f));
+    NewSetup.DirLightDiffuse = Vec3(1.0f, 1.0f, 1.0f);
+    NewSetup.DirLightAmbient = Vec3(1.0f, 1.0f, 1.0f);
+
+    RenderGroup->LastRenderSetup = NewSetup;
+}
 
 inline render_group
 BeginRenderGroup(
@@ -89,6 +125,7 @@ inline void* PushRenderElement_(
     uint32 Size,
     render_group_entry_type Type)
 {
+    TIMED_BLOCK();
 
     game_render_commands* Commands = RenderGroup->Commands;
 
@@ -201,8 +238,6 @@ inline void PushBitmap(
     bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
-    TIMED_BLOCK();
-
     render_entry_bitmap* PushedBitmap = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_bitmap);
 
     bitmap_dimension Dim = GetBitmapDim(RenderGroup, Bitmap, IVAN_MATH_ABS(Height), Offset, CAlign);
@@ -236,8 +271,6 @@ inline void PushBitmap(
     bool32 ScreenSpace = false,
     real32 CAlign = 1.0f)
 {
-    TIMED_BLOCK();
-
     loaded_bitmap* BitmapToRender = GetBitmap(RenderGroup->Assets, Id, RenderGroup->GenerationID);
     if (BitmapToRender){
         PushBitmap(RenderGroup, BitmapToRender, Height, Offset, Color, ScreenSpace, CAlign);
@@ -266,8 +299,6 @@ PushVoxelAtlas(
     render_group* RenderGroup, 
     voxel_atlas_id ID)
 {
-    TIMED_BLOCK();
-
     loaded_bitmap* Result = 0;
 
 #if 1
@@ -302,6 +333,8 @@ inline void PushVoxelChunkMesh(
         PushedMesh->Mesh = Mesh;
         PushedMesh->Bitmap = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
         PushedMesh->P = Pos;
+
+        PushedMesh->Setup = RenderGroup->LastRenderSetup;
     }
 }
 

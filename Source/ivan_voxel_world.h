@@ -24,18 +24,6 @@ struct voxel{
 	voxel_mat_type Type;
 };
 
-#define IVAN_VOXEL_CHUNK_HEIGHT 256
-#define IVAN_VOXEL_CHUNK_WIDTH 16
-#define IVAN_VOXEL_CHUNK_LAYER_COUNT (IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_WIDTH)
-
-/*
-	i -> left-right
-	j -> front-back
-	k -> bottom-top
-*/
-#define IVAN_GET_VOXEL_INDEX(i, j, k)	\
-	((k) * IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_WIDTH + (j) * IVAN_VOXEL_CHUNK_WIDTH + (i))	
-
 
 struct voxel_chunk{
 	vec3 Pos;
@@ -64,12 +52,15 @@ void GenerateVoxelChunk(memory_arena* Arena, voxel_chunk* Chunk, int32_t X, int3
 
 	Chunk->Pos = Vec3(PosX, PosY, PosZ);
 
-	float StartHeight = 50.0f;
+	float StartHeight = 10.0f;
 
 	//TODO(Dima): Check cache-friendly variations of this loop
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
-			float RandHeight = stb_perlin_noise3(PosX + i, PosY, PosZ + j, 0, 0, 0) + StartHeight;
+			float RandHeight = stb_perlin_noise3(
+				(float)(PosX + i) / 16.0f, 
+				(float)PosY / 16.0f, 
+				(float)(PosZ + j) / 16.0f, 0, 0, 0) * 5.0f + StartHeight;
 			uint32_t RandHeightU32 = (uint32_t)(RandHeight + 0.5f);
 
 			//NOTE(Dima): Do not change IsAir sence because of this

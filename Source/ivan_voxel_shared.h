@@ -16,7 +16,7 @@
 	k -> bottom-top
 */
 #define IVAN_GET_VOXEL_INDEX(i, j, k)	\
-	((k) * IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_WIDTH + (j) * IVAN_VOXEL_CHUNK_WIDTH + (i))
+	((k) * IVAN_VOXEL_CHUNK_LAYER_COUNT + (j) * IVAN_VOXEL_CHUNK_WIDTH + (i))
 
 enum voxel_mat_type{
 	VoxelMaterial_None,
@@ -29,6 +29,7 @@ enum voxel_mat_type{
 	VoxelMaterial_Leaves,
 	VoxelMaterial_Brick,
 	VoxelMaterial_Logs,
+	VoxelMaterial_Tree,
 
 	VoxelMaterial_Count,
 };

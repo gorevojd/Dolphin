@@ -42,27 +42,37 @@ struct hero_bitmap_ids{
     bitmap_id Torso;
 };
 
+struct camera_transform{
+	vec3 P;
+
+	float Yaw;
+	float Pitch;
+	float Roll;
+
+	vec3 Front;
+	vec3 Up;
+	vec3 Left;
+};
+
 struct game_state{
 	memory_arena PermanentArena;
 
 	vec2 PlayerPos;
 	real32 HeroFacingDirection;
 
-	loaded_sound TestSound;
-	uint32 TestSampleIndex;
-
 	audio_state AudioState;
 
 	real32 Time;
+	vec3 LastMouseP;
 
 	random_series EffectsSeries;
 	particle_cache FontainCache;
 
-	particle Particles[256];
-	uint32 NextParticle;
+	camera_transform Camera;
 };
 
 struct transient_state{
+	game_assets* Assets;
 	
 	bool32 IsInitialized;
 	memory_arena TranArena;
@@ -75,7 +85,10 @@ struct transient_state{
 
 	uint32 MainGenerationID;
 
-	game_assets* Assets;
+	
+	voxel_chunk VoxelChunk;
+	voxel_chunk_mesh MeshResult;
+	voxel_atlas_id VoxelAtlasID;
 };
 
 GLOBAL_VARIABLE platform_api Platform;

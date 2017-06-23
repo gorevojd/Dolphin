@@ -5,6 +5,12 @@
 #include "ivan_intrinsics.h"
 #include "ivan_render_math.h"
 
+enum camera_transform_flag{
+	CameraTransform_IsOrthographic = 0x1,
+	CameraTransform_IsInfinitePerspective = 0x2,
+	CameraTransform_IsInfiniteOrthographic = 0x4,
+};
+
 struct loaded_bitmap{
 	void* Memory;
 	int32 Width;
@@ -22,6 +28,7 @@ enum render_group_entry_type{
 	RenderGroupEntry_render_entry_bitmap,
 	RenderGroupEntry_render_entry_coordinate_system,
 	RenderGroupEntry_render_entry_voxel_mesh,
+	RenderGroupEntry_render_entry_cube,
 };
 
 struct render_group_entry_header{
@@ -57,13 +64,23 @@ struct render_entry_bitmap{
 	vec2 Size;
 };
 
+struct render_setup{
+	vec3 CameraP;
+	mat4 Projection;
+	mat4 CameraTransform;
+
+	vec3 DirLightDirection;
+	vec3 DirLightDiffuse;
+	vec3 DirLightAmbient;
+};
+
 struct voxel_chunk_mesh;
 struct render_entry_voxel_mesh{
 	voxel_chunk_mesh* Mesh;
-
 	loaded_bitmap* Bitmap;
-
 	vec3 P;
+
+	render_setup Setup;
 };
 
 struct bitmap_dimension{
@@ -90,8 +107,9 @@ struct render_group{
 	real32 GlobalAlphaChannel;
 
 	vec2 MonitorHalfDimInMeters;
-	bool32 InsideRender;
 	render_group_transform Transform;
+
+	render_setup LastRenderSetup;
 
 	game_render_commands* Commands;
 	uint32 GenerationID;

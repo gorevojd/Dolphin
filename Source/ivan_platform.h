@@ -247,6 +247,9 @@ struct game_input{
     real32 DeltaTime;
 
     vec3 MouseP;
+    vec3 DeltaMouseP;
+    bool32 CapturingMouse;
+    
     game_button_state MouseButtons[5];
 };
 
@@ -255,23 +258,6 @@ inline game_controller_input* GetController(game_input* Input, int ControllerInd
     game_controller_input* Result = &Input->Controllers[ControllerIndex];
     return(Result);
 }
-
-enum{
-    DebugCycleCounter_GameUpdateAndRender,
-    DebugCycleCounter_RenderRectangleQuickly,
-    DebugCycleCounter_RenderRectangleQuicklyCounted,
-    DebugCycleCounter_RenderRectangleSlowly,
-    DebugCycleCounter_RenderRectangleSlowlyCounted,
-    DebugCycleCounter_RenderRectangle,
-
-    DebugCycleCounter_Count
-};
-
-struct debug_cycle_counter{
-    uint32 CycleCount;
-    uint32 HitCount;
-};
-
 
 //extern platform_add_entry* PlatformAddEntry;
 //extern platform_complete_all_work* PlatformCompleteAllWork;
@@ -291,11 +277,8 @@ typedef struct game_memory{
     platform_texture_op_queue TextureOpQueue;
 
     platform_api PlatformAPI;
-
-#ifdef INTERNAL_BUILD
-    debug_cycle_counter Counters[DebugCycleCounter_Count];
-#endif
 } game_memory;
+
 extern game_memory* DebugGlobalMemory;
 
 #if GD_COMPILER_MSVC

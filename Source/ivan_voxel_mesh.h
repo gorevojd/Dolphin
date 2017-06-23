@@ -97,10 +97,10 @@ inline void DoFaceWorkAtFront(
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
 		Vec3(0.0f, 0.0f, 1.0f));	
 }
 
@@ -111,10 +111,10 @@ inline void DoFaceWorkAtBack(
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
 		Vec3(0.0f, 0.0f, -1.0f));
 }
 
@@ -178,16 +178,16 @@ inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t 
 	int32_t Result = 0;
 
 	if((i >= 0 && (i < IVAN_VOXEL_CHUNK_WIDTH)) &&
-		(j >= 0 && (j < IVAN_VOXEL_CHUNK_WIDTH)) &&
-		(k >= 0 && (k < IVAN_VOXEL_CHUNK_HEIGHT)) &&
-		Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)].IsAir)
+		(j >= 0 && (j < IVAN_VOXEL_CHUNK_HEIGHT)) &&
+		(k >= 0 && (k < IVAN_VOXEL_CHUNK_WIDTH)) &&
+		Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, k, j)].IsAir)
 	{
-		voxel UpVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k + 1)];
+/*		voxel UpVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k + 1)];
 		voxel DownVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k - 1)];
 		voxel RightVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i + 1, j, k)];
 		voxel LeftVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i - 1, j, k)];
 		voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
-		voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];
+		voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];*/
 	
 		Result = 1;
 	}
@@ -284,7 +284,7 @@ inline void PushFaceWorkForFrontVoxel(
 		Chunk,
 		InitX,
 		InitY,
-		InitZ + 1))
+		InitZ - 1))
 	{
 		DoFaceWorkAtFront(Mesh, VoxelPos, FaceT);
 	}
@@ -303,7 +303,7 @@ inline void PushFaceWorkForBackVoxel(
 		Chunk,
 		InitX,
 		InitY,
-		InitZ - 1))
+		InitZ + 1))
 	{
 		DoFaceWorkAtBack(Mesh, VoxelPos, FaceT);
 	}

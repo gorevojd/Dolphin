@@ -9,6 +9,7 @@ enum asset_font_type{
 
 enum asset_voxel_atlas_type{
 	VoxelAtlasType_Default = 0,
+	VoxelAtlasType_Minecraft = 1,
 };
 
 enum asset_tag_id{	

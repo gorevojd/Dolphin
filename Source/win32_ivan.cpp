@@ -108,6 +108,10 @@ typedef const GLubyte * WINAPI type_glGetStringi(GLenum name, GLuint index);
 typedef void WINAPI type_glUniform2f(GLint location, GLfloat v0, GLfloat v1);
 typedef void WINAPI type_glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
 typedef void WINAPI type_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+typedef void WINAPI type_glDeleteBuffers(GLsizei n, const GLuint * buffers);
+typedef void WINAPI type_glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
+typedef void WINAPI type_glGenerateMipmap(GLenum target);
+
 
 #define GL_DEBUG_CALLBACK(Name) void WINAPI Name(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
 typedef GL_DEBUG_CALLBACK(GLDEBUGPROC);
@@ -157,6 +161,9 @@ OPENGL_GLOBAL_FUNCTION(glUniform1i);
 OPENGL_GLOBAL_FUNCTION(glUniform2f);
 OPENGL_GLOBAL_FUNCTION(glUniform3f);
 OPENGL_GLOBAL_FUNCTION(glUniform4f);
+OPENGL_GLOBAL_FUNCTION(glDeleteBuffers);
+OPENGL_GLOBAL_FUNCTION(glDeleteVertexArrays);
+OPENGL_GLOBAL_FUNCTION(glGenerateMipmap);
 
 #include "ivan_opengl.h"
 GLOBAL_VARIABLE open_gl OpenGL;
@@ -200,6 +207,9 @@ GLOBAL_VARIABLE win32_offscreen_buffer GlobalScreen;
 GLOBAL_VARIABLE WINDOWPLACEMENT GlobalWindowPlacement;
 GLOBAL_VARIABLE LPDIRECTSOUNDBUFFER GlobalSecondaryBuffer;
 GLOBAL_VARIABLE int64 GlobalPerfomanceCounterFrequency;
+GLOBAL_VARIABLE bool32 GlobalCapturingMouse;
+GLOBAL_VARIABLE game_input GlobalGameInput;
+
 
 DEBUG_PLATFORM_FREE_FILE_MEMORY(DEBUGPlatformFreeFileMemory){
     if (Memory != 0){
@@ -643,28 +653,6 @@ Win32ProcessKeyboardMessage(game_button_state* State, bool32 IsDown, bool32 WasD
 
 
 INTERNAL_FUNCTION void
-HandleDebugCycleCounter(game_memory* Memory){
-#ifdef INTERNAL_BUILD
-    for (int i = 0; i < ArrayCount(Memory->Counters); i++){
-        debug_cycle_counter* Counter = Memory->Counters + i;
-
-        if (Counter->HitCount){
-            char Buffer[256];
-            _snprintf_s(Buffer, sizeof(Buffer),
-                "%d: Cycles:%u Hits:%u CyclesPerHit:%u\n",
-                i,
-                Counter->CycleCount,
-                Counter->HitCount,
-                Counter->CycleCount / Counter->HitCount);
-            OutputDebugStringA(Buffer);
-        }
-        Counter->CycleCount = 0;
-        Counter->HitCount = 0;
-    }
-#endif
-}
-
-INTERNAL_FUNCTION void
 Win32ToggleFullscreen(HWND Window)
 {
     DWORD Style = GetWindowLong(Window, GWL_STYLE);
@@ -886,6 +874,12 @@ Win32ProcessPendingMessages(game_controller_input* Controller){
                     }
                     else if (vkey == VK_F4){
                         Win32ProcessKeyboardMessage(&Controller->F4, IsDown, WasDown);
+                    }
+
+                    if(IsDown){
+                        if (vkey == VK_ESCAPE){
+                            GlobalGameInput.CapturingMouse = !GlobalGameInput.CapturingMouse;
+                        }
                     }
                 }
 
@@ -1116,6 +1110,9 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         WIN32_GET_OPENGL_FUNCTION(glUniform2f);
         WIN32_GET_OPENGL_FUNCTION(glUniform3f);
         WIN32_GET_OPENGL_FUNCTION(glUniform4f);
+        WIN32_GET_OPENGL_FUNCTION(glDeleteBuffers);
+        WIN32_GET_OPENGL_FUNCTION(glDeleteVertexArrays);
+        WIN32_GET_OPENGL_FUNCTION(glGenerateMipmap);
 
         opengl_info Info = OpenGLGetInfo(ModernContext);
 
@@ -1129,7 +1126,7 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         wgl_swap_interval_ext* wglSwapIntervalEXT = (wgl_swap_interval_ext*)wglGetProcAddress("wglSwapIntervalEXT");
 
         if(wglSwapIntervalEXT){
-            wglSwapIntervalEXT(1);
+            wglSwapIntervalEXT(0);
         }
 
         OpenGLInit(Info, OpenGL.SupportsSRGBFramebuffer, 
@@ -1437,7 +1434,7 @@ int WINAPI WinMain(
     wcex.lpszClassName = "WindowClassName";
 
     RegisterClassEx(&wcex);
-
+	
 
 
     GlobalScreen.Window = CreateWindowEx(
@@ -1544,7 +1541,7 @@ int WINAPI WinMain(
 
     int16* Samples = (int16*)VirtualAlloc(0, SoundOutput.SecondaryBufferByteSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    game_input GameInput = {};
+    GlobalGameInput.CapturingMouse = 1;
 
     LARGE_INTEGER PerfomanceCounterFreq;
     QueryPerformanceFrequency(&PerfomanceCounterFreq);
@@ -1569,18 +1566,33 @@ int WINAPI WinMain(
             Game = Win32LoadGameCode(SourceDLLName, TempDLLFullPath);
         }
 
-
-        game_controller_input* KeyboardController = GetController(&GameInput, 0);
+        game_controller_input* KeyboardController = GetController(&GlobalGameInput, 0);
         Win32ProcessPendingMessages(KeyboardController);
 
-        GameInput.DeltaTime = DeltaTime;
+        GlobalGameInput.DeltaTime = DeltaTime;
 
-        POINT MouseP;
-        GetCursorPos(&MouseP);
-        ScreenToClient(GlobalScreen.Window, &MouseP);
-        GameInput.MouseP.x = MouseP.x;
-        GameInput.MouseP.y = MouseP.y;
-        GameInput.MouseP.z = 0;
+        float ScreenCenterX = (float)GlobalScreen.Width / 2.0f;
+        float ScreenCenterY = (float)GlobalScreen.Height / 2.0f;
+        
+        if(GlobalGameInput.CapturingMouse){
+        
+            POINT MouseP;
+            GetCursorPos(&MouseP);
+            //ScreenToClient(GlobalScreen.Window, &MouseP);
+            
+            GlobalGameInput.MouseP.x = MouseP.x;
+            GlobalGameInput.MouseP.y = MouseP.y;
+            GlobalGameInput.MouseP.z = 0;
+            
+            GlobalGameInput.DeltaMouseP.x = -(float)MouseP.x + ScreenCenterX;
+            GlobalGameInput.DeltaMouseP.y = (float)MouseP.y - ScreenCenterY;
+        
+            SetCursorPos(ScreenCenterX, ScreenCenterY);
+        }
+        else{
+            GlobalGameInput.DeltaMouseP.x = 0;
+            GlobalGameInput.DeltaMouseP.y = 0;
+        }
 
         int16 MouseLButton = GetKeyState(VK_LBUTTON);
         int16 MouseRButton = GetKeyState(VK_RBUTTON);
@@ -1589,38 +1601,38 @@ int WINAPI WinMain(
         int16 MouseX2Button = GetKeyState(VK_XBUTTON2);
 
         Win32ProcessKeyboardMessage(
-            &GameInput.MouseButtons[0],
+            &GlobalGameInput.MouseButtons[0],
             MouseLButton & (1 << 15),
             MouseLButton & (1 << 0));
         Win32ProcessKeyboardMessage(
-            &GameInput.MouseButtons[1],
+            &GlobalGameInput.MouseButtons[1],
             MouseRButton & (1 << 15),
             MouseRButton & (1 << 0));
         Win32ProcessKeyboardMessage(
-            &GameInput.MouseButtons[2],
+            &GlobalGameInput.MouseButtons[2],
             MouseMButton & (1 << 15),
             MouseMButton & (1 << 0));
         Win32ProcessKeyboardMessage(
-            &GameInput.MouseButtons[3],
+            &GlobalGameInput.MouseButtons[3],
             MouseX1Button & (1 << 15),
             MouseX1Button & (1 << 0));
         Win32ProcessKeyboardMessage(
-            &GameInput.MouseButtons[4],
+            &GlobalGameInput.MouseButtons[4],
             MouseX2Button & (1 << 15),
             MouseX2Button & (1 << 0));
 
         //PROCESS XINPUT
         int MaxContrllerCount = XUSER_MAX_COUNT;
-        if (MaxContrllerCount > ArrayCount(GameInput.Controllers)){
-            MaxContrllerCount = ArrayCount(GameInput.Controllers);
+        if (MaxContrllerCount > ArrayCount(GlobalGameInput.Controllers)){
+            MaxContrllerCount = ArrayCount(GlobalGameInput.Controllers);
         }
         DWORD dwResult = 0;
         for (DWORD ControllerIndex = 0;
             ControllerIndex < XUSER_MAX_COUNT;
             ControllerIndex++)
         {
-            game_controller_input* NewController = GetController(&GameInput, ControllerIndex + 1);
-            game_controller_input* OldController = GetController(&GameInput, ControllerIndex + 1);
+            game_controller_input* NewController = GetController(&GlobalGameInput, ControllerIndex + 1);
+            game_controller_input* OldController = GetController(&GlobalGameInput, ControllerIndex + 1);
 
             XINPUT_STATE XInputState;
             ZeroMemory(&XInputState, sizeof(XINPUT_STATE));
@@ -1708,8 +1720,6 @@ int WINAPI WinMain(
                     &OldController->Back, XINPUT_GAMEPAD_BACK,
                     &NewController->Back);
 
-
-
                 int16 StickX = Gamepad.sThumbLX;
                 int16 StickY = Gamepad.sThumbLY;
             }
@@ -1761,14 +1771,11 @@ int WINAPI WinMain(
         GameBuffer.Height = GlobalScreen.Height;
 
         if(Game.GameUpdateAndRender){
-            Game.GameUpdateAndRender(&GameMemory, &GameInput, &GameBuffer, &RenderCommands);
+            Game.GameUpdateAndRender(&GameMemory, &GlobalGameInput, &GameBuffer, &RenderCommands);
         }
         if(Game.GameGetSoundSamples){
             Game.GameGetSoundSamples(&GameMemory, &GameSoundOutputBuffer);
         }
-        HandleDebugCycleCounter(&GameMemory);
-
-
 
         if (SoundIsValid){
             Win32FillSoundBuffer(&SoundOutput, ByteToLock, BytesToLock, &GameSoundOutputBuffer);

@@ -8,12 +8,39 @@
 
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
+INTERNAL_FUNCTION void UpdateCameraVectors(
+    camera_transform* Camera, 
+    float DeltaYaw = 0.0f, 
+    float DeltaPitch = 0.0f, 
+    float DeltaRoll = 0.0f,
+    vec3 WorldUp = Vec3(0.0f, 1.0f, 0.0f))
+{
+    float DeadEdge = 89.0f * IVAN_DEG_TO_RAD;
+
+    Camera->Yaw += DeltaYaw;
+    Camera->Pitch = IVAN_MATH_CLAMP(Camera->Pitch + DeltaPitch, -DeadEdge, DeadEdge);
+    Camera->Roll += DeltaRoll;
+
+    vec3 Front;
+    Front.x = Cos(Camera->Yaw) * Cos(Camera->Pitch);
+    Front.y = Sin(Camera->Pitch);
+    Front.z = Sin(Camera->Yaw) * Cos(Camera->Pitch);
+
+    vec3 Left = Normalize(Cross(WorldUp, Front));
+    vec3 Up = Normalize(Cross(Front, Left));
+
+    Camera->Front = Front;
+    Camera->Left = Left;
+    Camera->Up = Up;
+}
+
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState, bool32 DependsOnGameMode){
 	task_with_memory* FoundTask = 0;
     
 	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
 		task_with_memory* Task = TranState->Tasks + i;
 		if (!Task->BeingUsed){
+        //if(AtomicCompareExchangeUInt32((uint32* volatile)&Task->BeingUsed, true, false) == false){
 			FoundTask = Task;
 			Task->BeingUsed = true;
             Task->DependsOnGameMode = DependsOnGameMode;
@@ -152,6 +179,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             }
         }
 
+        GameState->Camera = {};
+        GameState->Camera.Left = {1.0f, 0.0f, 0.0f};
+        GameState->Camera.Up = {0.0f, 1.0f, 0.0f};
+        GameState->Camera.Front = {0.0f, 0.0f, 1.0f};
+
         Memory->IsInitialized = true;
     }
 
@@ -179,23 +211,29 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
-#if 0
-        voxel_chunk VoxelChunk;
-        VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
-        GenerateVoxelChunk(&TranState->TranArena, &VoxelChunk, 0, 0, 0);
+#if 1
+        TranState->VoxelChunk;
+        TranState->VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
+        GenerateVoxelChunk(&TranState->TranArena, &TranState->VoxelChunk, 0, 0, 0);
         
-        voxel_chunk_mesh MeshResult;
-        MeshResult.Positions = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
-        MeshResult.TexCoords = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec2);
-        MeshResult.Normals = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
-        MeshResult.Indices = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT, uint32_t);
+        TranState->MeshResult;
+        TranState->MeshResult.Positions = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
+        TranState->MeshResult.TexCoords = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec2);
+        TranState->MeshResult.Normals = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
+        TranState->MeshResult.Indices = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT, uint32_t);
 
-        voxel_atlas_id VoxelAtlasID = GetFirstVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas);
+        asset_vector VAMatchVector = {};
+        VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Minecraft;
+        asset_vector VAWeightVector = {};
+        VAWeightVector.Data[Tag_VoxelAtlasType] = 10.0f;
+        TranState->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
+
+
         GenerateVoxelMeshForChunk(
-            &MeshResult, 
-            &VoxelChunk, 
+            &TranState->MeshResult, 
+            &TranState->VoxelChunk, 
             TranState->Assets,
-            VoxelAtlasID);
+            TranState->VoxelAtlasID);
 #endif
 
         TranState->IsInitialized = true;
@@ -217,35 +255,63 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     real32 MetersToPixels = (real32)Buffer->Width / WidthOfMonitor / 8;
     SetOrthographic(RenderGroup, Buffer->Width, Buffer->Height, MetersToPixels);
 
+    SetCameraTransform(
+        RenderGroup,
+        0, 
+        GameState->Camera.P, 
+        GameState->Camera.Left,
+        GameState->Camera.Up,
+        GameState->Camera.Front);
+
     int temp1 = ArrayCount(Input->Controllers[0].Buttons);
     Assert((&Input->Controllers[0].Terminator - &Input->Controllers[0].Buttons[0]) ==
         (ArrayCount(Input->Controllers[0].Buttons)));
 
     vec2 MoveVector = Vec2(0.0f);
+    vec3 CameraMoveVector = Vec3(0.0f);
 
+    float MouseSpeed = 0.1f;
+    float DeltaYaw = 0.0f;
+    float DeltaPitch = 0.0f;
+#if 0
+    float DeltaYaw = (-(Input->MouseP.x - GameState->LastMouseP.x)) * IVAN_DEG_TO_RAD * MouseSpeed;
+    float DeltaPitch = (Input->MouseP.y - GameState->LastMouseP.y) * IVAN_DEG_TO_RAD * MouseSpeed;
+#else
+    if(Input->CapturingMouse && (Input->DeltaMouseP.x != 0 || Input->DeltaMouseP.y != 0)){
+        DeltaYaw = (Input->DeltaMouseP.x) * IVAN_DEG_TO_RAD * MouseSpeed;
+        DeltaPitch = (Input->DeltaMouseP.y) * IVAN_DEG_TO_RAD * MouseSpeed;
+    }
+#endif
+    UpdateCameraVectors(&GameState->Camera, DeltaYaw, DeltaPitch, 0.0f);
+    
     for (int ControllerIndex = 0;
         ControllerIndex < ArrayCount(Input->Controllers);
         ControllerIndex++)
     {
         game_controller_input* Controller = &Input->Controllers[ControllerIndex];
 
+        float AxisDeltaValue = 10.0f;
         if (Controller->MoveUp.EndedDown){
             MoveVector.y += 10;
+            CameraMoveVector.z += AxisDeltaValue;
             GameState->HeroFacingDirection = 0.25f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveDown.EndedDown){
             MoveVector.y -= 10;
+            CameraMoveVector.z -= AxisDeltaValue;
             GameState->HeroFacingDirection = 0.75f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveRight.EndedDown){
             MoveVector.x += 10;
+            CameraMoveVector.x -= AxisDeltaValue;
             GameState->HeroFacingDirection = 0.0f * IVAN_MATH_TAU;
         }
 
         if (Controller->MoveLeft.EndedDown){
             MoveVector.x -= 10;
+            CameraMoveVector.x += AxisDeltaValue;
             GameState->HeroFacingDirection = 0.5f * IVAN_MATH_TAU;
         }
 
@@ -254,18 +320,24 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
 
         real32 PlayerSpeed = 0.4f;
+        real32 CameraSpeed = 2.0f;
         GameState->PlayerPos = GameState->PlayerPos + Normalize0(MoveVector) * Input->DeltaTime * PlayerSpeed;
+
+        CameraMoveVector = CameraMoveVector * Input->DeltaTime * CameraSpeed;
+        GameState->Camera.P += GameState->Camera.Front * CameraMoveVector.z;
+        GameState->Camera.P -= GameState->Camera.Left * CameraMoveVector.x;
+        GameState->Camera.P += GameState->Camera.Up * CameraMoveVector.y;
     }
 
 
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
-    for (int i = 0; i < 5; i++){
-        if (Input->MouseButtons[i].EndedDown){
-            PushRectangle(RenderGroup, Vec3(10 + i * 20, 10, 0.0f), Vec2(10, 10), Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        }
-    }
+    PushVoxelChunkMesh(
+        RenderGroup,
+        &TranState->MeshResult,
+        TranState->VoxelAtlasID,
+        Vec3(0.0f, 0.0f, 0.0f));
 
     hero_bitmap_ids HeroBitmaps = {};
     asset_vector MatchVector = {};
@@ -282,9 +354,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushBitmap(RenderGroup, HeroBitmaps.Cape, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
     PushBitmap(RenderGroup, HeroBitmaps.Head, PlayerSizeConst, Vec3(GameState->PlayerPos, 0.0f));
 
-    PushRectangle(RenderGroup, Vec3(Input->MouseP.xy, 0.0f), Vec2(10, 10), Vec4(0.0f, 1.0f, 0.0f, 1.0f));
-
     GameState->Time += Input->DeltaTime;
+    GameState->LastMouseP = Input->MouseP;
+
     real32 Angle = GameState->Time;
     vec2 Origin = Vec2(400, 300);
     real32 AngleW = 0.5f;
@@ -341,6 +413,14 @@ OutputDebugRecords(debug_record* Counters, uint32 CountersCount, render_group* R
             DEBUGTextOut(RenderGroup, TextBuffer);
         }
     }
+
+    char TextBuffer[256];
+
+    stbsp_sprintf(TextBuffer, "ViewPosition: x:%.2f y:%.2f z:%.2f", 
+        RenderGroup->LastRenderSetup.CameraP.x,
+        RenderGroup->LastRenderSetup.CameraP.y,
+        RenderGroup->LastRenderSetup.CameraP.z);
+    DEBUGTextOut(RenderGroup, TextBuffer);
 }
 
 INTERNAL_FUNCTION void

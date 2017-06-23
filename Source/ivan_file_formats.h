@@ -42,9 +42,16 @@ struct dda_header{
 	uint64 AssetOffset;
 };
 
+enum dda_bitmap_type{
+	DDABitmap_Bitmap,
+	DDABitmap_VoxelAtlas,
+	DDABitmap_FontGlyph,
+};
+
 struct dda_bitmap{
 	uint32 Dimension[2];
 	real32 AlignPercentage[2];
+	dda_bitmap_type BitmapType;
 };
 
 enum dda_sound_chain{

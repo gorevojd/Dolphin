@@ -14,9 +14,9 @@ GenerateVoxelMeshForChunk(
 	LoadVoxelAtlasAsset(Assets, VoxelAtlasID, true);
 	loaded_voxel_atlas* Atlas = GetVoxelAtlas(Assets, VoxelAtlasID, GenerationID);
 
-	for(int32_t k = 1; k < IVAN_VOXEL_CHUNK_HEIGHT - 1; k++){
-		for(int32_t j = 1; j < IVAN_VOXEL_CHUNK_WIDTH - 1; j++){
-			for(int32_t i = 1; i < IVAN_VOXEL_CHUNK_WIDTH - 1; i++){
+	for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT ; k++){
+		for(int32_t j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
+			for(int32_t i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
 
 				voxel ToCheck = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)];
 
@@ -40,8 +40,8 @@ GenerateVoxelMeshForChunk(
 						voxel DownVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k - 1)];
 						voxel RightVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i + 1, j, k)];
 						voxel LeftVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i - 1, j, k)];
-						voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
-						voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];
+						voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];
+						voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
 
 						if(UpVoxel.IsAir){
 							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
@@ -134,6 +134,9 @@ GenerateVoxelMeshForChunk(
 			}
 		}
 	}
+
+	Result->IndicesCount = Result->ActiveIndexIndex;
+	Result->VerticesCount = Result->ActiveVertexIndex;
 
 	EndGeneration(Assets, GenerationID);
 }

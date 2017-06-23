@@ -90,6 +90,13 @@ struct rectangle3{
 	vec3 Max;
 };
 
+struct mat4{
+	union{
+		float E[16];
+		vec4 Rows[4];
+	};
+};
+
 #ifndef IVAN_MATH_CONSTANTS
 #define IVAN_MATH_EPSILON 1.19209290e-7f
 #define IVAN_MATH_ZERO 0.0f
@@ -100,6 +107,7 @@ struct rectangle3{
 #define IVAN_MATH_PI 3.14159265358979323846264338327950288f
 #define IVAN_MATH_ONE_OVER_TAU 0.636619772367581343075535053490057448f
 #define IVAN_MATH_ONE_OVER_PI 0.318309886183790671537767526745028724f
+#define IVAN_MATH_PI_OVER_180 0.017453292519943295769236907684886127f
 
 #define IVAN_MATH_TAU_OVER_2 3.14159265358979323846264338327950288f
 #define IVAN_MATH_TAU_OVER_4 1.570796326794896619231321691639751442f
@@ -113,8 +121,8 @@ struct rectangle3{
 #define IVAN_MATH_LOG_TWO 0.693147180559945309417232121458176568f
 #define IVAN_MATH_LOG_TEN 2.30258509299404568401799145468436421f
 
-#define IVAN_DEG_TO_RAD 0.0174533
-#define IVAN_RAD_TO_DEG 57.2958
+#define IVAN_DEG_TO_RAD 0.0174532925f
+#define IVAN_RAD_TO_DEG 57.2958f
 
 #define IVAN_MATH_CONSTANTS
 #endif
@@ -414,23 +422,27 @@ inline vec4 Mul(vec4 a, float s){
 
 /*Divide operation*/
 inline vec2 Div(vec2 a, float s){
-	a.x /= s;
-	a.y /= s;
+	float OneOverS = 1.0f / s;
+	a.x *= OneOverS;
+	a.y *= OneOverS;
 	return(a);
 }
 
 inline vec3 Div(vec3 a, float s){
-	a.x /= s;
-	a.y /= s;
-	a.z /= s;
+	float OneOverS = 1.0f / s;
+	a.x *= OneOverS;
+	a.y *= OneOverS;
+	a.z *= OneOverS;
 	return(a);
 }
 
 inline vec4 Div(vec4 a, float s){
-	a.x /= s;
-	a.y /= s;
-	a.z /= s;
-	a.w /= s;
+
+	float OneOverS = 1.0f / s;
+	a.x *= OneOverS;
+	a.y *= OneOverS;
+	a.z *= OneOverS;
+	a.w *= OneOverS;
 	return(a);
 }
 
@@ -614,4 +626,254 @@ GetClampedRectArea(rectangle2 A){
 	return(Result);
 }
 
+
+/*Matrix 4x4 functions and operators*/
+inline mat4 Multiply(mat4 M1, mat4 M2){
+	mat4 Result = {};
+
+	Result.E[0] = M1.E[0] * M2.E[0] + M1.E[1] * M2.E[4] + M1.E[2] * M2.E[8] + M1.E[3] * M2.E[12];
+	Result.E[1] = M1.E[0] * M2.E[1] + M1.E[1] * M2.E[5] + M1.E[2] * M2.E[9] + M1.E[3] * M2.E[13];
+	Result.E[2] = M1.E[0] * M2.E[2] + M1.E[1] * M2.E[6] + M1.E[2] * M2.E[10] + M1.E[3] * M2.E[14];
+	Result.E[3] = M1.E[0] * M2.E[3] + M1.E[1] * M2.E[7] + M1.E[2] * M2.E[11] + M1.E[3] * M2.E[15];
+
+	Result.E[4] = M1.E[4] * M2.E[0] + M1.E[5] * M2.E[4] + M1.E[6] * M2.E[8] + M1.E[7] * M2.E[12];
+	Result.E[5] = M1.E[4] * M2.E[1] + M1.E[5] * M2.E[5] + M1.E[6] * M2.E[9] + M1.E[7] * M2.E[13];
+	Result.E[6] = M1.E[4] * M2.E[2] + M1.E[5] * M2.E[6] + M1.E[6] * M2.E[10] + M1.E[7] * M2.E[14];
+	Result.E[7] = M1.E[4] * M2.E[3] + M1.E[5] * M2.E[7] + M1.E[6] * M2.E[11] + M1.E[7] * M2.E[15];
+
+	Result.E[8] = M1.E[8] * M2.E[0] + M1.E[9] * M2.E[4] + M1.E[10] * M2.E[8] + M1.E[11] * M2.E[12];
+	Result.E[9] = M1.E[8] * M2.E[1] + M1.E[9] * M2.E[5] + M1.E[10] * M2.E[9] + M1.E[11] * M2.E[13];
+	Result.E[10] = M1.E[8] * M2.E[2] + M1.E[9] * M2.E[6] + M1.E[10] * M2.E[10] + M1.E[11] * M2.E[14];
+	Result.E[11] = M1.E[8] * M2.E[3] + M1.E[9] * M2.E[7] + M1.E[10] * M2.E[11] + M1.E[11] * M2.E[15];
+
+	Result.E[12] = M1.E[12] * M2.E[0] + M1.E[13] * M2.E[4] + M1.E[14] * M2.E[8] + M1.E[15] * M2.E[12];
+	Result.E[13] = M1.E[12] * M2.E[1] + M1.E[13] * M2.E[5] + M1.E[14] * M2.E[9] + M1.E[15] * M2.E[13];
+	Result.E[14] = M1.E[12] * M2.E[2] + M1.E[13] * M2.E[6] + M1.E[14] * M2.E[10] + M1.E[15] * M2.E[14];
+	Result.E[15] = M1.E[12] * M2.E[3] + M1.E[13] * M2.E[7] + M1.E[14] * M2.E[11] + M1.E[15] * M2.E[15];
+
+	return(Result);
+}
+
+inline vec4 Multiply(mat4 M, vec4 V){
+	vec4 Result;
+
+	Result.E[0] = V.E[0] * M.E[0] + V.E[0] * M.E[1] + V.E[0] * M.E[2] + V.E[0] * M.E[3];
+	Result.E[1] = V.E[1] * M.E[4] + V.E[1] * M.E[5] + V.E[1] * M.E[6] + V.E[1] * M.E[7];
+	Result.E[2] = V.E[2] * M.E[8] + V.E[2] * M.E[9] + V.E[2] * M.E[10] + V.E[2] * M.E[11];
+	Result.E[3] = V.E[3] * M.E[12] + V.E[3] * M.E[13] + V.E[3] * M.E[14] + V.E[3] * M.E[15];
+
+	return(Result);
+}
+
+inline mat4 Identity(){
+	mat4 Result;
+
+	Result.Rows[0] = {1.0f, 0.0f, 0.0f, 0.0f};
+	Result.Rows[1] = {0.0f, 1.0f, 0.0f, 0.0f};
+	Result.Rows[2] = {0.0f, 0.0f, 1.0f, 0.0f};
+	Result.Rows[3] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+	return(Result);
+}
+
+inline mat4 Transpose(mat4 M){
+	for(int RowIndex = 0; RowIndex < 4; RowIndex++){
+		for(int ColumtIndex = 0; ColumtIndex < 4; ColumtIndex++){
+			float Tmp = M.E[RowIndex * 4 + ColumtIndex];
+			M.E[RowIndex * 4 + ColumtIndex] = M.E[ColumtIndex * 4 + RowIndex];
+			M.E[ColumtIndex * 4 + RowIndex] = Tmp;
+		}
+	}
+
+	return(M);
+}
+
+inline mat4 Rotation(vec3 R, float Angle){
+	mat4 Result;
+
+	float CosT = Cos(Angle);
+	float SinT = Sin(Angle);
+	float InvCosT = 1.0f - CosT;
+
+	float RxRyInvCos = R.x * R.y * InvCosT;
+	float RxRzInvCos = R.x * R.z * InvCosT;
+	float RyRzInvCos = R.y * R.z * InvCosT;
+
+	Result.E[0] = CosT + R.x * R.x * InvCosT;
+	Result.E[1] = RxRyInvCos - R.z * SinT;
+	Result.E[2] = RxRzInvCos + R.y * SinT;
+	Result.E[3] = 0;
+
+	Result.E[4] = RxRyInvCos + R.z * SinT;
+	Result.E[5] = CosT * R.y * R.y * InvCosT;
+	Result.E[6] = RyRzInvCos - R.x * SinT;
+	Result.E[7] = 0.0f;
+
+	Result.E[8] = RxRzInvCos - R.y * SinT;
+	Result.E[9] = RyRzInvCos + R.x * SinT;
+	Result.E[10] = CosT + R.z * R.z * InvCosT;
+	Result.E[11] = 0.0f;
+
+	Result.E[12] = 0.0f;
+	Result.E[13] = 0.0f;
+	Result.E[14] = 0.0f;
+	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 Translate(mat4 M, vec3 P){
+	mat4 Result = M;
+
+	Result.E[3] += P.x;
+	Result.E[7] += P.y;
+	Result.E[11] += P.z;
+
+	return(Result);
+}
+
+inline mat4 operator*(mat4 M1, mat4 M2){
+	return(Multiply(M1, M2));
+}
+
+inline vec4 operator*(mat4 M1, vec4 V){
+	return(Multiply(M1, V));
+}
+
+inline mat4 LookAt(vec3 Pos, vec3 TargetPos, vec3 WorldUp){
+	mat4 Result;
+
+	vec3 Fwd = TargetPos - Pos;
+	Fwd = Normalize0(Fwd);
+
+	vec3 Left = Normalize(Cross(WorldUp, Fwd));
+	vec3 Up = Normalize(Cross(Fwd, Left));
+
+	vec3 Eye = Pos;
+
+	Result.E[0] = Left.x;
+	Result.E[1] = Left.y;
+	Result.E[2] = Left.z;
+	Result.E[3] = -Dot(Left, Eye);
+
+	Result.E[4] = Up.x;
+	Result.E[5] = Up.y;
+	Result.E[6] = Up.z;
+	Result.E[7] = -Dot(Up, Eye);
+
+	Result.E[8] = -Fwd.x;
+	Result.E[9] = -Fwd.y;
+	Result.E[10] = -Fwd.z;
+	Result.E[11] = Dot(Fwd, Eye);
+
+	Result.E[12] = 0.0f;
+	Result.E[13] = 0.0f;
+	Result.E[14] = 0.0f;
+	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 PerspectiveProjection(uint32 Width, uint32 Height, float FOV, float Far, float Near)
+{
+	mat4 Result = {};
+
+	float AspectRatio = (float)Width / (float)Height;
+
+	float S = 1.0f / (Tan(FOV * 0.5f * IVAN_DEG_TO_RAD));
+	float A = S / AspectRatio;
+	float B = S;
+	float OneOverFarMinusNear = 1.0f / (Far - Near);
+	Result.E[0] = A;
+	Result.E[5] = B;
+	Result.E[10] = -(Far + Near) * OneOverFarMinusNear;
+	Result.E[11] = -(2.0f * Far * Near) * OneOverFarMinusNear;
+	Result.E[14] = -1.0f;
+
+	return(Result);
+}
+
+inline mat4 OrthographicProjection(
+	uint32 Right, uint32 Left,
+	uint32 Top, uint32 Bottom,
+	float Far, float Near)
+{
+	mat4 Result = {};
+
+	float OneOverRmL = 1.0f / ((float)Right - (float)Left);
+	float OneOverTmB = 1.0f / ((float)Top - (float)Bottom);
+	float OneOverFmN = 1.0f / (Far - Near);
+
+	Result.E[0] = 2.0f * OneOverRmL;
+	Result.E[3] = - (float)(Right + Left) * OneOverRmL;
+	Result.E[5] = 2.0f * OneOverTmB;
+	Result.E[7] = - (float)(Top + Bottom) * OneOverTmB;
+	Result.E[10] = -2.0f * OneOverFmN;
+	Result.E[11] = -(Far + Near) * OneOverFmN;
+	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 OrthographicProjection(
+	uint32 Width, uint32 Height,
+	float Far, float Near)
+{
+	mat4 Result = {};
+
+	float OneOverFmN = 1.0f / (Far - Near);
+	Result.E[0] = 2.0f / (float)Width;
+	Result.E[3] = -1.0f;
+	Result.E[5] = 2.0f / (float)Height;
+	Result.E[7] = -1.0f;
+	Result.E[10] = -2.0f * OneOverFmN;
+	Result.E[11] = -(Far + Near) * OneOverFmN;
+	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 OrthographicProjection(uint32 Width, uint32 Height){
+	mat4 Result = {};
+
+	Result.E[0] = 2.0f / (float)Width;
+	Result.E[3] = -1.0f;
+	Result.E[5] = 2.0f / (float)Height;
+	Result.E[7] = -1.0f;
+	Result.E[10] = 1.0f;
+	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 CameraTransform(
+	vec3 P, 
+	vec3 Left,
+	vec3 Up,
+	vec3 Front)
+{
+	mat4 Result = LookAt(P, P + Front, Vec3(0.0f, 1.0f, 0.0f));
+	//mat4 Result = Translate(Identity(), P);
+
+	return(Result);
+}
+
+/*
+	Result.E[0] = 0.0f;
+	Result.E[1] = 0.0f;
+	Result.E[2] = 0.0f;
+	Result.E[3] = 0.0f;
+	Result.E[4] = 0.0f;
+	Result.E[5] = 0.0f;
+	Result.E[6] = 0.0f;
+	Result.E[7] = 0.0f;
+	Result.E[8] = 0.0f;
+	Result.E[9] = 0.0f;
+	Result.E[10] = 0.0f;
+	Result.E[11] = 0.0f;
+	Result.E[12] = 0.0f;
+	Result.E[13] = 0.0f;
+	Result.E[14] = 0.0f;
+	Result.E[15] = 0.0f;
+*/
 #endif
