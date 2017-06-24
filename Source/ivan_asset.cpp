@@ -510,6 +510,7 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
                 Atlas->BitmapIDOffset = GetFile(Assets, Asset->FileIndex)->VoxelAtlasBitmapIDOffset;
                 Atlas->Materials = (voxel_tex_coords_set*)(Asset->Header + 1);
                 Atlas->BitmapID = Info->BitmapID;
+                Atlas->OneTextureWidth = Info->OneTextureWidth;
 
                 load_asset_work Work;
                 Work.Task = Task;

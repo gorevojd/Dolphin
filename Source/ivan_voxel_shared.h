@@ -51,6 +51,17 @@ union voxel_face_tex_coords_set{
 	vec2 T[4];
 };
 
+enum voxel_normal_type_index{
+	VoxelNormalIndex_Up,
+	VoxelNormalIndex_Down,
+	VoxelNormalIndex_Left,
+	VoxelNormalIndex_Right,
+	VoxelNormalIndex_Front,
+	VoxelNormalIndex_Back,
+
+	VoxelNormalIndex_Count,
+};
+
 enum voxel_texture_face_type{
 	IvanVoxelTexture_Top = 1,
 	IvanVoxelTexture_Bottom = 2,
@@ -79,6 +90,7 @@ enum voxel_face_type_index{
 };
 
 struct voxel_tex_coords_set{
+#if 0
 	union {
 		struct{
 			union{
@@ -101,6 +113,30 @@ struct voxel_tex_coords_set{
 		voxel_face_tex_coords_set All;
 		voxel_face_tex_coords_set Sets[VoxelFaceTypeIndex_Count];
 	};
+#else
+	union {
+		struct{
+			union{
+				struct{
+					uint8_t Top;
+					uint8_t Bottom;
+				};
+				uint8_t TopBottom;
+			};
+			union{
+				struct{
+					uint8_t Left;
+					uint8_t Right;
+					uint8_t Front;
+					uint8_t Back;
+				};
+				uint8_t Side;
+			};
+		};
+		uint8_t All;
+		uint8_t Sets[VoxelFaceTypeIndex_Count];
+	};
+#endif
 };
 
 struct voxel_texture_face_atlas{

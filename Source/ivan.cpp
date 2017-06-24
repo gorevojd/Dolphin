@@ -214,20 +214,16 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 #if 1
         TranState->VoxelChunk;
         TranState->VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
-        GenerateVoxelChunk(&TranState->TranArena, &TranState->VoxelChunk, 0, 0, 0);
+        GenerateVoxelChunk(&TranState->TranArena, &TranState->VoxelChunk, 0, 0);
         
         TranState->MeshResult;
-        TranState->MeshResult.Positions = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
-        TranState->MeshResult.TexCoords = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec2);
-        TranState->MeshResult.Normals = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_VERTEX_COUNT, vec3);
-        TranState->MeshResult.Indices = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT, uint32_t);
+        TranState->MeshResult.PUVN = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT * 6, uint32_t);
 
         asset_vector VAMatchVector = {};
         VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Minecraft;
         asset_vector VAWeightVector = {};
         VAWeightVector.Data[Tag_VoxelAtlasType] = 10.0f;
         TranState->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
-
 
         GenerateVoxelMeshForChunk(
             &TranState->MeshResult, 

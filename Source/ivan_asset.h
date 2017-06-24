@@ -26,6 +26,7 @@ struct loaded_voxel_atlas{
 	voxel_tex_coords_set* Materials;
 
 	bitmap_id BitmapID;
+	int32 OneTextureWidth;
 };
 
 enum asset_header_type{

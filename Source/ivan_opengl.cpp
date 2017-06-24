@@ -179,6 +179,7 @@ OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common*
     Common->VertPID = glGetAttribLocation(ProgramID, "VertPos");
     Common->VertNID = glGetAttribLocation(ProgramID, "VertNorm");
     Common->VertUVID = glGetAttribLocation(ProgramID, "VertUV");
+    Common->PUVNID = glGetAttribLocation(ProgramID, "VertexData");
 
     glDeleteShader(VertexShaderID);
     glDeleteShader(FragmentShaderID);
@@ -231,6 +232,7 @@ OpenGLCompileVoxelShaderProgram(voxel_shader_program* Result)
     Result->ProjectionLoc = glGetUniformLocation(Prog, "Projection");
     Result->ViewLoc = glGetUniformLocation(Prog, "View");
     Result->ModelLoc = glGetUniformLocation(Prog, "Model");
+    Result->OneTextureWidthLoc = glGetUniformLocation(Prog, "OneTextureWidth");
 
     Result->ViewPositionLoc = glGetUniformLocation(Prog, "ViewPosition");
     Result->DiffuseMapLoc = glGetUniformLocation(Prog, "DiffuseMap");
@@ -253,78 +255,27 @@ IsValidArray(GLuint ArrayID){
 INTERNAL_FUNCTION void 
 UseProgramBegin(opengl_program_common* Program){
     glUseProgram(Program->ProgramHandle);
-
-#if 0
-    GLuint PArray = Program->VertPID;
-    GLuint NArray = Program->VertNID;
-    GLuint UVArray = Program->VertUVID;
-
-    if(IsValidArray(PArray)){
-        glEnableVertexAttribArray(PArray);
-        glVertexAttribPointer(
-            PArray, 
-            3, 
-            GL_FLOAT, 
-            false, 
-            sizeof(textured_vertex),
-            (void*)OffsetOf(textured_vertex, P));        
-    }
-
-    if(IsValidArray(NArray)){
-        glEnableVertexAttribArray(NArray);
-        glVertexAttribPointer(
-            NArray,
-            3,
-            GL_FLOAT,
-            false,
-            sizeof(textured_vertex),
-            (void*)OffsetOf(textured_vertex, N));
-    }
-
-    if(IsValidArray(UVArray)){
-        glEnableVertexAttribArray(UVArray);
-        glVertexAttribPointer(
-            UVArray, 
-            2,
-            GL_FLOAT,
-            false,
-            sizeof(textured_vertex),
-            (void*)OffsetOf(textured_vertex, UV));
-    }
-#endif
 }
 
 INTERNAL_FUNCTION void 
 UseProgramEnd(opengl_program_common* Program){
     glUseProgram(0);
-
-#if 0
-    GLuint PArray = Program->VertPID;
-    GLuint NArray = Program->VertNID;
-    GLuint UVArray = Program->VertUVID;
-
-    if(IsValidArray(PArray)){
-        glDisableVertexAttribArray(PArray);
-    }
-
-    if(IsValidArray(NArray)){
-        glDisableVertexAttribArray(NArray);
-    }
-
-    if(IsValidArray(UVArray)){
-        glDisableVertexAttribArray(UVArray);
-    }
-#endif
 }
 
 INTERNAL_FUNCTION void 
-UseProgramBegin(voxel_shader_program* Program, render_setup* Setup, mat4 ModelTransform, uint32 AtlasTextureGLId)
+UseProgramBegin(
+    voxel_shader_program* Program, 
+    render_setup* Setup, 
+    mat4 ModelTransform, 
+    uint32 AtlasTextureGLId,
+    uint32 OneTextureWidth)
 {
     UseProgramBegin(&Program->Common);
 
     glUniformMatrix4fv(Program->ProjectionLoc, 1, GL_TRUE, Setup->Projection.E);
     glUniformMatrix4fv(Program->ViewLoc, 1, GL_TRUE, Setup->CameraTransform.E);
     glUniformMatrix4fv(Program->ModelLoc, 1, GL_TRUE, ModelTransform.E);
+    glUniform1i(Program->OneTextureWidthLoc, OneTextureWidth);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, AtlasTextureGLId);
@@ -783,8 +734,10 @@ OpenGLGroupToOutput(
 #if 1
                 voxel_shader_program* Program = &OpenGL.VoxelShaderProgram;
                 opengl_program_common* Common = &Program->Common;
+                voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
 
                 render_setup* Setup = &EntryVoxelMesh->Setup;
+                int32 OneTextureWidth = EntryVoxelMesh->OneTextureWidth;
                 mat4 ModelTransform = Translate(Identity(), EntryVoxelMesh->P);
                 
                 uint32 TextureToBind = 0;
@@ -793,104 +746,40 @@ OpenGLGroupToOutput(
                 }
 
                 GL_DEBUG_MARKER();
-#if 1
+
                 GLuint MeshVAO;
-                GLuint MeshVertsVBO;
-                GLuint MeshNormsVBO;
-                GLuint MeshUVsVBO;
-                GLuint MeshEBO;
-
-                glGenVertexArrays(1, &MeshVAO);
-                glGenBuffers(1, &MeshEBO);
-                glGenBuffers(1, &MeshVertsVBO);
-                glGenBuffers(1, &MeshNormsVBO);
-                glGenBuffers(1, &MeshUVsVBO);
-
-                glBindVertexArray(MeshVAO);
-
-                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-                glBufferData(GL_ARRAY_BUFFER, 
-                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec3), 
-                    EntryVoxelMesh->Mesh->Positions, GL_DYNAMIC_DRAW);
-
-                glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
-                glBufferData(GL_ARRAY_BUFFER, 
-                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec3), 
-                    EntryVoxelMesh->Mesh->Normals, GL_DYNAMIC_DRAW);
-
-                glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
-                glBufferData(GL_ARRAY_BUFFER, 
-                    EntryVoxelMesh->Mesh->VerticesCount * sizeof(vec2), 
-                    EntryVoxelMesh->Mesh->TexCoords, GL_DYNAMIC_DRAW);
-                
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, MeshEBO);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
-                    EntryVoxelMesh->Mesh->IndicesCount * sizeof(uint32_t), 
-                    EntryVoxelMesh->Mesh->Indices, GL_DYNAMIC_DRAW);
-
-                GL_DEBUG_MARKER();
-
-                if(IsValidArray(Common->VertPID)){
-                    glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
-                    glEnableVertexAttribArray(Common->VertPID);
-                    glVertexAttribPointer(Common->VertPID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
-                }
-
-                if(IsValidArray(Common->VertNID)){
-                    glBindBuffer(GL_ARRAY_BUFFER, MeshNormsVBO);
-                    glEnableVertexAttribArray(Common->VertNID);
-                    glVertexAttribPointer(Common->VertNID, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), 0);
-                }
-
-                if(IsValidArray(Common->VertUVID)){
-                    glBindBuffer(GL_ARRAY_BUFFER, MeshUVsVBO);
-                    glEnableVertexAttribArray(Common->VertUVID);
-                    glVertexAttribPointer(Common->VertUVID, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), 0);  
-                }
-
-                GL_DEBUG_MARKER();
-#else
-                GLuint MeshVAO;
-                GLuint MeshEBO;
                 GLuint MeshVBO;
 
                 glGenVertexArrays(1, &MeshVAO);
-                glGenBuffers(1, &MeshEBO);
                 glGenBuffers(1, &MeshVBO);
 
-                glBindBuffer(GL_ARRAY_BUFFER, MeshVertsVBO);
+                glBindVertexArray(MeshVAO);
 
-                glEnableVertexAttribArray(Program.VertPID);
-                glVertexAttribPointer(Program.VertPID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, P));
+                glBindBuffer(GL_ARRAY_BUFFER, MeshVBO);
+                glBufferData(GL_ARRAY_BUFFER,
+                    Mesh->VerticesCount * sizeof(uint32),
+                    Mesh->PUVN, GL_DYNAMIC_DRAW);
 
-                glEnableVertexAttribArray(Program.VertNID);
-                glVertexAttribPointer(Program.VertNID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, N));
-
-                glEnableVertexAttribArray(Program.VertUVID);
-                glVertexAttribPointer(Program.VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), OffsetOf(textured_vertex, UV));
-#endif
+                if(IsValidArray(Common->PUVNID)){
+                    glEnableVertexAttribArray(Common->PUVNID);
+                    glVertexAttribPointer(Common->PUVNID, 1, GL_FLOAT, GL_FALSE, 4, 0);
+                }
 
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindVertexArray(0);
 
-                UseProgramBegin(Program, Setup, ModelTransform, TextureToBind);
+                GL_DEBUG_MARKER();
+
+                UseProgramBegin(Program, Setup, ModelTransform, TextureToBind, OneTextureWidth);
                 
                 glBindVertexArray(MeshVAO);
 
-                voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
-                glDrawElements(
-                    GL_TRIANGLES, 
-                    Mesh->IndicesCount, 
-                    GL_UNSIGNED_INT, 
-                    0);
+                glDrawArrays(GL_TRIANGLES, 0, Mesh->VerticesCount); 
 
                 UseProgramEnd(&Program->Common);
 
                 glDeleteVertexArrays(1, &MeshVAO);
-                glDeleteBuffers(1, &MeshVertsVBO);
-                glDeleteBuffers(1, &MeshNormsVBO);
-                glDeleteBuffers(1, &MeshUVsVBO);
-                glDeleteBuffers(1, &MeshEBO);
+                glDeleteBuffers(1, &MeshVBO);
 
                 glBindVertexArray(0);
 #endif

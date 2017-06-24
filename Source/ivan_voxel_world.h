@@ -7,6 +7,16 @@
 		2) Dynamic chunk load from asset file
 
 		3) Frustrum culling for voxel chunks
+
+		4) Think about how to manage multiple chunks...
+		Use double linked list??
+
+	NOTE:
+		1) My voxel engine assumes that 256 is the maximum height
+		of the world you can get. Not actually maximum. It has no
+		feature to store chunks in up direction. Only in 
+		horizontal and vertical. Height is specified in
+		ivan_voxel_shared.h as IVAN_VOXEL_CHUNK_HEIGHT.
 */
 
 #ifndef IVAN_VOXEL_WORLD_H
@@ -26,18 +36,34 @@ struct voxel{
 
 
 struct voxel_chunk{
-	vec3 Pos;
+	int32_t HorizontalIndex;
+	int32_t VerticalIndex;
 
 	voxel* Voxels;
 	uint32_t VoxelsCount;
 };
+
+inline vec3 GetPosForVoxelChunk(voxel_chunk* Chunk){
+	vec3 Result;
+
+	Result.x = Chunk->HorizontalIndex * IVAN_VOXEL_CHUNK_WIDTH;
+	Result.y = 0.0f;
+	Result.z = Chunk->VerticalIndex * IVAN_VOXEL_CHUNK_WIDTH;
+
+	return(Result);
+}
 
 /*
 	X - Left-right chunk order number
 	Y - Top-down chunk order number
 	Z - Front-Back chunk order number
 */
-void GenerateVoxelChunk(memory_arena* Arena, voxel_chunk* Chunk, int32_t X, int32_t Y, int32_t Z){
+void GenerateVoxelChunk(
+	memory_arena* Arena, 
+	voxel_chunk* Chunk, 
+	int32_t HorizontalIndex,
+	int32_t VerticalIndex)
+{
 	float OneOverWidth = 1.0f / (float)IVAN_VOXEL_CHUNK_WIDTH;
 	float OneOverHeight = 1.0f / (float)IVAN_VOXEL_CHUNK_HEIGHT;
 
@@ -46,21 +72,20 @@ void GenerateVoxelChunk(memory_arena* Arena, voxel_chunk* Chunk, int32_t X, int3
 	Chunk->VoxelsCount = IVAN_MAX_VOXELS_IN_CHUNK;
 	Chunk->Voxels = (voxel*)PushSize(TempMem.Arena, Chunk->VoxelsCount * sizeof(voxel));
 
-	float PosX = (float)X * (float)IVAN_VOXEL_CHUNK_WIDTH;
-	float PosY = (float)Y * (float)IVAN_VOXEL_CHUNK_HEIGHT;
-	float PosZ = (float)Z * (float)IVAN_VOXEL_CHUNK_WIDTH;
+	Chunk->HorizontalIndex = HorizontalIndex;
+	Chunk->VerticalIndex = VerticalIndex;
 
-	Chunk->Pos = Vec3(PosX, PosY, PosZ);
+	float StartHeight = 20.0f;
 
-	float StartHeight = 10.0f;
+	vec3 ChunkPos = GetPosForVoxelChunk(Chunk);
 
 	//TODO(Dima): Check cache-friendly variations of this loop
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
 			float RandHeight = stb_perlin_noise3(
-				(float)(PosX + i) / 16.0f, 
-				(float)PosY / 16.0f, 
-				(float)(PosZ + j) / 16.0f, 0, 0, 0) * 5.0f + StartHeight;
+				(float)(ChunkPos.x + i) / 16.0f, 
+				(float)ChunkPos.y / 16.0f, 
+				(float)(ChunkPos.z + j) / 16.0f, 0, 0, 0) * 5.0f + StartHeight;
 			uint32_t RandHeightU32 = (uint32_t)(RandHeight + 0.5f);
 
 			//NOTE(Dima): Do not change IsAir sence because of this
@@ -82,6 +107,12 @@ void GenerateVoxelChunk(memory_arena* Arena, voxel_chunk* Chunk, int32_t X, int3
 	//EndTemporaryMemory(TempMem);
 }
 
+void LoadVoxelChunkFromFile(voxel_chunk* Chunk, int32_t x, int32_t y){
 
+}
+
+void StoreVoxelChunkToFile(voxel_chunk* Chunk){
+
+}
 
 #endif

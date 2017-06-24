@@ -44,89 +44,89 @@ GenerateVoxelMeshForChunk(
 						voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
 
 						if(UpVoxel.IsAir){
-							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
+							DoFaceWorkAtTop(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 
 						if(DownVoxel.IsAir){
-							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
+							DoFaceWorkAtBottom(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(RightVoxel.IsAir){
-							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
+							DoFaceWorkAtRight(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 						}
 
 						if(LeftVoxel.IsAir){
-							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
+							DoFaceWorkAtLeft(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 						}
 
 						if(FrontVoxel.IsAir){
-							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
+							DoFaceWorkAtFront(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 						}
 
 						if(BackVoxel.IsAir){
-							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
+							DoFaceWorkAtBack(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 						}
 					}
 					else{
 
 						if(i == 0){
-							DoFaceWorkAtLeft(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Left]);
+							DoFaceWorkAtLeft(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 						}
 
 						if(i == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							DoFaceWorkAtRight(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Right]);
+							DoFaceWorkAtRight(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 						}
 
 						if(j == 0){
-							DoFaceWorkAtFront(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Front]);
+							DoFaceWorkAtFront(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 						}
 
 						if(j == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							DoFaceWorkAtBack(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Back]);
+							DoFaceWorkAtBack(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 						}
 
 						if(k == 0){
-							DoFaceWorkAtBottom(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
+							DoFaceWorkAtBottom(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(k == (IVAN_VOXEL_CHUNK_HEIGHT - 1)){
-							DoFaceWorkAtTop(Result, VoxelPos, &TexSet->Sets[VoxelFaceTypeIndex_Top]);
+							DoFaceWorkAtTop(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 
 						PushFaceWorkForRightVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Right], 
+							TexSet->Sets[VoxelFaceTypeIndex_Right], 
 							VoxelPos);
 
 						PushFaceWorkForLeftVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Left], 
+							TexSet->Sets[VoxelFaceTypeIndex_Left], 
 							VoxelPos);
 
 						PushFaceWorkForUpperVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Top], 
+							TexSet->Sets[VoxelFaceTypeIndex_Top], 
 							VoxelPos);
 
 						PushFaceWorkForDownVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
+							TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
 							VoxelPos);
 
 						PushFaceWorkForFrontVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Front], 
+							TexSet->Sets[VoxelFaceTypeIndex_Front], 
 							VoxelPos);
 
 						PushFaceWorkForBackVoxel(
 							Chunk, Result, 
 							i, k, j, 
-							&TexSet->Sets[VoxelFaceTypeIndex_Back], 
+							TexSet->Sets[VoxelFaceTypeIndex_Back], 
 							VoxelPos);
 
 					}
@@ -135,7 +135,6 @@ GenerateVoxelMeshForChunk(
 		}
 	}
 
-	Result->IndicesCount = Result->ActiveIndexIndex;
 	Result->VerticesCount = Result->ActiveVertexIndex;
 
 	EndGeneration(Assets, GenerationID);

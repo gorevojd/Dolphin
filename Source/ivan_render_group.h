@@ -79,6 +79,7 @@ struct render_entry_voxel_mesh{
 	voxel_chunk_mesh* Mesh;
 	loaded_bitmap* Bitmap;
 	vec3 P;
+	int32 OneTextureWidth;
 
 	render_setup Setup;
 };

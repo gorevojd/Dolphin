@@ -260,25 +260,7 @@ LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
 
     Atlas->TextureFileName = FileName;
 
-/*
-    uint32 TexturesInfoArraySize = sizeof(dda_voxel_atlas_texture) * MaxTextureCount;
-    Atlas->TexturesInfo = (dda_voxel_atlas_texture*)malloc(TexturesInfoArraySize);
-    memset(Atlas->TexturesInfo, 0, TexturesInfoArraySize);
-*/
-
-/*    
-    Atlas->MaterialsCount = VoxelMaterial_Count;
-    Atlas->Materials = (voxel_tex_coords_set*)
-        malloc(sizeof(voxel_tex_coords_set) * Atlas->MaterialsCount);
-*/
-
     float UVOneTextureDelta = (float)OneTextureWidth / (float)AtlasWidth;
-
-    voxel_face_tex_coords_set DefaultSet;
-    DefaultSet.T0 = Vec2(0.0f, 0.0f);
-    DefaultSet.T1 = Vec2(UVOneTextureDelta, 0.0f);
-    DefaultSet.T2 = Vec2(UVOneTextureDelta);
-    DefaultSet.T3 = Vec2(0.0f, UVOneTextureDelta);
 
     for(int MaterialIndex = 0;
         MaterialIndex < VoxelMaterial_Count;
@@ -288,7 +270,7 @@ LoadVoxelAtlas(char* FileName, uint32 AtlasWidth, uint32 OneTextureWidth)
             i < VoxelFaceTypeIndex_Count;
             i++)
         {
-            Atlas->Materials[MaterialIndex].Sets[i] = DefaultSet;
+            Atlas->Materials[MaterialIndex].Sets[i] = 0;
         }
     }
 
@@ -847,82 +829,52 @@ DescribeVoxelAtlasTexture(
 
     Assert(CurrTextureIndex < Atlas->MaxTextureCount);
 
-    uint32 CurrTextureIndexX = (TexturesByWidth - 1) & CurrTextureIndex;
-    uint32 CurrTextureIndexY = CurrTextureIndex / TexturesByWidth;
-
-    float OneTexelDelta = 1.0f / (float)Atlas->AtlasWidth;
-#if 0
-    float UVOneTextureDelta = (float)Atlas->OneTextureWidth / (float)Atlas->AtlasWidth;
-    vec2 StartUV = 
-        {(float)CurrTextureIndexX * UVOneTextureDelta,
-        (float)CurrTextureIndexY * UVOneTextureDelta};
-
-    voxel_face_tex_coords_set TexSet;
-    TexSet.T0 = StartUV;
-    TexSet.T1 = Vec2(StartUV.x + UVOneTextureDelta, StartUV.y);
-    TexSet.T2 = Vec2(StartUV.x + UVOneTextureDelta, StartUV.y + UVOneTextureDelta);
-    TexSet.T3 = Vec2(StartUV.x, StartUV.y + UVOneTextureDelta);
-#else
-    float UVOneTextureDelta = (float)Atlas->OneTextureWidth / (float)Atlas->AtlasWidth;
-    vec2 StartUV = 
-        {(float)CurrTextureIndexX * UVOneTextureDelta,
-        (float)CurrTextureIndexY * UVOneTextureDelta};
-
-    voxel_face_tex_coords_set TexSet;
-    TexSet.T0 = StartUV;
-    TexSet.T1 = Vec2(StartUV.x + UVOneTextureDelta - OneTexelDelta, StartUV.y);
-    TexSet.T2 = Vec2(
-        StartUV.x + UVOneTextureDelta - OneTexelDelta, 
-        StartUV.y + UVOneTextureDelta - OneTexelDelta);
-    TexSet.T3 = Vec2(StartUV.x, StartUV.y + UVOneTextureDelta - OneTexelDelta);
-#endif
-
     voxel_tex_coords_set* MatTexSet = &Atlas->Materials[MaterialType];
 
     switch(FaceTypeIndex){
         case(VoxelFaceTypeIndex_Top):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_Bottom):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_Left):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;            
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = CurrTextureIndex;            
         }break;
 
         case(VoxelFaceTypeIndex_Right):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_Front):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_Back):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_All):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_Side):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Left] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Right] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Front] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Back] = CurrTextureIndex;
         }break;
 
         case(VoxelFaceTypeIndex_TopBottom):{
-            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = TexSet;
-            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = TexSet;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Bottom] = CurrTextureIndex;
+            MatTexSet->Sets[VoxelFaceTypeIndex_Top] = CurrTextureIndex;
         }break;
 
         default:{

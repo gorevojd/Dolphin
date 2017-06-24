@@ -7,6 +7,7 @@ struct opengl_program_common{
     GLuint VertPID;
     GLuint VertNID;
     GLuint VertUVID;
+    GLuint PUVNID;
 };
 
 struct voxel_shader_program{
@@ -15,6 +16,8 @@ struct voxel_shader_program{
     GLint ProjectionLoc;
     GLint ViewLoc;
     GLint ModelLoc;
+    GLint OneTextureWidthLoc;
+
     GLint DiffuseMapLoc;
     GLint DirLightDirectionLoc;
     GLint DirLightDiffuseLoc;

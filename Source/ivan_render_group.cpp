@@ -91,7 +91,7 @@ inline void SetCameraTransform(
 
     NewSetup.DirLightDirection = Normalize(Vec3(0.5f, -0.5f, 0.5f));
     NewSetup.DirLightDiffuse = Vec3(1.0f, 1.0f, 1.0f);
-    NewSetup.DirLightAmbient = Vec3(1.0f, 1.0f, 1.0f);
+    NewSetup.DirLightAmbient = Vec3(0.05f);
 
     RenderGroup->LastRenderSetup = NewSetup;
 }
@@ -294,19 +294,25 @@ inline loaded_font* PushFont(render_group* Group, font_id ID){
 
 extern bitmap_id GetBitmapForVoxelAtlas(game_assets* Assets, loaded_voxel_atlas* Atlas);
 //extern void LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate);
-inline loaded_bitmap*
+
+struct voxel_atlas_bitmap_info{
+    loaded_bitmap* Bitmap;
+    int32 OneTextureWidth;
+};
+
+inline voxel_atlas_bitmap_info
 PushVoxelAtlas(
     render_group* RenderGroup, 
     voxel_atlas_id ID)
 {
-    loaded_bitmap* Result = 0;
+    voxel_atlas_bitmap_info Result = {};
 
-#if 1
     loaded_voxel_atlas* Atlas = GetVoxelAtlas(RenderGroup->Assets, ID, RenderGroup->GenerationID);
     if(Atlas){
         bitmap_id BmpID = GetBitmapForVoxelAtlas(RenderGroup->Assets, Atlas);
-        Result = GetBitmap(RenderGroup->Assets, BmpID, RenderGroup->GenerationID);
-		if (Result) {
+        Result.Bitmap = GetBitmap(RenderGroup->Assets, BmpID, RenderGroup->GenerationID);
+		Result.OneTextureWidth = Atlas->OneTextureWidth;
+        if (Result.Bitmap) {
             
         }
 		else {
@@ -316,7 +322,6 @@ PushVoxelAtlas(
     else{
         LoadVoxelAtlasAsset(RenderGroup->Assets, ID, false);
     }
-#endif
 
     return(Result);
 }
@@ -330,9 +335,12 @@ inline void PushVoxelChunkMesh(
     render_entry_voxel_mesh* PushedMesh = PUSH_RENDER_ELEMENT(RenderGroup, render_entry_voxel_mesh);
 
     if(PushedMesh){
+        voxel_atlas_bitmap_info VoxelBitmapInfo = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
+
         PushedMesh->Mesh = Mesh;
-        PushedMesh->Bitmap = PushVoxelAtlas(RenderGroup, VoxelAtlasID);
+        PushedMesh->Bitmap = VoxelBitmapInfo.Bitmap;
         PushedMesh->P = Pos;
+        PushedMesh->OneTextureWidth = VoxelBitmapInfo.OneTextureWidth;
 
         PushedMesh->Setup = RenderGroup->LastRenderSetup;
     }

@@ -1,4 +1,9 @@
 /*
+	IMPORTANT:
+		I'm about optimizing some things. I will use
+		16 bits per position(9 bist per y, and 5 and 5
+		for x, z), 3 bits per normal index;
+
 	TODO(DIMA): 
 		Think about how to allocate memory for mesh
 
@@ -20,7 +25,7 @@
 		7 bits per x, 9 bits per y, 7 bits per z.
 		If we want to say that we will never change 
 		chunk default metrics, than we should store 
-		4 bits per x and z and 7 bits per y. So after
+		4 bits per x and z and 8 bits per y. So after
 		building mesh we can apply model transform
 		matrix to transpose our chunk to needed place.
 */
@@ -30,148 +35,158 @@
 
 #include "ivan_voxel_shared.h"
 
+enum voxel_texture_vert_type{
+	VoxelTextureVertType_UpLeft,
+	VoxelTextureVertType_UpRight,
+	VoxelTextureVertType_DownRight,
+	VoxelTextureVertType_DownLeft,
+};
+
+
 struct voxel_chunk_mesh{
 #define VOXEL_CHUNK_MESH_SOA 0
-	/*Vertices*/
-	vec3* Positions;
-	vec2* TexCoords;
-	vec3* Normals;
+	uint32_t* PUVN;
 
 	uint32_t VerticesCount;
 	uint32_t ActiveVertexIndex;
-
-	/*Indices*/
-	uint32_t* Indices;
-
-	uint32_t IndicesCount;
-	uint32_t ActiveIndexIndex;
 };
+
+inline uint32_t GetEncodedVertexData(
+	vec3 Pos, 
+	uint8_t TexIndex,
+	voxel_texture_vert_type TexVertType,
+	uint8_t NormIndex)
+{
+	uint32_t Result = 0;
+
+	uint32_t EncP = 
+		(((uint32_t)(Pos.x) & 31) << 27) | 
+		(((uint32_t)(Pos.y) & 511) << 18) | 
+		(((uint32_t)(Pos.z) & 31) << 13);
+
+	uint32_t EncN = ((uint32_t)(NormIndex) & 7) << 10;
+	uint32_t EncT = ((uint32_t)(TexIndex) << 2) | ((uint32_t)(TexVertType) & 3);
+
+	Result = EncP | EncN | EncT;
+
+	return(Result);
+}
 
 inline void PushVoxelMeshChunkFace(
 	voxel_chunk_mesh* Mesh,
-	vec3 P0, vec2 T0,
-	vec3 P1, vec2 T1,
-	vec3 P2, vec2 T2,
-	vec3 P3, vec2 T3,
-	vec3 N)
+	vec3 P0, 
+	vec3 P1,
+	vec3 P2,
+	vec3 P3,
+	uint8_t TextureIndex,
+	uint8_t NormalIndex)
 {
 	uint32_t Index = Mesh->ActiveVertexIndex;
-	uint32_t IndexIndex = Mesh->ActiveIndexIndex;
 
-	/*Positions*/
-	Mesh->Positions[Index] = P0;
-	Mesh->Positions[Index + 1] = P1;
-	Mesh->Positions[Index + 2] = P2;
-	Mesh->Positions[Index + 3] = P3;
+	uint32_t Value0 = GetEncodedVertexData(P0, TextureIndex, VoxelTextureVertType_UpLeft, NormalIndex);
+	uint32_t Value1 = GetEncodedVertexData(P1, TextureIndex, VoxelTextureVertType_UpRight, NormalIndex);
+	uint32_t Value2 = GetEncodedVertexData(P2, TextureIndex, VoxelTextureVertType_DownRight, NormalIndex);
+	uint32_t Value3 = GetEncodedVertexData(P3, TextureIndex, VoxelTextureVertType_DownLeft, NormalIndex);
 
-	/*Normals*/
-	Mesh->Normals[Index] = N;
-	Mesh->Normals[Index + 1] = N;
-	Mesh->Normals[Index + 2] = N;
-	Mesh->Normals[Index + 3] = N;
+	Mesh->PUVN[Index] = Value0;
+	Mesh->PUVN[Index + 1] = Value1;
+	Mesh->PUVN[Index + 2] = Value2;
 
-	/*TextureCoords*/
-	Mesh->TexCoords[Index] = T0;
-	Mesh->TexCoords[Index + 1] = T1;
-	Mesh->TexCoords[Index + 2] = T2;
-	Mesh->TexCoords[Index + 3] = T3;
+	Mesh->PUVN[Index + 3] = Value0;
+	Mesh->PUVN[Index + 4] = Value2;
+	Mesh->PUVN[Index + 5] = Value3;
 
-	/*Indices*/
-	Mesh->Indices[IndexIndex] = Index;
-	Mesh->Indices[IndexIndex + 1] = Index + 1;
-	Mesh->Indices[IndexIndex + 2] = Index + 2;
-
-	Mesh->Indices[IndexIndex + 3] = Index;
-	Mesh->Indices[IndexIndex + 4] = Index + 2;
-	Mesh->Indices[IndexIndex + 5] = Index + 3;
-
-	/*Incrementing*/
-	Mesh->ActiveVertexIndex += 4;
-	Mesh->ActiveIndexIndex += 6; 
+	Mesh->ActiveVertexIndex += 6;
 }
 
 inline void DoFaceWorkAtFront(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
-		Vec3(0.0f, 0.0f, 1.0f));	
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Front);	
 }
 
 inline void DoFaceWorkAtBack(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
-		Vec3(0.0f, 0.0f, -1.0f));
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Back);
 }
 
 inline void DoFaceWorkAtLeft(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T1,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T2,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
-		Vec3(-1.0f, 0.0f, 0.0f));	
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Left);	
 }
 
 inline void DoFaceWorkAtRight(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T0,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T3,
-		Vec3(1.0f, 0.0f, 0.0f));
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Right);
 }
 
 inline void DoFaceWorkAtTop(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T0,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f), FaceT->T1,
-		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T2,
-		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f), FaceT->T3,
-		Vec3(0.0f, 1.0f, 0.0f));	
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y + 0.5f, Pos.z + 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Up);	
 }
 
 inline void DoFaceWorkAtBottom(
 	voxel_chunk_mesh* Mesh,
 	vec3 Pos,
-	voxel_face_tex_coords_set* FaceT)
+	uint8_t TextureIndexInAtlas)
 {
 	PushVoxelMeshChunkFace(
 		Mesh,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T0,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f), FaceT->T1,
-		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T2,
-		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f), FaceT->T3,
-		Vec3(0.0f, -1.0f, 0.0f));	
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z + 0.5f),
+		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
+		TextureIndexInAtlas,
+		VoxelNormalIndex_Down);	
 }
 
 inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t j, int32_t k){
@@ -182,13 +197,6 @@ inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t 
 		(k >= 0 && (k < IVAN_VOXEL_CHUNK_WIDTH)) &&
 		Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, k, j)].IsAir)
 	{
-/*		voxel UpVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k + 1)];
-		voxel DownVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k - 1)];
-		voxel RightVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i + 1, j, k)];
-		voxel LeftVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i - 1, j, k)];
-		voxel FrontVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
-		voxel BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j - 1, k)];*/
-	
 		Result = 1;
 	}
 
@@ -201,7 +209,7 @@ inline void PushFaceWorkForDownVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -210,7 +218,7 @@ inline void PushFaceWorkForDownVoxel(
 		InitY - 1,
 		InitZ))
 	{
-		DoFaceWorkAtBottom(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtBottom(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
@@ -220,7 +228,7 @@ inline void PushFaceWorkForUpperVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -229,7 +237,7 @@ inline void PushFaceWorkForUpperVoxel(
 		InitY + 1,
 		InitZ))
 	{
-		DoFaceWorkAtTop(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtTop(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
@@ -239,7 +247,7 @@ inline void PushFaceWorkForLeftVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -248,7 +256,7 @@ inline void PushFaceWorkForLeftVoxel(
 		InitY,
 		InitZ))
 	{
-		DoFaceWorkAtLeft(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtLeft(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
@@ -258,7 +266,7 @@ inline void PushFaceWorkForRightVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -267,7 +275,7 @@ inline void PushFaceWorkForRightVoxel(
 		InitY,
 		InitZ))
 	{
-		DoFaceWorkAtRight(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtRight(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
@@ -277,7 +285,7 @@ inline void PushFaceWorkForFrontVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -286,7 +294,7 @@ inline void PushFaceWorkForFrontVoxel(
 		InitY,
 		InitZ - 1))
 	{
-		DoFaceWorkAtFront(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtFront(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
@@ -296,7 +304,7 @@ inline void PushFaceWorkForBackVoxel(
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
-	voxel_face_tex_coords_set* FaceT,
+	uint8_t TextureIndexInAtlas,
 	vec3 VoxelPos)
 {
 	if(NeighbourVoxelExistAndAir(
@@ -305,7 +313,7 @@ inline void PushFaceWorkForBackVoxel(
 		InitY,
 		InitZ + 1))
 	{
-		DoFaceWorkAtBack(Mesh, VoxelPos, FaceT);
+		DoFaceWorkAtBack(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
