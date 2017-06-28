@@ -5,6 +5,7 @@
 #include "ivan_particle.cpp"
 #include "ivan_render.cpp"
 #include "ivan_voxel_mesh.cpp"
+#include "ivan_voxel_world.cpp"
 
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
@@ -39,8 +40,8 @@ INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranSta
     
 	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
 		task_with_memory* Task = TranState->Tasks + i;
-		if (!Task->BeingUsed){
-        //if(AtomicCompareExchangeUInt32((uint32* volatile)&Task->BeingUsed, true, false) == false){
+		//if (!Task->BeingUsed){
+        if(AtomicCompareExchangeUInt32((uint32* volatile)&Task->BeingUsed, true, false) == false){
 			FoundTask = Task;
 			Task->BeingUsed = true;
             Task->DependsOnGameMode = DependsOnGameMode;
@@ -204,33 +205,15 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         {
             task_with_memory* Task = TranState->Tasks + TaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
+            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(10));
         }
 
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
-#if 1
-        TranState->VoxelChunk;
-        TranState->VoxelChunk.Voxels = (voxel*)malloc(IVAN_MAX_VOXELS_IN_CHUNK * sizeof(voxel));
-        GenerateVoxelChunk(&TranState->TranArena, &TranState->VoxelChunk, 0, 0);
-        
-        TranState->MeshResult;
-        TranState->MeshResult.PUVN = PushArray(&TranState->TranArena, IVAN_MAX_MESH_CHUNK_FACE_COUNT * 6, uint32_t);
 
-        asset_vector VAMatchVector = {};
-        VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Minecraft;
-        asset_vector VAWeightVector = {};
-        VAWeightVector.Data[Tag_VoxelAtlasType] = 10.0f;
-        TranState->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(TranState->Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
-
-        GenerateVoxelMeshForChunk(
-            &TranState->MeshResult, 
-            &TranState->VoxelChunk, 
-            TranState->Assets,
-            TranState->VoxelAtlasID);
-#endif
+        TranState->VoxelChunkManager = AllocateVoxelChunkManager(TranState, TranState->Assets);
 
         TranState->IsInitialized = true;
     }
@@ -329,11 +312,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
-    PushVoxelChunkMesh(
-        RenderGroup,
-        &TranState->MeshResult,
-        TranState->VoxelAtlasID,
-        Vec3(0.0f, 0.0f, 0.0f));
+    UpdateVoxelChunks(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
 
     hero_bitmap_ids HeroBitmaps = {};
     asset_vector MatchVector = {};

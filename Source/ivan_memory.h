@@ -87,7 +87,7 @@ PushString(memory_arena* Arena, char* Source){
 inline void ZeroSize(void* Memory, size_t Size){
 	uint8* Ptr = (uint8*)Memory;
 	for (int i = 0; i < Size; i++){
-		*Ptr = 0;
+		*Ptr++ = 0;
 	}
 }
 
@@ -105,4 +105,4 @@ inline void InitializeMemoryArena(memory_arena* Arena, size_t Size, void* BaseAd
 	Arena->MemorySize = Size;
 }
 
-#endif
+#endif`

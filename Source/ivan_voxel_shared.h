@@ -90,30 +90,6 @@ enum voxel_face_type_index{
 };
 
 struct voxel_tex_coords_set{
-#if 0
-	union {
-		struct{
-			union{
-				struct{
-					voxel_face_tex_coords_set Top;
-					voxel_face_tex_coords_set Bottom;
-				};
-				voxel_face_tex_coords_set TopBottom;
-			};
-			union{
-				struct{
-					voxel_face_tex_coords_set Left;
-					voxel_face_tex_coords_set Right;
-					voxel_face_tex_coords_set Front;
-					voxel_face_tex_coords_set Back;
-				};
-				voxel_face_tex_coords_set Side;
-			};
-		};
-		voxel_face_tex_coords_set All;
-		voxel_face_tex_coords_set Sets[VoxelFaceTypeIndex_Count];
-	};
-#else
 	union {
 		struct{
 			union{
@@ -136,7 +112,6 @@ struct voxel_tex_coords_set{
 		uint8_t All;
 		uint8_t Sets[VoxelFaceTypeIndex_Count];
 	};
-#endif
 };
 
 struct voxel_texture_face_atlas{

@@ -136,6 +136,7 @@ GenerateVoxelMeshForChunk(
 	}
 
 	Result->VerticesCount = Result->ActiveVertexIndex;
+	Result->MeshHandle = 0;
 
 	EndGeneration(Assets, GenerationID);
 }

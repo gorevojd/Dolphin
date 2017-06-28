@@ -45,6 +45,9 @@ enum voxel_texture_vert_type{
 
 struct voxel_chunk_mesh{
 #define VOXEL_CHUNK_MESH_SOA 0
+
+	void* MeshHandle;
+
 	uint32_t* PUVN;
 
 	uint32_t VerticesCount;

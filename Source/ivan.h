@@ -77,18 +77,24 @@ struct transient_state{
 	bool32 IsInitialized;
 	memory_arena TranArena;
 	
-	task_with_memory Tasks[16];
+	task_with_memory Tasks[50];
+	//task_with_memory VoxelTasks[];
 
 	loaded_bitmap GroundBitmap;
 	platform_work_queue* HighPriorityQueue;
 	platform_work_queue* LowPriorityQueue;
 
 	uint32 MainGenerationID;
-
 	
+#if 0
+	voxel_chunk_header VoxelChunkSentinel;
+
 	voxel_chunk VoxelChunk;
 	voxel_chunk_mesh MeshResult;
 	voxel_atlas_id VoxelAtlasID;
+#else
+	voxel_chunk_manager* VoxelChunkManager;
+#endif
 };
 
 GLOBAL_VARIABLE platform_api Platform;

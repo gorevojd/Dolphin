@@ -34,7 +34,6 @@ struct voxel{
 	voxel_mat_type Type;
 };
 
-
 struct voxel_chunk{
 	int32_t HorizontalIndex;
 	int32_t VerticalIndex;
@@ -42,6 +41,110 @@ struct voxel_chunk{
 	voxel* Voxels;
 	uint32_t VoxelsCount;
 };
+
+enum voxel_chunk_state{
+	VoxelChunkState_Unloaded,
+	VoxelChunkState_InProcess,
+	VoxelChunkState_Generated,
+};
+
+struct voxel_chunk_header{
+	voxel_chunk_header* Next;
+	voxel_chunk_header* Prev;
+
+	struct task_with_memory* Task;
+
+	voxel_chunk_state State;
+
+	int32_t IsSentinel;
+
+	int32_t TempNumber;
+
+	voxel_chunk* Chunk;
+	voxel_chunk_mesh* Mesh;
+};
+
+struct voxel_table_pair{
+	uint64_t Key;
+	voxel_chunk_header* Value;
+	
+	voxel_table_pair* NextPair;
+};
+
+
+struct voxel_chunk_manager{
+	voxel_chunk_header* VoxelChunkSentinel;
+	ticket_mutex Mutex;
+
+	transient_state* TranState;
+
+	memory_arena HashTableArena;
+	memory_arena ListArena;
+
+	int32_t CurrHorizontalIndex;
+	int32_t CurrVerticalIndex;
+
+	int32_t TempLstCount;
+
+	int32_t ChunksViewDistance;
+	voxel_atlas_id VoxelAtlasID;
+};
+
+inline void InsertChunkHeaderAtFront(voxel_chunk_manager* Manager, voxel_chunk_header* Header){
+	Header->Prev = Manager->VoxelChunkSentinel;
+	Header->Next = Manager->VoxelChunkSentinel->Next;
+
+	Header->Prev->Next = Header;
+	Header->Next->Prev = Header;
+}
+
+inline uint32_t VoxelHashFunc(uint64_t Key){
+	uint8_t* Bytes = (uint8_t*)&Key;
+
+	uint32_t Result = 0;
+
+	int Index = 0;
+	for(Index; Index < 8; Index++){
+		Result = (Result * 1664525) + (uint8_t)(Bytes[Index]) + 1013904223;
+	}
+
+	return(Result);
+}
+
+inline uint64_t GenerateKeyForChunkIndices(int32_t HorizontalIndex, int32_t VerticalIndex){
+	uint64_t Result;
+
+#if 0
+	Result = (HorizontalIndex & 0xFFFFFFFF) | (((uint64_t)(VerticalIndex) << 32) & 0xFFFFFFFF00000000);
+#else
+	Result = (uint32_t)HorizontalIndex | ((uint64_t)((uint32_t)(VerticalIndex)) << 32);
+#endif
+
+	return(Result);
+}
+
+inline void GetCurrChunkIndexBasedOnCamera(vec3 CamPos, int32_t* OutX, int32_t* OutY){
+	int32_t ResX;
+	int32_t CamPosX = (int32_t)(CamPos.x);
+	if(CamPos.x >= 0.0f){
+		ResX = CamPosX / IVAN_VOXEL_CHUNK_WIDTH;
+	}
+	else{
+		ResX = -(CamPosX / IVAN_VOXEL_CHUNK_WIDTH) - 1;
+	}
+
+	int32_t ResY;
+	int32_t CamPosY = (int32_t)CamPos.z;
+	if(CamPos.z >= 0.0f){
+		ResY = CamPosY / IVAN_VOXEL_CHUNK_WIDTH;
+	}
+	else{
+		ResY = -(CamPosY / IVAN_VOXEL_CHUNK_WIDTH) - 1;
+	}
+
+	*OutX = ResX;
+	*OutY = ResY;
+}
 
 inline vec3 GetPosForVoxelChunk(voxel_chunk* Chunk){
 	vec3 Result;
@@ -58,61 +161,8 @@ inline vec3 GetPosForVoxelChunk(voxel_chunk* Chunk){
 	Y - Top-down chunk order number
 	Z - Front-Back chunk order number
 */
-void GenerateVoxelChunk(
-	memory_arena* Arena, 
-	voxel_chunk* Chunk, 
-	int32_t HorizontalIndex,
-	int32_t VerticalIndex)
-{
-	float OneOverWidth = 1.0f / (float)IVAN_VOXEL_CHUNK_WIDTH;
-	float OneOverHeight = 1.0f / (float)IVAN_VOXEL_CHUNK_HEIGHT;
-
-	temporary_memory TempMem = BeginTemporaryMemory(Arena);
-
-	Chunk->VoxelsCount = IVAN_MAX_VOXELS_IN_CHUNK;
-	Chunk->Voxels = (voxel*)PushSize(TempMem.Arena, Chunk->VoxelsCount * sizeof(voxel));
-
-	Chunk->HorizontalIndex = HorizontalIndex;
-	Chunk->VerticalIndex = VerticalIndex;
-
-	float StartHeight = 20.0f;
-
-	vec3 ChunkPos = GetPosForVoxelChunk(Chunk);
-
-	//TODO(Dima): Check cache-friendly variations of this loop
-	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
-		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
-			float RandHeight = stb_perlin_noise3(
-				(float)(ChunkPos.x + i) / 16.0f, 
-				(float)ChunkPos.y / 16.0f, 
-				(float)(ChunkPos.z + j) / 16.0f, 0, 0, 0) * 5.0f + StartHeight;
-			uint32_t RandHeightU32 = (uint32_t)(RandHeight + 0.5f);
-
-			//NOTE(Dima): Do not change IsAir sence because of this
-			int32_t TempFlag = 0;
-			for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT; k++){
-				voxel* TempVoxel = &Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j, k)];
-				if(k == RandHeightU32){
-					TempVoxel->IsAir = TempFlag;
-					TempVoxel->Type = VoxelMaterial_GrassyGround;
-					TempFlag = 1;					
-				}
-				else{
-					TempVoxel->IsAir = TempFlag;
-					TempVoxel->Type = VoxelMaterial_Ground;
-				}
-			}
-		}
-	}
-	//EndTemporaryMemory(TempMem);
-}
-
-void LoadVoxelChunkFromFile(voxel_chunk* Chunk, int32_t x, int32_t y){
-
-}
-
-void StoreVoxelChunkToFile(voxel_chunk* Chunk){
-
-}
+INTERNAL_FUNCTION void GenerateVoxelChunk(
+	memory_arena* Arena, voxel_chunk* Chunk, 
+	int32_t HorizontalIndex, int32_t VerticalIndex);
 
 #endif
