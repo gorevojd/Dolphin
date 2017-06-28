@@ -130,7 +130,7 @@ inline void GetCurrChunkIndexBasedOnCamera(vec3 CamPos, int32_t* OutX, int32_t* 
 		ResX = CamPosX / IVAN_VOXEL_CHUNK_WIDTH;
 	}
 	else{
-		ResX = -(CamPosX / IVAN_VOXEL_CHUNK_WIDTH) - 1;
+		ResX = (CamPosX / IVAN_VOXEL_CHUNK_WIDTH) - 1;
 	}
 
 	int32_t ResY;
@@ -139,7 +139,7 @@ inline void GetCurrChunkIndexBasedOnCamera(vec3 CamPos, int32_t* OutX, int32_t* 
 		ResY = CamPosY / IVAN_VOXEL_CHUNK_WIDTH;
 	}
 	else{
-		ResY = -(CamPosY / IVAN_VOXEL_CHUNK_WIDTH) - 1;
+		ResY = (CamPosY / IVAN_VOXEL_CHUNK_WIDTH) - 1;
 	}
 
 	*OutX = ResX;
