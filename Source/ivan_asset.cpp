@@ -298,7 +298,7 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
             task_with_memory* Task = 0;
 
             if(!Immediate){
-                Task = BeginTaskWithMemory(Assets->TranState, false);
+                Task = BeginTaskWithMemory(Assets->TranState);
             }
 
             if(Immediate || Task){
@@ -362,7 +362,7 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
             AssetState_Queued,
             AssetState_Unloaded) == AssetState_Unloaded)
     {
-        task_with_memory* Task = BeginTaskWithMemory(Assets->TranState, false);
+        task_with_memory* Task = BeginTaskWithMemory(Assets->TranState);
         if(Task){
 
             asset* Asset = Assets->Assets + ID.Value;
@@ -424,7 +424,7 @@ LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
             task_with_memory* Task = 0;
 
             if(!Immediate){
-                Task = BeginTaskWithMemory(Assets->TranState, false);
+                Task = BeginTaskWithMemory(Assets->TranState);
             }
 
             if(Immediate || Task){
@@ -494,7 +494,7 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
             task_with_memory* Task = 0;
 
             if(!Immediate){
-                Task = BeginTaskWithMemory(Assets->TranState, false);
+                Task = BeginTaskWithMemory(Assets->TranState);
             }
 
             if(Immediate || Task){

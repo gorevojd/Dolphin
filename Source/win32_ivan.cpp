@@ -1466,7 +1466,7 @@ int WINAPI WinMain(
 
     game_memory GameMemory = {};
     GameMemory.PermanentStorageSize = GD_MEGABYTES(200);
-    GameMemory.TransientStorageSize = GD_MEGABYTES(800);
+    GameMemory.TransientStorageSize = GD_MEGABYTES(1500);
     
     uint32 MemoryBlockSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
     void* MemoryBlock = VirtualAlloc(0, MemoryBlockSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);

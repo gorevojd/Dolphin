@@ -1,22 +1,25 @@
 
 /*
 	TODO(DIMA):
-
-		1) Least Resently Used algorithm for chunks
-
+		1) Moving generation of the chunks to the other thread
+	
 		2) Dynamic chunk load from asset file
 
 		3) Frustrum culling for voxel chunks
 
-		4) Think about how to manage multiple chunks...
-		Use double linked list??
+		4) Chunk info loading/saving from files
 
-	NOTE:
+		5) Chunks mesh generator excluding side faces
+
+	NOTE(DIMA):
 		1) My voxel engine assumes that 256 is the maximum height
 		of the world you can get. Not actually maximum. It has no
 		feature to store chunks in up direction. Only in 
 		horizontal and vertical. Height is specified in
 		ivan_voxel_shared.h as IVAN_VOXEL_CHUNK_HEIGHT.
+
+		2) You need to guarantee that Manager->ListArena
+		will have enough space to contain its elements.
 */
 
 #ifndef IVAN_VOXEL_WORLD_H
@@ -27,19 +30,17 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include "stb_perlin.h"
 
-
-struct voxel{
-	//TODO(Dima): Encode this data to 16 or 32 bit unsigned integer
-	bool IsAir;
-	voxel_mat_type Type;
-};
-
 struct voxel_chunk{
 	int32_t HorizontalIndex;
 	int32_t VerticalIndex;
 
-	voxel* Voxels;
+	uint8_t* Voxels;
 	uint32_t VoxelsCount;
+
+	voxel_chunk* LeftNeighbour;
+	voxel_chunk* RightNeighbour;
+	voxel_chunk* FrontNeighbour;
+	voxel_chunk* BackNeighbour;
 };
 
 enum voxel_chunk_state{
@@ -48,17 +49,25 @@ enum voxel_chunk_state{
 	VoxelChunkState_Generated,
 };
 
+enum voxel_mesh_state{
+	VoxelMeshState_Unloaded,
+	VoxelMeshState_InProcess,
+	VoxelMeshState_Generated,
+};
+
+
 struct voxel_chunk_header{
 	voxel_chunk_header* Next;
 	voxel_chunk_header* Prev;
 
-	struct task_with_memory* Task;
+	struct task_with_memory* ChunkTask;
+	struct task_with_memory* MeshTask;
 
-	voxel_chunk_state State;
+	voxel_chunk_state ChunkState;
+	voxel_mesh_state MeshState;
 
 	int32_t IsSentinel;
-
-	int32_t TempNumber;
+	int32_t NeedsToBeGenerated;
 
 	voxel_chunk* Chunk;
 	voxel_chunk_mesh* Mesh;
@@ -83,8 +92,6 @@ struct voxel_chunk_manager{
 
 	int32_t CurrHorizontalIndex;
 	int32_t CurrVerticalIndex;
-
-	int32_t TempLstCount;
 
 	int32_t ChunksViewDistance;
 	voxel_atlas_id VoxelAtlasID;
@@ -114,11 +121,7 @@ inline uint32_t VoxelHashFunc(uint64_t Key){
 inline uint64_t GenerateKeyForChunkIndices(int32_t HorizontalIndex, int32_t VerticalIndex){
 	uint64_t Result;
 
-#if 0
-	Result = (HorizontalIndex & 0xFFFFFFFF) | (((uint64_t)(VerticalIndex) << 32) & 0xFFFFFFFF00000000);
-#else
 	Result = (uint32_t)HorizontalIndex | ((uint64_t)((uint32_t)(VerticalIndex)) << 32);
-#endif
 
 	return(Result);
 }

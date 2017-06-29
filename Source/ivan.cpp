@@ -35,21 +35,33 @@ INTERNAL_FUNCTION void UpdateCameraVectors(
     Camera->Up = Up;
 }
 
-INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState, bool32 DependsOnGameMode){
-	task_with_memory* FoundTask = 0;
-    
-	for (int i = 0; i < ArrayCount(TranState->Tasks); i++){
-		task_with_memory* Task = TranState->Tasks + i;
-		//if (!Task->BeingUsed){
+inline task_with_memory* BeginTaskWithMemory_(task_with_memory* Tasks, int32 TasksCount){
+    task_with_memory* FoundTask = 0;
+
+    for (int i = 0; i < TasksCount; i++){
+        task_with_memory* Task = &Tasks[i];
         if(AtomicCompareExchangeUInt32((uint32* volatile)&Task->BeingUsed, true, false) == false){
-			FoundTask = Task;
-			Task->BeingUsed = true;
-            Task->DependsOnGameMode = DependsOnGameMode;
-			Task->Memory = BeginTemporaryMemory(&Task->Arena);
-			break;
-		}
-	}
+            FoundTask = Task;
+            Task->Memory = BeginTemporaryMemory(&Task->Arena);
+            break;
+        }
+    }
+    return(FoundTask);
+}
+
+INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
+	task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->Tasks, ArrayCount(TranState->Tasks));
 	return(FoundTask);
+}
+
+INTERNAL_FUNCTION task_with_memory* BeginChunkTaskWithMemory(transient_state* TranState){
+    task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->ChunkTasks, ArrayCount(TranState->ChunkTasks));
+    return(FoundTask);
+}
+
+INTERNAL_FUNCTION task_with_memory* BeginMeshTaskWithMemory(transient_state* TranState){
+    task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->MeshTasks, ArrayCount(TranState->MeshTasks));
+    return(FoundTask);
 }
 
 INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
@@ -205,7 +217,25 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         {
             task_with_memory* Task = TranState->Tasks + TaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(10));
+            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
+        }
+
+        for(int MeshTaskIndex = 0;
+            MeshTaskIndex < ArrayCount(TranState->MeshTasks);
+            MeshTaskIndex++)
+        {
+            task_with_memory* Task = TranState->MeshTasks + MeshTaskIndex;
+            Task->BeingUsed = false;
+            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(4700));
+        }
+
+        for(int ChunkTaskIndex = 0;
+            ChunkTaskIndex < ArrayCount(TranState->ChunkTasks);
+            ChunkTaskIndex++)
+        {
+            task_with_memory* Task = TranState->ChunkTasks + ChunkTaskIndex;
+            Task->BeingUsed = false;
+            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(66));
         }
 
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState, &Memory->TextureOpQueue);

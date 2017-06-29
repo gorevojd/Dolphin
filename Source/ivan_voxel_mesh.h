@@ -2,7 +2,9 @@
 	IMPORTANT:
 		I'm about optimizing some things. I will use
 		16 bits per position(9 bist per y, and 5 and 5
-		for x, z), 3 bits per normal index;
+		for x, z), 3 bits per normal index, 8 bits per 
+		texture index, 2 bits for face index type(upper left, 
+		lower right and etc.)
 
 	TODO(DIMA): 
 		Think about how to allocate memory for mesh
@@ -41,7 +43,6 @@ enum voxel_texture_vert_type{
 	VoxelTextureVertType_DownRight,
 	VoxelTextureVertType_DownLeft,
 };
-
 
 struct voxel_chunk_mesh{
 #define VOXEL_CHUNK_MESH_SOA 0
@@ -198,7 +199,7 @@ inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t 
 	if((i >= 0 && (i < IVAN_VOXEL_CHUNK_WIDTH)) &&
 		(j >= 0 && (j < IVAN_VOXEL_CHUNK_HEIGHT)) &&
 		(k >= 0 && (k < IVAN_VOXEL_CHUNK_WIDTH)) &&
-		Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, k, j)].IsAir)
+		Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, k, j)] == VoxelMaterial_None)
 	{
 		Result = 1;
 	}
