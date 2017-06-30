@@ -77,8 +77,8 @@ struct transient_state{
 	memory_arena TranArena;
 	
 	task_with_memory Tasks[4];
-	task_with_memory MeshTasks[200];
-	task_with_memory ChunkTasks[200];
+	task_with_memory MeshTasks[300];
+	task_with_memory ChunkTasks[300];
 
 	loaded_bitmap GroundBitmap;
 	platform_work_queue* HighPriorityQueue;

@@ -7,10 +7,6 @@
 
 		3) Frustrum culling for voxel chunks
 
-		4) Chunk info loading/saving from files
-
-		5) Chunks mesh generator excluding side faces
-
 	NOTE(DIMA):
 		1) My voxel engine assumes that 256 is the maximum height
 		of the world you can get. Not actually maximum. It has no

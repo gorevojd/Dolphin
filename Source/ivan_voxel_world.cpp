@@ -376,11 +376,15 @@ UpdateVoxelChunks(
 			voxel_chunk* OldFront = Chunk->FrontNeighbour;
 			voxel_chunk* OldBack = Chunk->BackNeighbour;
 
+			GD_COMPLETE_READS_BEFORE_FUTURE;
+
 			SetNeighboursForChunk(
 				Chunk, 
 				Chunk->HorizontalIndex,
 				Chunk->VerticalIndex,
 				HashTable);
+
+			GD_COMPLETE_WRITES_BEFORE_FUTURE;
 
 			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
 
@@ -434,7 +438,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     Result->VoxelChunkSentinel->Prev = Result->VoxelChunkSentinel;
     Result->VoxelChunkSentinel->IsSentinel = true;
 
-    Result->ChunksViewDistance = 5;
+    Result->ChunksViewDistance = 7;
     Result->CurrHorizontalIndex = 0;
     Result->CurrVerticalIndex = 0;
 
