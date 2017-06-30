@@ -1,6 +1,6 @@
  win32_ivan
 
- Timestamp is 59553c78 (Thu Jun 29 21:44:24 2017)
+ Timestamp is 59561c5c (Fri Jun 30 13:39:40 2017)
 
  Preferred load address is 0000000140000000
 
@@ -2898,175 +2898,175 @@
  0002:000004c8       ?pre_cpp_initializer@@3P6AXXZEA 00000001400404c8     LIBCMTD:exe_winmain.obj
  0002:000004e0       ?pre_c_initializer@@3P6AHXZEA 00000001400404e0     LIBCMTD:exe_winmain.obj
  0002:000004e8       ?post_pgo_initializer@@3P6AHXZEA 00000001400404e8     LIBCMTD:exe_winmain.obj
- 0002:00000550       $SG100361                  0000000140040550     win32_ivan.obj
+ 0002:00000550       $SG100363                  0000000140040550     win32_ivan.obj
  0002:0000055c       $SG7212                    000000014004055c     win32_ivan.obj
  0002:00000560       $SG7213                    0000000140040560     win32_ivan.obj
- 0002:00000568       $SG100400                  0000000140040568     win32_ivan.obj
- 0002:00000578       $SG100425                  0000000140040578     win32_ivan.obj
- 0002:00000598       $SG99429                   0000000140040598     win32_ivan.obj
- 0002:000005a0       $SG99435                   00000001400405a0     win32_ivan.obj
- 0002:000005b8       $SG99438                   00000001400405b8     win32_ivan.obj
- 0002:000005d0       $SG99441                   00000001400405d0     win32_ivan.obj
- 0002:000005e8       $SG99444                   00000001400405e8     win32_ivan.obj
- 0002:00000608       $SG99446                   0000000140040608     win32_ivan.obj
- 0002:00000620       $SG99516                   0000000140040620     win32_ivan.obj
- 0002:00000640       $SG99518                   0000000140040640     win32_ivan.obj
- 0002:00000668       $SG99520                   0000000140040668     win32_ivan.obj
- 0002:00000690       $SG99522                   0000000140040690     win32_ivan.obj
- 0002:000006b8       $SG99524                   00000001400406b8     win32_ivan.obj
- 0002:000006e0       $SG99526                   00000001400406e0     win32_ivan.obj
- 0002:00000708       $SG99529                   0000000140040708     win32_ivan.obj
- 0002:00000728       $SG99531                   0000000140040728     win32_ivan.obj
- 0002:00000750       $SG99533                   0000000140040750     win32_ivan.obj
- 0002:00000778       $SG99535                   0000000140040778     win32_ivan.obj
- 0002:000007a0       $SG99537                   00000001400407a0     win32_ivan.obj
- 0002:000007c8       $SG99539                   00000001400407c8     win32_ivan.obj
- 0002:000007f0       $SG99544                   00000001400407f0     win32_ivan.obj
- 0002:00000810       $SG100569                  0000000140040810     win32_ivan.obj
- 0002:00000820       $SG100570                  0000000140040820     win32_ivan.obj
- 0002:00000830       $SG99546                   0000000140040830     win32_ivan.obj
- 0002:00000858       $SG100571                  0000000140040858     win32_ivan.obj
- 0002:00000868       $SG100572                  0000000140040868     win32_ivan.obj
- 0002:00000878       $SG99548                   0000000140040878     win32_ivan.obj
- 0002:000008a0       $SG99550                   00000001400408a0     win32_ivan.obj
- 0002:000008c8       $SG99552                   00000001400408c8     win32_ivan.obj
- 0002:000008f0       $SG99554                   00000001400408f0     win32_ivan.obj
- 0002:00000918       $SG99558                   0000000140040918     win32_ivan.obj
- 0002:00000938       $SG99560                   0000000140040938     win32_ivan.obj
- 0002:00000960       $SG99562                   0000000140040960     win32_ivan.obj
- 0002:00000988       $SG99564                   0000000140040988     win32_ivan.obj
- 0002:000009b0       $SG99566                   00000001400409b0     win32_ivan.obj
- 0002:000009d8       $SG99568                   00000001400409d8     win32_ivan.obj
- 0002:00000a00       $SG99571                   0000000140040a00     win32_ivan.obj
- 0002:00000a20       $SG100596                  0000000140040a20     win32_ivan.obj
- 0002:00000a40       $SG99573                   0000000140040a40     win32_ivan.obj
- 0002:00000a68       $SG99575                   0000000140040a68     win32_ivan.obj
- 0002:00000a90       $SG99577                   0000000140040a90     win32_ivan.obj
- 0002:00000ab8       $SG99579                   0000000140040ab8     win32_ivan.obj
- 0002:00000ae0       $SG99581                   0000000140040ae0     win32_ivan.obj
- 0002:00000b08       $SG99585                   0000000140040b08     win32_ivan.obj
- 0002:00000b28       $SG99587                   0000000140040b28     win32_ivan.obj
- 0002:00000b50       $SG99589                   0000000140040b50     win32_ivan.obj
- 0002:00000b78       $SG99591                   0000000140040b78     win32_ivan.obj
- 0002:00000ba0       $SG99593                   0000000140040ba0     win32_ivan.obj
- 0002:00000bc8       $SG99595                   0000000140040bc8     win32_ivan.obj
- 0002:00000bf0       $SG99598                   0000000140040bf0     win32_ivan.obj
- 0002:00000c10       $SG99600                   0000000140040c10     win32_ivan.obj
- 0002:00000c38       $SG99602                   0000000140040c38     win32_ivan.obj
- 0002:00000c60       $SG99604                   0000000140040c60     win32_ivan.obj
- 0002:00000c88       $SG99606                   0000000140040c88     win32_ivan.obj
- 0002:00000cb0       $SG99608                   0000000140040cb0     win32_ivan.obj
- 0002:00000cd8       $SG99691                   0000000140040cd8     win32_ivan.obj
- 0002:00000d08       $SG99693                   0000000140040d08     win32_ivan.obj
- 0002:00000d38       $SG99695                   0000000140040d38     win32_ivan.obj
- 0002:00000d68       $SG99697                   0000000140040d68     win32_ivan.obj
- 0002:00000d98       $SG99699                   0000000140040d98     win32_ivan.obj
- 0002:00000dc8       $SG99701                   0000000140040dc8     win32_ivan.obj
- 0002:00000df8       $SG99705                   0000000140040df8     win32_ivan.obj
- 0002:00000e28       $SG99707                   0000000140040e28     win32_ivan.obj
- 0002:00000e58       $SG99709                   0000000140040e58     win32_ivan.obj
- 0002:00000e88       $SG99711                   0000000140040e88     win32_ivan.obj
- 0002:00000eb8       $SG99713                   0000000140040eb8     win32_ivan.obj
- 0002:00000ee8       $SG99715                   0000000140040ee8     win32_ivan.obj
- 0002:00000f18       $SG99718                   0000000140040f18     win32_ivan.obj
+ 0002:00000568       $SG100402                  0000000140040568     win32_ivan.obj
+ 0002:00000578       $SG100427                  0000000140040578     win32_ivan.obj
+ 0002:00000598       $SG99431                   0000000140040598     win32_ivan.obj
+ 0002:000005a0       $SG99437                   00000001400405a0     win32_ivan.obj
+ 0002:000005b8       $SG99440                   00000001400405b8     win32_ivan.obj
+ 0002:000005d0       $SG99443                   00000001400405d0     win32_ivan.obj
+ 0002:000005e8       $SG99446                   00000001400405e8     win32_ivan.obj
+ 0002:00000608       $SG99448                   0000000140040608     win32_ivan.obj
+ 0002:00000620       $SG99518                   0000000140040620     win32_ivan.obj
+ 0002:00000640       $SG99520                   0000000140040640     win32_ivan.obj
+ 0002:00000668       $SG99522                   0000000140040668     win32_ivan.obj
+ 0002:00000690       $SG99524                   0000000140040690     win32_ivan.obj
+ 0002:000006b8       $SG99526                   00000001400406b8     win32_ivan.obj
+ 0002:000006e0       $SG99528                   00000001400406e0     win32_ivan.obj
+ 0002:00000708       $SG99531                   0000000140040708     win32_ivan.obj
+ 0002:00000728       $SG99533                   0000000140040728     win32_ivan.obj
+ 0002:00000750       $SG99535                   0000000140040750     win32_ivan.obj
+ 0002:00000778       $SG99537                   0000000140040778     win32_ivan.obj
+ 0002:000007a0       $SG99539                   00000001400407a0     win32_ivan.obj
+ 0002:000007c8       $SG99541                   00000001400407c8     win32_ivan.obj
+ 0002:000007f0       $SG99546                   00000001400407f0     win32_ivan.obj
+ 0002:00000810       $SG100571                  0000000140040810     win32_ivan.obj
+ 0002:00000820       $SG100572                  0000000140040820     win32_ivan.obj
+ 0002:00000830       $SG99548                   0000000140040830     win32_ivan.obj
+ 0002:00000858       $SG100573                  0000000140040858     win32_ivan.obj
+ 0002:00000868       $SG100574                  0000000140040868     win32_ivan.obj
+ 0002:00000878       $SG99550                   0000000140040878     win32_ivan.obj
+ 0002:000008a0       $SG99552                   00000001400408a0     win32_ivan.obj
+ 0002:000008c8       $SG99554                   00000001400408c8     win32_ivan.obj
+ 0002:000008f0       $SG99556                   00000001400408f0     win32_ivan.obj
+ 0002:00000918       $SG99560                   0000000140040918     win32_ivan.obj
+ 0002:00000938       $SG99562                   0000000140040938     win32_ivan.obj
+ 0002:00000960       $SG99564                   0000000140040960     win32_ivan.obj
+ 0002:00000988       $SG99566                   0000000140040988     win32_ivan.obj
+ 0002:000009b0       $SG99568                   00000001400409b0     win32_ivan.obj
+ 0002:000009d8       $SG99570                   00000001400409d8     win32_ivan.obj
+ 0002:00000a00       $SG99573                   0000000140040a00     win32_ivan.obj
+ 0002:00000a20       $SG100598                  0000000140040a20     win32_ivan.obj
+ 0002:00000a40       $SG99575                   0000000140040a40     win32_ivan.obj
+ 0002:00000a68       $SG99577                   0000000140040a68     win32_ivan.obj
+ 0002:00000a90       $SG99579                   0000000140040a90     win32_ivan.obj
+ 0002:00000ab8       $SG99581                   0000000140040ab8     win32_ivan.obj
+ 0002:00000ae0       $SG99583                   0000000140040ae0     win32_ivan.obj
+ 0002:00000b08       $SG99587                   0000000140040b08     win32_ivan.obj
+ 0002:00000b28       $SG99589                   0000000140040b28     win32_ivan.obj
+ 0002:00000b50       $SG99591                   0000000140040b50     win32_ivan.obj
+ 0002:00000b78       $SG99593                   0000000140040b78     win32_ivan.obj
+ 0002:00000ba0       $SG99595                   0000000140040ba0     win32_ivan.obj
+ 0002:00000bc8       $SG99597                   0000000140040bc8     win32_ivan.obj
+ 0002:00000bf0       $SG99600                   0000000140040bf0     win32_ivan.obj
+ 0002:00000c10       $SG99602                   0000000140040c10     win32_ivan.obj
+ 0002:00000c38       $SG99604                   0000000140040c38     win32_ivan.obj
+ 0002:00000c60       $SG99606                   0000000140040c60     win32_ivan.obj
+ 0002:00000c88       $SG99608                   0000000140040c88     win32_ivan.obj
+ 0002:00000cb0       $SG99610                   0000000140040cb0     win32_ivan.obj
+ 0002:00000cd8       $SG99693                   0000000140040cd8     win32_ivan.obj
+ 0002:00000d08       $SG99695                   0000000140040d08     win32_ivan.obj
+ 0002:00000d38       $SG99697                   0000000140040d38     win32_ivan.obj
+ 0002:00000d68       $SG99699                   0000000140040d68     win32_ivan.obj
+ 0002:00000d98       $SG99701                   0000000140040d98     win32_ivan.obj
+ 0002:00000dc8       $SG99703                   0000000140040dc8     win32_ivan.obj
+ 0002:00000df8       $SG99707                   0000000140040df8     win32_ivan.obj
+ 0002:00000e28       $SG99709                   0000000140040e28     win32_ivan.obj
+ 0002:00000e58       $SG99711                   0000000140040e58     win32_ivan.obj
+ 0002:00000e88       $SG99713                   0000000140040e88     win32_ivan.obj
+ 0002:00000eb8       $SG99715                   0000000140040eb8     win32_ivan.obj
+ 0002:00000ee8       $SG99717                   0000000140040ee8     win32_ivan.obj
+ 0002:00000f18       $SG99720                   0000000140040f18     win32_ivan.obj
  0002:00000f2c       $SG6624                    0000000140040f2c     win32_ivan.obj
- 0002:00000f38       $SG99820                   0000000140040f38     win32_ivan.obj
- 0002:00000f48       $SG99821                   0000000140040f48     win32_ivan.obj
- 0002:00000f60       $SG99845                   0000000140040f60     win32_ivan.obj
- 0002:00000f70       $SG99846                   0000000140040f70     win32_ivan.obj
+ 0002:00000f38       $SG99822                   0000000140040f38     win32_ivan.obj
+ 0002:00000f48       $SG99823                   0000000140040f48     win32_ivan.obj
+ 0002:00000f60       $SG99847                   0000000140040f60     win32_ivan.obj
+ 0002:00000f70       $SG99848                   0000000140040f70     win32_ivan.obj
  0002:00000f8c       $SG6717                    0000000140040f8c     win32_ivan.obj
  0002:00000f94       $SG6718                    0000000140040f94     win32_ivan.obj
- 0002:00000fa0       $SG99942                   0000000140040fa0     win32_ivan.obj
- 0002:00000fb8       $SG99943                   0000000140040fb8     win32_ivan.obj
- 0002:00000fd0       $SG99976                   0000000140040fd0     win32_ivan.obj
- 0002:00000fe0       $SG99978                   0000000140040fe0     win32_ivan.obj
- 0002:00000ff0       $SG99980                   0000000140040ff0     win32_ivan.obj
- 0002:00001000       $SG99982                   0000000140041000     win32_ivan.obj
- 0002:00001010       $SG99984                   0000000140041010     win32_ivan.obj
- 0002:00001020       $SG99986                   0000000140041020     win32_ivan.obj
- 0002:00001030       $SG99987                   0000000140041030     win32_ivan.obj
+ 0002:00000fa0       $SG99944                   0000000140040fa0     win32_ivan.obj
+ 0002:00000fb8       $SG99945                   0000000140040fb8     win32_ivan.obj
+ 0002:00000fd0       $SG99978                   0000000140040fd0     win32_ivan.obj
+ 0002:00000fe0       $SG99980                   0000000140040fe0     win32_ivan.obj
+ 0002:00000ff0       $SG99982                   0000000140040ff0     win32_ivan.obj
+ 0002:00001000       $SG99984                   0000000140041000     win32_ivan.obj
+ 0002:00001010       $SG99986                   0000000140041010     win32_ivan.obj
+ 0002:00001020       $SG99988                   0000000140041020     win32_ivan.obj
+ 0002:00001030       $SG99989                   0000000140041030     win32_ivan.obj
  0002:00001040       ?stbsp__bot@@3QBNB         0000000140041040     win32_ivan.obj
- 0002:000010f8       $SG100147                  00000001400410f8     win32_ivan.obj
+ 0002:000010f8       $SG100149                  00000001400410f8     win32_ivan.obj
  0002:00001110       ?stbsp__negbot@@3QBNB      0000000140041110     win32_ivan.obj
  0002:000011c0       ?stbsp__negboterr@@3QBNB   00000001400411c0     win32_ivan.obj
  0002:00001270       ?stbsp__top@@3QBNB         0000000140041270     win32_ivan.obj
- 0002:000012d8       $SG100149                  00000001400412d8     win32_ivan.obj
+ 0002:000012d8       $SG100151                  00000001400412d8     win32_ivan.obj
  0002:000012f0       ?stbsp__negtop@@3QBNB      00000001400412f0     win32_ivan.obj
- 0002:00001358       $SG100218                  0000000140041358     win32_ivan.obj
+ 0002:00001358       $SG100220                  0000000140041358     win32_ivan.obj
  0002:00001370       ?stbsp__toperr@@3QBNB      0000000140041370     win32_ivan.obj
- 0002:000013d8       $SG100219                  00000001400413d8     win32_ivan.obj
+ 0002:000013d8       $SG100221                  00000001400413d8     win32_ivan.obj
  0002:000013f0       ?stbsp__negtoperr@@3QBNB   00000001400413f0     win32_ivan.obj
- 0002:00001458       $SG100221                  0000000140041458     win32_ivan.obj
+ 0002:00001458       $SG100223                  0000000140041458     win32_ivan.obj
  0002:00001470       ?stbsp__powten@@3QB_KB     0000000140041470     win32_ivan.obj
- 0002:00001510       $SG100145                  0000000140041510     win32_ivan.obj
- 0002:00001520       $SG100150                  0000000140041520     win32_ivan.obj
- 0002:00001540       $SG100151                  0000000140041540     win32_ivan.obj
- 0002:00001560       $SG100155                  0000000140041560     win32_ivan.obj
- 0002:00001580       $SG100157                  0000000140041580     win32_ivan.obj
- 0002:000015a0       $SG100216                  00000001400415a0     win32_ivan.obj
- 0002:000015c0       $SG100217                  00000001400415c0     win32_ivan.obj
- 0002:000015e0       $SG100220                  00000001400415e0     win32_ivan.obj
- 0002:00001600       $SG100222                  0000000140041600     win32_ivan.obj
- 0002:00001618       $SG100223                  0000000140041618     win32_ivan.obj
- 0002:00001628       $SG100224                  0000000140041628     win32_ivan.obj
- 0002:00001638       $SG100225                  0000000140041638     win32_ivan.obj
- 0002:00001648       $SG100226                  0000000140041648     win32_ivan.obj
- 0002:00001658       $SG100227                  0000000140041658     win32_ivan.obj
- 0002:00001668       $SG100228                  0000000140041668     win32_ivan.obj
- 0002:00001678       $SG100229                  0000000140041678     win32_ivan.obj
- 0002:00001688       $SG100230                  0000000140041688     win32_ivan.obj
- 0002:000016a0       $SG100231                  00000001400416a0     win32_ivan.obj
- 0002:000016b8       $SG100232                  00000001400416b8     win32_ivan.obj
- 0002:000016d0       $SG100233                  00000001400416d0     win32_ivan.obj
- 0002:000016e0       $SG100234                  00000001400416e0     win32_ivan.obj
- 0002:000016f0       $SG100235                  00000001400416f0     win32_ivan.obj
- 0002:00001700       $SG100236                  0000000140041700     win32_ivan.obj
- 0002:00001710       $SG100237                  0000000140041710     win32_ivan.obj
- 0002:00001720       $SG100238                  0000000140041720     win32_ivan.obj
- 0002:00001730       $SG100239                  0000000140041730     win32_ivan.obj
- 0002:00001740       $SG100240                  0000000140041740     win32_ivan.obj
- 0002:00001758       $SG100241                  0000000140041758     win32_ivan.obj
- 0002:00001770       $SG100242                  0000000140041770     win32_ivan.obj
- 0002:00001788       $SG100243                  0000000140041788     win32_ivan.obj
- 0002:00001798       $SG100244                  0000000140041798     win32_ivan.obj
- 0002:000017a8       $SG100245                  00000001400417a8     win32_ivan.obj
- 0002:000017c0       $SG100246                  00000001400417c0     win32_ivan.obj
- 0002:000017d0       $SG100247                  00000001400417d0     win32_ivan.obj
- 0002:000017e8       $SG100248                  00000001400417e8     win32_ivan.obj
- 0002:000017f8       $SG100249                  00000001400417f8     win32_ivan.obj
- 0002:00001808       $SG100250                  0000000140041808     win32_ivan.obj
- 0002:00001818       $SG100251                  0000000140041818     win32_ivan.obj
- 0002:00001828       $SG100252                  0000000140041828     win32_ivan.obj
- 0002:00001838       $SG100253                  0000000140041838     win32_ivan.obj
- 0002:00001848       $SG100254                  0000000140041848     win32_ivan.obj
- 0002:00001858       $SG100255                  0000000140041858     win32_ivan.obj
- 0002:00001868       $SG100256                  0000000140041868     win32_ivan.obj
- 0002:00001880       $SG100257                  0000000140041880     win32_ivan.obj
- 0002:00001898       $SG100259                  0000000140041898     win32_ivan.obj
- 0002:000018b0       $SG100260                  00000001400418b0     win32_ivan.obj
- 0002:000018c8       $SG100261                  00000001400418c8     win32_ivan.obj
- 0002:000018e0       $SG100262                  00000001400418e0     win32_ivan.obj
- 0002:00001900       $SG100263                  0000000140041900     win32_ivan.obj
- 0002:00001918       $SG99257                   0000000140041918     win32_ivan.obj
- 0002:00001930       $SG99260                   0000000140041930     win32_ivan.obj
- 0002:00001948       $SG99263                   0000000140041948     win32_ivan.obj
- 0002:00001960       $SG99264                   0000000140041960     win32_ivan.obj
- 0002:00001968       $SG99265                   0000000140041968     win32_ivan.obj
- 0002:00001974       $SG99266                   0000000140041974     win32_ivan.obj
- 0002:00001980       $SG99267                   0000000140041980     win32_ivan.obj
- 0002:00001990       $SG99286                   0000000140041990     win32_ivan.obj
- 0002:000019a8       $SG99289                   00000001400419a8     win32_ivan.obj
- 0002:000019c0       $SG99294                   00000001400419c0     win32_ivan.obj
- 0002:000019e8       $SG99295                   00000001400419e8     win32_ivan.obj
- 0002:00001a10       $SG99296                   0000000140041a10     win32_ivan.obj
- 0002:00001a1c       $SG99297                   0000000140041a1c     win32_ivan.obj
- 0002:00001a24       $SG99298                   0000000140041a24     win32_ivan.obj
- 0002:00001a30       $SG99299                   0000000140041a30     win32_ivan.obj
- 0002:00001a40       $SG99300                   0000000140041a40     win32_ivan.obj
- 0002:00001a50       $SG99301                   0000000140041a50     win32_ivan.obj
- 0002:00001a60       $SG99302                   0000000140041a60     win32_ivan.obj
- 0002:00001a78       $SG99303                   0000000140041a78     win32_ivan.obj
- 0002:00001a90       $SG99304                   0000000140041a90     win32_ivan.obj
+ 0002:00001510       $SG100147                  0000000140041510     win32_ivan.obj
+ 0002:00001520       $SG100152                  0000000140041520     win32_ivan.obj
+ 0002:00001540       $SG100153                  0000000140041540     win32_ivan.obj
+ 0002:00001560       $SG100157                  0000000140041560     win32_ivan.obj
+ 0002:00001580       $SG100159                  0000000140041580     win32_ivan.obj
+ 0002:000015a0       $SG100218                  00000001400415a0     win32_ivan.obj
+ 0002:000015c0       $SG100219                  00000001400415c0     win32_ivan.obj
+ 0002:000015e0       $SG100222                  00000001400415e0     win32_ivan.obj
+ 0002:00001600       $SG100224                  0000000140041600     win32_ivan.obj
+ 0002:00001618       $SG100225                  0000000140041618     win32_ivan.obj
+ 0002:00001628       $SG100226                  0000000140041628     win32_ivan.obj
+ 0002:00001638       $SG100227                  0000000140041638     win32_ivan.obj
+ 0002:00001648       $SG100228                  0000000140041648     win32_ivan.obj
+ 0002:00001658       $SG100229                  0000000140041658     win32_ivan.obj
+ 0002:00001668       $SG100230                  0000000140041668     win32_ivan.obj
+ 0002:00001678       $SG100231                  0000000140041678     win32_ivan.obj
+ 0002:00001688       $SG100232                  0000000140041688     win32_ivan.obj
+ 0002:000016a0       $SG100233                  00000001400416a0     win32_ivan.obj
+ 0002:000016b8       $SG100234                  00000001400416b8     win32_ivan.obj
+ 0002:000016d0       $SG100235                  00000001400416d0     win32_ivan.obj
+ 0002:000016e0       $SG100236                  00000001400416e0     win32_ivan.obj
+ 0002:000016f0       $SG100237                  00000001400416f0     win32_ivan.obj
+ 0002:00001700       $SG100238                  0000000140041700     win32_ivan.obj
+ 0002:00001710       $SG100239                  0000000140041710     win32_ivan.obj
+ 0002:00001720       $SG100240                  0000000140041720     win32_ivan.obj
+ 0002:00001730       $SG100241                  0000000140041730     win32_ivan.obj
+ 0002:00001740       $SG100242                  0000000140041740     win32_ivan.obj
+ 0002:00001758       $SG100243                  0000000140041758     win32_ivan.obj
+ 0002:00001770       $SG100244                  0000000140041770     win32_ivan.obj
+ 0002:00001788       $SG100245                  0000000140041788     win32_ivan.obj
+ 0002:00001798       $SG100246                  0000000140041798     win32_ivan.obj
+ 0002:000017a8       $SG100247                  00000001400417a8     win32_ivan.obj
+ 0002:000017c0       $SG100248                  00000001400417c0     win32_ivan.obj
+ 0002:000017d0       $SG100249                  00000001400417d0     win32_ivan.obj
+ 0002:000017e8       $SG100250                  00000001400417e8     win32_ivan.obj
+ 0002:000017f8       $SG100251                  00000001400417f8     win32_ivan.obj
+ 0002:00001808       $SG100252                  0000000140041808     win32_ivan.obj
+ 0002:00001818       $SG100253                  0000000140041818     win32_ivan.obj
+ 0002:00001828       $SG100254                  0000000140041828     win32_ivan.obj
+ 0002:00001838       $SG100255                  0000000140041838     win32_ivan.obj
+ 0002:00001848       $SG100256                  0000000140041848     win32_ivan.obj
+ 0002:00001858       $SG100257                  0000000140041858     win32_ivan.obj
+ 0002:00001868       $SG100258                  0000000140041868     win32_ivan.obj
+ 0002:00001880       $SG100259                  0000000140041880     win32_ivan.obj
+ 0002:00001898       $SG100261                  0000000140041898     win32_ivan.obj
+ 0002:000018b0       $SG100262                  00000001400418b0     win32_ivan.obj
+ 0002:000018c8       $SG100263                  00000001400418c8     win32_ivan.obj
+ 0002:000018e0       $SG100264                  00000001400418e0     win32_ivan.obj
+ 0002:00001900       $SG100265                  0000000140041900     win32_ivan.obj
+ 0002:00001918       $SG99259                   0000000140041918     win32_ivan.obj
+ 0002:00001930       $SG99262                   0000000140041930     win32_ivan.obj
+ 0002:00001948       $SG99265                   0000000140041948     win32_ivan.obj
+ 0002:00001960       $SG99266                   0000000140041960     win32_ivan.obj
+ 0002:00001968       $SG99267                   0000000140041968     win32_ivan.obj
+ 0002:00001974       $SG99268                   0000000140041974     win32_ivan.obj
+ 0002:00001980       $SG99269                   0000000140041980     win32_ivan.obj
+ 0002:00001990       $SG99288                   0000000140041990     win32_ivan.obj
+ 0002:000019a8       $SG99291                   00000001400419a8     win32_ivan.obj
+ 0002:000019c0       $SG99296                   00000001400419c0     win32_ivan.obj
+ 0002:000019e8       $SG99297                   00000001400419e8     win32_ivan.obj
+ 0002:00001a10       $SG99298                   0000000140041a10     win32_ivan.obj
+ 0002:00001a1c       $SG99299                   0000000140041a1c     win32_ivan.obj
+ 0002:00001a24       $SG99300                   0000000140041a24     win32_ivan.obj
+ 0002:00001a30       $SG99301                   0000000140041a30     win32_ivan.obj
+ 0002:00001a40       $SG99302                   0000000140041a40     win32_ivan.obj
+ 0002:00001a50       $SG99303                   0000000140041a50     win32_ivan.obj
+ 0002:00001a60       $SG99304                   0000000140041a60     win32_ivan.obj
+ 0002:00001a78       $SG99305                   0000000140041a78     win32_ivan.obj
+ 0002:00001a90       $SG99306                   0000000140041a90     win32_ivan.obj
  0002:00001d60       GS_ExceptionPointers       0000000140041d60     LIBCMTD:gs_report.obj
  0002:00001db0       ?module_names@?A0x679b24ab@@3QBQEB_WB 0000000140041db0     libvcruntimed:winapi_downlevel.obj
  0002:00002020       ?candidate_modules@?1??try_get_FlsAlloc@@YAP6AKP6AXPEAX@Z@ZXZ@4QBW4module_id@?A0x679b24ab@@B 0000000140042020     libvcruntimed:winapi_downlevel.obj
@@ -3308,11 +3308,11 @@
  0002:000121b0       $unwind$??$tcslen@AEBQEB_W@?$__crt_char_traits@_W@@SA_KAEBQEB_W@Z 00000001400521b0     libucrtd:dbgrpt.obj
  0002:000121b0       $unwind$?type_case_u@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400521b0     libucrtd:output.obj
  0002:000121b0       $unwind$?type_case_d@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400521b0     libucrtd:output.obj
- 0002:000121b0       $unwind$??R<lambda_441f2315ac0f593d45428a8fceb6abe6>@@QEBAXXZ 00000001400521b0     libucrtd:mbctype.obj
- 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAA@XZ 00000001400521b0     libvcruntimed:std_exception.obj
  0002:000121b0       $unwind$??1formatting_buffer@__crt_stdio_output@@QEAA@XZ 00000001400521b0     libucrtd:output.obj
- 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@XZ 00000001400521b0     libucrtd:wsetlocale.obj
+ 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAA@XZ 00000001400521b0     libvcruntimed:std_exception.obj
  0002:000121b0       $unwind$_CrtIsValidHeapPointer 00000001400521b0     libucrtd:debug_heap.obj
+ 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@XZ 00000001400521b0     libucrtd:wsetlocale.obj
+ 0002:000121b0       $unwind$??R<lambda_441f2315ac0f593d45428a8fceb6abe6>@@QEBAXXZ 00000001400521b0     libucrtd:mbctype.obj
  0002:000121b0       $unwind$__std_exception_destroy 00000001400521b0     libvcruntimed:std_exception.obj
  0002:000121b0       $unwind$?value@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAAEAP6AHPEAU_exception@@@ZXZ 00000001400521b0     libucrtd:matherr.obj
  0002:000121b0       $unwind$?__acrt_stdio_free_stream@@YAXV__crt_stdio_stream@@@Z 00000001400521b0     libucrtd:stream.obj
@@ -3348,13 +3348,13 @@
  0002:000121b0       $unwind$??$__crt_fast_encode_pointer@P6AXH@Z@@YAP6AXH@ZQ6AXH@Z@Z 00000001400521b0     libucrtd:signal.obj
  0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAA@XZ 00000001400521b0     libucrtd:osfinfo.obj
  0002:000121b0       $unwind$??$tcslen@AEBQEBD@?$__crt_char_traits@D@@SA_KAEBQEBD@Z 00000001400521b0     libucrtd:dbgrpt.obj
+ 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAA@XZ 00000001400521b0     libucrtd:argv_parsing.obj
  0002:000121b0       $unwind$??1?$output_adapter_data@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001400521b0     libucrtd:output.obj
  0002:000121b0       $unwind$??$tcslen@AEAY0BAF@D@?$__crt_char_traits@D@@SA_KAEAY0BAF@D@Z 00000001400521b0     libucrtd:dbgrpt.obj
- 0002:000121b0       $unwind$??1?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAA@XZ 00000001400521b0     libucrtd:argv_parsing.obj
  0002:000121b0       $unwind$??$__crt_interlocked_read_pointer@X@@YAPEAXPEDSEAX@Z 00000001400521b0     libvcruntimed:winapi_downlevel.obj
- 0002:000121b0       $unwind$?update_field_width@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400521b0     libucrtd:output.obj
- 0002:000121b0       $unwind$??$__crt_fast_decode_pointer@PEAX@@YAPEAXQEAX@Z 00000001400521b0     libvcruntimed:winapi_downlevel.obj
  0002:000121b0       $unwind$??$__crt_interlocked_read@J@@YAJPEDJ@Z 00000001400521b0     libucrtd:output.obj
+ 0002:000121b0       $unwind$??$__crt_fast_decode_pointer@PEAX@@YAPEAXQEAX@Z 00000001400521b0     libvcruntimed:winapi_downlevel.obj
+ 0002:000121b0       $unwind$?update_field_width@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400521b0     libucrtd:output.obj
  0002:000121b0       $unwind$??$__crt_fast_encode_pointer@PEAX@@YAPEAXQEAX@Z 00000001400521b0     libvcruntimed:winapi_downlevel.obj
  0002:000121b0       $unwind$??B?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 00000001400521b0     libvcruntimed:std_type_info.obj
  0002:000121b0       $unwind$??$output_debug_string@AEBQEB_W@?$__crt_char_traits@_W@@SAXAEBQEB_W@Z 00000001400521b0     libucrtd:crtmbox.obj
@@ -3504,23 +3504,23 @@
  0002:000121ec       $unwind$?type_case_n@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400521ec     libucrtd:output.obj
  0002:000121ec       $unwind$?process@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAAHXZ 00000001400521ec     libucrtd:output.obj
  0002:000121ec       $unwind$__acrt_report_runtime_error 00000001400521ec     libucrtd:report_runtime_error.obj
+ 0002:000121f4       $unwind$?write_stored_string_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 00000001400521f4     libucrtd:output.obj
  0002:000121f4       $unwind$?parse_int_from_format_string@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 00000001400521f4     libucrtd:output.obj
  0002:000121f4       $unwind$?parse_int_from_format_string@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 00000001400521f4     libucrtd:output.obj
- 0002:000121f4       $unwind$?write_stored_string_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 00000001400521f4     libucrtd:output.obj
  0002:000121fc       $unwind$?state_case_type@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400521fc     libucrtd:output.obj
  0002:00012204       $unwind$?type_case_s_compute_narrow_string_length@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBAHHD@Z 0000000140052204     libucrtd:output.obj
  0002:00012204       $unwind$_lseeki64_nolock   0000000140052204     libucrtd:lseek.obj
  0002:0001220c       $unwind$?type_case_a@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005220c     libucrtd:output.obj
  0002:0001220c       $unwind$?type_case_a@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005220c     libucrtd:output.obj
- 0002:00012214       $unwind$?type_case_integer@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NI_N@Z 0000000140052214     libucrtd:output.obj
  0002:00012214       $unwind$?type_case_integer@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NI_N@Z 0000000140052214     libucrtd:output.obj
+ 0002:00012214       $unwind$?type_case_integer@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NI_N@Z 0000000140052214     libucrtd:output.obj
  0002:0001221c       $unwind$?write_stored_string_tchar@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_ND@Z 000000014005221c     libucrtd:output.obj
- 0002:0001222c       $unwind$?unset_flags@__crt_stdio_stream@@QEBA_NJ@Z 000000014005222c     libucrtd:_sftbuf.obj
  0002:0001222c       $unwind$??R<lambda_f5be1f167794094e7b43d690e4bace6f>@@QEBA_ND@Z 000000014005222c     libucrtd:argv_wildcards.obj
+ 0002:0001222c       $unwind$?unset_flags@__crt_stdio_stream@@QEBA_NJ@Z 000000014005222c     libucrtd:_sftbuf.obj
  0002:0001222c       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@H@Z 000000014005222c     win32_ivan.obj
  0002:0001222c       $unwind$?siglookup@@YAPEAU__crt_signal_action_t@@HQEAU1@@Z 000000014005222c     libucrtd:signal.obj
- 0002:0001222c       $unwind$?set_flags@__crt_stdio_stream@@QEBA_NJ@Z 000000014005222c     libucrtd:_sftbuf.obj
  0002:0001222c       $unwind$?has_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 000000014005222c     libucrtd:output.obj
+ 0002:0001222c       $unwind$?set_flags@__crt_stdio_stream@@QEBA_NJ@Z 000000014005222c     libucrtd:_sftbuf.obj
  0002:0001222c       $unwind$?has_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 000000014005222c     libucrtd:output.obj
  0002:00012234       $unwind$?adjust_hexit@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 0000000140052234     libucrtd:output.obj
  0002:00012234       $unwind$?adjust_hexit@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 0000000140052234     libucrtd:output.obj
@@ -3975,21 +3975,21 @@
  0002:00012894       $unwind$_freea_crt         0000000140052894     libucrtd:getstringtypea.obj
  0002:00012894       $unwind$??R<lambda_e9ab68cc08dfd839979545c079379e6e>@@QEBAHXZ 0000000140052894     libucrtd:commit.obj
  0002:00012894       $unwind$__acrt_free_locale 0000000140052894     libucrtd:locale_refcounting.obj
- 0002:00012894       $unwind$?validate@?$string_output_adapter@_W@__crt_stdio_output@@QEBA_NXZ 0000000140052894     libucrtd:output.obj
  0002:00012894       $unwind$?validate@?$c_string_character_source@D@__crt_strtox@@QEBA_NXZ 0000000140052894     libucrtd:atox.obj
  0002:00012894       $unwind$?GetTableIndexFromLocaleName@@YAHPEB_W@Z 0000000140052894     libucrtd:lcidtoname_downlevel.obj
  0002:00012894       $unwind$?issue_debug_notification@@YA_NQEB_W@Z 0000000140052894     libucrtd:report_runtime_error.obj
  0002:00012894       $unwind$_fileno            0000000140052894     libucrtd:fileno.obj
+ 0002:00012894       $unwind$?validate@?$string_output_adapter@_W@__crt_stdio_output@@QEBA_NXZ 0000000140052894     libucrtd:output.obj
  0002:0001289c       $unwind$__acrt_update_thread_locale_data 000000014005289c     libucrtd:locale_refcounting.obj
  0002:000128bc       $unwind$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001400528bc     libucrtd:output.obj
  0002:000128bc       $unwind$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001400528bc     libucrtd:output.obj
- 0002:000128bc       $unwind$?free_crt_array_internal@@YAXQEAPEBX_K@Z 00000001400528bc     libucrtd:inittime.obj
  0002:000128bc       $unwind$_CreateFrameInfo   00000001400528bc     libvcruntimed:trnsctrl.obj
- 0002:000128bc       $unwind$?is_space@__crt_strtox@@YA_N_WPEAU__crt_locale_pointers@@@Z 00000001400528bc     libucrtd:atox.obj
- 0002:000128bc       $unwind$?type_case_c_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 00000001400528bc     libucrtd:output.obj
- 0002:000128bc       $unwind$__acrt_execute_uninitializers 00000001400528bc     libucrtd:shared_initialization.obj
- 0002:000128bc       $unwind$iswctype           00000001400528bc     libucrtd:iswctype.obj
+ 0002:000128bc       $unwind$??8type_info@@QEBA_NAEBV0@@Z 00000001400528bc     libvcruntimed:frame.obj
  0002:000128bc       $unwind$?find_pe_section@@YAPEAU_IMAGE_SECTION_HEADER@@QEAE_K@Z 00000001400528bc     LIBCMTD:utility.obj
+ 0002:000128bc       $unwind$?is_space@__crt_strtox@@YA_N_WPEAU__crt_locale_pointers@@@Z 00000001400528bc     libucrtd:atox.obj
+ 0002:000128bc       $unwind$?free_crt_array_internal@@YAXQEAPEBX_K@Z 00000001400528bc     libucrtd:inittime.obj
+ 0002:000128bc       $unwind$?type_case_c_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 00000001400528bc     libucrtd:output.obj
+ 0002:000128bc       $unwind$iswctype           00000001400528bc     libucrtd:iswctype.obj
  0002:000128bc       $unwind$?try_get_first_available_module@@YAPEAUHINSTANCE__@@QEBW4module_id@?A0x679b24ab@@0@Z 00000001400528bc     libvcruntimed:winapi_downlevel.obj
  0002:000128bc       $unwind$??9__crt_strtox@@YA_NAEBUbig_integer@0@0@Z 00000001400528bc     libucrtd:cfout.obj
  0002:000128bc       $unwind$_initterm          00000001400528bc     libucrtd:initterm.obj
@@ -4002,7 +4002,7 @@
  0002:000128bc       $unwind$??4big_integer@__crt_strtox@@QEAAAEAU01@AEBU01@@Z 00000001400528bc     libucrtd:cfout.obj
  0002:000128bc       $unwind$??0big_integer@__crt_strtox@@QEAA@AEBU01@@Z 00000001400528bc     libucrtd:cfout.obj
  0002:000128bc       $unwind$_register_onexit_function 00000001400528bc     libucrtd:onexit.obj
- 0002:000128bc       $unwind$??8type_info@@QEBA_NAEBV0@@Z 00000001400528bc     libvcruntimed:frame.obj
+ 0002:000128bc       $unwind$__acrt_execute_uninitializers 00000001400528bc     libucrtd:shared_initialization.obj
  0002:000128c4       $unwind$_query_new_handler 00000001400528c4     libucrtd:new_handler.obj
  0002:000128e4       $unwind$raise              00000001400528e4     libucrtd:signal.obj
  0002:00012904       $unwind$??$?RV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@V<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@?$__crt_seh_guarded_call@P6AXH@Z@@QEAAP6AXH@Z$$QEAV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@$$QEAV<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@Z 0000000140052904     libucrtd:signal.obj
@@ -4226,13 +4226,13 @@
  0002:00012e80       $unwind$?type_case_c_tchar@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_ND@Z 0000000140052e80     libucrtd:output.obj
  0002:00012e88       $unwind$__CxxFrameHandler3 0000000140052e88     libvcruntimed:trnsctrl.obj
  0002:00012e88       $unwind$?CatchIt@@YAXPEAUEHExceptionRecord@@PEA_KPEAU_CONTEXT@@PEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@PEBU_s_HandlerType@@PEBU_s_CatchableType@@PEBU_s_TryBlockMapEntry@@H1EE@Z 0000000140052e88     libvcruntimed:frame.obj
- 0002:00012e90       $unwind$?common_lseek_do_seek_nolock@@YA_JQEAX_JH@Z 0000000140052e90     libucrtd:lseek.obj
- 0002:00012e90       $unwind$?__GetUnwindTryBlock@@YAHPEA_KPEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@@Z 0000000140052e90     libvcruntimed:ehstate.obj
  0002:00012e90       $unwind$?try_get_proc_address_from_first_available_module@@YAPEAXQEBDQEBW4module_id@?A0x679b24ab@@1@Z 0000000140052e90     libvcruntimed:winapi_downlevel.obj
+ 0002:00012e90       $unwind$?__GetUnwindTryBlock@@YAHPEA_KPEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@@Z 0000000140052e90     libvcruntimed:ehstate.obj
  0002:00012e90       $unwind$?try_get_proc_address_from_first_available_module@@YAPEAXQEBDQEBW4module_id@?A0x1e999e58@@1@Z 0000000140052e90     libucrtd:winapi_thunks.obj
  0002:00012e90       $unwind$?__StateFromIp@@YAHPEBU_s_FuncInfo@@PEAU_xDISPATCHER_CONTEXT@@_J@Z 0000000140052e90     libvcruntimed:ehstate.obj
  0002:00012e90       $unwind$?type_case_s_compute_narrow_string_length@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBAHH_W@Z 0000000140052e90     libucrtd:output.obj
  0002:00012e90       $unwind$?ExFilterRethrow@@YAHPEAU_EXCEPTION_POINTERS@@PEAUEHExceptionRecord@@PEAH@Z 0000000140052e90     libvcruntimed:frame.obj
+ 0002:00012e90       $unwind$?common_lseek_do_seek_nolock@@YA_JQEAX_JH@Z 0000000140052e90     libucrtd:lseek.obj
  0002:00012e98       $unwind$__CxxCallCatchBlock 0000000140052e98     libvcruntimed:frame.obj
  0002:00012ec8       $unwind$??0exception@std@@QEAA@QEBDH@Z 0000000140052ec8     libvcruntimed:frame.obj
  0002:00012ed0       $unwind$??0exception@std@@QEAA@AEBV01@@Z 0000000140052ed0     libvcruntimed:frame.obj

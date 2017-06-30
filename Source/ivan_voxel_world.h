@@ -82,6 +82,7 @@ struct voxel_chunk_manager{
 	ticket_mutex Mutex;
 
 	transient_state* TranState;
+	random_series RandomSeries;
 
 	memory_arena HashTableArena;
 	memory_arena ListArena;

@@ -101,6 +101,7 @@ GenerateVoxelMeshForChunk(
 					else{
 						int32_t IndexInNeighbourChunk = 0;
 						if(i == 0){
+							//BUG(Dima): For some reasons Voxels of neighbour are not initialized
 							if(Chunk->LeftNeighbour){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(IVAN_VOXEL_CHUNK_WIDTH - 1, j, k);
 

@@ -26,6 +26,7 @@ enum voxel_mat_type{
 	VoxelMaterial_GrassyGround,
 	VoxelMaterial_Lava,
 	VoxelMaterial_SnowGround,
+	VoxelMaterial_WinterGround,
 	VoxelMaterial_Leaves,
 	VoxelMaterial_Brick,
 	VoxelMaterial_Logs,

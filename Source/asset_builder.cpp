@@ -883,26 +883,14 @@ DescribeVoxelAtlasTexture(
     }
 }
 
-INTERNAL_FUNCTION void 
-AtlasCurrTextureDesc(
-    loaded_voxel_atlas* Atlas,
+INTERNAL_FUNCTION void
+DescribeByIndex(
+    loaded_voxel_atlas* Atlas, 
+    int HorzIndex, int VertIndex,
     voxel_mat_type MaterialType,
     voxel_face_type_index FaceTypeIndex)
 {
-    int CurrTextureIndex = Atlas->TextureCount - 1;
-
-    DescribeVoxelAtlasTexture(Atlas, MaterialType, FaceTypeIndex, CurrTextureIndex);
-}
-
-INTERNAL_FUNCTION void 
-AtlasNextTextureDesc(
-    loaded_voxel_atlas* Atlas,
-    voxel_mat_type MaterialType,
-    voxel_face_type_index FaceTypeIndex)
-{
-    int CurrTextureIndex = Atlas->TextureCount++;
-
-    DescribeVoxelAtlasTexture(Atlas, MaterialType, FaceTypeIndex, CurrTextureIndex);
+    DescribeVoxelAtlasTexture(Atlas, MaterialType, FaceTypeIndex, VertIndex * 16 + HorzIndex);
 }
 
 INTERNAL_FUNCTION bitmap_id
@@ -1176,22 +1164,28 @@ INTERNAL_FUNCTION void WriteVoxelAtlases(){
     };
 
     loaded_voxel_atlas* Atlas = Atlases[0];
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
-    AtlasCurrTextureDesc(Atlas, VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Tree, VoxelFaceTypeIndex_Side);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Tree, VoxelFaceTypeIndex_TopBottom);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Stone, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Sand, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Leaves, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 0, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
+    DescribeByIndex(Atlas, 1, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 2, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
+    DescribeByIndex(Atlas, 2, 0, VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 3, 0, VoxelMaterial_Tree, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 4, 0, VoxelMaterial_Tree, VoxelFaceTypeIndex_TopBottom);
+    DescribeByIndex(Atlas, 5, 0, VoxelMaterial_Stone, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 6, 0, VoxelMaterial_Sand, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 7, 0, VoxelMaterial_Leaves, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 0, 1, VoxelMaterial_SnowGround, VoxelFaceTypeIndex_Top);
+    DescribeByIndex(Atlas, 1, 1, VoxelMaterial_SnowGround, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 2, 1, VoxelMaterial_SnowGround, VoxelFaceTypeIndex_Bottom);
+    DescribeByIndex(Atlas, 2, 1, VoxelMaterial_WinterGround, VoxelFaceTypeIndex_All);
  
     Atlas = Atlases[1];
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_Stone, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
-    AtlasCurrTextureDesc(Atlas, VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
-    AtlasNextTextureDesc(Atlas, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 0, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Top);
+    DescribeByIndex(Atlas, 1, 0, VoxelMaterial_Stone, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 2, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Bottom);
+    DescribeByIndex(Atlas, 2, 0, VoxelMaterial_Ground, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 3, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 4, 1, VoxelMaterial_Tree, VoxelFaceTypeIndex_Side);
+    DescribeByIndex(Atlas, 5, 1, VoxelMaterial_Tree, VoxelFaceTypeIndex_TopBottom);
 
 
     BeginAssetType(Assets, Asset_VoxelAtlasTexture);

@@ -1,13 +1,19 @@
 #define VOXEL_HASH_TABLE_SIZE 256
 
-INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk){
+INTERNAL_FUNCTION void SpawnTree(voxel_chunk* Chunk, uint8_t HorzIndex, uint8_t VertIndex){
+
+}
+
+INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Series){
 
 	float OneOverWidth = 1.0f / (float)IVAN_VOXEL_CHUNK_WIDTH;
 	float OneOverHeight = 1.0f / (float)IVAN_VOXEL_CHUNK_HEIGHT;
 
-	float StartHeight = 150.0f;
+	float StartHeight = 120.0f;
 
 	vec3 ChunkPos = GetPosForVoxelChunk(Chunk);
+
+	uint8_t TerrainHeights[IVAN_VOXEL_CHUNK_LAYER_COUNT];
 
 	//TODO(Dima): Check cache-friendly variations of this loop
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
@@ -28,9 +34,34 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk){
 				(float)ChunkPos.y / 256.0f, 
 				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
 
-			float RandHeight = (Noise1 * 5.0f + Noise2 * 25.0f + Noise3 * 100.0f)+ StartHeight;
+			float BiomNoise = stb_perlin_noise3(
+				(float)(ChunkPos.x + i) / 256.0f, 
+				(float)ChunkPos.y / 256.0f, 
+				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
+
+			BiomNoise += 0.5f;
+
+			float Multiplyer = BiomNoise;
+			float NoiseScale1 = 5.0f * Multiplyer;
+			float NoiseScale2 = 25.0f * Multiplyer;
+			float NoiseScale3 = 100.0f * Multiplyer;
+
+			uint8_t DirtIndex = VoxelMaterial_WinterGround;
+			uint8_t GroundIndex = VoxelMaterial_SnowGround;
+
+			if(BiomNoise < 0.1f){
+				DirtIndex = VoxelMaterial_Sand;
+				GroundIndex = VoxelMaterial_Sand;
+			}
+			else if(BiomNoise >= 0.1f && BiomNoise < 0.6f){
+				DirtIndex = VoxelMaterial_Ground;
+				GroundIndex = VoxelMaterial_GrassyGround;
+			}
+
+			float RandHeight = (Noise1 * NoiseScale1 + Noise2 * NoiseScale2 + Noise3 * NoiseScale3) + StartHeight;
 			
-			uint32_t RandHeightU32 = (uint32_t)(RandHeight + 0.5f);
+			uint32_t RandHeightU32 = (uint8_t)(RandHeight + 0.5f);
+			TerrainHeights[j * IVAN_VOXEL_CHUNK_WIDTH + i] = RandHeightU32;
 
 			int32_t TempFlag = 0;
 			for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT; k++){
@@ -38,15 +69,35 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk){
 				if(TempFlag == 0){
 
 					if(k == RandHeightU32){
-						*TempVoxel = VoxelMaterial_GrassyGround;
+						*TempVoxel = GroundIndex;
 						TempFlag = 1;					
 					}
 					else{
-						*TempVoxel = VoxelMaterial_Ground;
+						*TempVoxel = DirtIndex;
 					}
 				}
 				else{
 					*TempVoxel = VoxelMaterial_None;
+				}
+			}
+		}
+	}
+
+	for(int i = 0; i < ArrayCount(TerrainHeights); i++){
+		uint32_t RandNum = RandomChoiceFromCount(Series, 200);
+
+		if(RandNum == 53){
+			int StartHeight = TerrainHeights[i];
+			int VoxelIndex = StartHeight * IVAN_VOXEL_CHUNK_LAYER_COUNT + i;
+			if(Chunk->Voxels[VoxelIndex] == VoxelMaterial_GrassyGround ||
+				Chunk->Voxels[VoxelIndex] == VoxelMaterial_Ground ||
+				Chunk->Voxels[VoxelIndex] == VoxelMaterial_SnowGround ||
+				Chunk->Voxels[VoxelIndex] == VoxelMaterial_WinterGround)
+			{
+				for(int k = StartHeight; k < StartHeight + 8; k++){
+					if(k < 256){
+						Chunk->Voxels[k * IVAN_VOXEL_CHUNK_LAYER_COUNT + i] = VoxelMaterial_Tree;
+					}
 				}
 			}
 		}
@@ -57,6 +108,7 @@ struct generate_chunk_work{
 	task_with_memory* Task;
 
 	voxel_chunk_header* Header;
+	random_series* Series;
 };
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
@@ -69,7 +121,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	Chunk->Voxels = PushArray(&Work->Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
 
 	GD_COMPLETE_READS_BEFORE_FUTURE;
-	GenerateVoxelChunk(Chunk);
+	GenerateVoxelChunk(Chunk, Work->Series);
 
 	GD_COMPLETE_WRITES_BEFORE_FUTURE;
 	Work->Header->ChunkState = VoxelChunkState_Generated;
@@ -92,6 +144,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 		generate_chunk_work Work;
 		Work.Task = Task;
 		Work.Header = Header;
+		Work.Series = &Manager->RandomSeries;
 
 		if(Task){
 			generate_chunk_work* ChunkWork = PushStruct(&Task->Arena, generate_chunk_work);
@@ -428,7 +481,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     Result->Mutex = {};
 
     asset_vector VAMatchVector = {};
-    VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Minecraft;
+    VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Default;
     asset_vector VAWeightVector = {};
     VAWeightVector.Data[Tag_VoxelAtlasType] = 10.0f;
     Result->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
@@ -437,6 +490,8 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     Result->VoxelChunkSentinel->Next = Result->VoxelChunkSentinel;
     Result->VoxelChunkSentinel->Prev = Result->VoxelChunkSentinel;
     Result->VoxelChunkSentinel->IsSentinel = true;
+
+    Result->RandomSeries = RandomSeed(123);
 
     Result->ChunksViewDistance = 7;
     Result->CurrHorizontalIndex = 0;
