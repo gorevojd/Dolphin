@@ -52,6 +52,7 @@ union vec3{
 union vec4{
     struct{ float x, y, z, w;};
     struct{ vec3 xyz; float w; };
+    struct{ float a, b, c, d;};
     struct{
         union{
             vec3 rgb;
@@ -115,6 +116,7 @@ struct mat4{
 
 #define IVAN_MATH_E 2.71828182845904523536f
 #define IVAN_MATH_SQRT_TWO 1.41421356237309504880168872420969808f
+#define IVAN_MATH_ONE_OVER_SQRT_TWO 0.7071067811865475244008443621048490392f
 #define IVAN_MATH_SQRT_THREE 1.73205080756887729352744634150587236f
 #define IVAN_MATH_SQRT_FIVE 2.23606797749978969640917366873127623f
 
@@ -581,6 +583,25 @@ vec3 Refract(vec3 i, vec3 n, float theta){
 
 float AspectRatio(vec2 v){ return ((v.y < 0.0001f) ? 0.0f : v.x / v.y); }
 
+/*Plane operations*/
+inline vec4 NormalizePlane(vec4 Pl){
+	vec4 Result;
+
+	float InvMag = 1.0f / Sqrt(Pl.a * Pl.a + Pl.b * Pl.b + Pl.c * Pl.c);
+	Result.a = Pl.a * InvMag;
+	Result.b = Pl.b * InvMag;
+	Result.c = Pl.c * InvMag;
+	Result.d = Pl.d * InvMag;
+
+	return(Result);
+}
+
+inline float DistanceToPoint(vec4 Plane, vec3 P){
+	float Result = Plane.a * P.x + Plane.b * P.y + Plane.c * P.z + Plane.d;
+
+	return(Result);
+}
+
 /*Interpolations*/
 
 float Lerp(float a, float b, float t){
@@ -677,15 +698,15 @@ inline mat4 Identity(){
 }
 
 inline mat4 Transpose(mat4 M){
+	mat4 Result;
+
 	for(int RowIndex = 0; RowIndex < 4; RowIndex++){
 		for(int ColumtIndex = 0; ColumtIndex < 4; ColumtIndex++){
-			float Tmp = M.E[RowIndex * 4 + ColumtIndex];
-			M.E[RowIndex * 4 + ColumtIndex] = M.E[ColumtIndex * 4 + RowIndex];
-			M.E[ColumtIndex * 4 + RowIndex] = Tmp;
+			Result.E[ColumtIndex * 4 + RowIndex] = M.E[RowIndex * 4 + ColumtIndex];
 		}
 	}
 
-	return(M);
+	return(Result);
 }
 
 inline mat4 Rotation(vec3 R, float Angle){

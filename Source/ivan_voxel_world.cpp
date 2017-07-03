@@ -1,8 +1,7 @@
 #define VOXEL_HASH_TABLE_SIZE 256
 
-INTERNAL_FUNCTION void SpawnTree(voxel_chunk* Chunk, uint8_t HorzIndex, uint8_t VertIndex){
-
-}
+#define IVAN_VOXEL_GENERATOR_BIOMS 0
+#define IVAN_VOXEL_GENERATOR_TREES 1
 
 INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Series){
 
@@ -19,6 +18,13 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
 
+			float NoiseScale1 = 5.0f;
+			float NoiseScale2 = 25.0f;
+			float NoiseScale3 = 100.0f;
+
+			uint8_t DirtIndex = VoxelMaterial_WinterGround;
+			uint8_t GroundIndex = VoxelMaterial_SnowGround;
+
 			float Noise1 = stb_perlin_noise3(
 				(float)(ChunkPos.x + i) / 16.0f, 
 				(float)ChunkPos.y / 16.0f, 
@@ -34,6 +40,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				(float)ChunkPos.y / 256.0f, 
 				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
 
+#if IVAN_VOXEL_GENERATOR_BIOMS
 			float BiomNoise = stb_perlin_noise3(
 				(float)(ChunkPos.x + i) / 256.0f, 
 				(float)ChunkPos.y / 256.0f, 
@@ -42,12 +49,10 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 			BiomNoise += 0.5f;
 
 			float Multiplyer = BiomNoise;
-			float NoiseScale1 = 5.0f * Multiplyer;
-			float NoiseScale2 = 25.0f * Multiplyer;
-			float NoiseScale3 = 100.0f * Multiplyer;
+			NoiseScale1 *= Multiplyer;
+			NoiseScale2 *= Multiplyer;
+			NoiseScale3 *= Multiplyer;
 
-			uint8_t DirtIndex = VoxelMaterial_WinterGround;
-			uint8_t GroundIndex = VoxelMaterial_SnowGround;
 
 			if(BiomNoise < 0.1f){
 				DirtIndex = VoxelMaterial_Sand;
@@ -57,6 +62,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				DirtIndex = VoxelMaterial_Ground;
 				GroundIndex = VoxelMaterial_GrassyGround;
 			}
+#endif
 
 			float RandHeight = (Noise1 * NoiseScale1 + Noise2 * NoiseScale2 + Noise3 * NoiseScale3) + StartHeight;
 			
@@ -83,6 +89,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 		}
 	}
 
+#if IVAN_VOXEL_GENERATOR_TREES
 	for(int i = 0; i < ArrayCount(TerrainHeights); i++){
 		uint32_t RandNum = RandomChoiceFromCount(Series, 200);
 
@@ -102,6 +109,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 			}
 		}
 	}
+#endif
 }
 
 struct generate_chunk_work{
@@ -272,19 +280,19 @@ inline void SetNeighboursForChunk(
 	Chunk->FrontNeighbour = 0;
 	Chunk->BackNeighbour = 0;
 	
-	if(LeftPair){
+	if(LeftPair && LeftPair->Value->ChunkState == VoxelChunkState_Generated){
 		Chunk->LeftNeighbour = LeftPair->Value->Chunk;
 	}
 
-	if(RightPair){
+	if(RightPair && RightPair->Value->ChunkState == VoxelChunkState_Generated){
 		Chunk->RightNeighbour = RightPair->Value->Chunk;
 	}
 
-	if(FrontPair){
+	if(FrontPair && FrontPair->Value->ChunkState == VoxelChunkState_Generated){
 		Chunk->FrontNeighbour = FrontPair->Value->Chunk;
 	}
 
-	if(BackPair){
+	if(BackPair && BackPair->Value->ChunkState == VoxelChunkState_Generated){
 		Chunk->BackNeighbour = BackPair->Value->Chunk;
 	}
 }
@@ -307,6 +315,33 @@ inline int32_t NeighboursWasChanged(
 	}
 
 	return(Result);	
+}
+
+inline int32_t TestChunkOnPlane(vec4 Pl, voxel_chunk* Chunk){
+	int32_t Result = 0;
+
+	float TestRadius = IVAN_VOXEL_CHUNK_WIDTH * 0.5f * IVAN_MATH_SQRT_TWO;
+
+	vec3 ChunkP = GetPosForVoxelChunk(Chunk);
+
+	for(int TestPosIndex = 0;
+		TestPosIndex < 16;
+		TestPosIndex++)
+	{
+		vec3 TestPos;
+		TestPos.x = ChunkP.x + 8.0f;
+		TestPos.y = ChunkP.y + (float)(TestPosIndex * 16 + 8);
+		TestPos.z = ChunkP.z + 8.0f;
+	
+		float TestValue = Pl.a * TestPos.x + Pl.b * TestPos.y + Pl.c * TestPos.z + Pl.d + TestRadius;
+
+		if(TestValue >= 0.0f){
+			Result = true;
+			break;
+		}
+	}
+
+	return(Result);
 }
 
 #define IVAN_CHUNK_ABS(x) ((x) >= 0 ? (x) : -(x))
@@ -419,6 +454,8 @@ UpdateVoxelChunks(
 		}
 	}
 
+	int ChunksTotal = 0;
+	int ChunksInFrustrum = 0;
 	Index = Manager->VoxelChunkSentinel->Next;
 	for(Index; !Index->IsSentinel; Index = Index->Next){
 		
@@ -452,11 +489,28 @@ UpdateVoxelChunks(
 			}
 
 			if(Index->MeshState == VoxelMeshState_Generated){
-			    PushVoxelChunkMesh(
-			    	RenderGroup, 
-			    	Index->Mesh,
-		        	Manager->VoxelAtlasID, 
-		        	GetPosForVoxelChunk(Index->Chunk));
+				ChunksTotal++;
+				vec4* Planes = RenderGroup->LastRenderSetup.Planes;
+
+				int32_t TestResult = 1;
+				for(int PlaneIndex = 0;
+					PlaneIndex < CameraPlane_Count;
+					PlaneIndex++)
+				{										
+					if(!TestChunkOnPlane(Planes[PlaneIndex], Index->Chunk)){
+						TestResult = 0;
+						break;
+					}
+				}
+
+				if(TestResult){
+					ChunksInFrustrum++;
+				    PushVoxelChunkMesh(
+				    	RenderGroup, 
+				    	Index->Mesh,
+			        	Manager->VoxelAtlasID, 
+			        	GetPosForVoxelChunk(Index->Chunk));
+				}
 			}
 		}
 	}
@@ -493,7 +547,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 
     Result->RandomSeries = RandomSeed(123);
 
-    Result->ChunksViewDistance = 7;
+    Result->ChunksViewDistance = 9;
     Result->CurrHorizontalIndex = 0;
     Result->CurrVerticalIndex = 0;
 

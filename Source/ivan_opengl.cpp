@@ -731,7 +731,6 @@ OpenGLGroupToOutput(
             case RenderGroupEntry_render_entry_voxel_mesh:{
                 render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
 
-#if 1
                 voxel_shader_program* Program = &OpenGL.VoxelShaderProgram;
                 opengl_program_common* Common = &Program->Common;
                 voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
@@ -782,7 +781,6 @@ OpenGLGroupToOutput(
                 glDeleteBuffers(1, &MeshVBO);
 
                 glBindVertexArray(0);
-#endif
 
                 HeaderAt += sizeof(*EntryVoxelMesh);
             }break;

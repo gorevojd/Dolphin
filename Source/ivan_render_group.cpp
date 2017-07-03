@@ -93,6 +93,51 @@ inline void SetCameraTransform(
     NewSetup.DirLightDiffuse = Vec3(1.0f, 1.0f, 1.0f);
     NewSetup.DirLightAmbient = Vec3(0.05f);
 
+    mat4 TmpProjMatrix = ProjectionMatrix;
+    mat4 TmpViewMatrix = NewSetup.CameraTransform;
+
+    //TmpProjMatrix = Transpose(TmpProjMatrix);
+    //TmpViewMatrix = Transpose(TmpViewMatrix);
+    mat4 PVM = TmpProjMatrix * TmpViewMatrix;
+    PVM = Transpose(PVM);
+
+    NewSetup.Planes[CameraPlane_Left].a = PVM.E[3] + PVM.E[0];
+    NewSetup.Planes[CameraPlane_Left].b = PVM.E[7] + PVM.E[4];
+    NewSetup.Planes[CameraPlane_Left].c = PVM.E[11] + PVM.E[8];
+    NewSetup.Planes[CameraPlane_Left].d = PVM.E[15] + PVM.E[12];
+
+    NewSetup.Planes[CameraPlane_Right].a = PVM.E[3] - PVM.E[0];
+    NewSetup.Planes[CameraPlane_Right].b = PVM.E[7] - PVM.E[4];
+    NewSetup.Planes[CameraPlane_Right].c = PVM.E[11] - PVM.E[8];
+    NewSetup.Planes[CameraPlane_Right].d = PVM.E[15] - PVM.E[12];
+
+    NewSetup.Planes[CameraPlane_Bottom].a = PVM.E[3] + PVM.E[1];
+    NewSetup.Planes[CameraPlane_Bottom].b = PVM.E[7] + PVM.E[5];
+    NewSetup.Planes[CameraPlane_Bottom].c = PVM.E[11] + PVM.E[9];
+    NewSetup.Planes[CameraPlane_Bottom].d = PVM.E[15] + PVM.E[13];
+
+    NewSetup.Planes[CameraPlane_Top].a = PVM.E[3] - PVM.E[1];
+    NewSetup.Planes[CameraPlane_Top].b = PVM.E[7] - PVM.E[5];
+    NewSetup.Planes[CameraPlane_Top].c = PVM.E[11] - PVM.E[9];
+    NewSetup.Planes[CameraPlane_Top].d = PVM.E[15] - PVM.E[13];
+
+    NewSetup.Planes[CameraPlane_Near].a = PVM.E[3] + PVM.E[2];
+    NewSetup.Planes[CameraPlane_Near].b = PVM.E[7] + PVM.E[6];
+    NewSetup.Planes[CameraPlane_Near].c = PVM.E[11] + PVM.E[10];
+    NewSetup.Planes[CameraPlane_Near].d = PVM.E[15] + PVM.E[14];
+
+    NewSetup.Planes[CameraPlane_Far].a = PVM.E[3] - PVM.E[2];
+    NewSetup.Planes[CameraPlane_Far].b = PVM.E[7] - PVM.E[6];
+    NewSetup.Planes[CameraPlane_Far].c = PVM.E[11] - PVM.E[10];
+    NewSetup.Planes[CameraPlane_Far].d = PVM.E[15] - PVM.E[14];
+
+    for(int PlaneIndex = 0;
+        PlaneIndex < CameraPlane_Count;
+        PlaneIndex++)
+    {
+        NewSetup.Planes[PlaneIndex] = NormalizePlane(NewSetup.Planes[PlaneIndex]);
+    }
+
     RenderGroup->LastRenderSetup = NewSetup;
 }
 

@@ -6,6 +6,8 @@
 #define TIMED_BLOCK(...) TIMED_BLOCK_(__LINE__, ## __VA_ARGS__)
 //#define TIMED_BLOCK(...)
 
+#define COUNTED_BLOCK(name)
+
 struct debug_record{
 	char* FileName;
 	char* FunctionName;

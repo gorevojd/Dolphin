@@ -51,7 +51,6 @@ enum voxel_mesh_state{
 	VoxelMeshState_Generated,
 };
 
-
 struct voxel_chunk_header{
 	voxel_chunk_header* Next;
 	voxel_chunk_header* Prev;

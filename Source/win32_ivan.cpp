@@ -111,7 +111,7 @@ typedef void WINAPI type_glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLf
 typedef void WINAPI type_glDeleteBuffers(GLsizei n, const GLuint * buffers);
 typedef void WINAPI type_glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 typedef void WINAPI type_glGenerateMipmap(GLenum target);
-
+typedef void WINAPI type_glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid * data);
 
 #define GL_DEBUG_CALLBACK(Name) void WINAPI Name(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam)
 typedef GL_DEBUG_CALLBACK(GLDEBUGPROC);
@@ -164,6 +164,7 @@ OPENGL_GLOBAL_FUNCTION(glUniform4f);
 OPENGL_GLOBAL_FUNCTION(glDeleteBuffers);
 OPENGL_GLOBAL_FUNCTION(glDeleteVertexArrays);
 OPENGL_GLOBAL_FUNCTION(glGenerateMipmap);
+OPENGL_GLOBAL_FUNCTION(glBufferSubData);
 
 #include "ivan_opengl.h"
 GLOBAL_VARIABLE open_gl OpenGL;
@@ -1113,6 +1114,7 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
         WIN32_GET_OPENGL_FUNCTION(glDeleteBuffers);
         WIN32_GET_OPENGL_FUNCTION(glDeleteVertexArrays);
         WIN32_GET_OPENGL_FUNCTION(glGenerateMipmap);
+        WIN32_GET_OPENGL_FUNCTION(glBufferSubData);
 
         opengl_info Info = OpenGLGetInfo(ModernContext);
 
@@ -1153,6 +1155,8 @@ INTERNAL_FUNCTION void Win32AddEntry(platform_work_queue* Queue, platform_work_q
 INTERNAL_FUNCTION bool32 
 Win32DoNextWork(platform_work_queue* Queue){
     bool32 ShouldSleep = false;
+
+    _ReadBarrier();
 
     int OriginalNextEntryToRead = Queue->NextEntryToRead;
     int NewNextEntryToRead = (OriginalNextEntryToRead + 1) % ArrayCount(Queue->Entries);
@@ -1456,7 +1460,7 @@ int WINAPI WinMain(
     OpenGLRC = Win32InitOpenGL(OpenGLDC);
     //InitOpenGL2(&GlobalScreen);
 
-    win32_thread_startup HighPriStartups[6] = {};
+    win32_thread_startup HighPriStartups[8] = {};
     platform_work_queue HighPriorityQueue = {};
     Win32MakeQueue(&HighPriorityQueue, ArrayCount(HighPriStartups), HighPriStartups);
 

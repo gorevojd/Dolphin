@@ -288,7 +288,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 #else
     if(Input->CapturingMouse && (Input->DeltaMouseP.x != 0 || Input->DeltaMouseP.y != 0)){
         DeltaYaw = (Input->DeltaMouseP.x) * IVAN_DEG_TO_RAD * MouseSpeed;
-        DeltaPitch = (Input->DeltaMouseP.y) * IVAN_DEG_TO_RAD * MouseSpeed;
+        DeltaPitch = -(Input->DeltaMouseP.y) * IVAN_DEG_TO_RAD * MouseSpeed;
     }
 #endif
     UpdateCameraVectors(&GameState->Camera, DeltaYaw, DeltaPitch, 0.0f);

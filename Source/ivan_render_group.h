@@ -64,10 +64,23 @@ struct render_entry_bitmap{
 	vec2 Size;
 };
 
+enum camera_plane_index{
+	CameraPlane_Near,
+	CameraPlane_Far,
+	CameraPlane_Left,
+	CameraPlane_Right,
+	CameraPlane_Bottom,
+	CameraPlane_Top,
+
+	CameraPlane_Count,
+};
+
 struct render_setup{
 	vec3 CameraP;
 	mat4 Projection;
 	mat4 CameraTransform;
+
+	vec4 Planes[6];
 
 	vec3 DirLightDirection;
 	vec3 DirLightDiffuse;
