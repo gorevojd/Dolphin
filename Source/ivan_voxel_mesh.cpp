@@ -1,8 +1,6 @@
-//#include "ivan_voxel_mesh.h"
+#include "ivan_voxel_mesh.h"
 
-//TODO(Dima): How do I actually want to allocate MESH result???? And where???
-
-#define IVAN_MESH_KEEP_SIDES_ON 0
+#define IVAN_MESH_KEEP_SIDES_ON 1
 
 struct generate_mesh_work{
 	task_with_memory* Task;
@@ -20,30 +18,190 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelMeshWork){
 	voxel_chunk_mesh* Mesh = Work->Header->Mesh;
 	voxel_chunk* Chunk = Work->Header->Chunk;
 
-	Mesh->PUVN = PushArray(&Work->Task->Arena, (IVAN_MAX_MESH_CHUNK_FACE_COUNT * 6) >> 1, uint32_t);
+	*Mesh = {};
 
 	GD_COMPLETE_READS_BEFORE_FUTURE;
-	GenerateVoxelMeshForChunk(Mesh, Chunk, Work->Assets, Work->VoxelAtlasID);
+
+	voxel_mesh_generation_context Context = InitVoxelMeshGeneration(Chunk, Work->Assets, Work->VoxelAtlasID);
+	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	Mesh->PUVN = (ivan_vertex_type*)Platform.AllocateMemory(Context.MemoryRequired);
+	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	FinalizeVoxelMeshGeneration(Mesh, &Context);
 
 	GD_COMPLETE_WRITES_BEFORE_FUTURE;
-	Work->Header->MeshState = VoxelMeshState_Generated;
 	Work->Header->MeshTask = Work->Task;
+	Work->Header->MeshState = VoxelMeshState_Generated;
 }
 
-INTERNAL_FUNCTION void 
-GenerateVoxelMeshForChunk(
-	voxel_chunk_mesh* Result, 
+inline voxel_mesh_generation_queue MakeVoxelMeshGenerationQueue(){
+	voxel_mesh_generation_queue Result = {};
+
+	Result.IsSentinel = 1;
+
+	return(Result);
+}
+
+inline void PushFaceWorkToQueue(
+	voxel_mesh_generation_queue* Queue,
+	vec3 VoxelPos, 
+	uint8_t TextureIndexInAtlas)
+{
+	voxel_mesh_generation_queue* NewEntry = (voxel_mesh_generation_queue*)
+		malloc(sizeof(voxel_mesh_generation_queue));
+
+	NewEntry->VoxelPos = VoxelPos;
+	NewEntry->TextureIndexInAtlas = TextureIndexInAtlas;
+	NewEntry->IsSentinel = 0;
+	NewEntry->Next = Queue->Next;
+
+	Queue->EntryCount++;
+	Queue->Next = NewEntry;
+}
+
+inline void PushFaceWorkForNeighbourVoxel(	
+	voxel_mesh_generation_queue* Queue,
+	voxel_chunk* Chunk,
+	int32_t InitX, 
+	int32_t InitY, 
+	int32_t InitZ,
+	uint8_t TextureIndexInAtlas,
+	vec3 VoxelPos)
+{
+	if(NeighbourVoxelExistAndAir(
+		Chunk,
+		InitX,
+		InitY,
+		InitZ))
+	{
+		PushFaceWorkToQueue(Queue, VoxelPos, TextureIndexInAtlas);
+	}
+}
+
+inline void FreeVoxelMeshGenerationQueue(voxel_mesh_generation_queue* Queue){
+	voxel_mesh_generation_queue* Temp = Queue->Next;
+
+	voxel_mesh_generation_queue* NextAddres = 0;
+
+	while(Temp != 0){
+		NextAddres = Temp->Next;
+
+		free(Temp);
+
+		Temp = NextAddres;
+	}
+}
+
+typedef enum voxel_mesh_generation_queue_type{
+	VOXEL_MESH_QUEUE_TOP,
+	VOXEL_MESH_QUEUE_BOTTOM,
+	VOXEL_MESH_QUEUE_RIGHT,
+	VOXEL_MESH_QUEUE_LEFT,
+	VOXEL_MESH_QUEUE_FRONT,
+	VOXEL_MESH_QUEUE_BACK,
+} voxel_mesh_generation_queue_type;
+
+inline void PerformWorkForVoxelMeshQueue(
+	voxel_mesh_generation_queue* Queue,
+	voxel_mesh_generation_queue_type Type,
+	voxel_chunk_mesh* Mesh)
+{
+	voxel_mesh_generation_queue* Entry = Queue->Next;
+	uint32_t EntriesDone = 0;
+
+	switch(Type){
+		case(VOXEL_MESH_QUEUE_TOP):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtTop(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+
+		case(VOXEL_MESH_QUEUE_BOTTOM):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtBottom(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+
+		case(VOXEL_MESH_QUEUE_RIGHT):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtRight(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+
+		case(VOXEL_MESH_QUEUE_LEFT):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtLeft(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+
+		case(VOXEL_MESH_QUEUE_FRONT):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtFront(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+
+		case(VOXEL_MESH_QUEUE_BACK):{
+			for(Entry;
+				Entry != 0;
+				Entry = Entry->Next)
+			{
+				DoFaceWorkAtBack(Mesh, Entry->VoxelPos, Entry->TextureIndexInAtlas);
+				EntriesDone++;
+			}
+		}break;
+	
+		INVALID_DEFAULT_CASE;
+	}
+
+	Assert(EntriesDone == Queue->EntryCount);
+}
+
+INTERNAL_FUNCTION voxel_mesh_generation_context
+InitVoxelMeshGeneration(
 	voxel_chunk* Chunk, 
 	game_assets* Assets,
 	voxel_atlas_id VoxelAtlasID)
 {
-	uint32_t GenerationID = BeginGeneration(Assets);
+	voxel_mesh_generation_context Context_;
+	voxel_mesh_generation_context* Context = &Context_;
 
-	Result->VerticesCount = 0;
-	Result->ActiveVertexIndex = 0;
-	
+	Context->GenerationID = BeginGeneration(Assets);
+
 	LoadVoxelAtlasAsset(Assets, VoxelAtlasID, true);
-	loaded_voxel_atlas* Atlas = GetVoxelAtlas(Assets, VoxelAtlasID, GenerationID);
+	loaded_voxel_atlas* Atlas = GetVoxelAtlas(Assets, VoxelAtlasID, Context->GenerationID);
+
+	Context->TopQueue = MakeVoxelMeshGenerationQueue();
+	Context->BottomQueue = MakeVoxelMeshGenerationQueue();
+	Context->RightQueue = MakeVoxelMeshGenerationQueue();
+	Context->LeftQueue = MakeVoxelMeshGenerationQueue();
+	Context->BackQueue = MakeVoxelMeshGenerationQueue();
+	Context->FrontQueue = MakeVoxelMeshGenerationQueue();
+
+	voxel_mesh_generation_queue* TopQueue = &Context->TopQueue;
+	voxel_mesh_generation_queue* BottomQueue = &Context->BottomQueue;
+	voxel_mesh_generation_queue* RightQueue = &Context->RightQueue;
+	voxel_mesh_generation_queue* LeftQueue = &Context->LeftQueue;
+	voxel_mesh_generation_queue* BackQueue = &Context->BackQueue;
+	voxel_mesh_generation_queue* FrontQueue = &Context->FrontQueue;	
 
 	for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT ; k++){
 		for(int32_t j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
@@ -55,14 +213,13 @@ GenerateVoxelMeshForChunk(
 				VoxelPos.x = i + 0.5f;
 				VoxelPos.y = k + 0.5f;
 				VoxelPos.z = j + 0.5f;
-				
+
 				voxel_tex_coords_set* TexSet = 0;
 				if(Atlas){
 					TexSet = &Atlas->Materials[ToCheck];
 				}
 
 				if(ToCheck != VoxelMaterial_None && TexSet){
-
 					if((i >= 1 && i < (IVAN_VOXEL_CHUNK_WIDTH - 1)) &&
 						(j >= 1 && j < (IVAN_VOXEL_CHUNK_WIDTH - 1)) &&
 						(k >= 1 && k < (IVAN_VOXEL_CHUNK_HEIGHT - 1)))
@@ -75,43 +232,43 @@ GenerateVoxelMeshForChunk(
 						uint8_t BackVoxel = Chunk->Voxels[IVAN_GET_VOXEL_INDEX(i, j + 1, k)];
 
 						if(UpVoxel == VoxelMaterial_None){
-							DoFaceWorkAtTop(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
+							PushFaceWorkToQueue(TopQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 
 						if(DownVoxel == VoxelMaterial_None){
-							DoFaceWorkAtBottom(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
+							PushFaceWorkToQueue(BottomQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(RightVoxel == VoxelMaterial_None){
-							DoFaceWorkAtRight(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
+							PushFaceWorkToQueue(RightQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 						}
 
 						if(LeftVoxel == VoxelMaterial_None){
-							DoFaceWorkAtLeft(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
+							PushFaceWorkToQueue(LeftQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 						}
 
 						if(FrontVoxel == VoxelMaterial_None){
-							DoFaceWorkAtFront(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
+							PushFaceWorkToQueue(FrontQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 						}
 
 						if(BackVoxel == VoxelMaterial_None){
-							DoFaceWorkAtBack(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
+							PushFaceWorkToQueue(BackQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 						}
 					}
 					else{
 						int32_t IndexInNeighbourChunk = 0;
+
 						if(i == 0){
-							//BUG(Dima): For some reasons Voxels of neighbour are not initialized
 							if(Chunk->LeftNeighbour){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(IVAN_VOXEL_CHUNK_WIDTH - 1, j, k);
 
 								if(Chunk->LeftNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
-									DoFaceWorkAtLeft(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
+									PushFaceWorkToQueue(LeftQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 								}
 							}
 							else{
 #if IVAN_MESH_KEEP_SIDES_ON
-								DoFaceWorkAtLeft(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
+								PushFaceWorkToQueue(LeftQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 #endif
 							}
 						}
@@ -120,12 +277,12 @@ GenerateVoxelMeshForChunk(
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(0, j, k);
 
 								if(Chunk->RightNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
-									DoFaceWorkAtRight(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
+									PushFaceWorkToQueue(RightQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 								}
 							}
 							else{
 #if IVAN_MESH_KEEP_SIDES_ON
-								DoFaceWorkAtRight(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
+								PushFaceWorkToQueue(RightQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 #endif
 							}
 						}
@@ -134,12 +291,12 @@ GenerateVoxelMeshForChunk(
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(i, IVAN_VOXEL_CHUNK_WIDTH - 1, k);
 
 								if(Chunk->FrontNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
-									DoFaceWorkAtFront(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
+									PushFaceWorkToQueue(FrontQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 								}
 							}
 							else{
 #if IVAN_MESH_KEEP_SIDES_ON
-								DoFaceWorkAtFront(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
+								PushFaceWorkToQueue(FrontQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 #endif
 							}
 						}
@@ -149,70 +306,113 @@ GenerateVoxelMeshForChunk(
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(i, 0, k);
 
 								if(Chunk->BackNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
-									DoFaceWorkAtBack(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
+									PushFaceWorkToQueue(BackQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 								}
 							}
 							else{
 #if IVAN_MESH_KEEP_SIDES_ON
-								DoFaceWorkAtBack(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
+								PushFaceWorkToQueue(BackQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 #endif
 							}
 						}
 
 #if IVAN_MESH_KEEP_SIDES_ON
 						if(k == 0){
-							DoFaceWorkAtBottom(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
+							PushFaceWorkToQueue(BottomQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Bottom]);
 						}
 
 						if(k == (IVAN_VOXEL_CHUNK_HEIGHT - 1)){
-							DoFaceWorkAtTop(Result, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
+							PushFaceWorkToQueue(TopQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Top]);
 						}
 #endif
 
-						PushFaceWorkForRightVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							RightQueue,
+							Chunk,
+							i + 1, k, j, 
 							TexSet->Sets[VoxelFaceTypeIndex_Right], 
 							VoxelPos);
 
-						PushFaceWorkForLeftVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							LeftQueue,
+							Chunk,
+							i - 1, k, j, 
 							TexSet->Sets[VoxelFaceTypeIndex_Left], 
 							VoxelPos);
 
-						PushFaceWorkForUpperVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							TopQueue,
+							Chunk,
+							i, k + 1, j, 
 							TexSet->Sets[VoxelFaceTypeIndex_Top], 
 							VoxelPos);
 
-						PushFaceWorkForDownVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							BottomQueue,
+							Chunk,
+							i, k - 1, j, 
 							TexSet->Sets[VoxelFaceTypeIndex_Bottom], 
 							VoxelPos);
 
-						PushFaceWorkForFrontVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							FrontQueue,
+							Chunk,
+							i, k, j - 1, 
 							TexSet->Sets[VoxelFaceTypeIndex_Front], 
 							VoxelPos);
 
-						PushFaceWorkForBackVoxel(
-							Chunk, Result, 
-							i, k, j, 
+						PushFaceWorkForNeighbourVoxel(
+							BackQueue,
+							Chunk,
+							i, k, j + 1, 
 							TexSet->Sets[VoxelFaceTypeIndex_Back], 
 							VoxelPos);
-
 					}
 				}
 			}
 		}
 	}
 
-	Result->VerticesCount = Result->ActiveVertexIndex;
-	Result->MeshHandle = 0;
+	uint32_t TopQueueMemoryRequired = TopQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
+	uint32_t BottomQueueMemoryRequired = BottomQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
+	uint32_t RightQueueMemoryRequired = RightQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
+	uint32_t LeftQueueMemoryRequired = LeftQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
+	uint32_t FrontQueueMemoryRequired = FrontQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
+	uint32_t BackQueueMemoryRequired = BackQueue->EntryCount * 6 * sizeof(ivan_vertex_type);
 
-	EndGeneration(Assets, GenerationID);
+	Context->MemoryRequired = 
+		TopQueueMemoryRequired +
+		BottomQueueMemoryRequired + 
+		RightQueueMemoryRequired +
+		LeftQueueMemoryRequired +
+		FrontQueueMemoryRequired + 
+		BackQueueMemoryRequired;
+
+	Context->Assets = Assets;
+
+	return(Context_);
+}
+
+INTERNAL_FUNCTION void
+FinalizeVoxelMeshGeneration(
+	voxel_chunk_mesh* Mesh,
+	voxel_mesh_generation_context* Context)
+{	
+	PerformWorkForVoxelMeshQueue(&Context->BottomQueue, VOXEL_MESH_QUEUE_BOTTOM, Mesh);
+	PerformWorkForVoxelMeshQueue(&Context->RightQueue, VOXEL_MESH_QUEUE_RIGHT, Mesh);
+	PerformWorkForVoxelMeshQueue(&Context->LeftQueue, VOXEL_MESH_QUEUE_LEFT, Mesh);
+	PerformWorkForVoxelMeshQueue(&Context->FrontQueue, VOXEL_MESH_QUEUE_FRONT, Mesh);
+	PerformWorkForVoxelMeshQueue(&Context->BackQueue, VOXEL_MESH_QUEUE_BACK, Mesh);
+	PerformWorkForVoxelMeshQueue(&Context->TopQueue, VOXEL_MESH_QUEUE_TOP, Mesh);
+
+	FreeVoxelMeshGenerationQueue(&Context->TopQueue);
+	FreeVoxelMeshGenerationQueue(&Context->BottomQueue);
+	FreeVoxelMeshGenerationQueue(&Context->RightQueue);
+	FreeVoxelMeshGenerationQueue(&Context->LeftQueue);
+	FreeVoxelMeshGenerationQueue(&Context->FrontQueue);
+	FreeVoxelMeshGenerationQueue(&Context->BackQueue);
+
+	Mesh->VerticesCount = Mesh->ActiveVertexIndex;
+
+	EndGeneration(Context->Assets, Context->GenerationID);
 }

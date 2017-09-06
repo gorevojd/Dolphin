@@ -51,16 +51,19 @@ inline task_with_memory* BeginTaskWithMemory_(task_with_memory* Tasks, int32 Tas
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(transient_state* TranState){
 	task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->Tasks, ArrayCount(TranState->Tasks));
+    TranState->TasksInUse++;
 	return(FoundTask);
 }
 
 INTERNAL_FUNCTION task_with_memory* BeginChunkTaskWithMemory(transient_state* TranState){
     task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->ChunkTasks, ArrayCount(TranState->ChunkTasks));
+    TranState->ChunkTasksInUse++;
     return(FoundTask);
 }
 
 INTERNAL_FUNCTION task_with_memory* BeginMeshTaskWithMemory(transient_state* TranState){
     task_with_memory* FoundTask = BeginTaskWithMemory_(TranState->MeshTasks, ArrayCount(TranState->MeshTasks));
+    TranState->MeshTasksInUse++;
     return(FoundTask);
 }
 
@@ -210,7 +213,9 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         TranState->LowPriorityQueue = Memory->LowPriorityQueue;
         TranState->HighPriorityQueue = Memory->HighPriorityQueue;
+        TranState->VoxelMeshQueue = Memory->VoxelMeshQueue;
 
+        TranState->TasksInUse = 0;
         for (int TaskIndex = 0;
             TaskIndex < ArrayCount(TranState->Tasks);
             TaskIndex++)
@@ -220,15 +225,17 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
             SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
         }
 
+        TranState->MeshTasksInUse = 0;
         for(int MeshTaskIndex = 0;
             MeshTaskIndex < ArrayCount(TranState->MeshTasks);
             MeshTaskIndex++)
         {
             task_with_memory* Task = TranState->MeshTasks + MeshTaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(4700));
+            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(1));
         }
 
+        TranState->ChunkTasksInUse = 0;
         for(int ChunkTaskIndex = 0;
             ChunkTaskIndex < ArrayCount(TranState->ChunkTasks);
             ChunkTaskIndex++)
@@ -329,10 +336,10 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
 
         real32 PlayerSpeed = 0.4f;
-        real32 CameraSpeed = 2.0f;
+        real32 CameraSpeed = 20.0f;
         GameState->PlayerPos = GameState->PlayerPos + Normalize0(MoveVector) * Input->DeltaTime * PlayerSpeed;
 
-        CameraMoveVector = CameraMoveVector * Input->DeltaTime * CameraSpeed;
+        CameraMoveVector = Normalize0(CameraMoveVector) * Input->DeltaTime * CameraSpeed;
         GameState->Camera.P += GameState->Camera.Front * CameraMoveVector.z;
         GameState->Camera.P -= GameState->Camera.Left * CameraMoveVector.x;
         GameState->Camera.P += GameState->Camera.Up * CameraMoveVector.y;
@@ -342,7 +349,11 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
+#if IVAN_VOXEL_WORLD_MULTITHREADED
+    UpdateVoxelChunksMultithreaded(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
+#else
     UpdateVoxelChunks(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
+#endif
 
     hero_bitmap_ids HeroBitmaps = {};
     asset_vector MatchVector = {};
@@ -431,7 +442,7 @@ OutputDebugRecords(debug_record* Counters, uint32 CountersCount, render_group* R
 INTERNAL_FUNCTION void
 OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup){
 #ifdef INTERNAL_BUILD
-    DEBUGTextOut(RenderGroup, "\\#900DEBUG \\#090CYCLE \\#990\\COUNTS");
+    DEBUGTextOut(RenderGroup, "\\#900DEBUG \\#090CYCLE \\#940COUNTS");
     
     OutputDebugRecords(
         DebugRecords_MainTranslationUnit, 

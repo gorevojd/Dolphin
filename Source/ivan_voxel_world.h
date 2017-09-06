@@ -1,4 +1,3 @@
-
 /*
 	TODO(DIMA):
 		1) Moving generation of the chunks to the other thread
@@ -20,6 +19,8 @@
 
 #ifndef IVAN_VOXEL_WORLD_H
 #define IVAN_VOXEL_WORLD_H
+
+#define IVAN_VOXEL_WORLD_MULTITHREADED 1
 
 #include "ivan_voxel_shared.h"
 
@@ -64,6 +65,8 @@ struct voxel_chunk_header{
 	int32_t IsSentinel;
 	int32_t NeedsToBeGenerated;
 
+	int32_t FrustumCullingTestResult;
+
 	voxel_chunk* Chunk;
 	voxel_chunk_mesh* Mesh;
 };
@@ -75,27 +78,62 @@ struct voxel_table_pair{
 	voxel_table_pair* NextPair;
 };
 
+struct voxel_chunk_thread_context{
+	int32_t IsValid;
+
+	memory_arena TempArena;
+	memory_arena ListArena;
+	memory_arena HashTableArena;
+
+	int32_t MinXOffset;
+	int32_t MaxXOffset;
+	int32_t MinYOffset;
+	int32_t MaxYOffset;
+
+	struct voxel_chunk_manager* Manager;
+
+	voxel_chunk_header* VoxelChunkSentinel;
+	voxel_chunk_header* FirstFreeSentinel;
+};
 
 struct voxel_chunk_manager{
 	voxel_chunk_header* VoxelChunkSentinel;
-	ticket_mutex Mutex;
+	ticket_mutex ListMutex;
+	ticket_mutex ListArenaMutex;
+	ticket_mutex HashTableMutex;
+	ticket_mutex HashTableArenaMutex;
+	ticket_mutex TempArenaMutex;
+
+	ticket_mutex RenderPushMutex;
 
 	transient_state* TranState;
 	random_series RandomSeries;
 
 	memory_arena HashTableArena;
 	memory_arena ListArena;
+	memory_arena TempArena;
 
 	int32_t CurrHorizontalIndex;
 	int32_t CurrVerticalIndex;
 
 	int32_t ChunksViewDistance;
 	voxel_atlas_id VoxelAtlasID;
+
+#define IVAN_VOXEL_CHUNK_CONTEXTS_COUNT 64
+	voxel_chunk_thread_context Contexts[IVAN_VOXEL_CHUNK_CONTEXTS_COUNT];
 };
 
 inline void InsertChunkHeaderAtFront(voxel_chunk_manager* Manager, voxel_chunk_header* Header){
 	Header->Prev = Manager->VoxelChunkSentinel;
 	Header->Next = Manager->VoxelChunkSentinel->Next;
+
+	Header->Prev->Next = Header;
+	Header->Next->Prev = Header;
+}
+
+inline void InsertChunkHeaderAtFront(voxel_chunk_thread_context* Context, voxel_chunk_header* Header){
+	Header->Prev = Context->VoxelChunkSentinel;
+	Header->Next = Context->VoxelChunkSentinel->Next;
 
 	Header->Prev->Next = Header;
 	Header->Next->Prev = Header;

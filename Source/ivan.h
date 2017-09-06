@@ -1,6 +1,7 @@
 #ifndef IVAN_H
 #define IVAN_H
 
+
 #include "ivan_platform.h"
 #include "ivan_shared.h"
 #include "ivan_memory.h"
@@ -77,24 +78,20 @@ struct transient_state{
 	memory_arena TranArena;
 	
 	task_with_memory Tasks[4];
-	task_with_memory MeshTasks[400];
-	task_with_memory ChunkTasks[400];
+	int32_t TasksInUse;
+	task_with_memory MeshTasks[4096];
+	int32_t MeshTasksInUse;
+	task_with_memory ChunkTasks[4096];
+	int32_t ChunkTasksInUse;
 
 	loaded_bitmap GroundBitmap;
 	platform_work_queue* HighPriorityQueue;
 	platform_work_queue* LowPriorityQueue;
+	platform_work_queue* VoxelMeshQueue;
 
 	uint32 MainGenerationID;
 	
-#if 0
-	voxel_chunk_header VoxelChunkSentinel;
-
-	voxel_chunk VoxelChunk;
-	voxel_chunk_mesh MeshResult;
-	voxel_atlas_id VoxelAtlasID;
-#else
 	voxel_chunk_manager* VoxelChunkManager;
-#endif
 };
 
 GLOBAL_VARIABLE platform_api Platform;

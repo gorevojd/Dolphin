@@ -1460,13 +1460,17 @@ int WINAPI WinMain(
     OpenGLRC = Win32InitOpenGL(OpenGLDC);
     //InitOpenGL2(&GlobalScreen);
 
-    win32_thread_startup HighPriStartups[8] = {};
+    win32_thread_startup HighPriStartups[4] = {};
     platform_work_queue HighPriorityQueue = {};
     Win32MakeQueue(&HighPriorityQueue, ArrayCount(HighPriStartups), HighPriStartups);
 
     win32_thread_startup LowPriStartups[2] = {};
     platform_work_queue LowPriorityQueue = {};
     Win32MakeQueue(&LowPriorityQueue, ArrayCount(LowPriStartups), LowPriStartups);
+
+    win32_thread_startup VoxelMeshStartups[4] = {};
+    platform_work_queue VoxelMeshQueue = {};
+    Win32MakeQueue(&VoxelMeshQueue, ArrayCount(VoxelMeshStartups), VoxelMeshStartups);
 
     game_memory GameMemory = {};
     GameMemory.PermanentStorageSize = GD_MEGABYTES(200);
@@ -1486,6 +1490,7 @@ int WINAPI WinMain(
     
     GameMemory.HighPriorityQueue = &HighPriorityQueue;
     GameMemory.LowPriorityQueue = &LowPriorityQueue;
+    GameMemory.VoxelMeshQueue = &VoxelMeshQueue;
 
     GameMemory.PlatformAPI.GetAllFilesOfTypeBegin = Win32GetAllFilesOfTypeBegin;
     GameMemory.PlatformAPI.GetAllFilesOfTypeEnd = Win32GetAllFilesOfTypeEnd;

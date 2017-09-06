@@ -55,7 +55,7 @@ struct platform_work_queue{
     uint32 volatile NextEntryToWrite;
     uint32 volatile NextEntryToRead;
     HANDLE SemaphoreHandle;
-    platform_work_queue_entry Entries[2048];
+    platform_work_queue_entry Entries[4096];
 };
 
 struct win32_thread_startup{

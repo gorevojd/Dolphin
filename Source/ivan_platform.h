@@ -273,6 +273,7 @@ typedef struct game_memory{
 
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;
+    platform_work_queue* VoxelMeshQueue;
 
     platform_texture_op_queue TextureOpQueue;
 

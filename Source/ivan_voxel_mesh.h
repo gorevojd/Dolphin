@@ -44,16 +44,45 @@ enum voxel_texture_vert_type{
 	VoxelTextureVertType_DownLeft,
 };
 
-struct voxel_chunk_mesh{
-#define VOXEL_CHUNK_MESH_SOA 0
+typedef struct voxel_mesh_generation_queue{
+	voxel_mesh_generation_queue* Next;
 
+	int32_t IsSentinel;
+	uint32_t EntryCount;
+
+	vec3 VoxelPos;
+	uint8_t TextureIndexInAtlas;
+} voxel_mesh_generation_queue;
+
+typedef struct voxel_mesh_generation_context{
+	uint32_t MemoryRequired;
+
+	voxel_mesh_generation_queue LeftQueue;
+	voxel_mesh_generation_queue RightQueue;
+	voxel_mesh_generation_queue TopQueue;
+	voxel_mesh_generation_queue BottomQueue;
+	voxel_mesh_generation_queue FrontQueue;
+	voxel_mesh_generation_queue BackQueue;
+
+	uint32_t GenerationID;
+	game_assets* Assets;
+} voxel_mesh_generation_context;
+
+struct voxel_mesh_size{
+	uint32_t TriangleCount;
+	uint32_t TotalByteSize;
+};
+
+struct voxel_chunk_mesh{
 	void* MeshHandle;
 
-	uint32_t* PUVN;
+	ivan_vertex_type* PUVN;
 
 	uint32_t VerticesCount;
 	uint32_t ActiveVertexIndex;
 };
+
+typedef void do_face_work_prot(voxel_chunk_mesh* Mesh, vec3 Pos, uint8_t TextureIndexInAtlas);
 
 inline uint32_t GetEncodedVertexData(
 	vec3 Pos, 
@@ -115,7 +144,7 @@ inline void DoFaceWorkAtFront(
 		Vec3(Pos.x + 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
 		Vec3(Pos.x - 0.5f, Pos.y - 0.5f, Pos.z - 0.5f),
 		TextureIndexInAtlas,
-		VoxelNormalIndex_Front);	
+		VoxelNormalIndex_Front);
 }
 
 inline void DoFaceWorkAtBack(
@@ -207,122 +236,45 @@ inline int32_t NeighbourVoxelExistAndAir(voxel_chunk* Chunk, int32_t i, int32_t 
 	return(Result);
 }
 
-inline void PushFaceWorkForDownVoxel(
+inline void PushFaceWorkForVoxel(	
 	voxel_chunk* Chunk,
 	voxel_chunk_mesh* Mesh,
 	int32_t InitX, 
 	int32_t InitY, 
 	int32_t InitZ,
 	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
-{
-	if(NeighbourVoxelExistAndAir(
-		Chunk,
-		InitX,
-		InitY - 1,
-		InitZ))
-	{
-		DoFaceWorkAtBottom(Mesh, VoxelPos, TextureIndexInAtlas);
-	}
-}
-
-inline void PushFaceWorkForUpperVoxel(
-	voxel_chunk* Chunk,
-	voxel_chunk_mesh* Mesh, 
-	int32_t InitX, 
-	int32_t InitY, 
-	int32_t InitZ,
-	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
-{
-	if(NeighbourVoxelExistAndAir(
-		Chunk,
-		InitX,
-		InitY + 1,
-		InitZ))
-	{
-		DoFaceWorkAtTop(Mesh, VoxelPos, TextureIndexInAtlas);
-	}
-}
-
-inline void PushFaceWorkForLeftVoxel(
-	voxel_chunk* Chunk,
-	voxel_chunk_mesh* Mesh, 
-	int32_t InitX, 
-	int32_t InitY, 
-	int32_t InitZ,
-	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
-{
-	if(NeighbourVoxelExistAndAir(
-		Chunk,
-		InitX - 1,
-		InitY,
-		InitZ))
-	{
-		DoFaceWorkAtLeft(Mesh, VoxelPos, TextureIndexInAtlas);
-	}
-}
-
-inline void PushFaceWorkForRightVoxel(
-	voxel_chunk* Chunk,
-	voxel_chunk_mesh* Mesh, 
-	int32_t InitX, 
-	int32_t InitY, 
-	int32_t InitZ,
-	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
-{
-	if(NeighbourVoxelExistAndAir(
-		Chunk,
-		InitX + 1,
-		InitY,
-		InitZ))
-	{
-		DoFaceWorkAtRight(Mesh, VoxelPos, TextureIndexInAtlas);
-	}
-}
-
-inline void PushFaceWorkForFrontVoxel(
-	voxel_chunk* Chunk,
-	voxel_chunk_mesh* Mesh, 
-	int32_t InitX, 
-	int32_t InitY, 
-	int32_t InitZ,
-	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
+	vec3 VoxelPos,
+	do_face_work_prot* DoFaceWork)
 {
 	if(NeighbourVoxelExistAndAir(
 		Chunk,
 		InitX,
 		InitY,
-		InitZ - 1))
+		InitZ))
 	{
-		DoFaceWorkAtFront(Mesh, VoxelPos, TextureIndexInAtlas);
+		DoFaceWork(Mesh, VoxelPos, TextureIndexInAtlas);
 	}
 }
 
-inline void PushFaceWorkForBackVoxel(
-	voxel_chunk* Chunk,
-	voxel_chunk_mesh* Mesh, 
-	int32_t InitX, 
-	int32_t InitY, 
-	int32_t InitZ,
-	uint8_t TextureIndexInAtlas,
-	vec3 VoxelPos)
-{
-	if(NeighbourVoxelExistAndAir(
-		Chunk,
-		InitX,
-		InitY,
-		InitZ + 1))
-	{
-		DoFaceWorkAtBack(Mesh, VoxelPos, TextureIndexInAtlas);
-	}
-}
-
+#if 0
 INTERNAL_FUNCTION void 
 GenerateVoxelMeshForChunk(
 	voxel_chunk_mesh* Result, voxel_chunk* Chunk, 
 	game_assets* Assets, voxel_atlas_id VoxelAtlasID);
+
+INTERNAL_FUNCTION uint32_t
+PrecalculateVoxelMeshSize(voxel_chunk* Chunk, uint32_t BytesPerVertex);
+#else
+INTERNAL_FUNCTION voxel_mesh_generation_context
+InitVoxelMeshGeneration(
+	voxel_chunk* Chunk, 
+	game_assets* Assets,
+	voxel_atlas_id VoxelAtlasID);
+
+INTERNAL_FUNCTION void
+FinalizeVoxelMeshGeneration(
+	voxel_chunk_mesh* Mesh,
+	voxel_mesh_generation_context* Context);
+#endif
+
 #endif

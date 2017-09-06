@@ -10,6 +10,10 @@
 #define IVAN_MAX_MESH_CHUNK_VERTEX_COUNT (IVAN_MAX_MESH_CHUNK_FACE_COUNT * 4)
 #define IVAN_MAX_VOXELS_IN_CHUNK (IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_WIDTH * IVAN_VOXEL_CHUNK_HEIGHT)
 
+typedef uint32_t ivan_vertex_type;
+#define IVAN_MEMORY_PER_VERTEX (sizeof(ivan_vertex_type))
+#define IVAN_MAX_MEMORY_FOR_CHUNK (IVAN_MAX_VOXELS_IN_CHUNK * 6 * 2 *3  * IVAN_MEMORY_PER_VERTEX)
+
 /*
 	i -> left-right
 	j -> front-back
