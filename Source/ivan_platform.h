@@ -1,14 +1,211 @@
 #ifndef IVAN_PLATFORM_H
 #define IVAN_PLATFORM_H
 
+#define IVAN_INTERNAL 0
+
+#include "ivan_debug_interface.h"
+
 #include <stdio.h>
 
-#define GD_IMPLEMENTATION
-#include "E:/Programming/MyProjects/GD_LIBS/gd.h"
+#ifndef IVAN_BIT
+#define IVAN_BIT(value) (1 << (value))
+#endif
+
+#ifndef IVAN_LERP
+#define IVAN_LERP(a, b, t) ((a) + ((b) - (a)) * (t))
+#endif
+
+#ifndef IVAN_MIN
+#define IVAN_MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef IVAN_MAX
+#define IVAN_MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef IVAN_CLAMP
+#define IVAN_CLAMP(value, lower, upper) (IVAN_MIN(IVAN_MAX(value, lower), upper))
+#endif
+
+#ifndef IVAN_CLAMP01
+#define IVAN_CLAMP01(value) (IVAN_CLAMP(value, 0, 1))
+#endif
+
+#ifndef IVAN_SQUARE
+#define IVAN_SQUARE(value) ((value) * (value))
+#endif
+
+#ifndef IVAN_CUBE
+#define IVAN_CUBE(value) ((value) * (value) * (value))
+#endif
+
+#ifndef IVAN_ABS
+#define IVAN_ABS(value) ((value) >= 0 ? (value) : -(value))
+#endif
+
+#ifndef IVAN_ARRAY_COUNT
+#define IVAN_ARRAY_COUNT(Array) (sizeof(Array) / sizeof(Array[0]))
+#endif
+
+#ifndef IVAN_KILOBYTES
+#define IVAN_KILOBYTES(Value) (Value * 1024)
+#define IVAN_MEGABYTES(Value) (IVAN_KILOBYTES(1024) * Value)
+#define IVAN_GIGABYTES(Value) (IVAN_MEGABYTES(1024) * Value)
+#define IVAN_TERABYTES(Value) (IVAN_GIGABYTES(1024) * Value)
+#endif
+
+#ifdef __cplusplus
+#define IVAN_EXTERN extern "C"
+#else
+#define IVAN_EXTERN extern
+#endif
+
+#ifdef _WIN32
+#define IVAN_DLL_EXPORT IVAN_EXTERN __declspec(dllexport)
+#define IVAN_DLL_IMPORT IVAN_EXTERN __declspec(dllimport)
+#else
+#define IVAN_DLL_EXPORT IVAN_EXTERN __attribute__((visibility("default")))
+#define IVAN_DLL_IMPORT IVAN_EXTERN
+#endif
+
+#if defined(_WIN64) || defined(__x86_64__) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
+#ifndef IVAN_ARCH_64_BIT
+#define IVAN_ARCH_64_BIT 1
+#endif
+#else
+#ifndef IVAN_ARCH_32_BIT
+#define IVAN_ARCH_32_BIT 1
+#endif
+#endif
+#if defined(_WIN32) || defined(_WIN64)
+#ifndef IVAN_SYSTEM_WINDOWS
+#define IVAN_SYSTEM_WINDOWS 1
+#endif
+#elif defined(__APPLE__) && defined(__MACH__)
+#ifndef IVAN_SYSTEM_OSX
+#define IVAN_SYSTEM_OSX 1
+#endif
+#elif defined(__unix__)
+#ifndef IVAN_SYSTEM_UNIX
+#define IVAN_SYSTEM_UNIX 1
+#endif
+#ifdef __linux__
+#ifndef IVAN_SYSTEM_LINUX
+#define IVAN_SYSTEM_LINUX 1
+#endif
+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#ifndef IVAN_SYSTEM_FREEBSD
+#define IVAN_SYSTEM_FREEBSD 1
+#endif
+#else
+#error this UNIX OS is not supported
+#endif
+#else
+#error This operating system is not supported
+#endif
+
+
+#ifdef _MSC_VER
+#define IVAN_COMPILER_MSVC 1
+#elif defined(__GNUC__)
+#define IVAN_COMPILER_GCC 1
+#elif defined(__clang__)
+#define IVAN_COMPILER_CLANG 1
+#else
+#error This compiler is not supported
+#endif
+
+
+#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
+#ifndef IVAN_CPU_X86
+#define IVAN_CPU_X86 1
+#endif
+#ifndef IVAN_CACHE_LINE_SIZE
+#define IVAN_CACHE_LINE_SIZE 64
+#endif
+#elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
+#ifndef IVAN_CPU_PPC
+#define IVAN_CPU_PPC 1
+#endif
+#ifndef IVAN_CACHE_LINE_SIZE
+#define IVAN_CACHE_LINE_SIZE 128
+#endif
+#elif defined(__arm__)
+#ifndef IVAN_CPU_ARM
+#define IVAN_CPU_ARM 1
+#endif
+#ifndef IVAN_CACHE_LINE_SIZE
+#define IVAN_CACHE_LINE_SIZE 64
+#endif
+#elif defined(__MIPSEL__) || defined(__mips_isa_rev)
+#ifndef IVAN_CPU_MIPS
+#define IVAN_CPU_MIPS 1
+#endif
+#ifndef IVAN_CACHE_LINE_SIZE
+#define IVAN_CACHE_LINE_SIZE 64
+#endif
+#else
+#error Unknown CPU type
+#endif
+
+
+#if defined(_WIN32) && !defined(__MINGW32__)
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
+
+#ifndef IVAN_TYPES_DEFINED
+#define IVAN_TYPES_DEFINED
+
+#ifdef IVAN_COMPILER_MSVC
+#if _MSC_VER < 1300
+typedef unsigned char uint8;
+typedef signed char int8;
+typedef unsigned short uint16;
+typedef signed short int16;
+typedef unsigned int uint32;
+typedef signed int int32;
+#else
+typedef unsigned __int8 uint8;
+typedef signed __int8 int8;
+typedef unsigned __int16 uint16;
+typedef signed __int16 int16;
+typedef unsigned __int32 uint32;
+typedef signed __int32 int32;
+#endif
+typedef unsigned __int64 uint64;
+typedef signed __int64 int64;
+#else
+#include <stdint.h>
+typedef uint8_t uint8;
+typedef int8_t int8;
+typedef uint16_t uint16;
+typedef int16_t int16;
+typedef uint32_t uint32;
+typedef int32_t int32;
+typedef uint64_t uint64;
+typedef int64_t int64;
+#endif
+#endif
+
+typedef float real32;
+typedef double real64;
+
+#include <stdio.h>
+typedef uintptr_t uintptr;
+typedef intptr_t  intptr;
+
+typedef int32 bool32;
+
+#define F32_MIN 1.175494351e-38F  
+#define F32_MAX 3.402823466e+38F
+
+#define Real32Maximum (F32_MAX)
+#define Real32Minimum -(F32_MAX)
 
 #define STB_SPRINTF_IMPLEMENTATION
 #include "stb_sprintf.h"
-
 
 #define GLOBAL_VARIABLE static
 #define LOCAL_PERSIST static
@@ -20,13 +217,11 @@
 #define INVALID_CODE_PATH Assert(!"Invalid code path!")
 #define INVALID_DEFAULT_CASE default:{INVALID_CODE_PATH;} break;
 
-#define INTERNAL_BUILD
-
 typedef size_t memory_index;
 
-#if GD_COMPILER_MSVC
+#if IVAN_COMPILER_MSVC
 #include <intrin.h>
-#else  
+#else
 #include <x86intrin.h>
 #endif
 
@@ -265,11 +460,14 @@ inline game_controller_input* GetController(game_input* Input, int ControllerInd
 typedef struct game_memory{
     bool32 IsInitialized;
 
-    uint32 PermanentStorageSize;
+    uint64 PermanentStorageSize;
     void* PermanentStorage;
 
-    uint32 TransientStorageSize;
+    uint64 TransientStorageSize;
     void* TransientStorage;
+
+    uint64 DebugStorageSize;
+    void* DebugStorage;
 
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;
@@ -282,16 +480,16 @@ typedef struct game_memory{
 
 extern game_memory* DebugGlobalMemory;
 
-#if GD_COMPILER_MSVC
-#define GD_COMPLETE_WRITES_BEFORE_FUTURE _WriteBarrier();
-#define GD_COMPLETE_READS_BEFORE_FUTURE _ReadBarrier();
-#elif GD_COMPILER_GCC
-#define GD_COMPLETE_WRITES_BEFORE_FUTURE asm volatile("" ::: "memory");
-#define GD_COMPLETE_READS_BEFORE_FUTURE asm volatile("" ::: "memory");
+#if IVAN_COMPILER_MSVC
+#define IVAN_COMPLETE_WRITES_BEFORE_FUTURE _WriteBarrier();
+#define IVAN_COMPLETE_READS_BEFORE_FUTURE _ReadBarrier();
+#elif IVAN_COMPILER_GCC
+#define IVAN_COMPLETE_WRITES_BEFORE_FUTURE asm volatile("" ::: "memory");
+#define IVAN_COMPLETE_READS_BEFORE_FUTURE asm volatile("" ::: "memory");
 #endif
 
-#if GD_COMPILER_MSVC
-inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Comparand){
+#if IVAN_COMPILER_MSVC
+inline uint32 AtomicCompareExchangeU32(uint32 volatile *Value, uint32 New, uint32 Comparand){
     uint32 Result = _InterlockedCompareExchange((long volatile*)Value, New, Comparand);
     return(Result);
 }
@@ -307,26 +505,53 @@ inline uint64 AtomicExchangeU64(uint64 volatile* Value, uint64 New){
     return(Result);
 }
 
-inline 
+inline uint32 GetThreadID(void){
+    uint8* ThreadLocalStorage = (uint8*)__readgsqword(0x30);
+    uint32 ThreadID = *(uint32*)(ThreadLocalStorage + 0x48);
 
-#elif GD_COMPILER_GCC
-inline uint32 AtomicCompareExchangeUInt32(uint32 volatile *Value, uint32 New, uint32 Comparand){
+    return(ThreadID);
+}
+
+#elif IVAN_COMPILER_GCC
+inline uint32 AtomicCompareExchangeU32(uint32 volatile *Value, uint32 New, uint32 Comparand){
     uint32 Result = __sync_val_compare_and_swap(Value, Comparand, New);
     return(Result);
+}
+
+inline uint64 = AtomicExchangeU64(uint64 volatile* Value, uint64 New){
+    uint64 Result = __sync_lock_test_and_set(Value, New);
+
+    return(Result);
+}
+
+inline uint64 AtomicAddU64(uint64 volatile* Value, uint64 Addend){
+    uint64 Result = __sync_fetch_and_add(Value, Addend);
+
+    return(Result);
+}
+
+inline uint32 GetThreadID(){
+    uint32 ThreadID;
+#if defined(__APPLE__) && defined(__x86_64__)
+    asm("mov %%gs:0x00,%0" : "=r"(ThreadID));
+#elif defined(__i386__)
+    asm("mov %%gs:0x08,%0" : "=r"(ThreadID));
+#elif defined(__x86_64__)
+    asm("mov %%fs:0x10,%0" : "=r"(ThreadID));
+#else
+#error Unsupported architecture
+#endif
 }
 #endif
 
 #define GAME_UPDATE_AND_RENDER(name) void name(game_memory* Memory, game_input* Input, game_offscreen_buffer* Buffer, game_render_commands* RenderCommands)
 typedef GAME_UPDATE_AND_RENDER(game_update_and_render);
-GAME_UPDATE_AND_RENDER(GameUpdateAndRenderStub){
-
-}
 
 #define GAME_GET_SOUND_SAMPLES(name) void name(game_memory* Memory, game_sound_output_buffer* SoundOutput)
 typedef GAME_GET_SOUND_SAMPLES(game_get_sound_samples);
-GAME_GET_SOUND_SAMPLES(GameGetSoundSamplesStub){
 
-}
+#define DEBUG_GAME_FRAME_END(name) void name(game_memory *Memory, game_input *Input, game_render_commands *RenderCommands)
+typedef DEBUG_GAME_FRAME_END(debug_game_frame_end);
 
 inline void BeginTicketMutex(ticket_mutex* Mutex){
     uint64 Ticket = AtomicAddU64(&Mutex->Ticket, 1);

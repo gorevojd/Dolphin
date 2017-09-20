@@ -139,10 +139,10 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	Chunk->Voxels = PushArray(&Work->Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
 	Assert(Chunk->Voxels);
 
-	GD_COMPLETE_READS_BEFORE_FUTURE;
+	IVAN_COMPLETE_READS_BEFORE_FUTURE;
 	GenerateVoxelChunk(Chunk, Work->Series);
 
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Work->Header->ChunkState = VoxelChunkState_Generated;
 	Work->Header->ChunkTask = Work->Task;
 
@@ -154,7 +154,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 	voxel_chunk_manager* Manager)
 {
 	
-	if(AtomicCompareExchangeUInt32((uint32 volatile *)&Header->ChunkState,
+	if(AtomicCompareExchangeU32((uint32 volatile *)&Header->ChunkState,
             VoxelChunkState_InProcess,
             VoxelChunkState_Unloaded) == VoxelChunkState_Unloaded)
 	{
@@ -184,7 +184,7 @@ INTERNAL_FUNCTION void GenerateVoxelMesh(
 	voxel_chunk_header* Header,
 	voxel_chunk_manager* Manager)
 {
-	if(AtomicCompareExchangeUInt32((uint32 volatile*)&Header->MeshState,
+	if(AtomicCompareExchangeU32((uint32 volatile*)&Header->MeshState,
 		VoxelMeshState_InProcess,
 		VoxelMeshState_Unloaded) == VoxelMeshState_Unloaded)
 	{
@@ -413,7 +413,7 @@ UpdateVoxelChunks(
 				Index->Prev->Next = Index->Next;
 				Index->Next->Prev = Index->Prev;
 
-				GD_COMPLETE_WRITES_BEFORE_FUTURE;
+				IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 
 				if(Index->ChunkTask && (Index->ChunkState != VoxelChunkState_InProcess)){
 					EndTaskWithMemory(Index->ChunkTask);
@@ -493,7 +493,7 @@ UpdateVoxelChunks(
 			voxel_chunk* OldFront = Chunk->FrontNeighbour;
 			voxel_chunk* OldBack = Chunk->BackNeighbour;
 
-			GD_COMPLETE_READS_BEFORE_FUTURE;
+			IVAN_COMPLETE_READS_BEFORE_FUTURE;
 
 			SetNeighboursForChunk(
 				Chunk, 
@@ -501,12 +501,12 @@ UpdateVoxelChunks(
 				Chunk->VerticalIndex,
 				HashTable);
 
-			GD_COMPLETE_WRITES_BEFORE_FUTURE;
+			IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 
 			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
 
 				if(Index->MeshTask && Index->MeshState != VoxelMeshState_InProcess){
-					GD_COMPLETE_READS_BEFORE_FUTURE;
+					IVAN_COMPLETE_READS_BEFORE_FUTURE;
 					Index->MeshState = VoxelMeshState_Unloaded;
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
@@ -594,13 +594,13 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 			if((IVAN_CHUNK_ABS(Work->CamIndexX - Index->Chunk->HorizontalIndex) > Work->ChunksViewDistance) ||
 				(IVAN_CHUNK_ABS(Work->CamIndexY - Index->Chunk->VerticalIndex) > Work->ChunksViewDistance))
 			{
-				GD_COMPLETE_WRITES_BEFORE_FUTURE;
+				IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 
 				if(Index->ChunkTask && (Index->ChunkState == VoxelChunkState_Generated))
 				{
 					EndTaskWithMemory(Index->ChunkTask);
 
-					AtomicCompareExchangeUInt32(
+					AtomicCompareExchangeU32(
 						(uint32 volatile *)&Index->ChunkState,
         				VoxelChunkState_Unloaded,
         				VoxelChunkState_Generated);
@@ -611,7 +611,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
 					
-					AtomicCompareExchangeUInt32(
+					AtomicCompareExchangeU32(
 						(uint32 volatile *)&Index->MeshState,
         				VoxelMeshState_Unloaded,
         				VoxelMeshState_Generated);
@@ -715,7 +715,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
 					
-					AtomicCompareExchangeUInt32(
+					AtomicCompareExchangeU32(
 						(uint32 volatile *)&Index->MeshState,
         				VoxelMeshState_Unloaded,
         				VoxelMeshState_Generated);
@@ -876,9 +876,9 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     Result->CurrHorizontalIndex = 0;
     Result->CurrVerticalIndex = 0;
 
-	SubArena(&Result->HashTableArena, &TranState->TranArena, GD_KILOBYTES(500));
-	SubArena(&Result->ListArena, &TranState->TranArena, GD_MEGABYTES(5));
-	SubArena(&Result->TempArena, &TranState->TranArena, GD_KILOBYTES(500));
+	SubArena(&Result->HashTableArena, &TranState->TranArena, IVAN_KILOBYTES(500));
+	SubArena(&Result->ListArena, &TranState->TranArena, IVAN_MEGABYTES(5));
+	SubArena(&Result->TempArena, &TranState->TranArena, IVAN_KILOBYTES(500));
 
 	for(int32_t ContextIndex = 0;
 		ContextIndex < ArrayCount(Result->Contexts);
@@ -942,9 +942,9 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 
 		if(Context->IsValid){
 
-			SubArena(&Context->HashTableArena, &TranState->TranArena, GD_KILOBYTES(20));
-			SubArena(&Context->ListArena, &TranState->TranArena, GD_KILOBYTES(100));
-			SubArena(&Context->TempArena, &TranState->TranArena, GD_KILOBYTES(10));
+			SubArena(&Context->HashTableArena, &TranState->TranArena, IVAN_KILOBYTES(20));
+			SubArena(&Context->ListArena, &TranState->TranArena, IVAN_KILOBYTES(100));
+			SubArena(&Context->TempArena, &TranState->TranArena, IVAN_KILOBYTES(10));
 
 			Context->VoxelChunkSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
 			Context->VoxelChunkSentinel->Next = Context->VoxelChunkSentinel;

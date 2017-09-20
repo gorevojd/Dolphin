@@ -518,6 +518,8 @@ struct win32_game_code{
     FILETIME LastWriteTimeDLL;
     game_update_and_render* GameUpdateAndRender;
     game_get_sound_samples* GameGetSoundSamples;
+    debug_game_frame_end* DEBUGFrameEnd;
+
     bool32 IsValid;
 };
 
@@ -542,16 +544,18 @@ Win32LoadGameCode(char* SourceFileName, char* TempFileName){
     GameCode.LastWriteTimeDLL = Win32GetLastFileWriteTime(SourceFileName);
     CopyFile(SourceFileName, TempFileName, FALSE);
     GameCode.GameCodeLib = LoadLibraryA(TempFileName);
+
     if(GameCode.GameCodeLib){
         GameCode.GameUpdateAndRender = (game_update_and_render*)GetProcAddress(GameCode.GameCodeLib, "GameUpdateAndRender");
         GameCode.GameGetSoundSamples = (game_get_sound_samples*)GetProcAddress(GameCode.GameCodeLib, "GameGetSoundSamples");             
-        
+        GameCode.DEBUGFrameEnd = (debug_game_frame_end*)GetProcAddress(GameCode.GameCodeLib, "DEBUGGameFrameEnd");
+
         GameCode.IsValid = GameCode.GameUpdateAndRender && GameCode.GameGetSoundSamples;
     }
 
     if(!GameCode.IsValid){
-        GameCode.GameUpdateAndRender = GameUpdateAndRenderStub;
-        GameCode.GameGetSoundSamples = GameGetSoundSamplesStub;
+        GameCode.GameUpdateAndRender = 0;
+        GameCode.GameGetSoundSamples = 0;
     }
 
     return(GameCode);
@@ -563,8 +567,8 @@ Win32UnloadGameCode(win32_game_code* GameCode){
         FreeLibrary(GameCode->GameCodeLib);
         GameCode->GameCodeLib = 0;
     }
-    GameCode->GameUpdateAndRender = GameUpdateAndRenderStub;
-    GameCode->GameGetSoundSamples = GameGetSoundSamplesStub;
+    GameCode->GameUpdateAndRender = 0;
+    GameCode->GameGetSoundSamples = 0;
     GameCode->IsValid = false;
 }
 
@@ -1473,14 +1477,25 @@ int WINAPI WinMain(
     Win32MakeQueue(&VoxelMeshQueue, ArrayCount(VoxelMeshStartups), VoxelMeshStartups);
 
     game_memory GameMemory = {};
-    GameMemory.PermanentStorageSize = GD_MEGABYTES(200);
-    GameMemory.TransientStorageSize = GD_MEGABYTES(2000);
+    GameMemory.PermanentStorageSize = IVAN_MEGABYTES(200);
+    GameMemory.TransientStorageSize = IVAN_MEGABYTES(2000);
+    GameMemory.DebugStorageSize = IVAN_MEGABYTES(256);
+
+    //GameMemory.DebugTable = GlobalDebugTable;
     
-    uint32 MemoryBlockSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
+    uint32 MemoryBlockSize = 
+        GameMemory.PermanentStorageSize + 
+        GameMemory.TransientStorageSize +
+        GameMemory.DebugStorageSize;
     void* MemoryBlock = VirtualAlloc(0, MemoryBlockSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     GameMemory.PermanentStorage = MemoryBlock;
-    GameMemory.TransientStorage = (uint8*)MemoryBlock + GameMemory.PermanentStorageSize;
-    
+    GameMemory.TransientStorage = 
+        (uint8*)MemoryBlock + 
+        GameMemory.PermanentStorageSize;
+    GameMemory.DebugStorage = 
+        (uint8*)GameMemory.TransientStorage + 
+        GameMemory.TransientStorageSize;
+
     GameMemory.PlatformAPI.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
     GameMemory.PlatformAPI.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;
     GameMemory.PlatformAPI.DEBUGWriteEntireFile = DEBUGPlatformWriteEntireFile;
@@ -1513,7 +1528,7 @@ int WINAPI WinMain(
         Op->Next = TextureOpQueue->FirstFree + TextureOpIndex + 1;
     }
 
-    uint32 PushBufferSize = GD_MEGABYTES(5);
+    uint32 PushBufferSize = IVAN_MEGABYTES(5);
     uint8* PushBuffer = (uint8*)VirtualAlloc(0, PushBufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     game_render_commands RenderCommands = DefaultRenderCommands(

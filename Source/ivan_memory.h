@@ -105,4 +105,4 @@ inline void InitializeMemoryArena(memory_arena* Arena, size_t Size, void* BaseAd
 	Arena->MemorySize = Size;
 }
 
-#endif`
+#endif

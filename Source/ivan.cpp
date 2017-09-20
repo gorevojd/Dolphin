@@ -40,7 +40,7 @@ inline task_with_memory* BeginTaskWithMemory_(task_with_memory* Tasks, int32 Tas
 
     for (int i = 0; i < TasksCount; i++){
         task_with_memory* Task = &Tasks[i];
-        if(AtomicCompareExchangeUInt32((uint32* volatile)&Task->BeingUsed, true, false) == false){
+        if(AtomicCompareExchangeU32((uint32* volatile)&Task->BeingUsed, true, false) == false){
             FoundTask = Task;
             Task->Memory = BeginTemporaryMemory(&Task->Arena);
             break;
@@ -70,106 +70,45 @@ INTERNAL_FUNCTION task_with_memory* BeginMeshTaskWithMemory(transient_state* Tra
 INTERNAL_FUNCTION void EndTaskWithMemory(task_with_memory* Task){
 	EndTemporaryMemory(Task->Memory);
 
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Task->BeingUsed = false;
 }
 
-GLOBAL_VARIABLE float CursorY;
-GLOBAL_VARIABLE float FontScale;
-GLOBAL_VARIABLE font_id FontID;
+INTERNAL_FUNCTION uint32
+DEBUGGetMainGenerationID(game_memory* Memory){
+    uint32 Result = 0;
 
-INTERNAL_FUNCTION void DEBUGTextReset(render_group* RenderGroup){
-    TIMED_BLOCK();
-
-    asset_vector MatchVector = {};
-    MatchVector.Data[Tag_FontType] = FontType_Debug;
-    asset_vector WeightVector = {};
-    WeightVector.Data[Tag_FontType] = 10.0f;
-    FontID = GetBestMatchFontFrom(RenderGroup->Assets, Asset_Font, &MatchVector, &WeightVector);
-    
-    FontScale = 1.0f;
-
-    dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
-    CursorY = GetStartingBaselineY(Info) * FontScale;
-}
-
-INTERNAL_FUNCTION void DEBUGTextOut(render_group* RenderGroup, char* String){
-    TIMED_BLOCK();
-
-    loaded_font* Font = PushFont(RenderGroup, FontID);
-    
-    if(Font){        
-
-        dda_font* Info = GetFontInfo(RenderGroup->Assets, FontID);
-
-        float CharScale = FontScale;
-        float CursorX = 0;
-        uint32 PrevCodePoint = 0;
-        vec4 Color = Vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-        char* Ptr = String;
-        while(*Ptr){
-
-            if((Ptr[0] == '\\') &&
-                (Ptr[1] == '#') &&
-                (Ptr[2] != 0) &&
-                (Ptr[3] != 0) &&
-                (Ptr[4] != 0))
-            {
-                float ColorScale = 1.0f / 9.0f;
-                Color = Vec4(
-                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[2] - '0')),
-                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[3] - '0')),
-                    IVAN_MATH_CLAMP01(ColorScale * (float)(Ptr[4] - '0')),
-                    1.0f);
-                Ptr += 5;
-            }
-            else if((Ptr[0] == '\\') &&
-                (Ptr[1] == '^') &&
-                (Ptr[2] != 0))
-            {
-                float ScaleScale = 1.0f / 9.0f;
-                CharScale = FontScale * IVAN_MATH_CLAMP01(ScaleScale * (float)(Ptr[2] - '0'));
-                Ptr += 3;
-            }
-            else{    
-                uint32 CodePoint = *Ptr;
-
-                float AdvanceX = CharScale * GetHorizontalAdvanceForPair(Info, Font, PrevCodePoint, CodePoint);
-                CursorX += AdvanceX;
-
-                if(CodePoint != ' '){
-
-                    bitmap_id BitmapID = GetBitmapForGlyph(RenderGroup->Assets, Info, Font, CodePoint);
-                    dda_bitmap* BitmapInfo = GetBitmapInfo(RenderGroup->Assets, BitmapID);
-
-                    PushBitmap(RenderGroup, BitmapID, -CharScale * (float)BitmapInfo->Dimension[1], Vec3(CursorX, CursorY, 0), Color, true);
-                }
-
-                PrevCodePoint = CodePoint;
-                Ptr++;
-            }
-
-        }
-
-        CursorY += GetLineAdvanceFor(Info) * CharScale;
+    transient_state* TranState = (transient_state*)Memory->TransientStorage;
+    if(TranState->IsInitialized){
+        Result = TranState->MainGenerationID;
     }
+
+    return(Result);
 }
 
-#ifdef INTERNAL_BUILD
+INTERNAL_FUNCTION game_assets*
+DEBUGGetGameAssets(game_memory* Memory){
+    game_assets* Assets = 0;
+
+    transient_state *TranState = (transient_state *)Memory->TransientStorage;
+    if(TranState->IsInitialized)
+    {
+        Assets = TranState->Assets;
+    }
+
+    return(Assets);
+}
+
 game_memory* DebugGlobalMemory;
-#endif
 platform_add_entry* PlatformAddEntry;
 platform_complete_all_work* PlatformCompleteAllWork;
 
-GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
+IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     TIMED_BLOCK();
 
     Platform = Memory->PlatformAPI;
 
-#ifdef INTERNAL_BUILD
     DebugGlobalMemory = Memory;
-#endif
 
     game_state* GameState = (game_state*)Memory->PermanentStorage;
     if (!Memory->IsInitialized){
@@ -222,7 +161,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         {
             task_with_memory* Task = TranState->Tasks + TaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_MEGABYTES(1));
+            SubArena(&Task->Arena, &TranState->TranArena, IVAN_MEGABYTES(1));
         }
 
         TranState->MeshTasksInUse = 0;
@@ -232,7 +171,7 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         {
             task_with_memory* Task = TranState->MeshTasks + MeshTaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(1));
+            SubArena(&Task->Arena, &TranState->TranArena, IVAN_KILOBYTES(1));
         }
 
         TranState->ChunkTasksInUse = 0;
@@ -242,13 +181,13 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         {
             task_with_memory* Task = TranState->ChunkTasks + ChunkTaskIndex;
             Task->BeingUsed = false;
-            SubArena(&Task->Arena, &TranState->TranArena, GD_KILOBYTES(66));
+            SubArena(&Task->Arena, &TranState->TranArena, IVAN_KILOBYTES(66));
         }
 
-        TranState->Assets = AllocateGameAssets(&TranState->TranArena, GD_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
+        TranState->Assets = AllocateGameAssets(&TranState->TranArena, IVAN_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
-        //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
+        PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
         TranState->VoxelChunkManager = AllocateVoxelChunkManager(TranState, TranState->Assets);
 
@@ -384,69 +323,20 @@ GD_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     SpawnFontain(&GameState->FontainCache, Vec3(0.0f, 0.0f, 0.0f));    
     UpdateAndRenderParticleSystems(&GameState->FontainCache, Input->DeltaTime, RenderGroup, Vec3(0.0f));
 */
-    OverlayCycleCounters(Memory, RenderGroup);
-
-    DEBUGTextReset(RenderGroup);
 
     //TiledRenderGroupToOutput(Memory->HighPriorityQueue, RenderGroup->Commands, (loaded_bitmap*)Buffer);
     
     EndTemporaryMemory(RenderMemory);
 }
 
-GD_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
+#if IVAN_INTERNAL
+#include "ivan_debug.cpp"
+#else
+#endif
+
+IVAN_DLL_EXPORT GAME_GET_SOUND_SAMPLES(GameGetSoundSamples){
     game_state* GameState = (game_state*)Memory->PermanentStorage;
     transient_state* TranState = (transient_state*)Memory->TransientStorage;
 
     OutputPlayingSounds(&GameState->AudioState, SoundOutput, TranState->Assets, &GameState->PermanentArena);
-}
-
-debug_record DebugRecordArray[__COUNTER__];
-
-#include <stdio.h>
-
-INTERNAL_FUNCTION void 
-OutputDebugRecords(debug_record* Counters, uint32 CountersCount, render_group* RenderGroup){
-    for(int CounterIndex = 0;
-        CounterIndex < CountersCount;
-        CounterIndex++)
-    {
-        debug_record* Counter = Counters + CounterIndex;
-
-        uint64 HitCount_CycleCount = AtomicExchangeU64(&Counter->HitCount_CycleCount, 0);
-        uint32 HitCount = (uint32)(HitCount_CycleCount >> 32);
-        uint32 CycleCount = (uint32)(HitCount_CycleCount & 0xFFFFFFFF);
-
-        if(HitCount){
-            char TextBuffer[256];
-
-            stbsp_sprintf(TextBuffer, "%32s(%4d): %10ucy %8uh %10ucy/h",
-                Counter->FunctionName,
-                Counter->LineNumber,
-                CycleCount,
-                HitCount,
-                CycleCount / HitCount);
-
-            DEBUGTextOut(RenderGroup, TextBuffer);
-        }
-    }
-
-    char TextBuffer[256];
-
-    stbsp_sprintf(TextBuffer, "ViewPosition: x:%.2f y:%.2f z:%.2f", 
-        RenderGroup->LastRenderSetup.CameraP.x,
-        RenderGroup->LastRenderSetup.CameraP.y,
-        RenderGroup->LastRenderSetup.CameraP.z);
-    DEBUGTextOut(RenderGroup, TextBuffer);
-}
-
-INTERNAL_FUNCTION void
-OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup){
-#ifdef INTERNAL_BUILD
-    DEBUGTextOut(RenderGroup, "\\#900DEBUG \\#090CYCLE \\#940COUNTS");
-    
-    OutputDebugRecords(
-        DebugRecords_MainTranslationUnit, 
-        ArrayCount(DebugRecords_MainTranslationUnit), 
-        RenderGroup);
-#endif
 }

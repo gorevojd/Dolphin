@@ -2,6 +2,7 @@
 #define IVAN_MATH_H
 
 #include <math.h>
+#include <stdint.h>
 
 #ifndef IVAN_MATH_LERP
 #define IVAN_MATH_LERP(a, b, t) ((a) + ((b) - (a)) * (t))
@@ -298,6 +299,17 @@ inline quat Mul(quat q1, quat q2){
     return(q);
 }
 
+inline quat Mul(quat Q, float s){
+	quat Result;
+
+	Result.x = Q.x * s;
+	Result.y = Q.y * s;
+	Result.z = Q.z * s;
+	Result.w = Q.w * s;
+
+	return(Result);
+}
+
 inline quat Quat(float Yaw, float Pitch, float Roll){
 	quat q1 = Quat(1.0f, 0.0f, 0.0f, Pitch);
 	quat q2 = Quat(0.0f, 1.0f, 0.0f, Yaw);
@@ -336,6 +348,28 @@ inline float Dot(quat q1, quat q2){
 	return(Result);
 }
 
+inline quat Add(quat A, quat B){
+	quat Result;
+
+	Result.x = A.x + B.x;
+	Result.y = A.y + B.y;
+	Result.z = A.z + B.z;
+	Result.w = A.w + B.w;
+
+	return(Result);
+}
+
+inline quat Sub(quat A, quat B){
+	quat Result;
+
+	Result.x = A.x - B.x;
+	Result.y = A.y - B.y;
+	Result.z = A.z - B.z;
+	Result.w = A.w - B.w;
+
+	return(Result);
+}
+
 inline quat Div(quat q, float s){
 	quat Result;
 	float OneOverS = 1.0f / s;
@@ -347,11 +381,67 @@ inline quat Div(quat q, float s){
 	return(Result);
 }
 
+inline float Length(quat q){
+	float Result = Sqrt(Dot(q, q));
+	return(Result);
+}
+
+inline quat Normalize(quat q){
+	quat Result;
+
+	float Len = Length(q);
+	float OneOverLen = 1.0f / Len;
+
+	Result.w = q.w * OneOverLen;
+	Result.x = q.x * OneOverLen;
+	Result.y = q.y * OneOverLen;
+	Result.z = q.z * OneOverLen;
+
+	return(Result);
+}
+
 inline quat Inverse(quat q){
 	quat Result;
 
 	Result = Conjugate(q);
 	Result = Div(Result, Dot(q, q));
+
+	return(Result);
+}
+
+inline mat4 RotationMatrix(quat Q){
+	
+	mat4 Result;
+
+	float xy = Q.x * Q.y;
+	float xz = Q.x * Q.z;
+	float xw = Q.x * Q.w;
+	float yz = Q.y * Q.z;
+	float yw = Q.y * Q.w;
+	float zw = Q.z * Q.w;
+	float xSquared;
+	float ySquared;
+	float zSquared;
+
+	Result.E[0] = 1.0f - 2.0f * (ySquared * zSquared);
+	Result.E[1] = 2.0f * (xy - zw);
+	Result.E[2] = 2.0f * (xz + yw);
+	Result.E[3] = 0.0f;
+
+	Result.E[4] = 2.0f * (xy + zw);
+	Result.E[5] = 1.0f - 2.0f * (xSquared + zSquared);
+	Result.E[6] = 2.0f * (yz - xw);
+	Result.E[7] = 0.0f;
+
+	Result.E[8] = 2.0f * (xz - yw);
+	Result.E[9] = 2.0f * (yz + xw);
+	Result.E[10] = 1.0f - 2.0f * (xSquared + ySquared);
+	Result.E[11] = 0.0f;
+
+	Result.E[8] = 0.0f;
+	Result.E[8] = 0.0f;
+	Result.E[8] = 0.0f;
+	Result.E[8] = 1.0f;
 
 	return(Result);
 }
@@ -514,6 +604,13 @@ inline vec4 &operator-=(vec4& a, vec4 b){return(a = a - b);}
 inline vec4 &operator*=(vec4& a, float s){return(a = a * s);}
 inline vec4 &operator/=(vec4& a, float s){return(a = a / s);}
 
+/*quat operator overloading*/
+inline quat operator+(quat A, quat B) {Add(A, B);}
+inline quat operator-(quat A, quat B) {Sub(A, B);}
+inline quat operator*(quat A, quat B) {Mul(A, B);}
+inline quat operator*(quat A, float S) {Mul(A, S);}
+inline quat operator/(quat A, float S) {Div(A, S);}
+
 /*Dot product*/
 inline float Dot(vec2 v0, vec2 v1){ return v0.x * v1.x + v0.y * v1.y; }
 inline float Dot(vec3 v0, vec3 v1){ return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z; }
@@ -604,7 +701,7 @@ inline float DistanceToPoint(vec4 Plane, vec3 P){
 
 /*Interpolations*/
 
-float Lerp(float a, float b, float t){
+inline float Lerp(float a, float b, float t){
 	float Result = a * (1.0f - t) + b * t;
 	return(Result);
 }
@@ -620,8 +717,64 @@ inline vec3 Lerp(vec3 a, vec3 b, float delta){ IVAN_VECTOR_LERP(3, a, b, delta);
 inline vec4 Lerp(vec4 a, vec4 b, float delta){ IVAN_VECTOR_LERP(4, a, b, delta); }
 #undef IVAN_VECTOR_LERP
 
+inline quat Slerp(quat A, quat B, float Delta){
+	quat Result;
+
+	float dot = Dot(A, B);
+	float InvDelta = 1.0f - Delta;
+
+	if(dot < 0.0f){
+		B = Quat(-B.x, -B.y -B.z, -B.w);
+		dot = -dot;
+	}
+
+	float k0, k1;
+	if(IVAN_MATH_ABS(dot) > 0.9999f){
+		k0 = 1.0f - Delta;
+		k1 = Delta;
+	}
+	else{
+		float SinTheta = Sqrt(1.0f - dot * dot);
+
+		float Theta = ATan2(SinTheta, dot);
+		float OneOverSinTheta = 1.0f / SinTheta;
+
+		k0 = Sin((1 - Delta) * Theta) * OneOverSinTheta;
+		k1 = Sin(Delta * Theta) * OneOverSinTheta;
+	}
+
+	Result.x = A.x * k0 + B.x * k1;
+	Result.y = A.y * k0 + B.y * k1;
+	Result.z = A.z * k0 + B.z * k1;
+	Result.w = A.w * k0 + B.w * k1;
+
+	return(Result);
+}
 
 /*Rectangle Functions*/
+
+inline rectangle2
+InvertedInfinityRectangle(){
+    rectangle2 Result;
+
+    Result.Min.x = Result.Min.y = Real32Maximum;
+    Result.Max.x = Result.Max.y = -Real32Maximum;
+
+    return(Result);
+}
+
+inline rectangle2
+Union(rectangle2 A, rectangle2 B){
+	rectangle2 Result;
+
+    Result.Min.x = (A.Min.x < B.Min.x) ? A.Min.x : B.Min.x;
+    Result.Min.y = (A.Min.y < B.Min.y) ? A.Min.y : B.Min.y;
+    Result.Max.x = (A.Max.x > B.Max.x) ? A.Max.x : B.Max.x;
+    Result.Max.y = (A.Max.y > B.Max.y) ? A.Max.y : B.Max.y;
+
+    return(Result);
+}
+
 inline int32
 GetWidth(rectangle2i A){
 	int32 Result = A.MaxX - A.MinX;
@@ -709,7 +862,17 @@ inline mat4 Transpose(mat4 M){
 	return(Result);
 }
 
-inline mat4 Rotation(vec3 R, float Angle){
+inline mat4 TranslationMatrix(vec3 Translation){
+	mat4 Result = Identity();
+
+	Result.E[3] = Translation.x;
+	Result.E[7] = Translation.y;
+	Result.E[11] = Translation.z;
+
+	return(Result);
+}
+
+inline mat4 RotationMatrix(vec3 R, float Angle){
 	mat4 Result;
 
 	float CosT = Cos(Angle);
@@ -739,6 +902,15 @@ inline mat4 Rotation(vec3 R, float Angle){
 	Result.E[13] = 0.0f;
 	Result.E[14] = 0.0f;
 	Result.E[15] = 1.0f;
+
+	return(Result);
+}
+
+inline mat4 ScalingMatrix(vec3 Scale){
+	mat4 Result = Identity();
+	Result.E[0] = Scale.x;
+	Result.E[5] = Scale.y;
+	Result.E[10] = Scale.z;
 
 	return(Result);
 }
@@ -874,27 +1046,8 @@ inline mat4 CameraTransform(
 	vec3 Front)
 {
 	mat4 Result = LookAt(P, P + Front, Vec3(0.0f, 1.0f, 0.0f));
-	//mat4 Result = Translate(Identity(), P);
 
 	return(Result);
 }
 
-/*
-	Result.E[0] = 0.0f;
-	Result.E[1] = 0.0f;
-	Result.E[2] = 0.0f;
-	Result.E[3] = 0.0f;
-	Result.E[4] = 0.0f;
-	Result.E[5] = 0.0f;
-	Result.E[6] = 0.0f;
-	Result.E[7] = 0.0f;
-	Result.E[8] = 0.0f;
-	Result.E[9] = 0.0f;
-	Result.E[10] = 0.0f;
-	Result.E[11] = 0.0f;
-	Result.E[12] = 0.0f;
-	Result.E[13] = 0.0f;
-	Result.E[14] = 0.0f;
-	Result.E[15] = 0.0f;
-*/
 #endif

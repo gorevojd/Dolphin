@@ -86,7 +86,7 @@ INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
         }
     }
 	
-    GD_COMPLETE_WRITES_BEFORE_FUTURE;
+    IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 
     if(!PlatformNoFileErrors(Work->Handle)){
         ZeroSize(Work->Destination, Work->Size);
@@ -291,7 +291,7 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
     asset* Asset = Assets->Assets + ID.Value;
 
     if(ID.Value){
-        if(AtomicCompareExchangeUInt32((uint32 volatile *)&Assets->Assets[ID.Value].State,
+        if(AtomicCompareExchangeU32((uint32 volatile *)&Assets->Assets[ID.Value].State,
             AssetState_Queued,
             AssetState_Unloaded) == AssetState_Unloaded)
         {
@@ -358,7 +358,7 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
     TIMED_BLOCK();
 
     if(ID.Value &&
-        AtomicCompareExchangeUInt32((uint32 volatile *)&Assets->Assets[ID.Value].State,
+        AtomicCompareExchangeU32((uint32 volatile *)&Assets->Assets[ID.Value].State,
             AssetState_Queued,
             AssetState_Unloaded) == AssetState_Unloaded)
     {
@@ -416,7 +416,7 @@ LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
 
     asset* Asset = Assets->Assets + ID.Value;
     if(ID.Value){
-        if(AtomicCompareExchangeUInt32(
+        if(AtomicCompareExchangeU32(
             (uint32 *)&Asset->State,
             AssetState_Queued, 
             AssetState_Unloaded) == AssetState_Unloaded)
@@ -486,7 +486,7 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
 
     asset* Asset = Assets->Assets + ID.Value;
     if(ID.Value){
-        if(AtomicCompareExchangeUInt32(
+        if(AtomicCompareExchangeU32(
             (uint32 *)&Asset->State,
             AssetState_Queued, 
             AssetState_Unloaded) == AssetState_Unloaded)
@@ -575,7 +575,7 @@ GetBestMatchAssetFrom(
             real32 B = Tag->Value;
             real32 D0 = IVAN_MATH_ABS(A - B);
             real32 D1 = IVAN_MATH_ABS((A - Assets->TagRange[Tag->ID] * IVAN_MATH_SIGN(A)) - B);
-            real32 Diffrence = GD_MIN(D0, D1);
+            real32 Diffrence = IVAN_MIN(D0, D1);
 
             real32 Weighted = WeightVector->Data[Tag->ID] * Diffrence;
             TotalWeightedDiff += Weighted;

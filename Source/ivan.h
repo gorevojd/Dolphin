@@ -1,11 +1,16 @@
 #ifndef IVAN_H
 #define IVAN_H
 
+/*
+ 	TODO(DIMA)
+ 		build single voxel mesh, that we will send to GPU(CHANGE SHADER!)
+		build character atlases for fonts.
+		DEBUG UI 		
+*/
 
 #include "ivan_platform.h"
 #include "ivan_shared.h"
 #include "ivan_memory.h"
-#include "ivan_debug.h"
 
 #include "ivan_intrinsics.h"
 #include "ivan_random.h"
@@ -17,9 +22,12 @@
 #include "ivan_audio.h"
 #include "ivan_particle.h"
 #include "ivan_render.h"
+#include "ivan_anim.h"
 
 #include "ivan_voxel_world.h"
 #include "ivan_voxel_mesh.h"
+
+#include "ivan_debug.h"
 
 struct task_with_memory{
     bool32 BeingUsed;
@@ -95,7 +103,6 @@ struct transient_state{
 };
 
 GLOBAL_VARIABLE platform_api Platform;
-
 
 INTERNAL_FUNCTION task_with_memory* BeginTaskWithMemory(struct transient_state* TranState);
 INTERNAL_FUNCTION task_with_memory* BeginChunkTaskWithMemory(transient_state* TranState);

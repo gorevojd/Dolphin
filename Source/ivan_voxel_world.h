@@ -20,7 +20,7 @@
 #ifndef IVAN_VOXEL_WORLD_H
 #define IVAN_VOXEL_WORLD_H
 
-#define IVAN_VOXEL_WORLD_MULTITHREADED 1
+#define IVAN_VOXEL_WORLD_MULTITHREADED 0
 
 #include "ivan_voxel_shared.h"
 

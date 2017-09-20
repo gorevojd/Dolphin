@@ -1,6 +1,6 @@
 #include "ivan_voxel_mesh.h"
 
-#define IVAN_MESH_KEEP_SIDES_ON 1
+#define IVAN_MESH_KEEP_SIDES_ON 0
 
 struct generate_mesh_work{
 	task_with_memory* Task;
@@ -20,15 +20,15 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelMeshWork){
 
 	*Mesh = {};
 
-	GD_COMPLETE_READS_BEFORE_FUTURE;
+	IVAN_COMPLETE_READS_BEFORE_FUTURE;
 
 	voxel_mesh_generation_context Context = InitVoxelMeshGeneration(Chunk, Work->Assets, Work->VoxelAtlasID);
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Mesh->PUVN = (ivan_vertex_type*)Platform.AllocateMemory(Context.MemoryRequired);
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	FinalizeVoxelMeshGeneration(Mesh, &Context);
 
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Work->Header->MeshTask = Work->Task;
 	Work->Header->MeshState = VoxelMeshState_Generated;
 }

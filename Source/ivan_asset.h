@@ -133,14 +133,14 @@ struct game_assets{
 
 inline void BeginAssetLock(game_assets* Assets){
 	for(;;){
-		if(AtomicCompareExchangeUInt32(&Assets->OperationLock, 1, 0) == 0){
+		if(AtomicCompareExchangeU32(&Assets->OperationLock, 1, 0) == 0){
 			break;
 		}
 	}
 }
 
 inline void EndAssetLock(game_assets* Assets){
-	GD_COMPLETE_WRITES_BEFORE_FUTURE;
+	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Assets->OperationLock = 0;
 }
 
@@ -178,7 +178,7 @@ inline asset_memory_header* GetAsset(game_assets* Assets, uint32 ID, uint32 Gene
 			Asset->Header->GenerationID = GenerationID;
 		}
 
-		GD_COMPLETE_WRITES_BEFORE_FUTURE;
+		IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	}
 
 	EndAssetLock(Assets);

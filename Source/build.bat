@@ -14,7 +14,7 @@ REM Asset builder
 cl %CommonCompilerFlags% -D_CRT_SECURE_NO_WARNINGS ..\Source\asset_builder.cpp /link %CommonLinkerFlags%
 
 
-cl %CommonCompilerFlags% /LD ..\Source\ivan.cpp -Fmivan.map -DDebugRecordArray=DebugRecords_MainTranslationUnit /link -incremental:no -opt:ref -PDB:ivan_%random%.pdb
+cl %CommonCompilerFlags% /LD ..\Source\ivan.cpp -Fmivan.map /link -incremental:no -opt:ref -PDB:ivan_%random%.pdb
 
 cl %CommonCompilerFlags% ..\Source\win32_ivan.cpp -Fmwin32_ivan.map /link %CommonLinkerFlags%
 
