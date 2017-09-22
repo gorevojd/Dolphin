@@ -66,7 +66,7 @@ struct timed_block{
 	~timed_block(){
 		END_BLOCK();
 	}
-}
+};
 #else
 
 #define TIMED_BLOCK(...)

@@ -6,7 +6,7 @@ inline void RenderBitmap(
     vec2 Pos,
     vec2 Align = {})
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     int32 MinX = Pos.x - Align.x;
     int32 MinY = Pos.y - Align.y;
@@ -125,7 +125,7 @@ inline void RenderRectangle(
     vec4 Color, 
     rectangle2i ClipRect)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     int32 MinX = RoundReal32ToInt32(MinP.x);
     int32 MinY = RoundReal32ToInt32(MinP.y);
@@ -185,7 +185,7 @@ inline void RenderRectangleQuickly(
     vec4 Color,
     rectangle2i ClipRect)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     Color.rgb *= Color.a;
 
@@ -289,7 +289,7 @@ inline void RenderRectangleQuickly(
             RectPixelArea = FillRectHeight * FillRectWidth;
         }
 
-        TIMED_BLOCK(RectPixelArea);
+        TIMED_BLOCK("PixelFill");
 
         for (int Y = MinY; Y < MaxY; Y++){
             uint32* DestPixel = (uint32*)Row;
@@ -512,7 +512,7 @@ inline void RenderRectangleQuickly(
 }
 
 inline void DesaturateBitmapQuickly(loaded_bitmap* Texture){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     int PixelCount = Texture->Width * Texture->Height;
 
@@ -606,7 +606,7 @@ inline void DesaturateBitmapQuickly(loaded_bitmap* Texture){
 
 inline void DesaturateBitmapSlowly(loaded_bitmap* Texture){
 
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     real32 OneThird = 1.0f / 3.0f;
 
@@ -638,7 +638,7 @@ inline void DesaturateBitmapSlowly(loaded_bitmap* Texture){
 
 inline void ChangeBitmapSaturation(loaded_bitmap* Texture, real32 Level){
     
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     real32 OneThird = 1.0f / 3.0f;
 
@@ -680,7 +680,7 @@ inline void RenderRectangleSlowly(
     loaded_bitmap* Texture,
     vec4 Color)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     Color.rgb *= Color.a;
 
@@ -747,8 +747,6 @@ inline void RenderRectangleSlowly(
     if(FillRectWidth > 0 && FillRectHeight > 0){
         RectPixelArea = FillRectHeight * FillRectWidth;
     }
-
-    TIMED_BLOCK(RectPixelArea);
 
     for (int Y = MinY; Y < MaxY; Y++){
         for (int X = MinX; X < MaxX; X++){
@@ -867,7 +865,7 @@ inline void RenderRectangleSlowly(
 INTERNAL_FUNCTION void 
 RenderGroupToOutput(game_render_commands* Commands, loaded_bitmap* OutputTarget, rectangle2i ClipRect)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     for(uint8* HeaderAt = Commands->PushBufferBase;
         HeaderAt < Commands->PushBufferDataAt;
@@ -973,7 +971,7 @@ TiledRenderGroupToOutput(
     game_render_commands* Commands,
     loaded_bitmap* OutputTarget)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     const int TileCountX = 4;
     const int TileCountY = 4;

@@ -143,16 +143,14 @@ LoadBMP(char* FileName, bool32 FlipOnLoad = false){
             uint32 SrcPixel = *Pixel;
 
             vec4 Color = {
-                (SrcPixel & 0xFF),
-                ((SrcPixel >> 8) & 0xFF),
-                ((SrcPixel >> 16) & 0xFF),
-                ((SrcPixel >> 24) & 0xFF) };
+                (float)(SrcPixel & 0xFF),
+                (float)((SrcPixel >> 8) & 0xFF),
+                (float)((SrcPixel >> 16) & 0xFF),
+                (float)((SrcPixel >> 24) & 0xFF) };
 
-#if 1
 
 #if 1
             /*Gamma-corrected premultiplied alpha*/
-
             Color = SRGB255ToLinear1(Color);
             real32 Alpha = Color.a;
             Color.r = Color.r * Alpha;
@@ -164,12 +162,11 @@ LoadBMP(char* FileName, bool32 FlipOnLoad = false){
             Color.rgb *= Color.a;
 #endif
 
-#endif
-
             *Pixel++ = (((uint32)(Color.a + 0.5f) << 24) |
                 ((uint32)(Color.r + 0.5f) << 16) |
                 ((uint32)(Color.g + 0.5f) << 8) |
                 ((uint32)(Color.b + 0.5f) << 0));
+
         }
     }
 

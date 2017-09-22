@@ -14,6 +14,10 @@
 #define WGL_SUPPORT_OPENGL_ARB                  0x2010
 #define WGL_DOUBLE_BUFFER_ARB                   0x2011
 #define WGL_PIXEL_TYPE_ARB                      0x2013
+#define WGL_COLOR_BITS_ARB                      0x2014
+#define WGL_DEPTH_BITS_ARB                      0x2022
+#define WGL_STENCIL_BITS_ARB                    0x2023
+
 
 #define WGL_TYPE_RGBA_ARB                       0x202B
 #define WGL_FULL_ACCELERATION_ARB               0x2027
@@ -914,7 +918,7 @@ int Win32OpenGLAttribs[] =
     //NOTE(Dima): WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB can remove all deprecated features.
     //So I should never actually use it here. LOL. 
     WGL_CONTEXT_FLAGS_ARB, 0
-#ifdef INTERNAL_BUILD
+#ifdef IVAN_INTERNAL
     |WGL_CONTEXT_DEBUG_BIT_ARB
 #endif
     ,
@@ -936,6 +940,7 @@ Win32SetPixelFormat(HDC WindowDC){
             WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
             WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
             WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB, GL_TRUE,
+
             0
         };
         /*
@@ -943,7 +948,7 @@ Win32SetPixelFormat(HDC WindowDC){
             WGL_DEPTH_BITS_ARB, 24,
             WGL_STENCIL_BITS_ARB, 8,
             WGL_SAMPLE_BUFFERS_ARB, 1, //Number of buffers (must be 1 at time of writing)
-            WGL_SAMPLES_ARB, numberOfSamples,        //Number of samples
+            WGL_SAMPLES_ARB, 4,        //Number of samples
         */
 
         if(!OpenGL.SupportsSRGBFramebuffer){
@@ -983,6 +988,8 @@ Win32SetPixelFormat(HDC WindowDC){
         WindowDC,
         SuggestedPixelFormatIndex, 
         &SuggestedPixelFormat);
+
+    uint32 Error = GetLastError();
 }
 
 INTERNAL_FUNCTION void
@@ -1053,6 +1060,8 @@ Win32LoadWGLExtensions(){
         ReleaseDC(Window, WindowDC);
         DestroyWindow(Window);
     }
+
+    uint32 Error = GetLastError();
 }
 
 INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
@@ -1139,6 +1148,8 @@ INTERNAL_FUNCTION HGLRC Win32InitOpenGL(HDC WindowDC){
             DEBUGPlatformReadEntireFile, 
             DEBUGPlatformFreeFileMemory);
     }
+
+    uint32 Error = GetLastError();
 
     return(OpenGLRC);
 }
@@ -1418,6 +1429,14 @@ Win32WindowProcessing(
     return 0;
 }
 
+#include "ivan_debug_interface.h"
+#if IVAN_INTERNAL
+GLOBAL_VARIABLE debug_table GlobalDebugTable_;
+debug_table *GlobalDebugTable = &GlobalDebugTable_;
+#endif
+
+
+
 int WINAPI WinMain(
     HINSTANCE Instance,
     HINSTANCE PrevInstance,
@@ -1481,8 +1500,6 @@ int WINAPI WinMain(
     GameMemory.TransientStorageSize = IVAN_MEGABYTES(2000);
     GameMemory.DebugStorageSize = IVAN_MEGABYTES(256);
 
-    //GameMemory.DebugTable = GlobalDebugTable;
-    
     uint32 MemoryBlockSize = 
         GameMemory.PermanentStorageSize + 
         GameMemory.TransientStorageSize +
@@ -1495,6 +1512,8 @@ int WINAPI WinMain(
     GameMemory.DebugStorage = 
         (uint8*)GameMemory.TransientStorage + 
         GameMemory.TransientStorageSize;
+
+    GameMemory.DebugTable = GlobalDebugTable;
 
     GameMemory.PlatformAPI.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
     GameMemory.PlatformAPI.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;
@@ -1799,6 +1818,9 @@ int WINAPI WinMain(
         }
         if(Game.GameGetSoundSamples){
             Game.GameGetSoundSamples(&GameMemory, &GameSoundOutputBuffer);
+        }
+        if(Game.DEBUGFrameEnd){
+            Game.DEBUGFrameEnd(&GameMemory, &GlobalGameInput, &RenderCommands);
         }
 
         if (SoundIsValid){

@@ -18,8 +18,6 @@ struct debug_state{
 	struct font_id FontID;
 	float GlobalWidth;
 	float GlobalHeight;
-
-	//debug_record DebugRecordArray[256];
 };
 
 #endif

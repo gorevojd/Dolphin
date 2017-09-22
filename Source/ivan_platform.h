@@ -1,9 +1,8 @@
 #ifndef IVAN_PLATFORM_H
 #define IVAN_PLATFORM_H
 
-#define IVAN_INTERNAL 0
+#define IVAN_INTERNAL 1
 
-#include "ivan_debug_interface.h"
 
 #include <stdio.h>
 
@@ -457,6 +456,8 @@ inline game_controller_input* GetController(game_input* Input, int ControllerInd
 //extern platform_add_entry* PlatformAddEntry;
 //extern platform_complete_all_work* PlatformCompleteAllWork;
 
+
+
 typedef struct game_memory{
     bool32 IsInitialized;
 
@@ -468,6 +469,8 @@ typedef struct game_memory{
 
     uint64 DebugStorageSize;
     void* DebugStorage;
+
+    struct debug_table* DebugTable;
 
     platform_work_queue* HighPriorityQueue;
     platform_work_queue* LowPriorityQueue;

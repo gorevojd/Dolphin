@@ -53,7 +53,7 @@ union vec3{
 union vec4{
     struct{ float x, y, z, w;};
     struct{ vec3 xyz; float w; };
-    struct{ float a, b, c, d;};
+    struct{ float A, B, C, D;};
     struct{
         union{
             vec3 rgb;
@@ -684,17 +684,17 @@ float AspectRatio(vec2 v){ return ((v.y < 0.0001f) ? 0.0f : v.x / v.y); }
 inline vec4 NormalizePlane(vec4 Pl){
 	vec4 Result;
 
-	float InvMag = 1.0f / Sqrt(Pl.a * Pl.a + Pl.b * Pl.b + Pl.c * Pl.c);
-	Result.a = Pl.a * InvMag;
-	Result.b = Pl.b * InvMag;
-	Result.c = Pl.c * InvMag;
-	Result.d = Pl.d * InvMag;
+	float InvMag = 1.0f / Sqrt(Pl.A * Pl.A + Pl.B * Pl.B + Pl.C * Pl.C);
+	Result.A = Pl.A * InvMag;
+	Result.B = Pl.B * InvMag;
+	Result.C = Pl.C * InvMag;
+	Result.D = Pl.D * InvMag;
 
 	return(Result);
 }
 
 inline float DistanceToPoint(vec4 Plane, vec3 P){
-	float Result = Plane.a * P.x + Plane.b * P.y + Plane.c * P.z + Plane.d;
+	float Result = Plane.A * P.x + Plane.B * P.y + Plane.C * P.z + Plane.D;
 
 	return(Result);
 }

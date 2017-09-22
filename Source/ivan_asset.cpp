@@ -41,7 +41,7 @@ AddOp(platform_texture_op_queue* Queue, texture_op* Source){
 }
 
 INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     Platform.ReadDataFromFile(Work->Handle, Work->Offset, Work->Size, Work->Destination);
     if(PlatformNoFileErrors(Work->Handle)){
@@ -195,7 +195,7 @@ INTERNAL_FUNCTION bool32 GenerationHasCompleted(game_assets* Assets, uint32 Chec
 
 INTERNAL_FUNCTION asset_memory_header*
 RequestAssetMemory(game_assets* Assets, uint32 Size, uint32 AssetIndex, asset_header_type AssetType){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     asset_memory_header* Result = 0;
 
@@ -286,7 +286,7 @@ AddAssetHeaderToList(game_assets* Assets, uint32 AssetIndex, asset_memory_size S
 }
 
 INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32 Immediate){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     asset* Asset = Assets->Assets + ID.Value;
 
@@ -355,7 +355,7 @@ INTERNAL_FUNCTION void LoadBitmapAsset(game_assets* Assets, bitmap_id ID, bool32
 }
 
 INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     if(ID.Value &&
         AtomicCompareExchangeU32((uint32 volatile *)&Assets->Assets[ID.Value].State,
@@ -412,7 +412,7 @@ INTERNAL_FUNCTION void LoadSoundAsset(game_assets* Assets, sound_id ID){
 
 INTERNAL_FUNCTION void
 LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     asset* Asset = Assets->Assets + ID.Value;
     if(ID.Value){
@@ -482,7 +482,7 @@ LoadFontAsset(game_assets* Assets, font_id ID, bool32 Immediate){
 
 INTERNAL_FUNCTION void
 LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     asset* Asset = Assets->Assets + ID.Value;
     if(ID.Value){
@@ -552,7 +552,7 @@ GetBestMatchAssetFrom(
     asset_vector* MatchVector,
     asset_vector* WeightVector)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     uint32 Result = 0;
 
@@ -593,7 +593,7 @@ GetBestMatchAssetFrom(
 INTERNAL_FUNCTION uint32
 GetRandomAssetFrom(game_assets* Assets, asset_type_id TypeID, random_series* Series)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     uint32 Result = 0;
 
@@ -610,7 +610,7 @@ GetRandomAssetFrom(game_assets* Assets, asset_type_id TypeID, random_series* Ser
 
 INTERNAL_FUNCTION uint32
 GetFirstAssetFrom(game_assets* Assets, asset_type_id TypeID){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     uint32 Result = 0;
 

@@ -47,7 +47,7 @@ inline void SetCameraTransform(
     float FarClipPlane = 1000.0f,
     float FOV = 45.0f)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     bool32 IsOrthographic = (bool32)(Flags & CameraTransform_IsOrthographic);
     bool32 IsInfiniteOrthographic = (bool32)(Flags & CameraTransform_IsInfiniteOrthographic);
@@ -101,35 +101,35 @@ inline void SetCameraTransform(
     mat4 PVM = TmpProjMatrix * TmpViewMatrix;
     PVM = Transpose(PVM);
 
-    NewSetup.Planes[CameraPlane_Left].a = PVM.E[3] + PVM.E[0];
-    NewSetup.Planes[CameraPlane_Left].b = PVM.E[7] + PVM.E[4];
-    NewSetup.Planes[CameraPlane_Left].c = PVM.E[11] + PVM.E[8];
-    NewSetup.Planes[CameraPlane_Left].d = PVM.E[15] + PVM.E[12];
+    NewSetup.Planes[CameraPlane_Left].A = PVM.E[3] + PVM.E[0];
+    NewSetup.Planes[CameraPlane_Left].B = PVM.E[7] + PVM.E[4];
+    NewSetup.Planes[CameraPlane_Left].C = PVM.E[11] + PVM.E[8];
+    NewSetup.Planes[CameraPlane_Left].D = PVM.E[15] + PVM.E[12];
 
-    NewSetup.Planes[CameraPlane_Right].a = PVM.E[3] - PVM.E[0];
-    NewSetup.Planes[CameraPlane_Right].b = PVM.E[7] - PVM.E[4];
-    NewSetup.Planes[CameraPlane_Right].c = PVM.E[11] - PVM.E[8];
-    NewSetup.Planes[CameraPlane_Right].d = PVM.E[15] - PVM.E[12];
+    NewSetup.Planes[CameraPlane_Right].A = PVM.E[3] - PVM.E[0];
+    NewSetup.Planes[CameraPlane_Right].B = PVM.E[7] - PVM.E[4];
+    NewSetup.Planes[CameraPlane_Right].C = PVM.E[11] - PVM.E[8];
+    NewSetup.Planes[CameraPlane_Right].D = PVM.E[15] - PVM.E[12];
 
-    NewSetup.Planes[CameraPlane_Bottom].a = PVM.E[3] + PVM.E[1];
-    NewSetup.Planes[CameraPlane_Bottom].b = PVM.E[7] + PVM.E[5];
-    NewSetup.Planes[CameraPlane_Bottom].c = PVM.E[11] + PVM.E[9];
-    NewSetup.Planes[CameraPlane_Bottom].d = PVM.E[15] + PVM.E[13];
+    NewSetup.Planes[CameraPlane_Bottom].A = PVM.E[3] + PVM.E[1];
+    NewSetup.Planes[CameraPlane_Bottom].B = PVM.E[7] + PVM.E[5];
+    NewSetup.Planes[CameraPlane_Bottom].C = PVM.E[11] + PVM.E[9];
+    NewSetup.Planes[CameraPlane_Bottom].D = PVM.E[15] + PVM.E[13];
 
-    NewSetup.Planes[CameraPlane_Top].a = PVM.E[3] - PVM.E[1];
-    NewSetup.Planes[CameraPlane_Top].b = PVM.E[7] - PVM.E[5];
-    NewSetup.Planes[CameraPlane_Top].c = PVM.E[11] - PVM.E[9];
-    NewSetup.Planes[CameraPlane_Top].d = PVM.E[15] - PVM.E[13];
+    NewSetup.Planes[CameraPlane_Top].A = PVM.E[3] - PVM.E[1];
+    NewSetup.Planes[CameraPlane_Top].B = PVM.E[7] - PVM.E[5];
+    NewSetup.Planes[CameraPlane_Top].C = PVM.E[11] - PVM.E[9];
+    NewSetup.Planes[CameraPlane_Top].D = PVM.E[15] - PVM.E[13];
 
-    NewSetup.Planes[CameraPlane_Near].a = PVM.E[3] + PVM.E[2];
-    NewSetup.Planes[CameraPlane_Near].b = PVM.E[7] + PVM.E[6];
-    NewSetup.Planes[CameraPlane_Near].c = PVM.E[11] + PVM.E[10];
-    NewSetup.Planes[CameraPlane_Near].d = PVM.E[15] + PVM.E[14];
+    NewSetup.Planes[CameraPlane_Near].A = PVM.E[3] + PVM.E[2];
+    NewSetup.Planes[CameraPlane_Near].B = PVM.E[7] + PVM.E[6];
+    NewSetup.Planes[CameraPlane_Near].C = PVM.E[11] + PVM.E[10];
+    NewSetup.Planes[CameraPlane_Near].D = PVM.E[15] + PVM.E[14];
 
-    NewSetup.Planes[CameraPlane_Far].a = PVM.E[3] - PVM.E[2];
-    NewSetup.Planes[CameraPlane_Far].b = PVM.E[7] - PVM.E[6];
-    NewSetup.Planes[CameraPlane_Far].c = PVM.E[11] - PVM.E[10];
-    NewSetup.Planes[CameraPlane_Far].d = PVM.E[15] - PVM.E[14];
+    NewSetup.Planes[CameraPlane_Far].A = PVM.E[3] - PVM.E[2];
+    NewSetup.Planes[CameraPlane_Far].B = PVM.E[7] - PVM.E[6];
+    NewSetup.Planes[CameraPlane_Far].C = PVM.E[11] - PVM.E[10];
+    NewSetup.Planes[CameraPlane_Far].D = PVM.E[15] - PVM.E[14];
 
     for(int PlaneIndex = 0;
         PlaneIndex < CameraPlane_Count;
@@ -170,7 +170,7 @@ inline void* PushRenderElement_(
     uint32 Size,
     render_group_entry_type Type)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     game_render_commands* Commands = RenderGroup->Commands;
 
@@ -197,7 +197,7 @@ struct entity_basis_p_result{
 };
 
 inline entity_basis_p_result GetRenderEntityBasisP(render_group_transform* Transform, vec3 OriginalP){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     entity_basis_p_result Result = {};
 
@@ -267,7 +267,7 @@ inline void PushRectangle(
                 PushedRect->P = Basis.P;
             }
             else{
-                PushedRect->Dim = Dim * Basis.Scale;
+                PushedRect->Dim = Dim;
                 PushedRect->P = Offset.xy;
             }
         }
@@ -395,13 +395,14 @@ inline void PushRectangleOutline(
     render_group* RenderGroup,
     vec3 Offset,
     vec2 Dim,
-    vec4 Color = Vec4(0.0f, 0.0f, 0.0f, 1.0f),
-    real32 Thickness = 4)
+    bool32 ScreenSpace = false,
+    real32 Thickness = 2,
+    vec4 Color = Vec4(0.0f, 0.0f, 0.0f, 1.0f))
 {
-    PushRectangle(RenderGroup, Offset - Vec3(Thickness, 0.0f, 0.0f), Vec2(Thickness, Dim.y + Thickness), Color);
-    PushRectangle(RenderGroup, Offset - Vec3(Thickness, Thickness, 0.0f), Vec2(Dim.x + 2.0f * Thickness, Thickness), Color);
-    PushRectangle(RenderGroup, Offset + Vec3(0.0f, Dim.y, 0.0f), Vec2(Dim.x + Thickness, Thickness), Color);
-    PushRectangle(RenderGroup, Offset + Vec3(Dim.x, 0.0f, 0.0f), Vec2(Thickness, Dim.y), Color);
+    PushRectangle(RenderGroup, Offset - Vec3(Thickness, 0.0f, 0.0f), Vec2(Thickness, Dim.y + Thickness), Color, ScreenSpace);
+    PushRectangle(RenderGroup, Offset - Vec3(Thickness, Thickness, 0.0f), Vec2(Dim.x + 2.0f * Thickness, Thickness), Color, ScreenSpace);
+    PushRectangle(RenderGroup, Offset + Vec3(0.0f, Dim.y, 0.0f), Vec2(Dim.x + Thickness, Thickness), Color, ScreenSpace);
+    PushRectangle(RenderGroup, Offset + Vec3(Dim.x, 0.0f, 0.0f), Vec2(Thickness, Dim.y), Color, ScreenSpace);
 }
 
 inline void PushClear(render_group* RenderGroup, vec4 Color){

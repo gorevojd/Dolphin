@@ -30,7 +30,7 @@ OutputSineWave(game_sound_output_buffer* SoundBuffer, int Frequency, volume_v2 V
 
 INTERNAL_FUNCTION playing_sound*
 PlaySound(audio_state* AudioState, sound_id SoundID){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     if(!AudioState->FirstFreePlayingSound){
         AudioState->FirstFreePlayingSound = PushStruct(AudioState->PermArena, playing_sound);
@@ -87,7 +87,7 @@ OutputPlayingSounds(
 	game_assets* Assets,
 	memory_arena* TempArena)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
 #define AUDIO_STATE_OUTPUT_CHANNEL_COUNT 2
 

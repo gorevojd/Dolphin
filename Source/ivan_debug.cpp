@@ -1,11 +1,12 @@
 #include "ivan_debug.h"
-#include "ivan_debug_ui.h"
+#include "ivan_debug_ui.cpp"
 
 INTERNAL_FUNCTION void 
 OutputDebugRecords(debug_state* DebugState){
     
     render_group* RenderGroup = &DebugState->RenderGroup;
 
+#if 0
     for(int CounterIndex = 0;
         CounterIndex < ArrayCount(DebugState->DebugRecordArray);
         CounterIndex++)
@@ -29,6 +30,7 @@ OutputDebugRecords(debug_state* DebugState){
             DEBUGTextOut(RenderGroup, TextBuffer);
         }
     }
+#endif
 
     char TextBuffer[256];
 
@@ -36,17 +38,16 @@ OutputDebugRecords(debug_state* DebugState){
         RenderGroup->LastRenderSetup.CameraP.x,
         RenderGroup->LastRenderSetup.CameraP.y,
         RenderGroup->LastRenderSetup.CameraP.z);
-    DEBUGTextOut(RenderGroup, TextBuffer);
+
+    TextOutAt(DebugState, Vec2(10, 20), TextBuffer);
+    TextOutAt(DebugState, Vec2(10, 50), "That's not the shape of my heart");
 }
 
 INTERNAL_FUNCTION void
-OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup){
-    DEBUGTextOut(RenderGroup, "\\#900DEBUG \\#090CYCLE \\#940COUNTS");
+OverlayCycleCounters(debug_state* DebugState){
+	//TextOut(RenderGrou, "\\#900DEBUG \\#090CYCLE \\#940COUNTS");
     
-    OutputDebugRecords(
-        DebugRecords_MainTranslationUnit, 
-        ArrayCount(DebugRecords_MainTranslationUnit), 
-        RenderGroup);
+    OutputDebugRecords(DebugState);
 }
 
 inline debug_state* 
@@ -73,19 +74,14 @@ INTERNAL_FUNCTION void DEBUGStart(
 	game_render_commands* Commands,
 	game_assets* Assets,
 	uint32 MainGenerationID,
-	uint32 Width, uint32 Height){
+	uint32 Width, uint32 Height)
+{
 
 	if(!DebugState->Initialized){
 		memory_index TotalMemorySize = DebugGlobalMemory->DebugStorageSize - sizeof(debug_state);
 		InitializeMemoryArena(&DebugState->DebugArena, TotalMemorySize, DebugState + 1);
 		SubArena(&DebugState->PerFrameArena, &DebugState->DebugArena, (TotalMemorySize / 2));
 
-		for(int CounterIndex = 0;
-			CounterIndex < ArrayCount(DebugState->DebugRecordArray);
-			CounterIndex++)
-		{
-			CounterIndex = {};
-		}
 
 		DebugState->Initialized = true;
 	}
@@ -111,7 +107,7 @@ INTERNAL_FUNCTION void DEBUGEnd(debug_state* DebugState, game_input* Input){
 	EndRenderGroup(RenderGroup);
 }
 
-extern "C" DEBUG_GAME_FRAME_END(DEBUGGameFrameEnd){
+IVAN_DLL_EXPORT DEBUG_GAME_FRAME_END(DEBUGGameFrameEnd){
 	debug_state* DebugState = (debug_state*)Memory->DebugStorage;
 	if(DebugState){
 		game_assets* Assets = DEBUGGetGameAssets(Memory);
@@ -123,6 +119,9 @@ extern "C" DEBUG_GAME_FRAME_END(DEBUGGameFrameEnd){
 			DEBUGGetMainGenerationID(Memory), 
 			RenderCommands->Width,
 			RenderCommands->Height);
+
+		OverlayCycleCounters(DebugState);
+
 
 		DEBUGEnd(DebugState, Input);
 	}

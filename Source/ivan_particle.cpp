@@ -5,7 +5,7 @@ SpawnFontain(
     particle_cache* Cache,
     vec3 InitPoint)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     if(Cache){
         particle_system* System = &Cache->FontainSystem;
@@ -53,7 +53,7 @@ UpdateAndRenderFontain(
     vec3 FrameDisplacement, 
     render_group* RenderGroup)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     //object_transform Transform = DefaultUprightTransform();
     vec3_4x FrameDisplacementWide = Vec3ToWide(FrameDisplacement);
@@ -139,7 +139,7 @@ UpdateAndRenderParticleSystems(
     render_group* RenderGroup,
     vec3 FrameDisplacement)
 {
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     UpdateAndRenderFontain(
         &Cache->FontainSystem, 
@@ -151,7 +151,7 @@ UpdateAndRenderParticleSystems(
 
 INTERNAL_FUNCTION void 
 InitParticleCache(particle_cache* Cache, game_assets* Assets){
-    TIMED_BLOCK();
+    TIMED_FUNCTION();
 
     ZeroStruct(*Cache);
     Cache->ParticleEntropy = RandomSeed(1234);

@@ -36,12 +36,20 @@ struct joint_animation{
 	uint32 FramesCount;
 };
 
+enum skeletal_animation_type{
+	SkAnimationType_Looping,
+	SKAnimationType_StopAtEnd,
+};
+
 struct skeletal_animation{
 
 	joint_animation* JointAnims;
 	uint32 JointAnimsCount;
 
+	uint8 Type;
+
 	float Length;
+	float PlayCursorTime;
 };
 
 inline mat4 InterpolateFrames(float Time, joint_animation* JointAnim){

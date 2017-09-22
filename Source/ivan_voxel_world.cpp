@@ -19,7 +19,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 	for(int j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 		for(int i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
 
-			float NoiseScale1 = 5.0f;
+			float NoiseScale1 = 3.0f;
 			float NoiseScale2 = 25.0f;
 			float NoiseScale3 = 100.0f;
 
@@ -27,19 +27,19 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 			uint8_t GroundIndex = VoxelMaterial_GrassyGround;
 
 			float Noise1 = stb_perlin_noise3(
-				(float)(ChunkPos.x + i) / 16.0f, 
-				(float)ChunkPos.y / 16.0f, 
-				(float)(ChunkPos.z + j) / 16.0f, 0, 0, 0);
-
-			float Noise2 = stb_perlin_noise3(
 				(float)(ChunkPos.x + i) / 64.0f, 
-				(float)ChunkPos.y / 32.0f, 
+				(float)ChunkPos.y / 64.0f, 
 				(float)(ChunkPos.z + j) / 64.0f, 0, 0, 0);
 
-			float Noise3 = stb_perlin_noise3(
+			float Noise2 = stb_perlin_noise3(
 				(float)(ChunkPos.x + i) / 256.0f, 
 				(float)ChunkPos.y / 256.0f, 
 				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
+
+			float Noise3 = stb_perlin_noise3(
+				(float)(ChunkPos.x + i) / 1024.0f, 
+				(float)ChunkPos.y / 1024.0f, 
+				(float)(ChunkPos.z + j) / 1024.0f, 0, 0, 0);
 
 #if IVAN_VOXEL_GENERATOR_BIOMS
 			float BiomNoise = stb_perlin_noise3(
@@ -361,7 +361,7 @@ inline int32_t TestChunkOnPlane(vec4 Pl, voxel_chunk* Chunk){
 		TestPos.y = ChunkP.y + (float)(TestPosIndex * 16 + 8);
 		TestPos.z = ChunkP.z + 8.0f;
 	
-		float TestValue = Pl.a * TestPos.x + Pl.b * TestPos.y + Pl.c * TestPos.z + Pl.d + TestRadius;
+		float TestValue = Pl.A * TestPos.x + Pl.B * TestPos.y + Pl.C * TestPos.z + Pl.D + TestRadius;
 
 		if(TestValue >= 0.0f){
 			Result = true;
@@ -380,7 +380,7 @@ UpdateVoxelChunks(
 	render_group* RenderGroup,
 	vec3 CamPos)
 {
-	TIMED_BLOCK();
+	TIMED_FUNCTION();
 
 	voxel_chunk_header* Index = 0;
 
@@ -482,8 +482,6 @@ UpdateVoxelChunks(
 	int ChunksTotal = 0;
 	int ChunksInFrustrum = 0;
 	Index = Manager->VoxelChunkSentinel->Next;
-	{
-	TIMED_BLOCK();	
 	for(Index; !Index->IsSentinel; Index = Index->Next){
 		
 		if(Index->ChunkState == VoxelChunkState_Generated){			
@@ -542,7 +540,6 @@ UpdateVoxelChunks(
 				}
 			}
 		}
-	}
 	}
 
 	FreeVoxelHashTable(HashTable, VOXEL_HASH_TABLE_SIZE);

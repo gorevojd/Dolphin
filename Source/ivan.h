@@ -12,6 +12,7 @@
 #include "ivan_shared.h"
 #include "ivan_memory.h"
 
+
 #include "ivan_intrinsics.h"
 #include "ivan_random.h"
 #include "ivan_simd.h"
@@ -27,6 +28,7 @@
 #include "ivan_voxel_world.h"
 #include "ivan_voxel_mesh.h"
 
+#include "ivan_debug_interface.h"
 #include "ivan_debug.h"
 
 struct task_with_memory{

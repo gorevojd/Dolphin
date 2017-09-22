@@ -99,17 +99,20 @@ DEBUGGetGameAssets(game_memory* Memory){
     return(Assets);
 }
 
+#if IVAN_INTERNAL
 game_memory* DebugGlobalMemory;
-platform_add_entry* PlatformAddEntry;
-platform_complete_all_work* PlatformCompleteAllWork;
+debug_table* GlobalDebugTable;
+#endif
 
 IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
-    TIMED_BLOCK();
 
     Platform = Memory->PlatformAPI;
 
     DebugGlobalMemory = Memory;
+    GlobalDebugTable = Memory->DebugTable;
 
+    TIMED_FUNCTION();
+    
     game_state* GameState = (game_state*)Memory->PermanentStorage;
     if (!Memory->IsInitialized){
 
@@ -187,7 +190,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, IVAN_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
         InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
-        PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
+        //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
         TranState->VoxelChunkManager = AllocateVoxelChunkManager(TranState, TranState->Assets);
 
@@ -285,7 +288,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     }
 
 
-    PushClear(RenderGroup, Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+    PushClear(RenderGroup, Vec4(0.05f, 0.05f, 0.05f, 1.0f));
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
 #if IVAN_VOXEL_WORLD_MULTITHREADED
@@ -311,6 +314,20 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     GameState->Time += Input->DeltaTime;
     GameState->LastMouseP = Input->MouseP;
+
+/*
+    render_group* RenderGroup,
+    vec3 Offset,
+    vec2 Dim,
+    bool32 ScreenSpace = false,
+    real32 Thickness = 4,
+    vec4 Color = Vec4(0.0f, 0.0f, 0.0f, 1.0f))
+*/
+
+/*
+    PushRectangleOutline(RenderGroup, Vec3(30,30, 0), Vec2(100, 100), true);
+    PushRectangle(RenderGroup, Vec3(30, 30, 0), Vec2(100, 100), Vec4(1.0f, 0.6f, 0.0f, 1.0f), true);
+*/
 
     real32 Angle = GameState->Time;
     vec2 Origin = Vec2(400, 300);

@@ -12,8 +12,8 @@ INTERNAL_FUNCTION rectangle2 DEBUGTextOut(
 
 	if(DebugState && DebugState->DebugFont){
 		render_group* RenderGroup = &DebugState->RenderGroup;
-	    loaded_font* Font = PushFont(RenderGroup, FontID);
-	    dda_front* Info = DebugState->DebugFontInfo;
+	    loaded_font* Font = PushFont(RenderGroup, DebugState->FontID);
+	    dda_font* Info = DebugState->DebugFontInfo;
 
         float CharScale = DebugState->FontScale;
         float CursorX = P.x;
@@ -42,7 +42,7 @@ INTERNAL_FUNCTION rectangle2 DEBUGTextOut(
                 (Ptr[2] != 0))
             {
                 float ScaleScale = 1.0f / 9.0f;
-                CharScale = FontScale * IVAN_MATH_CLAMP01(ScaleScale * (float)(Ptr[2] - '0'));
+                CharScale = DebugState->FontScale * IVAN_MATH_CLAMP01(ScaleScale * (float)(Ptr[2] - '0'));
                 Ptr += 3;
             }
             else{    
@@ -64,7 +64,7 @@ INTERNAL_FUNCTION rectangle2 DEBUGTextOut(
 	                    PushBitmap(
 	                        RenderGroup,
 	                        BitmapID,
-	                        BitmapScale
+	                        BitmapScale,
 	                        BitmapOffset + Vec3(2.0f, 2.0f, 0.0f),
 	                        Vec4(0.0f, 0.0f, 0.0f, 1.0f),
 	                        true);                    
@@ -87,10 +87,10 @@ INTERNAL_FUNCTION rectangle2 DEBUGTextOut(
                     	
                     	if(Bitmap){
                     		rectangle2 GlyphDim;
-                    		GlyphDim.MinX = BitmapOffset.x;
-                    		GlyphDim.MinY = BitmapOffset.y;
-                    		GlyphDim.MaxX = BitmapOffset.x + Bitmap->Width;
-                    		GlyphDim.MaxY = BitmapOffset.y + Bitmap->Height;
+                    		GlyphDim.Min.x = BitmapOffset.x;
+                    		GlyphDim.Min.y = BitmapOffset.y;
+                    		GlyphDim.Max.x = BitmapOffset.x + Bitmap->Width;
+                    		GlyphDim.Max.y = BitmapOffset.y + Bitmap->Height;
                     		Result = Union(Result, GlyphDim);
                     	}
                     }
@@ -108,9 +108,9 @@ INTERNAL_FUNCTION rectangle2 DEBUGTextOut(
 inline void
 TextOutAt(
 	debug_state* DebugState, 
-	v2 P, 
+	vec2 P, 
 	char* String, 
-	vec4 Color(1, 1, 1, 1),
+	vec4 Color = Vec4(1, 1, 1, 1),
 	float AtZ = 0.0f)
 {
 	DEBUGTextOut(DebugState, DEBUGTextOp_DrawText, P, String, Color, AtZ);
@@ -118,7 +118,7 @@ TextOutAt(
 
 inline rectangle2
 GetTextSize(debug_state* DebugState, char* String){
-	rectangle2 Result = DEBUGTextOut(DebugState, DEBUGTextOp_SizeText, At, String);
+	rectangle2 Result = DEBUGTextOut(DebugState, DEBUGTextOp_SizeText, Vec2(0, 0), String);
 
 	return(Result);
 }
