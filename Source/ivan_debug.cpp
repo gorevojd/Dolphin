@@ -1,6 +1,79 @@
 #include "ivan_debug.h"
 #include "ivan_debug_ui.cpp"
 
+struct debug_parsed_name{
+	uint32 HashValue;
+	uint32 FileNameCount;
+	uint32 LineNumber;
+
+	uint32 NameLength;
+	char* Name;
+};
+
+inline debug_parsed_name
+DebugParseName(char* GUID, char* ProperName){
+	debug_parsed_name Result = {};
+
+	uint32 PipeCount = 0;
+	uint32 NameStartsAt = 0;
+	char *Scan = GUID;
+
+	for(;*Scan;++Scan){
+		if(*Scan == '|'){
+			if(PipeCount == 0){
+				Result.FileNameCount = (uint32)(Scan - GUID);
+				Result.LineNumber = IntFromString(Scan + 1);
+			}
+			else if(PipeCount == 1){
+
+			}
+			else{
+				NameStartsAt = (uint32)(Scan - GUID + 1);
+			}
+
+			++PipeCount;
+		}
+
+		Result.HashValue = 65599 * Result.HashValue + *Scan;
+	}
+
+	Result.NameLength = StringLength(ProperName);
+	Result.Name = ProperName;
+
+	return(Result);
+}
+
+inline debug_element* 
+GetElementFromGUID(debug_state* DebugState, uint32 Index, char* GUID){
+	debug_element* Result = 0;
+
+	for(debug_element* Chain = DebugState->ElementHash[Index];
+		Chain;
+		Chain = Chain->NextInHash)
+	{
+		if(StringsAreEqual(Chain->GUID, GUID)){
+			Result = Chain;
+			break;
+		}
+	}
+}
+
+inline debug_element*
+GetElementFromGUID(debug_state* DebugState, char* GUID){
+	debug_element* Result = 0;
+
+	if(GUID){
+		debug_parsed_name ParsedName = DebugParseName(GUID, 0);
+		uint32 Index = (ParsedName.HashValue % ArrayCount(DebugState->ElementHash));
+
+		Result = GetElementFromGUID(DebugState, Index, GUID);
+	}
+
+	return(Result);
+}
+
+
+
 INTERNAL_FUNCTION void 
 OutputDebugRecords(debug_state* DebugState){
     

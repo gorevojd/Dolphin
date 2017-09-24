@@ -12,7 +12,6 @@
 #include "ivan_shared.h"
 #include "ivan_memory.h"
 
-
 #include "ivan_intrinsics.h"
 #include "ivan_random.h"
 #include "ivan_simd.h"

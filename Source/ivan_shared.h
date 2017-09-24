@@ -22,6 +22,19 @@ IsWhitespace(char C){
 	return(Result);
 }
 
+inline uint32 StringLength(char* String){
+	uint32 Result = 0;
+	if(String){
+		while(*String){
+			++Result;
+
+			*String++;
+		}
+	}
+
+	return(Result);
+}
+
 inline bool32
 StringsAreEqual(char* A, char* B){
 	bool32 Result = (A == B);

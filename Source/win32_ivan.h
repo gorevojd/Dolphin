@@ -3,6 +3,8 @@
 
 #include "ivan.h"
 
+#define WIN32_MAX_FILENAME_LENGTH 256
+
 struct win32_offscreen_buffer{
 	void* Memory;
 	int Width;
@@ -28,6 +30,8 @@ struct win32_sound_output{
 	WORD BlockSize;
 	DWORD RunningSample;
 	DWORD LatencyCycleCount;
+
+	int32 SafetyBytes;
 
 	int32 ToneHz;
 	int32 ToneVolume;

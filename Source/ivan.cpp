@@ -291,6 +291,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushClear(RenderGroup, Vec4(0.05f, 0.05f, 0.05f, 1.0f));
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
+
 #if IVAN_VOXEL_WORLD_MULTITHREADED
     UpdateVoxelChunksMultithreaded(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
 #else
@@ -328,6 +329,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     PushRectangleOutline(RenderGroup, Vec3(30,30, 0), Vec2(100, 100), true);
     PushRectangle(RenderGroup, Vec3(30, 30, 0), Vec2(100, 100), Vec4(1.0f, 0.6f, 0.0f, 1.0f), true);
 */
+    PushRectangle(RenderGroup, Input->MouseP, Vec2(10, 10), Vec4(1.0f, 1.0f, 1.0f, 1.0f), true);
 
     real32 Angle = GameState->Time;
     vec2 Origin = Vec2(400, 300);

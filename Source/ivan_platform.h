@@ -213,6 +213,10 @@ typedef int32 bool32;
 #define Assert(Expression) if(!(Expression)){*(int*)0 = 0;}
 #define ArrayCount(Array) (sizeof(Array) / sizeof(Array[0]))
 
+#define Align4(Value) ((Value + 3) & ~3)
+#define Align8(Value) ((Value + 7) & ~7)
+#define Align16(Value) ((Value + 15) & ~15)
+
 #define INVALID_CODE_PATH Assert(!"Invalid code path!")
 #define INVALID_DEFAULT_CASE default:{INVALID_CODE_PATH;} break;
 
@@ -434,17 +438,32 @@ struct game_controller_input{
     };
 };
 
+enum game_input_mouse_button{
+    PlatformMouseButton_Left,
+    PlatformMouseButton_Middle,
+    PlatformMouseButton_Right,
+    PlatformMouseButton_Extended0,
+    PlatformMouseButton_Extended1,
+
+    PlatformMouseButton_Count,
+};
+
 struct game_input{
     //1 KEYBOARD, 4 GAMEPADS
     game_controller_input Controllers[5];
 
     real32 DeltaTime;
 
+    bool32 QuitRequested;
+
+    game_button_state MouseButtons[PlatformMouseButton_Count];
     vec3 MouseP;
     vec3 DeltaMouseP;
     bool32 CapturingMouse;
-    
-    game_button_state MouseButtons[5];
+
+    bool32 ShiftDown;
+    bool32 AltDown;
+    bool32 ControlDown;
 };
 
 inline game_controller_input* GetController(game_input* Input, int ControllerIndex){
@@ -453,10 +472,17 @@ inline game_controller_input* GetController(game_input* Input, int ControllerInd
     return(Result);
 }
 
-//extern platform_add_entry* PlatformAddEntry;
-//extern platform_complete_all_work* PlatformCompleteAllWork;
+inline bool32 WasPressed(game_button_state State){
+    bool32 Result = ((State.HalfTransitionCount > 1) || ((State.HalfTransitionCount == 1) &&(State.EndedDown)));
 
+    return(Result);
+}
 
+inline bool32 IsDown(game_button_state State){
+    bool32 Result = (State.EndedDown);
+
+    return(Result);
+}
 
 typedef struct game_memory{
     bool32 IsInitialized;
@@ -478,6 +504,7 @@ typedef struct game_memory{
 
     platform_texture_op_queue TextureOpQueue;
 
+    bool32 ExecutableReloaded;
     platform_api PlatformAPI;
 } game_memory;
 

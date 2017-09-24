@@ -800,6 +800,47 @@ GetClampedRectArea(rectangle2 A){
 	return(Result);
 }
 
+inline rectangle2i
+AspectRatioFit(
+	uint32 RenderWidth, uint32 RenderHeight,
+	uint32 WindowWidth, uint32 WindowHeight)
+{
+	rectangle2i Result = {};
+
+	if((RenderWidth > 0) &&
+		(RenderHeight > 0) && 
+		(WindowWidth > 0) && 
+		(WindowHeight > 0))
+	{
+		real32 OptimalWindowWidth = (real32)WindowHeight * ((real32)RenderWidth / (real32)RenderHeight);
+		real32 OptimalWindowHeight = (real32)WindowWidth * ((real32)RenderHeight / (real32)RenderWidth);
+
+		if(OptimalWindowWidth > (real32)WindowWidth){
+			Result.MinX = 0;
+			Result.MaxX = WindowWidth;
+
+			real32 Empty = (real32)WindowHeight - OptimalWindowHeight;
+			int32 HalfEmpty = roundf(0.5f * Empty);
+			int32 UseHeight = roundf(OptimalWindowHeight);
+
+			Result.MinY = HalfEmpty;
+			Result.MaxY = Result.MinY + UseHeight;
+		}
+		else{
+			Result.MinY = 0;
+			Result.MaxY = WindowHeight;
+
+			real32 Empty = (real32)WindowWidth - OptimalWindowWidth;
+			int32 HalfEmpty = roundf(0.5f * Empty);
+			int32 UseWidth = roundf(OptimalWindowWidth);
+
+			Result.MinX = HalfEmpty;
+			Result.MaxX = Result.MinX + UseWidth;
+		}
+	}
+
+	return(Result);
+}
 
 /*Matrix 4x4 functions and operators*/
 inline mat4 Multiply(mat4 M1, mat4 M2){
@@ -1046,6 +1087,36 @@ inline mat4 CameraTransform(
 	vec3 Front)
 {
 	mat4 Result = LookAt(P, P + Front, Vec3(0.0f, 1.0f, 0.0f));
+
+	return(Result);
+}
+
+inline real32 Clamp(real32 Value, real32 Min, real32 Max){
+	real32 Result = Value;
+
+	if(Result < Min){
+		Result = Min;
+	}
+	else if(Result > Max){
+		Result = Max;
+	}
+	
+	return(Result);
+}
+
+inline real32 Clamp01(real32 Value){
+	real32 Result = Clamp(Value, 0.0f, 1.0f);
+
+	return(Result);
+}
+
+inline real32 Clamp01MapToRange(real32 Min, real32 Max, real32 t){
+	real32 Result = 0.0f;
+
+	real32 Range = Max - Min;
+	if(Range != 0.0f){
+		Result = Clamp01((t - Min) / Range);
+	}
 
 	return(Result);
 }
