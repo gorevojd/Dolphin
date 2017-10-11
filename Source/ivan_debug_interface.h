@@ -1,10 +1,10 @@
 #ifndef IVAN_DEBUG_INTERFACE_H
 
-#if IVAN_INTERNAL
-
 struct debug_id{
 	void* Value[2];
 };
+
+#if IVAN_INTERNAL
 
 enum debug_type{
 	DebugType_Unknown,

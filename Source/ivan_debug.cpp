@@ -142,6 +142,100 @@ DEBUGGetState(){
 	return(Result);
 }
 
+inline open_debug_block*
+AllocateOpenDebugBlock(
+	debug_state* DebugState, 
+	debug_element* Element,
+	uint32 FrameIndex, 
+	debug_event* Event,
+	open_debug_block **FristOpenBlock)
+{
+	open_debug_block* Result = 0;
+	FREELIST_ALLOCATE(Result, DebugState->FirstFreeBlock,
+		PushStruct(&DebugState->DebugArena, open_debug_block));
+
+	Result->StartingFrameIndex = FrameIndex;
+	Result->BeginClock = Event->Clock;
+	Result->Element = Element;
+	Result->NextFree = 0;
+
+	Result->Parent = *FirstOpenBlock;
+	*FirstOpenBlock = Result;
+
+	return(Result);
+}
+
+inline void DeallocateOpenDebugBlock(debug_state* DebugState, open_debug_block** FirstOpenBlock){
+	open_debug_block* FreeBlock = *FirstOpenBlock;
+	*FirstOpenBlock = FreeBlock->Parent;
+
+	FreeBlock->NextFree = DebugState->FirstFreeBlock;
+	DebugState->FirstFreeBlock = FreeBlock;
+}
+
+inline void IncrementFrameOrdinal(uint32* Ordinal){
+	*Ordinal = (*Ordinal + 1) % DEBUG_FRAME_COUNT;
+}
+
+INTERNAL_FUNCTION void
+FreeOldestFrame(debug_state* DebugState){
+	FreeFrame(DebugState, DebugState->OldestFrameOrdinal);
+
+	if(DebugState->OldestFrameOrdinal == DebugState->MostRecentFrameOrdinal){
+		IncrementFrameOrdinal(&DebugState->MostRecentFrameOrdinal);
+	}
+	IncrementFrameOrdinal(&DebugState->OldestFrameOrdinal;)
+}
+
+inline debug_frame*
+GetCollationFrame(debug_state* DebugState){
+	debug_frame* Result = DebugState->Frames + DebugState->CollationFrameOrdinal;
+
+	return(Result);
+}
+
+INTERNAL_FUNCTION debug_stored_event*
+StoreEvent(debug_state* DebugState, debug_element* Element, debug_event* Event){
+	debug_stored_event* Result = 0;
+	while(!Result){
+		Result = DebugState->FirstFreeStoredEvent;
+		if(Result){
+			DebugState->FirstFreeStoredEvent = Result->NextFree;
+		}
+		else{
+			Result = PushStruct(&DebugState->PerFrameArena, debug_stored_event);
+		}
+	}
+
+	debug_frame* CollationFrame = GetCollationFrame(DebugState);
+
+	Result->Next = 0;
+	Result->FrameIndex = CollationFrame->FrameIndex;
+	Result->Event = *Event;
+
+	CollationFrame->StoredEventCount++;
+
+	debug_element_frame* Frame = Element->Frames + DebugState->CollationFrameOrdinal;
+	if(Frame->MostRecentEvent){
+		Frame->MostRecentEvent = Frame->MostRecentEvent->Next = Result;
+	}
+	else{
+		Frame->OldestEvent = Frame->MostRecentEvent = Result;
+	}
+
+	return(Result);
+}
+
+INTERNAL_FUNCTION void
+CollateDebugRecords(debug_state* DebugState, uint32 EventCount, debug_event* EventArray){
+	for(uint32 EventIndex = 0;
+		EventIndex < EventCount;
+		EventIndex++)
+	{
+		debug_event* Event = EventArray + EventIndex;
+	}
+}
+
 INTERNAL_FUNCTION void DEBUGStart(
 	debug_state* DebugState, 
 	game_render_commands* Commands,
@@ -154,7 +248,6 @@ INTERNAL_FUNCTION void DEBUGStart(
 		memory_index TotalMemorySize = DebugGlobalMemory->DebugStorageSize - sizeof(debug_state);
 		InitializeMemoryArena(&DebugState->DebugArena, TotalMemorySize, DebugState + 1);
 		SubArena(&DebugState->PerFrameArena, &DebugState->DebugArena, (TotalMemorySize / 2));
-
 
 		DebugState->Initialized = true;
 	}
@@ -181,7 +274,25 @@ INTERNAL_FUNCTION void DEBUGEnd(debug_state* DebugState, game_input* Input){
 }
 
 IVAN_DLL_EXPORT DEBUG_GAME_FRAME_END(DEBUGGameFrameEnd){
-	debug_state* DebugState = (debug_state*)Memory->DebugStorage;
+
+	ZeroStruct(GlobalDebugTable->EditEvent);
+
+	GlobalDebugTable->CurrentEventArrayIndex = !GlobalDebugTable->CurrentEventArrayIndex;
+	uint64 ArrayIndex_EventIndex = AtomicExchangeU64(
+		&GlobalDebugTable->EventArrayIndex_EventIndex,
+		(uint64)GlobalDebugTable->CurrentEventArrayIndex << 32);
+
+	uint32 EventArrayIndex = ArrayIndex_EventIndex >> 32;
+	Assert(EventArrayIndex <= 1);
+	uint32 EventCount = ArrayIndex_EventIndex & 0xFFFFFFFF;
+
+	if(!Memory->DebugState){
+		Memory->DebugState = DEBUGInit(
+			RenderCommands->Width,
+			RenderCommands->Height);
+	}
+
+	debug_state* DebugState = Memory->DebugState;
 	if(DebugState){
 		game_assets* Assets = DEBUGGetGameAssets(Memory);
 
@@ -193,8 +304,7 @@ IVAN_DLL_EXPORT DEBUG_GAME_FRAME_END(DEBUGGameFrameEnd){
 			RenderCommands->Width,
 			RenderCommands->Height);
 
-		OverlayCycleCounters(DebugState);
-
+		CollateDebugRecords(DebugState, EventCount, GlobalDebugTable->Events[EventArrayIndex]);
 
 		DEBUGEnd(DebugState, Input);
 	}

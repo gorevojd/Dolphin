@@ -754,6 +754,65 @@ inline quat Slerp(quat A, quat B, float Delta){
 /*Rectangle Functions*/
 
 inline rectangle2
+RectMinMax(vec2 Min, vec2 Max){
+	rectangle2 Result;
+	Result.Min = Min;
+	Result.Max = Max;
+	return(Result);
+}
+
+inline rectangle2
+AddRadiusTo(rectangle2 A, vec2 Radius){
+	rectangle2 Result;
+	Result.Min = A.Min - Radius;
+	Result.Max = A.Max + Radius;
+	return(Result);
+}
+
+inline rectangle2
+Offset(rectangle2 A, vec2 Offset){
+	rectangle2 Result;
+
+	Result.Min = A.Min + Offset;
+	Result.Max = A.Max + Offset;
+
+	return(Result);
+}
+
+inline bool32 
+IsInRectangle(rectangle2 Rectangle, vec2 Test){
+	bool32 Result = 
+		((Test.x >= RectangleMin.x) &&
+		(Test.y >= Rectangle.Min.y) && 
+		(Test.x < Rectangle.Max.x) &&
+		(Test.y < Rectangle.Max.y));
+
+	return(Result);
+}
+
+inline vec2 GetMinCorner(rectangle2 Rect){
+	vec2 Result = Rect.Min;
+	return(Result);
+}
+
+inline vec2 GetMaxCorner(rectangle2 Rect){
+	vec2 Result = Rect.Max;
+	return(Result);
+}
+
+inline vec2 
+GetDim(rectangle2 Rect){
+	vec2 Result = Rect.Max - Rect.Min;
+	return(Result);
+}
+
+inline rectangle2
+GetCenter(rectangle2 Rect){
+	vec2 Result = 0.5f * (Rect.Min + Rect.Max);
+	return(Result);
+}
+
+inline rectangle2
 InvertedInfinityRectangle(){
     rectangle2 Result;
 

@@ -23,6 +23,10 @@ struct voxel_atlas_id{
 	unsigned int Value;
 };
 
+struct animation_id{
+	unsigned int Value;
+};
+
 struct dda_header{
 #define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 
@@ -66,6 +70,23 @@ struct dda_sound{
 	dda_sound_chain Chain;
 };
 
+struct dda_joint_frames_info{
+	uint32 TranslationFramesByteSize;
+	uint32 RotationFramesByteSize;
+	uint32 ScalingFramesByteSize;
+};
+
+
+#define DDA_ANIMATION_MAX_BONE_COUNT 256
+struct dda_animation{
+	dda_joint_frames_info JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
+	uint32 JointAnimsCount;
+
+    float LengthTime;
+
+    float TicksPerSecond;
+};
+
 struct dda_font_glyph{
 	uint32 UnicodeCodePoint;
 	bitmap_id BitmapID;
@@ -103,6 +124,7 @@ struct dda_asset{
 		dda_sound Sound;
 		dda_font Font;
 		dda_voxel_atlas VoxelAtlas;
+		dda_animation Animation;
 	};
 };
 

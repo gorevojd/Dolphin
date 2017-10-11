@@ -36,6 +36,7 @@ enum asset_header_type{
 	AssetType_Font,
 	AssetType_Model,
 	AssetType_VoxelAtlas,
+	AssetType_Animation,
 };
 
 struct asset_memory_header{
@@ -52,6 +53,7 @@ struct asset_memory_header{
 		loaded_bitmap Bitmap;
 		loaded_font Font;
 		loaded_voxel_atlas VoxelAtlas;
+		loaded_animation Animation;
 	};
 };
 

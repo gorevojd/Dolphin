@@ -1,6 +1,8 @@
 #ifndef IVAN_DEBUG_H
 #define IVAN_DEBUG_H
 
+#if IVAN_INTERNAL
+
 #include "ivan_debug_ui.h"
 #include "ivan_render_group.h"
 
@@ -53,6 +55,48 @@ struct debug_element{
 	debug_element* NextInHash;
 };
 
+struct debug_frame{
+	uint64 BeginClock;
+	uint64 EndClock;
+	real32 WallSecondsElapsed
+
+	float FrameBarScale;
+
+	uint32 FrameIndex;
+
+	uint32 StoredDebugEvent;
+	uint32 ProfileBlockCount;
+	uint32 DataBlockCount;
+
+	debug_stored_event* RootProfileNode;
+};
+
+struct open_debug_block{
+	union{
+		open_debug_block* Parent;
+		open_debug_block* NextFree;
+	};
+
+	uint32 StartingFrameIndex;
+	debug_element *Element;
+	uint64 BeginClock;
+	debug_stored_event* Node;
+
+	debug_variable_link* Group;
+};
+
+struct debug_thread{
+	union{
+		debug_thread* Next;
+		debug_thread* NextFree;
+	};
+
+	uint32 ID;
+	uint32 LaneIndex;
+	open_debug_block* FirstOpenCodeBlock;
+	open_debug_block* FirstOpenDataBlock;
+};
+
 struct debug_state{
 	bool32 Initialized;
 
@@ -69,6 +113,31 @@ struct debug_state{
 	float GlobalHeight;
 
 	debug_element* ElementHash[1024];
+
+	uint32 TotalFrameCount;
+	uint32 ViewingFrameOrdinal;
+
+	uint32 MostRecentFrameOrdinal;
+	uint32 CollationFrameOrdinal;
+	uint32 OldestFrameOrdinal;
+	debug_frame Frames[DEBUG_FRAME_COUNT];
+
+	debug_element* RootProfileNode;
+
+	uint32 FrameBarLaneCount;
+	debug_thread* FirstThread;
+	debug_thread* FirstFreeThread;
+	open_debug_block* FirstFreeBlock;
+
+	debug_stored_event* FirstFreeStoredEvent;
+
+	uint32 RootInfoSize;
+	char* RootInfo;
+
+	uint32 ToolTipCount;
+	char ToolTipText[16][256];
 };
+
+#endif
 
 #endif

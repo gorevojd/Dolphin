@@ -1461,6 +1461,8 @@ int WINAPI WinMain(
     int ComandShow)
 {
 
+    DEBUGSetEventRecording(true);
+
     Win32InitXInput();
 
 #if 1
@@ -1528,7 +1530,9 @@ int WINAPI WinMain(
         (uint8*)GameMemory.TransientStorage + 
         GameMemory.TransientStorageSize;
 
+#if IVAN_INTERNAL
     GameMemory.DebugTable = GlobalDebugTable;
+#endif
 
     GameMemory.PlatformAPI.DEBUGFreeFileMemory = DEBUGPlatformFreeFileMemory;
     GameMemory.PlatformAPI.DEBUGReadEntireFile = DEBUGPlatformReadEntireFile;

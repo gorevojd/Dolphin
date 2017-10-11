@@ -50,6 +50,29 @@ INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
 
             }break;
 
+            case FinalizeAsset_Animation:{
+                loaded_animation* Animation = &Work->Asset->Header->Animation;
+                dda_animation* DDA = &Work->Asset->DDA.Animation;
+
+                uint32 JointAnimBase = 0;
+                for(uint32 JointAnimIndex = 0;
+                    JointAnimIndex < Animation->JointAnimsCount;
+                    JointAnimIndex++)
+                {
+                    joint_animation* Dst = &Animation->JointAnims[JointAnimIndex];
+                    dda_joint_frames_info* Src = &DDA->JointAnims[JointAnimIndex];
+
+                    Dst->TranslationFrames = (uint8*)Work->Destination + JointAnimBase;
+                    Dst->RotationFrames = Dst->TranslationFrames + Src->TranslationFramesByteSize;
+                    Dst->ScalingFrames = Dst->RotationFrames + Src->RotationFramesByteSize;
+
+                    JointAnimBase += 
+                        (Src->TranslationFramesByteSize + 
+                        Src->RotationFramesByteSize +
+                        Src->ScalingFramesByteSize);
+                }
+            }break;
+
             case FinalizeAsset_Font:{
                 loaded_font* Font = &Work->Asset->Header->Font;
                 dda_font* DDA = &Work->Asset->DDA.Font;
@@ -521,6 +544,98 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
                 Work.Destination = Atlas->Materials;
                 Work.FinalizeOperation = FinalizeAsset_None;
                 Work.FinalState = AssetState_Loaded;
+
+                if(Task){
+                    load_asset_work* TaskWork = PushStruct(&Task->Arena, load_asset_work);
+                    *TaskWork = Work;
+                    Platform.AddEntry(Assets->TranState->LowPriorityQueue, LoadAssetWork, TaskWork);
+                }
+                else{
+                    LoadAssetWorkDirectly(&Work);
+                }
+            }
+            else{
+                Asset->State = AssetState_Unloaded;
+            }
+
+        }
+        else if(Immediate){
+            asset_state volatile* State = (asset_state volatile*)&Asset->State;
+            while(*State == AssetState_Queued){
+
+            }
+        }
+    }
+}
+
+INTERNAL_FUNCTION LoadAnimationAsset(game_assets, animation_id ID, bool32 Immediate){
+    TIMED_FUNCTION();
+
+    asset* Asset = Assets->Assets + ID.Value;
+    if(ID.Value){
+        if(AtomicCompareExchangeU32(
+            (uint32 *)&Asset->State,
+            AssetState_Queued, 
+            AssetState_Unloaded) == AssetState_Unloaded)
+        {
+            task_with_memory* Task = 0;
+
+            if(!Immediate){
+                Task = BeginTaskWithMemory(Assets->TranState);
+            }
+
+            if(Immediate || Task){
+                dda_animation* Info = &Asset->DDA.Animation;
+
+                uint32 JointAnimsSize = 0;
+                for(uint32 JointAnimIndex = 0;
+                    JointAnimIndex < Info->JointAnimsCount;
+                    JointAnimIndex++)
+                {
+                    dda_joint_frames_info* Src = &Info->JointAnims[JointAnimIndex];
+
+                    JointAnimsSize += sizeof(joint_animation);
+
+                    JointAnimsSize += Src->TranslationFramesByteSize;
+                    JointAnimsSize += Src->RotationFramesByteSize;
+                    JointAnimsSize += Src->ScalingFramesByteSize;
+                }
+
+                uint32 SizeOfData = JointAnimsSize;
+                uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header);
+
+                Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_Animation);
+
+                loaded_animation* Animation = &Asset->Header.Animation;
+                Animation->JointAnimsCount = Info->JointAnimsCount;
+                Animation->Length = Info->LengthTime;
+                Animation->PlayCursorTime = 0.0f;
+                Animation->PlaybackSpeed = 1.0f;
+                Animation->TicksPerSecond = Info->TicksPerSecond;
+
+                for(uint32 JointAnimIndex = 0;
+                    JointAnimIndex < Info->JointAnimsCount;
+                    JointAnimIndex++)
+                {
+                    joint_animation* Dst = &Animation->JointAnims[JointAnimIndex];
+                    dda_joint_frames_info* Src = &Info->JointAnims[JointAnimIndex];
+
+                    Dst->TranslationFramesByteSize = Src->TranslationFramesByteSize / sizeof(translation_key_frame);
+                    Dst->RotationFramesByteSize = Src->RotationFramesByteSize / sizeof(rotation_key_frame);
+                    Dst->ScalingFramesByteSize = Src->ScalingFramesByteSize / sizeof(scaling_key_frame);
+                }
+
+                load_asset_work Work;
+                Work.Task = Task;
+                Work.Asset = Assets->Assets + ID.Value;
+                Work.Handle = GetFileHandleFor(Assets, Asset->FileIndex);
+                Work.Offset = Asset->DDA.DataOffset;
+                Work.Size = SizeOfData;
+                Work.Destination = Animation->JointAnims;
+                Work.FinalizeOperation = FinalizeAsset_Animation;
+                Work.FinalState = AssetState_Loaded;
+
+                /*Key frames are set in Finalize operation*/
 
                 if(Task){
                     load_asset_work* TaskWork = PushStruct(&Task->Arena, load_asset_work);

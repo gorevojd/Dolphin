@@ -108,8 +108,10 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
     Platform = Memory->PlatformAPI;
 
+#if IVAN_INTERNAL
     DebugGlobalMemory = Memory;
     GlobalDebugTable = Memory->DebugTable;
+#endif
 
     TIMED_FUNCTION();
     

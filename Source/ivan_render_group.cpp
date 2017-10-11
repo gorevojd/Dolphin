@@ -274,6 +274,16 @@ inline void PushRectangle(
     }
 }
 
+inline void PushRectangle(
+    render_group* RenderGroup, 
+    rectangle2 Rect, 
+    float Z, 
+    vec4 Color = Vec4(1, 1, 1, 1),
+    bool32 ScreenSpace = false)
+{
+    PushRect(Group, Vec3(GetMinCorner(Rect), Z), GetDim(Rect), Color, ScreenSpace);
+}
+
 inline void PushBitmap(
     render_group* RenderGroup,
     loaded_bitmap* Bitmap,

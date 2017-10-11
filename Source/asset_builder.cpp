@@ -7,7 +7,6 @@
 /*
     TODO(Dima):
         Font Atlas
-        Voxel texture atlas
 */
 
 #pragma pack(push, 1)
@@ -171,6 +170,396 @@ LoadBMP(char* FileName, bool32 FlipOnLoad = false){
     }
 
     return(Result);
+}
+
+enum load_mesh_flags{
+    LoadMesh_RecalculateNormals = 1,
+    LoadMesh_CalculateTangents = 2,
+    LoadMesh_LoadSkinData = 4,
+    LoadMesh_UseExistingSkeleton = 8,
+};
+
+INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
+    aiMesh* Mesh,
+    uint32 VertexBase, 
+    bone_vertex_info* Infos,
+    loaded_skeleton* Skeleton)
+{
+    for(uint32 BoneIndex = 0; 
+        BoneIndex < Mesh->mNumBones;
+        BoneIndex++)
+    {
+        Assert(Mesh->mNumBones <= MAX_BONE_COUNT);
+
+        char* BoneName = Mesh->mBones[BoneIndex]->mName.data;
+        std::string BoneNameString = std::string(BoneName);
+
+        uint32 IndexToBoneArray = 0;
+
+        if(Skeleton != 0){
+            if(Skeleton->BoneMapping.find(BoneName) == Skeleton->BoneMapping.end()){
+                IndexToBoneArray = Skeleton->BoneMapping.size();
+                bone_transform_info BoneTransform;
+                BoneTransform.Name = BoneName;
+                BoneTransform.Offset = AiMatToOurs(&Mesh->mBones[BoneIndex]->mOffsetMatrix);
+                Skeleton->Bones.push_back(BoneTransform);
+                Skeleton->BoneMapping[BoneNameString] = IndexToBoneArray;
+            }
+            else{
+                IndexToBoneArray = Skeleton->BoneMapping[BoneNameString];
+            }
+        }
+
+        for(uint32 WeightIndex = 0;
+            WeightIndex < Mesh->mBones[BoneIndex]->mNumWeights;
+            WeightIndex++)
+        {
+            uint32 VertexIndex = VertexOffset + Mesh->mBones[BoneIndex]->mWeights[WeightIndex].mVertexId;
+            AddBoneVertexInfo(
+                &Infos[VertexIndex], 
+                Mesh->mBones[BoneIndex]->mWeights[WeightIndex].mWeight, 
+                IndexToBoneArray);
+        }
+    }
+}
+
+INTERNAL_FUNCTION loaded_skinned_mesh 
+LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 Flags)
+{
+    loaded_skinned_mesh Result;
+
+    uint32 IndexBase = 0;
+    uint32 VertexBase = 0;
+
+    bool32 UseExistingSkeleton = Flags & LoadMesh_UseExistingSkeleton;
+    loaded_skeleton NewSkeleton = {};
+    loaded_skeleton* Skeleton;
+
+    if(UseExistingSkeleton){
+        Skeleton = Skeleton_;
+    }
+    else{
+        Skeleton = &NewSkeleton;
+        *Skeleton_ = NewSkeleton;
+    }
+
+    uint32 TotalVertexCount = 0;
+    for(uint32 MeshIndex = 0;
+        MeshIndex < AssimpScene->mNumMeshes;
+        MeshIndex++)
+    {
+        TotalVertexCount += AssimpScene->mMeshes[MeshIndex]->mNumVertices;
+    }
+    Result->VerticesCount = TotalVertexCount;
+
+    bone_vertex_info* VertexInfos = (bone_vertex_info*)calloc(TotalVertexCount, sizeof(bone_vertex_info));
+
+    for(uint32 MeshIndex = 0;
+        MeshIndex < AssimpScene->mNumMeshes;
+        MeshIndex++)
+    {       
+        aiMesh* Mesh = &AssimpScene->mMeshes[MeshIndex];
+
+        if(Mesh->mNumBones > 0){
+            LoadBoneInfoFromAssimp(Mesh, VertexBase, VertexInfos, Skeleton);
+        }
+
+        VertexBase += Mesh->mNumVertices;
+    }
+
+    VertexBase = 0;
+    for(uint32 MeshIndex = 0;
+        MeshIndex < AssimpScene->mNumMeshes;
+        MeshIndex++)
+    {       
+        aiMesh* Mesh = &AssimpScene->mMeshes[MeshIndex];
+
+        for(uint32 VertexIndex = 0; 
+            VertexIndex < Mesh->mNumVertices;
+            VertexIndex++)
+        {
+            aiVector3D* RefP = &Mesh->mVertices[i];        
+            aiVector3D* RefN = &Mesh->mNormals[i];
+
+            Assert(VertexBase + VertexIndex <= MAX_VERTICES_COUNT);
+            scinned_vertex* NewVertex = &Result.Vertices[VertexBase + VertexIndex];
+
+            Newvertex->P.x = RefP->x;
+            Newvertex->P.y = RefP->y;
+            Newvertex->P.z = RefP->z;
+
+            NewVertex->N.x = RefN->x;
+            NewVertex->N.y = RefN->y;
+            NewVertex->N.z = refN->z;
+
+            if(mesh->mTextureCoords[0]){
+                NewVertex->UV->x = mesh->mTextureCoords[0][i].x;
+                NewVertex->UV->y = mesh->mTextureCoords[0][i].y;
+            }
+
+            for(int32 InfluenceBoneIndex = 0;
+                InfluenceBoneIndex < MAX_INFLUENCE_BONE_COUNT;
+                InfluenceBoneIndex++)
+            {
+                NewVertex->Weights[InfluenceBoneIndex] = VertexInfos[VertexBase + VertexIndex].Weights[InfluenceBoneIndex];
+                NewVertex->BoneIDs[InfluenceBoneIndex] = VertexInfos[VertexBase + VertexInfos].BoneIDs[InfluenceBoneIndex];
+            }
+        }
+
+        uint32 IndexIterator = 0;
+        for(uint32 FaceIndex = 0;
+            FaceIndex < Mesh->mNumFaces; 
+            FaceIndex++)
+        {
+            aiFace* AssimpFace = &Mesh->mNumFaces[FaceIndex];
+
+            for(uint32 FaceVertexIndex = AssimFace->mNumIndices;
+                FaceVertexIndex > 0; 
+                FaceVertexIndex--)
+            {
+                Result.Indices[IndexBase + IndexIterator++] = AssimFace->mIndices[FaceVertexIndex - 1];
+            }
+        }
+
+        if(Flags & LoadMesh_CalculateTangents){ 
+            for(uint32 FaceIndex = 0;
+                FaceIndex < Mesh->mNumFaces; 
+                FaceIndex++)
+            {
+                aiFace* AssimpFace = &Mesh->mNumFaces[FaceIndex];
+                if(AssimpFace->mNumIndices == 3){
+                    vec3 NewT;
+
+                    vec3 Vert1 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[0]]);
+                    vec3 Vert2 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[1]]);
+                    vec3 Vert3 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[2]]);
+
+                    vec2 UV1 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[0]]);
+                    vec2 UV2 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[1]]);
+                    vec2 UV3 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[2]]);
+
+                    vec3 Edge1 = Vert2 - Vert1;
+                    vec3 Edge2 = Vert3 - Vert1;
+
+                    vec2 DeltaUV1 = UV2 - UV1;
+                    vec2 DeltaUV2 = UV3 - UV1;
+
+                    float f = 1.0f / (DeltaUV1.x * DeltaUV2.y - DeltaUV2.x * DeltaUV1.y);
+
+                    NewT.x = f *(DeltaUV2.y * Edge1.x - DeltaUV1.y * Edge2.x);
+                    NewT.y = f *(DeltaUV2.y * Edge1.y - DeltaUV1.y * Edge2.y);
+                    NewT.z = f *(DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z);
+                    NewT = Normalize(NewT);
+                    
+                    Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
+                    Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
+                    Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
+                }
+            }
+        }
+
+        IndexBase += IndexIterator;
+    }
+
+    Result.IndicesCount = IndexBase;
+
+    free(VertexInfos);
+}
+
+struct loaded_skeleton{
+    std::map<std::string, uint32> BoneMapping;
+    std::vector<bone_transform_info> Bones;
+};
+
+inline aiNodeAnim* FindNodeAnimInAssimpAnimation(aiAnimation* Animation, char* NodeName){
+    aiNodeAnim* Result = 0;
+
+    for(uint32 ChannelIndex = 0;
+        ChannelIndex < Animation->mNumChannels;
+        ChannelIndex++)
+    {
+        aiNodeAnim* NodeAnim = Animation->mChannels[ChannelIndex];
+
+        if(strcmp(NodeAnim->mNodeName.data, NodeName) == 0){
+            Result = NodeAnim;
+            break;
+        }
+    }
+
+    return(Result);
+}
+
+INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
+    loaded_skeletal_animation* SkAnimation, 
+    aiNode* AssimpNode,
+    aiAnimation* AssimpAnimation,
+    loaded_skeleton* Skeleton)
+{
+    uint32 CurrentJointIndex;
+    std::string CurrentJointName = std::string(AssimpNode->mName.data);
+    uint32 CurrentJointIndex = Skeleton->BoneMapping[CurrentJointName];
+
+    joint_animation* Animation = &SkAnimation->JointAnims[CurrentJointIndex];
+
+    aiNodeAnim* NodeAnim = FindNodeAnimInAssimpAnimation(AssimpAnimation, AssimpNode->mName.data);
+
+    Animation->TranslationFramesCount = NodeAnim->mNumPositionKeys;
+    Animation->RotationFramesCount = NodeAnim->mNumRotationKeys;
+    Animation->ScalingFramesCount = NodeAnim->mNumScalingKeys;
+    uint32 JointMemoryBlockByteSize = 
+        (Animation->TranslationFramesCount * sizeof(translation_key_frame)) + 
+        (Animation->RotationFramesCount * sizeof(rotation_key_frame)) + 
+        (Animation->ScalingFramesCount * sizeof(scaling_key_frame));
+
+    uint8* JointMemoryBlock = (uint8*)malloc(JointMemoryBlockByteSize);
+    memset(JointMemoryBlock, 0, JointMemoryBlockByteSize);
+
+    Animation->TranslationFrames = (translation_key_frame*)JointMemoryBlock;
+    Animation->RotationFrames = (rotation_key_frame*)(JointMemoryBlock + Animation->TranslationFramesCount * sizeof(translation_key_frame));
+    Animation->ScalingFrames = (scaling_key_frame*)((uint8*)Animation->RotationFrames + Animation->RotationFramesCount * sizeof(rotation_key_frame));
+
+    Animation->Free = JointMemoryBlock;
+
+    //NOTE(Dima): Copying the translation animation data;
+    for(uint32 TranslationFrameIndex = 0;
+        TranslationFrameIndex < Animation->TranslationFramesCount;
+        TranslationFrameIndex++)
+    {
+        aiVectorKey* SrcFrame = &NodeAnim->mPositionKeys[TranslationFrameIndex];
+        translation_key_frame* DstFrame = &Animation->TranslationFrames[TranslationFrameIndex].Translation;
+        
+        DstFrame->TimeStamp = (float)SrcFrame->mTime;
+        DstFrame->Translation = AiVec3ToOurs(SrcFrame->mValue);
+    }
+
+    //NOTE(Dima): Copying the rotation animation data;
+    for(uint32 RotationFrameIndex = 0;
+        RotationFrameIndex < Animation->RotationFramesCount;
+        RotationFrameIndex++)
+    {
+        aiQuatKey* SrcFrame = &NodeAnim->mRotationKeys[RotationFrameIndex];
+        rotation_key_frame* DstFrame = &Animation->RotationFrames[RotationFrameIndex].Rotation;
+
+        DstFrame->TimeStamp = (float)SrcFrame->mTime;
+        DstFrame->Rotation = AiQuatToOurs(SrcFrame->mValue);
+    }
+
+    //NOTE(Dima): Copying the scaling animation data;
+    for(uint32 ScalingFrameIndex = 0;
+        ScalingFrameIndex < Animation->ScalingFramesCount;
+        ScalingFrameIndex++)
+    {
+        aiVectorKey* SrcFrame = &NodeAnim->mScalingKeys[ScalingFrameIndex];
+        scaling_key_frame* DstFrame = &Animation->ScalingFrames[ScalingFrameIndex].Scaling;
+
+        DstFrame->TimeStamp = (float)SrcFrame->mTime;
+        DstFrame->Scaling = AiVec3ToOurs(SrcFrame->mValue);
+    }
+
+    char* CurrentBoneName = AssimpNode->mName.data;
+    std::string CurrentBoneNameStr = std::string(CurrentBoneName);
+    bone_transform_info* CurrentBoneTransform = &(Skeleton->Bones.at([Skeleton->BoneMapping[CurrentBoneNameStr]]));    
+
+    //NOTE(Dima): Children processing
+    if(AssimpNode->mNumChildren > 0){
+        //NOTE(Dima): Allocating children
+        CurrentBoneTransform->ChildrenCount = AssimpNode->mNumChildren;
+        CurrentBoneTransform->Children = (bone_transform_info*)
+            malloc(sizeof(bone_transform_info) * CurrentBoneTransform->ChildrenCount);
+
+        //NOTE(Dima): Assigning children indices to current bone
+        for(uint32 ChildIndex = 0;
+            ChildIndex < AssimpNode->mNumChildren;
+            ChildIndex++)
+        {
+            std::string ChildNodeName = std::string(AssimpNode->mChildren[ChildIndex]->mName.data);
+
+            if(Skeleton->BoneMapping.find(ChildNodeName) != Skeleton->BoneMapping.end()){
+                CurrentBoneTransform->Children[ChildIndex] = Skeleton->BoneMapping[ChildNodeName];
+            }
+            else{
+                //NOTE(Dima): This should not happen because child bone should be found
+                INVALID_CODE_PATH;
+            }
+        }
+    }
+    else{
+        CurrentBoneTransform->Children = 0;
+        CurrentBoneTransform->ChildrenCount = 0;
+    }
+
+    //NOTE(Dima): Hopefully this should work
+    if(AssimpNode->mNumChildren){
+        for(uint32 ChildIndex = 0;
+            ChildIndex < AssimpNode->mNumChildren;
+            ChildIndex++)
+        {
+            std::string ChildNodeName = std::string(AssimpNode->mChildren[ChildIndex]->mName.data);
+
+            uint32 ToLoadIndex = 0;
+            if(Skeleton->BoneMapping.find(ChildNodeName) != Skeleton->BoneMapping.end()){
+                ToLoadIndex = Skeleton->BoneMapping[ChildNodeName];
+            }
+            else{
+                //NOTE(Dima): This should not happen because child bone should be found
+                INVALID_CODE_PATH;
+            }
+
+            joint_animation* ToLoad = &SkAnimation->JointAnims[ToLoadIndex];
+
+            LoadJointAnimationFromAssimpRecursively(
+                ToLoad,
+                pNode->mChildren[ChildIndex], 
+                AssimpAnimation, 
+                Skeleton);
+        }
+    }
+}
+
+INTERNAL_FUNCTION loaded_animations_result
+LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
+{
+    Assimp::Importer Importer;
+    aiScene* AssimpScene = AssimpImporter.ReadFile(FileName, 0);
+
+    loaded_animations_result Result_ = {};
+    loaded_animations_result* Result = &Result_;
+
+    uint32 SrcAnimationsCount = AssimpScene->mNumAnimations;
+    Result->AnimationsCount = SrcAnimationsCount;
+    Result->Animations = (loaded_skeletal_animation*)malloc(sizeof(loaded_skeletal_animation) * AnimationsCount);
+    Result->Free = (void*)Result->Animations;
+
+    for(uint32 CurrentAnimationIndex = 0;
+        CurrentAnimationIndex < SrcAnimationsCount;
+        CurrentAnimationIndex++)
+    {
+        aiAnimation* SrcAnim = AssimpScene->mAnimations[CurrentAnimationIndex];
+        loaded_skeletal_animation* DstAnim = &Result->Animations[CurrentAnimationIndex];
+
+        DstAnim->LengthTime = (float)SrcAnim->mDuration;
+        DstAnim->PlayCursorTime = 0.0f;
+        DstAnim->PlaybackSpeed = 1.0f;
+        
+        if(SrcAnim->mTicksPerSecond != 0){
+            DstAnim->TicksPerSecond = ScrAnim->mTicksPerSecond;
+        }
+        else{
+            DstAnim->TicksPerSecond = 25.0f;
+        }
+
+        uint32 BonesCount = Skeleton->Bones.size();
+        uint32 ToAllocateForJoints = sizeof(joint_animation) * BonesCount;
+        DstAnim->JointAnims = (joint_animation*)malloc(ToAllocateForJoints);
+        memset(DstAnim->JointAnims, 0, ToAllocateForJoints);
+        DstAnim->JointAnimsCount = BonesCount;
+
+        LoadJointAnimationFromAssimpRecursively(
+            DstAnim, 
+            AssimpScene->mRootNode,
+            SrcAnim,
+            Skeleton);
+    }
 }
 
 INTERNAL_FUNCTION loaded_font*
@@ -796,6 +1185,55 @@ AddVoxelAtlasTextureAsset(game_assets* Assets, loaded_voxel_atlas* Atlas){
     return(Result);
 }
 
+
+INTERNAL_FUNCTION void
+FinalizeAnimationAsset(loaded_animation* Animation){
+    for(int JointAnimIndex = 0;
+        JointAnimIndex < Animation->JointAnimsCount;
+        JointAnimIndex++)
+    {
+        joint_animation* SrcDst = &Animation->JointAnims[JointAnimIndex];
+        
+        SrcDst->TranslationFramesByteSize = SrcDst->TranslationFramesCount * sizeof(translation_key_frame);
+        SrcDst->RotationFramesByteSize = SrcDst->RotationFramesCount * sizeof(rotation_key_frame);
+        SrcDst->ScalingFramesByteSize = SrcDst->ScalingFramesCount * sizeof(scaling_key_frame);
+    }
+}
+
+struct dda_joint_frames_info{
+    uint32 TranslationFramesByteSize;
+    uint32 RotationFramesByteSize;
+    uint32 ScalingFramesByteSize;
+};
+
+
+INTERNAL_FUNCTION animation_id 
+AddAnimationAsset(game_assets* Assets, loaded_animation* Animation){
+    added_asset Asset = AddAsset(Assets);
+
+    Asset.Source->Type = AssetType_Animation;
+    Asset.Source->Animation.Animation = Animation;
+
+    Asset.DDA->Animation.JointAnimsCount = Animation->JointAnimsCount;
+    Asset.DDA->Animation.LengthTime = Animation->LengthTime;
+    Asset.DDA->Animation.TicksPerSecond = Animation->TicksPerSecond;
+
+    for(int JointAnimIndex = 0;
+        JointAnimIndex < Animation->JointAnimsCount;
+        JointAnimIndex++)
+    {
+        dda_joint_frames_info* Dst = &Asset.DDA->Animation.JointAnims;
+        joint_animation* Src = &Animation->JointAnims[JointAnimIndex];
+        
+        Dst->TranslationFramesByteSize = Src->TranslationFramesCount * sizeof(translation_key_frame);
+        Dst->RotationFramesByteSize = Src->RotationFramesCount * sizeof(rotation_key_frame);
+        Dst->ScalingFramesByteSize = Src->ScalingFramesCount * sizeof(scaling_key_frame);
+    }
+
+    animation_id Result = {Asset.ID};
+    return(Result);
+}
+
 INTERNAL_FUNCTION voxel_atlas_id
 AddVoxelAtlasAsset(
     game_assets* Assets,
@@ -1049,7 +1487,25 @@ WriteDDA(game_assets* Assets, char* FileName){
                     free(Bitmap.Free);
                 }break;
 
-                case(AssetType_Model):{
+                case(AssetType_Animation):{
+                    loaded_animation* Anim = Source->Animation.Animation;
+
+                    Assert(Anim->JointAnimsCount <= DDA_ANIMATION_MAX_BONE_COUNT);
+
+                    FinalizeAnimationAsset(Anim);
+
+                    for(uint32 JointAnimIndex = 0;
+                        JointAnimIndex < Anim->JointAnimsCount;
+                        JointAnimIndex++)
+                    {
+                        joint_animation* JointAnim = &Anim->JointAnims[JointAnimIndex];
+
+                        fwrite(JointAnim->TranslationFrames, JointAnim->TranslationFramesByteSize, 1, fp);
+                        fwrite(JointAnim->RotationFrames, JointAnim->RotationFramesByteSize, 1, fp);
+                        fwrite(JointAnim->ScalingFrames, JointAnim->ScalingFramesByteSize, 1, fp);
+
+                        free(JointAnim->Free);
+                    }
 
                 }break;
 
@@ -1107,6 +1563,33 @@ INTERNAL_FUNCTION void Initialize(game_assets* Assets){
 
     Assets->AssetTypeCount = Asset_Count;
     memset(Assets->AssetTypes, 0, sizeof(Assets->AssetTypes));
+}
+
+INTERNAL_FUNCTION void WriteAnimations(){
+    game_assets Assets_;
+    game_assets* Assets = &Assets_;
+    Initialize(Assets);
+
+    loaded_animations_result* Results[] = {
+        LoadSkeletalAnimation("Dima_RunF01.fbx", ???);
+    };
+
+    BeginAssetType(Assets, AssetType_Animation);
+    for(uint32 ResultIndex = 0;
+        ResultIndex < ArrayCount(Results);
+        ResultIndex++)
+    {
+        for(uint32 AnimationIndex = 0;
+            AnimationIndex < Results[ResultIndex].AnimationsCount;
+            AnimationIndex++)
+        {
+            AddAnimationAsset(&Results[ResultIndex]);
+        }
+    }
+    EndAssetType(Assets);
+
+    WriteDDA(Assets, "../Data/asset_pack_animations.dda");
+    printf("Animation assets written successfully :D");
 }
 
 INTERNAL_FUNCTION void WriteFonts(){
@@ -1404,6 +1887,7 @@ int main(int ArgCount, char** Args){
     WriteSounds();
     WriteFonts();
     WriteVoxelAtlases();
+    WriteAnimations();
 
     system("pause");
 	return(0);

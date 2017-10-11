@@ -11,7 +11,6 @@ INTERNAL_FUNCTION void ANIM_AnimateModel(skinned_mesh* Mesh, skeletal_animation*
 		else{
 			Assert(Animation->Type == SkAnimationType_StopAtEnd);
 			
-
 		}
 	}
 
