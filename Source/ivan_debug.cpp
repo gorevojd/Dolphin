@@ -72,7 +72,99 @@ GetElementFromGUID(debug_state* DebugState, char* GUID){
 	return(Result);
 }
 
+inline debug_id
+DebugIDFromLink(debug_tree* Tree, debug_variable_link* Link){
+	debug_id Result = {};
 
+	Result.Value[0] = Tree;
+	Result.Value[1] = Link;
+
+	return(Result);
+}
+
+inline debug_id
+DebugIDFromGUID(debug_tree* Tree, char* GUID){
+	debug_id Result = {};
+
+	Result.Value[0] = Tree;
+	Result.Value[1] = GUID;
+
+	return(Result);
+}
+
+inline debug_state* 
+DEBUGGetState(game_memory* Memory){
+	debug_state* DebugState = 0;
+	if(Memory){
+		DebugState = (debug_state*)Memory->DebugStorage;
+		if(!DebugState->Initialized){
+			DebugState = 0;
+		}
+	}
+	return(DebugState);
+}
+
+inline debug_state*
+DEBUGGetState(){
+	debug_state* Result = DEBUGGetState(DebugGlobalMemory);
+
+	return(Result);
+}
+
+INTERNAL_FUNCTION debug_tree*
+AddTree(debug_state* DebugState, debug_variable_link* Group, vec2 AtP){
+	debug_tree* Tree = PushStruct(&DebugState->DebugArena, debug_tree);
+
+	Tree->UIP = AtP;
+	Tree->Group = Group;
+
+	DLIST_INSERT(&DebugState->TreeSentinel, Tree);
+
+	return(Tree);
+}
+
+inline void 
+BeginDebugStatistic(debug_statistic* Stat){
+	Stat->Min = Real32Maximum;
+	Stat->Max = Real32Minimum;
+	Stat->Sum = 0.0f;
+	Stat->Count = 0;
+}
+
+inline void 
+AccumDebugStatistic(debug_statistic* Stat, real64 Value){
+	++Stat->Count;
+
+	if(Stat->Min > Value){
+		Stat->Min = Value;
+	}
+
+	if(Stat->Max < Value){
+		Stat->Max = Value;
+	}
+
+	Stat->Sum += Value;
+}
+
+inline void EndDebugStatistic(debug_statistic* Stat){
+	if(Stat->Count){
+		Stat->Avg = Stat->Sum / (real64)Stat->Count;
+	}
+	else{
+		Stat->Min = 0.0f;
+		Stat->Max = 0.0f;
+		Stat->Avg = 0.0f;
+	}
+}
+
+INTERNAL_FUNCTION memory_index
+DEBUGEventToText(char* Buffer, char* End, debug_element* Element, debug_event* Event, uint32 Flags){
+	char* At = Buffer;
+
+	if(Flags & DEBUGVarToText_AddDebugUI){
+		
+	}
+}
 
 INTERNAL_FUNCTION void 
 OutputDebugRecords(debug_state* DebugState){
@@ -116,30 +208,13 @@ OutputDebugRecords(debug_state* DebugState){
     TextOutAt(DebugState, Vec2(10, 50), "That's not the shape of my heart");
 }
 
+
+
 INTERNAL_FUNCTION void
 OverlayCycleCounters(debug_state* DebugState){
 	//TextOut(RenderGrou, "\\#900DEBUG \\#090CYCLE \\#940COUNTS");
     
     OutputDebugRecords(DebugState);
-}
-
-inline debug_state* 
-DEBUGGetState(game_memory* Memory){
-	debug_state* DebugState = 0;
-	if(Memory){
-		DebugState = (debug_state*)Memory->DebugStorage;
-		if(!DebugState->Initialized){
-			DebugState = 0;
-		}
-	}
-	return(DebugState);
-}
-
-inline debug_state*
-DEBUGGetState(){
-	debug_state* Result = DEBUGGetState(DebugGlobalMemory);
-
-	return(Result);
 }
 
 inline open_debug_block*

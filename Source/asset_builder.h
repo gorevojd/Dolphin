@@ -120,7 +120,6 @@ struct joint_animation{
     uint32 ScalingFramesCount;
 
     void* Free;
-
 };
 
 struct loaded_skeletal_animation{

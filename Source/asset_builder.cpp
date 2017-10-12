@@ -1574,7 +1574,7 @@ INTERNAL_FUNCTION void WriteAnimations(){
         LoadSkeletalAnimation("Dima_RunF01.fbx", ???);
     };
 
-    BeginAssetType(Assets, AssetType_Animation);
+    BeginAssetType(Assets, Asset_Animation);????
     for(uint32 ResultIndex = 0;
         ResultIndex < ArrayCount(Results);
         ResultIndex++)

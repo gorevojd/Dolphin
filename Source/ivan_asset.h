@@ -227,6 +227,14 @@ inline dda_sound* GetSoundInfo(game_assets* Assets, sound_id ID){
 	return(Result);
 }
 
+inline loaded_animation* GetAnimation(game_assets* Assets, animation_id ID, GenerationID){
+	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
+	
+	loaded_animation* Result = Header ? &Header->Animation : 0;
+
+	return(Result);
+}
+
 inline loaded_font* GetFont(game_assets* Assets, font_id ID, uint32 GenerationID){
 	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
 

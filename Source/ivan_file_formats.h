@@ -27,6 +27,10 @@ struct animation_id{
 	unsigned int Value;
 };
 
+struct mesh_id{
+	unsigned int Value;
+};
+
 struct dda_header{
 #define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 

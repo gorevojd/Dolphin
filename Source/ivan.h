@@ -70,6 +70,7 @@ struct game_state{
 	real32 HeroFacingDirection;
 
 	audio_state AudioState;
+	animator_controller AnimatorController;
 
 	real32 Time;
 	vec3 LastMouseP;

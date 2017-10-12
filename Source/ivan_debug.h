@@ -8,6 +8,60 @@
 
 #define DEBUG_FRAME_COUNT 256
 
+enum debug_variable_to_tet_flag{
+	DEBUGVarToText_AddDebugUI = 0x1,
+	DEBUGVarToText_AddName = 0x2,
+	DEBUGVarToText_FloatSuffx = 0x4,
+	DEBUGVarToText_LineFeedEnd = 0x8,
+	DEBUGVarToText_NullTerminator = 0x10,
+	DEBUGVarToText_Colon = 0x20,
+	DEBUGVarToText_PrettyBools = 0x40,
+	DEBUGVarToText_ShowEntireGUID = 0x80,
+	DEBUGVarToText_AddValue = 0x100,
+};
+
+struct debug_tree;
+
+struct debug_view_inline_block{
+	vec2 Dim;
+};
+
+struct debug_view_profile_graph{
+	debug_view_inline_block Block;
+	char* GUID;
+};
+
+struct debug_view_arena_graph{
+	debug_view_inline_block Block;
+};
+
+struct debug_view_collapsible{
+	bool32 ExpandedAlways;
+	bool32 ExpandedAltView;
+};
+
+enum debug_view_type{
+	DebugViewType_Unknown,
+
+	DebugViewType_Basic,
+	DebugViewType_InlineBlock,
+	DebugViewType_Collapsible,
+};
+
+struct debug_view{
+	debug_id ID;
+	debug_view* NextInHash;
+
+	debug_view_type Type;
+	union{
+		debug_view_inline_block InlineBlock;
+		debug_view_profile_graph ProfileGraph;
+		debug_view_collapsible Collapsible;
+		debug_view_arena_graph ArenaGraph;
+	};
+};
+
+
 struct debug_profile_node{
 	struct debug_element* Element;
 	struct debug_stored_event* FirstChild;
@@ -53,6 +107,60 @@ struct debug_element{
 
 	debug_element_frame Frames[DEBUG_FRAME_COUNT];
 	debug_element* NextInHash;
+};
+
+inline char* GetName(debug_element* Element){
+	char* Result = Element->Name;
+
+	return(Result);
+}
+
+struct debug_variable_link{
+	debug_variable_link* Next;
+	debug_variable_link* Prev;
+
+	debug_variable_link* FirstChild;
+	debug_variable_link* LastChild;
+
+	char* Name;
+	debug_element* Element;
+};
+
+inline debug_variable_link* GetSentinel(debug_variable_link* From){
+	debug_variable_link* Result = (debug_variable_link*)(&From->FirstChild);
+
+	return(Result);
+}
+
+inline bool32 HasChildren(debug_variable_link* Link){
+	bool32 Result = (Link->FirstChild != GetSentinel(Link));
+	return(Result);
+}
+
+struct debug_tree{
+	vec2 UIP;
+	debug_variable_link* Group;
+
+	debug_tree* Next;
+	debug_tree* Prev;
+};
+
+struct render_group;
+struct game_assets;
+struct loaded_bitmap;
+struct loaded_font;
+struct dda_font;
+
+struct debug_counter_snapshot{
+	uint32 HitCount;
+	uint64 CycleCount;
+};
+
+struct debug_counter_state{
+	char* FileName;
+	char* BlockName;
+
+	uint32 LineNumber;
 };
 
 struct debug_frame{

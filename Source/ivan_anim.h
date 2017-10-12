@@ -31,124 +31,82 @@ struct joint_animation{
 	uint32 ScalingFramesCount;
 };
 
-enum skeletal_animation_type{
-	SkAnimationType_Looping,
-	SKAnimationType_StopAtEnd,
+enum playing_animation_type{
+	PlayingAnimation_Looping,
+	PlayingAnimation_StopAtEnd,
 };
 
 struct loaded_animation{
 	joint_animation* JointAnims;
 	uint32 JointAnimsCount;
 
-	uint8 Type;
-
 	float Length;
-	float PlayCursorTime;
-	float PlaybackSpeed;
-  
+
     float TicksPerSecond;
 };
 
-inline mat4 InterpolateTranslation(float Time, joint_animation* JointAnim){
-	vec3 Translation;
+struct playing_animation{
+	loaded_animation* Animation;
 
-	if(JointAnim->TranslationFramesCount == 1){
-		Translation = JointAnim->TranslationFrames[0].Translation;
-	}
-	else{
-		uint32 CurrentFrameIndex = 0;
-		for(uint32 FrameIndex = 0;
-			FrameIndex < JointAnim->TranslationFramesCount - 1;
-			FrameIndex++)
-		{
-			if(Time < JointAnim->TranslationFrames[FrameIndex + 1].TimeStamp){
-				CurrentFrameIndex = FrameIndex;
-				break;
-			}
-		}
+	float PlayCursorTime;
+	float PlaybackSpeed;	
 
-		translation_key_frame* CurrentFrame = &JointAnim->TranslationFrames[CurrentFrameIndex];
-		translation_key_frame* NextFrame = &JointAnim->TranslationFrames[CurrentFrameIndex + 1];
+	uint8 Type;
 
-		float Delta = (Time - CurrentFrame->TimeStamp) / (NextFrame->TimeStamp - CurrentFrame->TimeStamp);
+	animation_id ID;
+};
 
-		Translation = Lerp(CurrentFrame->Translation, NextFrame->Translation, Delta);
-	}
+#define TEMP_ANIMATIONS_COUNT 32
 
-	mat4 ResultTransl = TranslationMatrix(Translation);
+struct temp_animation_slot{
+	volatile uint32 InUse;
 
-	return(ResultTransl);
+	loaded_animation* Animation;
+};
+
+struct animation_node{
+	playing_animation Animation;
+
+	animation_node* NextInList;
+	animation_node* PrevInList;
+};
+
+inline void InitializeAnimationNode(animation_node* Node, playing_animation* Animation){
+	Node->Animation = Animation;
+	Node->NextInList = 0;
+	Node->PrevInList = 0;
 }
 
-inline mat4 InterpolateRotation(float Time, joint_animation* JointAnim){
-	quat Rotation;
+struct animator_controller{
+	game_assets* Assets;
 
-	if(JointAnim->RotationFramesCount == 1){
-		Rotation = JointAnim->RotationFrames[0].Rotation;
-	}
-	else{
-		uint32 CurrentFrameIndex = 0;
-		for(uint32 FrameIndex = 0;
-			FrameIndex < JointAnim->RotationFramesCount - 1;
-			FrameIndex++)
-		{
-			if(Time < JointAnim->RotationFrames[FrameIndex + 1].TimeStamp){
-				CurrentFrameIndex = FrameIndex;
-				break;
-			}
-		}
+	memory_arena Arena;
 
-		rotation_key_frame* CurrentFrame = &JointAnim->RotationFrames[CurrentFrameIndex];
-		rotation_key_frame* NextFrame = &JointAnim->RotationFrames[CurrentFrameIndex + 1];
+	animation_node* FirstSentinel;
+	animation_node* FirstFreeSentinel;
 
-		Rotation = Slerp(CurrentFrame->Rotation, NextFrame->Rotation, Delta);
+	uint32 GenerationID;
+};
 
-	}
-	
-	mat4 ResultRot = RotationMatrix(Rotation);
+inline void InsertAnimationNodeAtFront(animator_controller* Controller, animation_node* Node){
+	Node->NextInList = Controller->FirstSentinel->NextInList;
+	Node->PrevInList = Controller->FirstSentinel;
 
-	return(ResultRot);
+	Node->NextInList->PrevInList = Node;
+	Node->PrevInList->NextInList = Node;
 }
 
-inline mat4 InterpolateScaling(float Time, joint_animation* JointAnim){
-	vec3 Scaling;
+inline void RemoveAnimationNode(animator_controller* Controller, animation_node* Node){
+	/*Removing from animations list*/
+	Node->NextInList->PrevInList = Node->PrevInList;
+	Node->PrevInList->NextInList = Node->NextInList;
 
-	if(JointAnim->ScalingFramesCount == 1){
-		Scaling = JointAnim->ScalingFrames[0].Scale;
-	}
-	else{
-		uint32 CurrentFrameIndex = 0;
-		for(uint32 FrameIndex = 0;
-			FrameIndex < JointAnim->ScalingFramesCount - 1;
-			FrameIndex++)
-		{
-			if(Time < JointAnim->ScalingFrames[FrameIndex + 1].TimeStamp){
-				CurrentFrameIndex = FrameIndex;
-				break;
-			}
-		}
-		
-		scaling_key_frame* CurrentFrame = &JointAnim->ScalingFrames[CurrentFrameIndex];
-		scaling_key_frame* NextFrame = &JointAnim->ScalingFrames[CurrentFrameIndex + 1];
+	/*Adding node to free animation list*/
+	Node->NextInList = Controller->FirstFreeSentinel->NextInList;
+	Node->PrevInList = Controller->FirstFreeSentinel;
 
-		Scaling = Lerp(CurrentFrame->Scale, NextFrame->Scale, Delta);
-	}
-	
-	mat4 ResultScale = ScalingMatrix(Scaling);
-
-	return(ResultScale);
-}
-
-inline mat4 InterpolateFrames(float Time, joint_animation* JointAnim){
-	mat4 Transform;
-
-	mat4 ResultTransl = InterpolateTranslation(Time, JoinAnim);
-	mat4 ResultRot = InterpolateRotation(Time, JoinAnim);
-	mat4 ResultScale = InterpolateScaling(Time, JoinAnim);
-
-	Transform = ResultTransl * ResultRot * ResultScale;
-	
-	return(Transform);	
+	Node->NextInList->PrevInList = Node;
+	Node->PrevInList->NextInList = Node;
 }
 
 #define IVAN_ANIM_H

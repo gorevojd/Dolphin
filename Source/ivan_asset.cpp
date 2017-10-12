@@ -609,8 +609,6 @@ INTERNAL_FUNCTION LoadAnimationAsset(game_assets, animation_id ID, bool32 Immedi
                 loaded_animation* Animation = &Asset->Header.Animation;
                 Animation->JointAnimsCount = Info->JointAnimsCount;
                 Animation->Length = Info->LengthTime;
-                Animation->PlayCursorTime = 0.0f;
-                Animation->PlaybackSpeed = 1.0f;
                 Animation->TicksPerSecond = Info->TicksPerSecond;
 
                 for(uint32 JointAnimIndex = 0;
