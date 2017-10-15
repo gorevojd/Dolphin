@@ -2,6 +2,7 @@ enum finalize_asset_operation{
     FinalizeAsset_None,
     FinalizeAsset_Font,
     FinalizeAsset_Bitmap,
+    FinalizeAsset_Animation,
 };
 
 struct load_asset_work{
@@ -54,22 +55,36 @@ INTERNAL_FUNCTION void LoadAssetWorkDirectly(load_asset_work* Work){
                 loaded_animation* Animation = &Work->Asset->Header->Animation;
                 dda_animation* DDA = &Work->Asset->DDA.Animation;
 
-                uint32 JointAnimBase = 0;
+                uint8* At = (uint8*)Work->Destination;
+
+                uint32 CurrentFramesArraysCount = 0;
+
                 for(uint32 JointAnimIndex = 0;
                     JointAnimIndex < Animation->JointAnimsCount;
                     JointAnimIndex++)
                 {
                     joint_animation* Dst = &Animation->JointAnims[JointAnimIndex];
-                    dda_joint_frames_info* Src = &DDA->JointAnims[JointAnimIndex];
 
-                    Dst->TranslationFrames = (uint8*)Work->Destination + JointAnimBase;
-                    Dst->RotationFrames = Dst->TranslationFrames + Src->TranslationFramesByteSize;
-                    Dst->ScalingFrames = Dst->RotationFrames + Src->RotationFramesByteSize;
+                    dda_joint_frames_header* MyTempHeader = (dda_joint_frames_header*)At;
+                    At += sizeof(dda_joint_frames_header);
+                    Assert(MyTempHeader->Type == JointFrameHeader_Translation);
+                    Dst->TranslationFrames = (translation_key_frame*)At;
+                    Dst->TranslationFramesCount = MyTempHeader->BytesLength / sizeof(translation_key_frame);
+                    At += MyTempHeader->BytesLength;
 
-                    JointAnimBase += 
-                        (Src->TranslationFramesByteSize + 
-                        Src->RotationFramesByteSize +
-                        Src->ScalingFramesByteSize);
+                    MyTempHeader = (dda_joint_frames_header*)At;
+                    At += sizeof(dda_joint_frames_header);
+                    Assert(MyTempHeader->Type == JointFrameHeader_Rotation);
+                    Dst->RotationFrames = (rotation_key_frame*)At;
+                    Dst->RotationFramesCount = MyTempHeader->BytesLength / sizeof(rotation_key_frame);
+                    At += MyTempHeader->BytesLength;
+
+                    MyTempHeader = (dda_joint_frames_header*)At;
+                    At += sizeof(dda_joint_frames_header);
+                    Assert(MyTempHeader->Type == JointFrameHeader_Scaling);
+                    Dst->ScalingFrames = (scaling_key_frame*)At;
+                    Dst->ScalingFramesCount = MyTempHeader->BytesLength / sizeof(scaling_key_frame);
+                    At += MyTempHeader->BytesLength;
                 }
             }break;
 
@@ -568,7 +583,9 @@ LoadVoxelAtlasAsset(game_assets* Assets, voxel_atlas_id ID, bool32 Immediate){
     }
 }
 
-INTERNAL_FUNCTION LoadAnimationAsset(game_assets, animation_id ID, bool32 Immediate){
+INTERNAL_FUNCTION void 
+LoadAnimationAsset(game_assets* Assets, animation_id ID, bool32 Immediate)
+{
     TIMED_FUNCTION();
 
     asset* Asset = Assets->Assets + ID.Value;
@@ -587,41 +604,15 @@ INTERNAL_FUNCTION LoadAnimationAsset(game_assets, animation_id ID, bool32 Immedi
             if(Immediate || Task){
                 dda_animation* Info = &Asset->DDA.Animation;
 
-                uint32 JointAnimsSize = 0;
-                for(uint32 JointAnimIndex = 0;
-                    JointAnimIndex < Info->JointAnimsCount;
-                    JointAnimIndex++)
-                {
-                    dda_joint_frames_info* Src = &Info->JointAnims[JointAnimIndex];
-
-                    JointAnimsSize += sizeof(joint_animation);
-
-                    JointAnimsSize += Src->TranslationFramesByteSize;
-                    JointAnimsSize += Src->RotationFramesByteSize;
-                    JointAnimsSize += Src->ScalingFramesByteSize;
-                }
-
-                uint32 SizeOfData = JointAnimsSize;
+                uint32 SizeOfData = Info->TotalFileSize;
                 uint32 SizeTotal = SizeOfData + sizeof(asset_memory_header);
 
                 Asset->Header = RequestAssetMemory(Assets, SizeTotal, ID.Value, AssetType_Animation);
 
-                loaded_animation* Animation = &Asset->Header.Animation;
+                loaded_animation* Animation = &Asset->Header->Animation;
                 Animation->JointAnimsCount = Info->JointAnimsCount;
                 Animation->Length = Info->LengthTime;
                 Animation->TicksPerSecond = Info->TicksPerSecond;
-
-                for(uint32 JointAnimIndex = 0;
-                    JointAnimIndex < Info->JointAnimsCount;
-                    JointAnimIndex++)
-                {
-                    joint_animation* Dst = &Animation->JointAnims[JointAnimIndex];
-                    dda_joint_frames_info* Src = &Info->JointAnims[JointAnimIndex];
-
-                    Dst->TranslationFramesByteSize = Src->TranslationFramesByteSize / sizeof(translation_key_frame);
-                    Dst->RotationFramesByteSize = Src->RotationFramesByteSize / sizeof(rotation_key_frame);
-                    Dst->ScalingFramesByteSize = Src->ScalingFramesByteSize / sizeof(scaling_key_frame);
-                }
 
                 load_asset_work Work;
                 Work.Task = Task;

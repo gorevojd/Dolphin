@@ -246,6 +246,40 @@ struct debug_state{
 	char ToolTipText[16][256];
 };
 
+struct debug_statistic{
+	real64 Min;
+	real64 Max;
+	real64 Sum;
+	real64 Avg;
+	uint32 Count;
+};
+
+INTERNAL_FUNCTION debug_variable_link* CloneVariableLink(
+	debug_state* DebugState, 
+	debug_variable_link* DestGroup, 
+	debug_variable_link* Source);
+
+INTERNAL_FUNCTION debug_variable_link* CloneVariableLink(
+	debug_state* DebugState,
+	debug_variable_link* Source);
+
+INTERNAL_FUNCTION debug_variable_link* CloneVariableLink(
+	debug_state* DebugState,
+	uint32 NameLength, char* Name);
+
+inline bool32 
+DebugIDsAreEqual(debug_id A, debug_id B){
+	bool32 Result = ((A.Value[0] == B.Value[0]) &&
+		(A.Value[1] == B.Value[1]));
+
+	return(Result);
+}
+
+
+enum debug_element_add_op{
+	DebugElement_AddToGroup = 0x1,
+	DebugElement_CreateHierarchy = 0x2,
+};
 #endif
 
 #endif

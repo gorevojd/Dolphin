@@ -190,7 +190,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
 
         TranState->Assets = AllocateGameAssets(&TranState->TranArena, IVAN_MEGABYTES(64), TranState, &Memory->TextureOpQueue);
-        InitializeAnimatorController(&GameState->AnimatorController, , TranState->Assets);
+        //InitializeAnimatorController(&GameState->AnimatorController, , TranState->Assets);
         //InitParticleCache(&GameState->FontainCache, TranState->Assets);
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));

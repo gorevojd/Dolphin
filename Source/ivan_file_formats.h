@@ -74,17 +74,24 @@ struct dda_sound{
 	dda_sound_chain Chain;
 };
 
-struct dda_joint_frames_info{
-	uint32 TranslationFramesByteSize;
-	uint32 RotationFramesByteSize;
-	uint32 ScalingFramesByteSize;
+enum dda_joint_frames_header_type{
+	JointFrameHeader_Translation,
+	JointFrameHeader_Rotation,
+	JointFrameHeader_Scaling,
+};
+
+struct dda_joint_frames_header{
+	uint8 Type;
+
+	uint32 BytesLength;
 };
 
 
 #define DDA_ANIMATION_MAX_BONE_COUNT 256
 struct dda_animation{
-	dda_joint_frames_info JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
+	//dda_joint_frames_info JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
 	uint32 JointAnimsCount;
+	uint32 TotalFileSize;
 
     float LengthTime;
 

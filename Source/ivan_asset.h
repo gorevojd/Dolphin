@@ -29,6 +29,15 @@ struct loaded_voxel_atlas{
 	int32 OneTextureWidth;
 };
 
+struct loaded_animation{
+	struct joint_animation* JointAnims;
+	uint32 JointAnimsCount;
+
+	float Length;
+
+    float TicksPerSecond;
+};
+
 enum asset_header_type{
 	AssetType_None,
 	AssetType_Bitmap,
@@ -227,7 +236,7 @@ inline dda_sound* GetSoundInfo(game_assets* Assets, sound_id ID){
 	return(Result);
 }
 
-inline loaded_animation* GetAnimation(game_assets* Assets, animation_id ID, GenerationID){
+inline loaded_animation* GetAnimation(game_assets* Assets, animation_id ID, uint32 GenerationID){
 	asset_memory_header* Header = GetAsset(Assets, ID.Value, GenerationID);
 	
 	loaded_animation* Result = Header ? &Header->Animation : 0;

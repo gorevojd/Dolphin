@@ -1,8 +1,27 @@
 #define VOXEL_HASH_TABLE_SIZE 1024
 
-#define IVAN_VOXEL_GENERATOR_BIOMS 0
+#define IVAN_VOXEL_GENERATOR_BIOMS 1
 #define IVAN_VOXEL_GENERATOR_TREES 1
 #define IVAN_VOXEL_WORLD_FRUSTUM_CULLING 1
+
+INTERNAL_FUNCTION void BuildColumnForChunk(
+	voxel_chunk* Chunk, 
+	int32 LocalXIndex, 
+	int32 LocalZIndex, 
+	uint32 StartHeight, 
+	uint32 Height,
+	uint8 Material)
+{
+	if((LocalXIndex >= 0 && LocalXIndex < IVAN_VOXEL_CHUNK_WIDTH) &&
+		(LocalZIndex >= 0 && LocalZIndex < IVAN_VOXEL_CHUNK_WIDTH))
+	{
+		for(int k = StartHeight; k < StartHeight + Height; k++){
+			if(k < IVAN_VOXEL_CHUNK_HEIGHT){
+				Chunk->Voxels[k * IVAN_VOXEL_CHUNK_LAYER_COUNT + LocalZIndex * IVAN_VOXEL_CHUNK_WIDTH + LocalXIndex] = Material;
+			}
+		}
+	}
+}
 
 INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Series){
 
@@ -37,9 +56,9 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
 
 			float Noise3 = stb_perlin_noise3(
-				(float)(ChunkPos.x + i) / 1024.0f, 
-				(float)ChunkPos.y / 1024.0f, 
-				(float)(ChunkPos.z + j) / 1024.0f, 0, 0, 0);
+				(float)(ChunkPos.x + i) / 256.0f, 
+				(float)ChunkPos.y / 256.0f, 
+				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
 
 #if IVAN_VOXEL_GENERATOR_BIOMS
 			float BiomNoise = stb_perlin_noise3(
@@ -60,8 +79,13 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				GroundIndex = VoxelMaterial_Sand;
 			}
 			else if(BiomNoise >= 0.1f && BiomNoise < 0.6f){
+#if 0
 				DirtIndex = VoxelMaterial_Ground;
 				GroundIndex = VoxelMaterial_GrassyGround;
+#else
+				DirtIndex = VoxelMaterial_Ground;
+				GroundIndex = VoxelMaterial_GrassyGround;
+#endif
 			}
 #endif
 
@@ -102,11 +126,86 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				Chunk->Voxels[VoxelIndex] == VoxelMaterial_SnowGround ||
 				Chunk->Voxels[VoxelIndex] == VoxelMaterial_WinterGround)
 			{
+#if 0
 				for(int k = StartHeight; k < StartHeight + 8; k++){
 					if(k < 256){
 						Chunk->Voxels[k * IVAN_VOXEL_CHUNK_LAYER_COUNT + i] = VoxelMaterial_Tree;
 					}
 				}
+#else
+				int32 XIndex = i & (IVAN_VOXEL_CHUNK_WIDTH - 1);
+				int32 YIndex = i / IVAN_VOXEL_CHUNK_WIDTH;
+
+				BuildColumnForChunk(Chunk, 
+					XIndex, 
+					YIndex,
+					StartHeight,
+					8,
+					VoxelMaterial_Tree);
+
+				BuildColumnForChunk(Chunk,
+					XIndex,
+					YIndex,
+					StartHeight + 8,
+					2,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex + 1,
+					YIndex,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex - 1,
+					YIndex,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex,
+					YIndex + 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex,
+					YIndex - 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex + 1,
+					YIndex + 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex + 1,
+					YIndex - 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex - 1,
+					YIndex - 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+
+				BuildColumnForChunk(Chunk,
+					XIndex - 1,
+					YIndex + 1,
+					StartHeight + 4,
+					6,
+					VoxelMaterial_Leaves);
+#endif
 			}
 		}
 	}
@@ -503,8 +602,7 @@ UpdateVoxelChunks(
 
 			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
 
-				if(Index->MeshTask && Index->MeshState != VoxelMeshState_InProcess){
-					IVAN_COMPLETE_READS_BEFORE_FUTURE;
+				if(Index->MeshTask && Index->MeshState == VoxelMeshState_Generated){
 					Index->MeshState = VoxelMeshState_Unloaded;
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
@@ -722,7 +820,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 			}
 
 
-			if(Index->MeshState == VoxelMeshState_Generated && Index->MeshTask){					
+			if(Index->MeshState == VoxelMeshState_Generated && Index->MeshTask){
 				vec4* Planes = Work->RenderGroup->LastRenderSetup.Planes;
 
 				int32_t TestResult = 1;

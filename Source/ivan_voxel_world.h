@@ -59,8 +59,8 @@ struct voxel_chunk_header{
 	struct task_with_memory* ChunkTask;
 	struct task_with_memory* MeshTask;
 
-	voxel_chunk_state ChunkState;
-	voxel_mesh_state MeshState;
+	volatile voxel_chunk_state ChunkState;
+	volatile voxel_mesh_state MeshState;
 
 	int32_t IsSentinel;
 	int32_t NeedsToBeGenerated;

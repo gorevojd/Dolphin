@@ -281,7 +281,7 @@ inline void PushRectangle(
     vec4 Color = Vec4(1, 1, 1, 1),
     bool32 ScreenSpace = false)
 {
-    PushRect(Group, Vec3(GetMinCorner(Rect), Z), GetDim(Rect), Color, ScreenSpace);
+    PushRectangle(RenderGroup, Vec3(GetMinCorner(Rect), Z), GetDim(Rect), Color, ScreenSpace);
 }
 
 inline void PushBitmap(

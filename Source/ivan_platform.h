@@ -1,7 +1,7 @@
 #ifndef IVAN_PLATFORM_H
 #define IVAN_PLATFORM_H
 
-#define IVAN_INTERNAL 1
+#define IVAN_INTERNAL 0
 
 
 #include <stdio.h>

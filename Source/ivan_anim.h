@@ -36,15 +36,6 @@ enum playing_animation_type{
 	PlayingAnimation_StopAtEnd,
 };
 
-struct loaded_animation{
-	joint_animation* JointAnims;
-	uint32 JointAnimsCount;
-
-	float Length;
-
-    float TicksPerSecond;
-};
-
 struct playing_animation{
 	loaded_animation* Animation;
 
@@ -70,12 +61,6 @@ struct animation_node{
 	animation_node* NextInList;
 	animation_node* PrevInList;
 };
-
-inline void InitializeAnimationNode(animation_node* Node, playing_animation* Animation){
-	Node->Animation = Animation;
-	Node->NextInList = 0;
-	Node->PrevInList = 0;
-}
 
 struct animator_controller{
 	game_assets* Assets;

@@ -1,5 +1,7 @@
 #ifndef ASSET_BUILDER_H
 
+#define BUILD_WITH_ANIMAITON 0
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -80,13 +82,6 @@ struct loaded_voxel_atlas{
 	uint32 OneTextureWidth;
 };
 
-struct loaded_animations_result{
-    loaded_skeletal_animation* Animations;
-    uint32 AnimationsCount;
-
-    void* Free;
-};
-
 struct translation_key_frame{
     vec3 Translation;
 
@@ -122,8 +117,8 @@ struct joint_animation{
     void* Free;
 };
 
-struct loaded_skeletal_animation{
-    joint_animation* JointAnims;
+struct loaded_animation{
+    joint_animation JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
     uint32 JointAnimsCount;
 
     uint8 Type;
@@ -133,6 +128,13 @@ struct loaded_skeletal_animation{
     float PlaybackSpeed;
 
     float TicksPerSecond;
+};
+
+struct loaded_animations_result{
+    loaded_animation* Animations;
+    uint32 AnimationsCount;
+
+    void* Free;
 };
 
 struct asset_source_font{
@@ -209,7 +211,7 @@ struct game_assets{
 
 struct bone_vertex_info{
 	float Weights[MAX_INFLUENCE_BONE_COUNT];
-	uint32 IDs[MAX_INFLUENCE_BONE_COUNT];
+	uint32 BoneIDs[MAX_INFLUENCE_BONE_COUNT];
 };
 
 inline void AddBoneVertexInfo(bone_vertex_info* Info, float Weight, uint32 BoneID){
@@ -267,6 +269,7 @@ struct loaded_skinned_mesh{
 	uint32 IndicesCount;
 };
 
+#if BUILD_WITH_ANIMAITON
 inline mat4 AiMatToOurs(aiMatrix4x4* aiMatr){
 	mat4 Result;
 
@@ -314,6 +317,7 @@ inline quat AiQuatToOurs(AiQuaternion quater){
 	Result.w = quater.w;
 	return(Result);
 }
+#endif
 
 #define ASSET_BUILDER_H
 #endif

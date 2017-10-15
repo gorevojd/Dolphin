@@ -782,7 +782,7 @@ Offset(rectangle2 A, vec2 Offset){
 inline bool32 
 IsInRectangle(rectangle2 Rectangle, vec2 Test){
 	bool32 Result = 
-		((Test.x >= RectangleMin.x) &&
+		((Test.x >= Rectangle.Min.x) &&
 		(Test.y >= Rectangle.Min.y) && 
 		(Test.x < Rectangle.Max.x) &&
 		(Test.y < Rectangle.Max.y));
@@ -806,7 +806,7 @@ GetDim(rectangle2 Rect){
 	return(Result);
 }
 
-inline rectangle2
+inline vec2
 GetCenter(rectangle2 Rect){
 	vec2 Result = 0.5f * (Rect.Min + Rect.Max);
 	return(Result);

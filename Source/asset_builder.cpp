@@ -179,6 +179,8 @@ enum load_mesh_flags{
     LoadMesh_UseExistingSkeleton = 8,
 };
 
+#if BUILD_WITH_ANIMATION
+
 INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
     aiMesh* Mesh,
     uint32 VertexBase, 
@@ -549,9 +551,7 @@ LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
         }
 
         uint32 BonesCount = Skeleton->Bones.size();
-        uint32 ToAllocateForJoints = sizeof(joint_animation) * BonesCount;
-        DstAnim->JointAnims = (joint_animation*)malloc(ToAllocateForJoints);
-        memset(DstAnim->JointAnims, 0, ToAllocateForJoints);
+        memset(DstAnim->JointAnims, 0, DDA_ANIMATION_MAX_BONE_COUNT * sizeof(joint_animation));
         DstAnim->JointAnimsCount = BonesCount;
 
         LoadJointAnimationFromAssimpRecursively(
@@ -561,6 +561,8 @@ LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
             Skeleton);
     }
 }
+
+#endif
 
 INTERNAL_FUNCTION loaded_font*
 LoadFont(char* FileName, char* FontName, int PixelHeight){
@@ -1186,27 +1188,6 @@ AddVoxelAtlasTextureAsset(game_assets* Assets, loaded_voxel_atlas* Atlas){
 }
 
 
-INTERNAL_FUNCTION void
-FinalizeAnimationAsset(loaded_animation* Animation){
-    for(int JointAnimIndex = 0;
-        JointAnimIndex < Animation->JointAnimsCount;
-        JointAnimIndex++)
-    {
-        joint_animation* SrcDst = &Animation->JointAnims[JointAnimIndex];
-        
-        SrcDst->TranslationFramesByteSize = SrcDst->TranslationFramesCount * sizeof(translation_key_frame);
-        SrcDst->RotationFramesByteSize = SrcDst->RotationFramesCount * sizeof(rotation_key_frame);
-        SrcDst->ScalingFramesByteSize = SrcDst->ScalingFramesCount * sizeof(scaling_key_frame);
-    }
-}
-
-struct dda_joint_frames_info{
-    uint32 TranslationFramesByteSize;
-    uint32 RotationFramesByteSize;
-    uint32 ScalingFramesByteSize;
-};
-
-
 INTERNAL_FUNCTION animation_id 
 AddAnimationAsset(game_assets* Assets, loaded_animation* Animation){
     added_asset Asset = AddAsset(Assets);
@@ -1217,18 +1198,6 @@ AddAnimationAsset(game_assets* Assets, loaded_animation* Animation){
     Asset.DDA->Animation.JointAnimsCount = Animation->JointAnimsCount;
     Asset.DDA->Animation.LengthTime = Animation->LengthTime;
     Asset.DDA->Animation.TicksPerSecond = Animation->TicksPerSecond;
-
-    for(int JointAnimIndex = 0;
-        JointAnimIndex < Animation->JointAnimsCount;
-        JointAnimIndex++)
-    {
-        dda_joint_frames_info* Dst = &Asset.DDA->Animation.JointAnims;
-        joint_animation* Src = &Animation->JointAnims[JointAnimIndex];
-        
-        Dst->TranslationFramesByteSize = Src->TranslationFramesCount * sizeof(translation_key_frame);
-        Dst->RotationFramesByteSize = Src->RotationFramesCount * sizeof(rotation_key_frame);
-        Dst->ScalingFramesByteSize = Src->ScalingFramesCount * sizeof(scaling_key_frame);
-    }
 
     animation_id Result = {Asset.ID};
     return(Result);
@@ -1492,7 +1461,7 @@ WriteDDA(game_assets* Assets, char* FileName){
 
                     Assert(Anim->JointAnimsCount <= DDA_ANIMATION_MAX_BONE_COUNT);
 
-                    FinalizeAnimationAsset(Anim);
+                    uint32 TotalFileSize = 0;
 
                     for(uint32 JointAnimIndex = 0;
                         JointAnimIndex < Anim->JointAnimsCount;
@@ -1500,12 +1469,30 @@ WriteDDA(game_assets* Assets, char* FileName){
                     {
                         joint_animation* JointAnim = &Anim->JointAnims[JointAnimIndex];
 
+                        dda_joint_frames_header TempHeader;
+
+                        TempHeader.BytesLength = JointAnim->TranslationFramesByteSize;
+                        TempHeader.Type = JointFrameHeader_Translation;
+                        fwrite(&TempHeader, sizeof(dda_joint_frames_header), 1, fp);
                         fwrite(JointAnim->TranslationFrames, JointAnim->TranslationFramesByteSize, 1, fp);
+                        TotalFileSize += (sizeof(dda_joint_frames_header) + JointAnim->TranslationFramesByteSize);
+
+                        TempHeader.BytesLength = JointAnim->RotationFramesByteSize;
+                        TempHeader.Type = JointFrameHeader_Rotation;
+                        fwrite(&TempHeader, sizeof(dda_joint_frames_header), 1, fp);
                         fwrite(JointAnim->RotationFrames, JointAnim->RotationFramesByteSize, 1, fp);
+                        TotalFileSize += (sizeof(dda_joint_frames_header) + JointAnim->RotationFramesByteSize);
+
+                        TempHeader.BytesLength = JointAnim->ScalingFramesByteSize;
+                        TempHeader.Type = JointFrameHeader_Scaling;
+                        fwrite(&TempHeader, sizeof(dda_joint_frames_header), 1, fp);
                         fwrite(JointAnim->ScalingFrames, JointAnim->ScalingFramesByteSize, 1, fp);
+                        TotalFileSize = (sizeof(dda_joint_frames_header) + JointAnim->ScalingFramesByteSize);
 
                         free(JointAnim->Free);
                     }
+
+                    DDA->Animation.TotalFileSize = TotalFileSize;
 
                 }break;
 
@@ -1566,6 +1553,7 @@ INTERNAL_FUNCTION void Initialize(game_assets* Assets){
 }
 
 INTERNAL_FUNCTION void WriteAnimations(){
+#if BUILD_WITH_ANIMATION
     game_assets Assets_;
     game_assets* Assets = &Assets_;
     Initialize(Assets);
@@ -1590,6 +1578,7 @@ INTERNAL_FUNCTION void WriteAnimations(){
 
     WriteDDA(Assets, "../Data/asset_pack_animations.dda");
     printf("Animation assets written successfully :D");
+#endif
 }
 
 INTERNAL_FUNCTION void WriteFonts(){
@@ -1887,6 +1876,7 @@ int main(int ArgCount, char** Args){
     WriteSounds();
     WriteFonts();
     WriteVoxelAtlases();
+
     WriteAnimations();
 
     system("pause");
