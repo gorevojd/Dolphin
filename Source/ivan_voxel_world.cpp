@@ -509,19 +509,28 @@ UpdateVoxelChunks(
 			if((IVAN_CHUNK_ABS(IndX - Index->Chunk->HorizontalIndex) > Manager->ChunksViewDistance) ||
 				(IVAN_CHUNK_ABS(IndY - Index->Chunk->VerticalIndex) > Manager->ChunksViewDistance))
 			{
-				Index->Prev->Next = Index->Next;
-				Index->Next->Prev = Index->Prev;
 
-				IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
-
-				if(Index->ChunkTask && (Index->ChunkState != VoxelChunkState_InProcess)){
+				if(Index->ChunkTask && (Index->ChunkState == VoxelChunkState_Generated)){
 					EndTaskWithMemory(Index->ChunkTask);
 				}
 
-				if(Index->MeshTask && (Index->MeshState != VoxelMeshState_InProcess)){
+				if(Index->MeshTask && (Index->MeshState == VoxelMeshState_Generated)){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
 				}
+
+				if(Index->ChunkState == VoxelChunkState_Generated &&
+					Index->MeshState == VoxelMeshState_Generated)
+				{
+					Index->Prev->Next = Index->Next;
+					Index->Next->Prev = Index->Prev;
+					
+					Index->Next = Manager->FirstFreeSentinel->Next;
+					Index->Prev = Manager->FirstFreeSentinel;
+					Index->Next->Prev = Index;
+					Index->Prev->Next = Index;
+				}
+
 			}
 		}
 	}
@@ -559,7 +568,18 @@ UpdateVoxelChunks(
 				KeyToFind);
 
 			if(!FoundPair){
-				voxel_chunk_header* NewHeader = PushStruct(&Manager->ListArena, voxel_chunk_header);
+				voxel_chunk_header* NewHeader;
+
+				if(!Manager->FirstFreeSentinel->Next->IsSentinel){
+					NewHeader = Manager->FirstFreeSentinel->Next;
+
+					NewHeader->Next->Prev = NewHeader->Prev;
+					NewHeader->Prev->Next = NewHeader->Next;
+				}
+				else{
+					NewHeader = PushStruct(&Manager->ListArena, voxel_chunk_header);
+				}
+
 				NewHeader->IsSentinel = false;
 				NewHeader->Chunk = PushStruct(&Manager->ListArena, voxel_chunk);
 				NewHeader->Mesh = PushStruct(&Manager->ListArena, voxel_chunk_mesh);
@@ -764,8 +784,8 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 				else{
 					NewHeader = Context->FirstFreeSentinel->Next;
 
-					Context->FirstFreeSentinel->Next = NewHeader->Next;
-					NewHeader->Next->Prev = Context->FirstFreeSentinel;
+					NewHeader->Prev->Next = NewHeader->Next;
+					NewHeader->Next->Prev = NewHeader->Prev;
 				}
 				NewHeader->IsSentinel = false;
 				NewHeader->Chunk = PushStruct(&Context->ListArena, voxel_chunk);
@@ -962,9 +982,15 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     Result->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
 
     Result->VoxelChunkSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
+    Result->FirstFreeSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
+
     Result->VoxelChunkSentinel->Next = Result->VoxelChunkSentinel;
     Result->VoxelChunkSentinel->Prev = Result->VoxelChunkSentinel;
     Result->VoxelChunkSentinel->IsSentinel = true;
+
+    Result->FirstFreeSentinel->Next = Result->FirstFreeSentinel;
+    Result->FirstFreeSentinel->Prev = Result->FirstFreeSentinel;
+    Result->FirstFreeSentinel->IsSentinel = true;
 
     Result->RandomSeries = RandomSeed(123);
     Result->ChunksViewDistance = 20;
