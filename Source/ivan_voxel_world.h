@@ -98,6 +98,8 @@ struct voxel_chunk_thread_context{
 
 struct voxel_chunk_manager{
 	voxel_chunk_header* VoxelChunkSentinel;
+	voxel_chunk_header* FirstFreeSentinel;
+
 	ticket_mutex ListMutex;
 	ticket_mutex ListArenaMutex;
 	ticket_mutex HashTableMutex;
@@ -123,17 +125,9 @@ struct voxel_chunk_manager{
 	voxel_chunk_thread_context Contexts[IVAN_VOXEL_CHUNK_CONTEXTS_COUNT];
 };
 
-inline void InsertChunkHeaderAtFront(voxel_chunk_manager* Manager, voxel_chunk_header* Header){
-	Header->Prev = Manager->VoxelChunkSentinel;
-	Header->Next = Manager->VoxelChunkSentinel->Next;
-
-	Header->Prev->Next = Header;
-	Header->Next->Prev = Header;
-}
-
-inline void InsertChunkHeaderAtFront(voxel_chunk_thread_context* Context, voxel_chunk_header* Header){
-	Header->Prev = Context->VoxelChunkSentinel;
-	Header->Next = Context->VoxelChunkSentinel->Next;
+inline void InsertChunkHeaderAtFront(voxel_chunk_header* Sentinel, voxel_chunk_header* Header){
+	Header->Prev = Sentinel;
+	Header->Next = Sentinel->Next;
 
 	Header->Prev->Next = Header;
 	Header->Next->Prev = Header;

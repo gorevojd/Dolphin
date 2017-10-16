@@ -1,6 +1,6 @@
  ivan
 
- Timestamp is 59e3051b (Sun Oct 15 10:50:03 2017)
+ Timestamp is 59e49529 (Mon Oct 16 15:16:57 2017)
 
  Preferred load address is 0000000180000000
 
@@ -68,75 +68,75 @@
  0001:00006660       stb_perlin_ridge_noise3    0000000180007660 f   ivan.obj
  0001:00006810       stb_perlin_fbm_noise3      0000000180007810 f   ivan.obj
  0001:00006930       stb_perlin_turbulence_noise3 0000000180007930 f   ivan.obj
- 0001:0000c610       GameUpdateAndRender        000000018000d610 f   ivan.obj
- 0001:0000dc80       GameGetSoundSamples        000000018000ec80 f   ivan.obj
- 0001:0000dce0       ??$__vcrt_va_start_verify_argument_type@QEB_W@@YAXXZ 000000018000ece0 f i libucrtd:dbgrpt.obj
- 0001:0000dce0       ??$__vcrt_va_start_verify_argument_type@PEBD@@YAXXZ 000000018000ece0 f i ivan.obj
- 0001:0000dce0       ??$__vcrt_va_start_verify_argument_type@QEBD@@YAXXZ 000000018000ece0 f i libvcruntimed:undname.obj
- 0001:0000dcf0       ??4ticket_mutex@@QEAAAEAU0@$$QEAU0@@Z 000000018000ecf0 f i ivan.obj
- 0001:0000dd30       ??D@YA?ATvec2@@MT0@@Z      000000018000ed30 f i ivan.obj
- 0001:0000dd80       ??D@YA?ATvec2@@T0@M@Z      000000018000ed80 f i ivan.obj
- 0001:0000ddd0       ??D@YA?ATvec3@@MT0@@Z      000000018000edd0 f i ivan.obj
- 0001:0000de70       ??D@YA?ATvec3@@T0@M@Z      000000018000ee70 f i ivan.obj
- 0001:0000df10       ??D@YA?ATvec4@@T0@M@Z      000000018000ef10 f i ivan.obj
- 0001:0000dfb0       ??D@YA?AUmat4@@U0@0@Z      000000018000efb0 f i ivan.obj
- 0001:0000e050       ??D@YA?AUvolume_v2@@MU0@@Z 000000018000f050 f i ivan.obj
- 0001:0000e0b0       ??G@YA?ATvec3@@T0@0@Z      000000018000f0b0 f i ivan.obj
- 0001:0000e160       ??H@YA?ATvec2@@T0@0@Z      000000018000f160 f i ivan.obj
- 0001:0000e1b0       ??H@YA?ATvec3@@T0@0@Z      000000018000f1b0 f i ivan.obj
- 0001:0000e260       ??Y@YAAEATvec3@@AEAT0@T0@@Z 000000018000f260 f i ivan.obj
- 0001:0000e310       ??Z@YAAEATvec3@@AEAT0@T0@@Z 000000018000f310 f i ivan.obj
- 0001:0000e3c0       ?Add@@YA?ATvec2@@T1@0@Z    000000018000f3c0 f i ivan.obj
- 0001:0000e400       ?Add@@YA?ATvec3@@T1@0@Z    000000018000f400 f i ivan.obj
- 0001:0000e490       ?AddAssetHeaderToList@@YAXPEAUgame_assets@@IUasset_memory_size@@@Z 000000018000f490 f i ivan.obj
- 0001:0000e4f0       ?AtomicAddU64@@YA_KPEC_K_K@Z 000000018000f4f0 f i ivan.obj
- 0001:0000e520       ?AtomicCompareExchangeU32@@YAIPECIII@Z 000000018000f520 f i ivan.obj
- 0001:0000e560       ?BeginAssetLock@@YAXPEAUgame_assets@@@Z 000000018000f560 f i ivan.obj
- 0001:0000e5a0       ?BeginGeneration@@YAIPEAUgame_assets@@@Z 000000018000f5a0 f i ivan.obj
- 0001:0000e630       ?BeginRenderGroup@@YA?AUrender_group@@PEAUgame_assets@@PEAUgame_render_commands@@I@Z 000000018000f630 f i ivan.obj
- 0001:0000e740       ?BeginTaskWithMemory_@@YAPEAUtask_with_memory@@PEAU1@H@Z 000000018000f740 f i ivan.obj
- 0001:0000e810       ?BeginTemporaryMemory@@YA?AUtemporary_memory@@PEAUmemory_arena@@@Z 000000018000f810 f i ivan.obj
- 0001:0000e870       ?BeginTicketMutex@@YAXPEAUticket_mutex@@@Z 000000018000f870 f i ivan.obj
- 0001:0000e8b0       ?CameraTransform@@YA?AUmat4@@Tvec3@@000@Z 000000018000f8b0 f i ivan.obj
- 0001:0000ea40       ?Cos@@YAMM@Z               000000018000fa40 f i ivan.obj
- 0001:0000ea70       ?Cross@@YA?ATvec3@@T1@0@Z  000000018000fa70 f i ivan.obj
- 0001:0000eb60       ?DoFaceWorkAtBack@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 000000018000fb60 f i ivan.obj
- 0001:0000ee20       ?DoFaceWorkAtBottom@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 000000018000fe20 f i ivan.obj
- 0001:0000f0e0       ?DoFaceWorkAtFront@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 00000001800100e0 f i ivan.obj
- 0001:0000f3a0       ?DoFaceWorkAtLeft@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 00000001800103a0 f i ivan.obj
- 0001:0000f660       ?DoFaceWorkAtRight@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 0000000180010660 f i ivan.obj
- 0001:0000f920       ?DoFaceWorkAtTop@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 0000000180010920 f i ivan.obj
- 0001:0000fbe0       ?Dot@@YAMTvec2@@0@Z        0000000180010be0 f i ivan.obj
- 0001:0000fc10       ?Dot@@YAMTvec3@@0@Z        0000000180010c10 f i ivan.obj
- 0001:0000fc60       ?EndAssetLock@@YAXPEAUgame_assets@@@Z 0000000180010c60 f i ivan.obj
- 0001:0000fc80       ?EndGeneration@@YAXPEAUgame_assets@@I@Z 0000000180010c80 f i ivan.obj
- 0001:0000fd30       ?EndTemporaryMemory@@YAXUtemporary_memory@@@Z 0000000180010d30 f i ivan.obj
- 0001:0000fda0       ?EndTicketMutex@@YAXPEAUticket_mutex@@@Z 0000000180010da0 f i ivan.obj
- 0001:0000fdd0       ?FindPairInVoxelHashTable@@YAPEAUvoxel_table_pair@@PEAPEAU1@I_K@Z 0000000180010dd0 f i ivan.obj
- 0001:0000fe60       ?FreeVoxelHashTable@@YAXPEAPEAUvoxel_table_pair@@I@Z 0000000180010e60 f i ivan.obj
- 0001:0000fee0       ?FreeVoxelMeshGenerationQueue@@YAXPEAUvoxel_mesh_generation_queue@@@Z 0000000180010ee0 f i ivan.obj
- 0001:0000ff30       ?GenerateKeyForChunkIndices@@YA_KHH@Z 0000000180010f30 f i ivan.obj
- 0001:0000ff60       ?GetAlignmentOffset@@YA_KPEAUmemory_arena@@_K@Z 0000000180010f60 f i ivan.obj
- 0001:0000ffe0       ?GetAsset@@YAPEAUasset_memory_header@@PEAUgame_assets@@II@Z 0000000180010fe0 f i ivan.obj
- 0001:000100b0       ?GetBestMatchVoxelAtlasFrom@@YA?AUvoxel_atlas_id@@PEAUgame_assets@@W4asset_type_id@@PEAUasset_vector@@2@Z 00000001800110b0 f i ivan.obj
- 0001:000100b0       ?GetBestMatchBitmapFrom@@YA?AUbitmap_id@@PEAUgame_assets@@W4asset_type_id@@PEAUasset_vector@@2@Z 00000001800110b0 f i ivan.obj
- 0001:000100f0       ?GetBitmapDim@@YA?AUbitmap_dimension@@PEAUrender_group@@PEAUloaded_bitmap@@MTvec3@@M@Z 00000001800110f0 f i ivan.obj
- 0001:00010250       ?GetCurrChunkIndexBasedOnCamera@@YAXTvec3@@PEAH1@Z 0000000180011250 f i ivan.obj
- 0001:00010300       ?GetEncodedVertexData@@YAITvec3@@EW4voxel_texture_vert_type@@E@Z 0000000180011300 f i ivan.obj
- 0001:000103a0       ?GetFile@@YAPEAUasset_file@@PEAUgame_assets@@I@Z 00000001800113a0 f i ivan.obj
- 0001:000103f0       ?GetFileHandleFor@@YAPEAUplatform_file_handle@@PEAUgame_assets@@I@Z 00000001800113f0 f i ivan.obj
- 0001:00010440       ?GetFirstSoundFrom@@YA?AUsound_id@@PEAUgame_assets@@W4asset_type_id@@@Z 0000000180011440 f i ivan.obj
- 0001:00010470       ?GetNextSoundInChain@@YA?AUsound_id@@PEAUgame_assets@@U1@@Z 0000000180011470 f i ivan.obj
- 0001:000104e0       ?GetPosForVoxelChunk@@YA?ATvec3@@PEAUvoxel_chunk@@@Z 00000001800114e0 f i ivan.obj
- 0001:00010560       ?GetRenderEntityBasisP@@YA?AUentity_basis_p_result@@PEAUrender_group_transform@@Tvec3@@@Z 0000000180011560 f i ivan.obj
- 0001:00010910       ?GetBitmap@@YAPEAUloaded_bitmap@@PEAUgame_assets@@Ubitmap_id@@I@Z 0000000180011910 f i ivan.obj
- 0001:00010910       ?GetVoxelAtlas@@YAPEAUloaded_voxel_atlas@@PEAUgame_assets@@Uvoxel_atlas_id@@I@Z 0000000180011910 f i ivan.obj
- 0001:00010910       ?GetSound@@YAPEAUloaded_sound@@PEAUgame_assets@@Usound_id@@I@Z 0000000180011910 f i ivan.obj
- 0001:00010970       ?GetSoundInfo@@YAPEAUdda_sound@@PEAUgame_assets@@Usound_id@@@Z 0000000180011970 f i ivan.obj
- 0001:000109c0       ?Hadamard@@YA?ATvec2@@T1@0@Z 00000001800119c0 f i ivan.obj
- 0001:00010a30       ?InitializeMemoryArena@@YAXPEAUmemory_arena@@_KPEAX@Z 0000000180011a30 f i ivan.obj
- 0001:00010a70       ?InsertAssetHeaderAtFront@@YAXPEAUgame_assets@@PEAUasset_memory_header@@@Z 0000000180011a70 f i ivan.obj
- 0001:00010ad0       ?InsertChunkHeaderAtFront@@YAXPEAUvoxel_chunk_manager@@PEAUvoxel_chunk_header@@@Z 0000000180011ad0 f i ivan.obj
+ 0001:0000c620       GameUpdateAndRender        000000018000d620 f   ivan.obj
+ 0001:0000dc90       GameGetSoundSamples        000000018000ec90 f   ivan.obj
+ 0001:0000dcf0       ??$__vcrt_va_start_verify_argument_type@QEB_W@@YAXXZ 000000018000ecf0 f i libucrtd:dbgrpt.obj
+ 0001:0000dcf0       ??$__vcrt_va_start_verify_argument_type@QEBD@@YAXXZ 000000018000ecf0 f i libvcruntimed:undname.obj
+ 0001:0000dcf0       ??$__vcrt_va_start_verify_argument_type@PEBD@@YAXXZ 000000018000ecf0 f i ivan.obj
+ 0001:0000dd00       ??4ticket_mutex@@QEAAAEAU0@$$QEAU0@@Z 000000018000ed00 f i ivan.obj
+ 0001:0000dd40       ??D@YA?ATvec2@@MT0@@Z      000000018000ed40 f i ivan.obj
+ 0001:0000dd90       ??D@YA?ATvec2@@T0@M@Z      000000018000ed90 f i ivan.obj
+ 0001:0000dde0       ??D@YA?ATvec3@@MT0@@Z      000000018000ede0 f i ivan.obj
+ 0001:0000de80       ??D@YA?ATvec3@@T0@M@Z      000000018000ee80 f i ivan.obj
+ 0001:0000df20       ??D@YA?ATvec4@@T0@M@Z      000000018000ef20 f i ivan.obj
+ 0001:0000dfc0       ??D@YA?AUmat4@@U0@0@Z      000000018000efc0 f i ivan.obj
+ 0001:0000e060       ??D@YA?AUvolume_v2@@MU0@@Z 000000018000f060 f i ivan.obj
+ 0001:0000e0c0       ??G@YA?ATvec3@@T0@0@Z      000000018000f0c0 f i ivan.obj
+ 0001:0000e170       ??H@YA?ATvec2@@T0@0@Z      000000018000f170 f i ivan.obj
+ 0001:0000e1c0       ??H@YA?ATvec3@@T0@0@Z      000000018000f1c0 f i ivan.obj
+ 0001:0000e270       ??Y@YAAEATvec3@@AEAT0@T0@@Z 000000018000f270 f i ivan.obj
+ 0001:0000e320       ??Z@YAAEATvec3@@AEAT0@T0@@Z 000000018000f320 f i ivan.obj
+ 0001:0000e3d0       ?Add@@YA?ATvec2@@T1@0@Z    000000018000f3d0 f i ivan.obj
+ 0001:0000e410       ?Add@@YA?ATvec3@@T1@0@Z    000000018000f410 f i ivan.obj
+ 0001:0000e4a0       ?AddAssetHeaderToList@@YAXPEAUgame_assets@@IUasset_memory_size@@@Z 000000018000f4a0 f i ivan.obj
+ 0001:0000e500       ?AtomicAddU64@@YA_KPEC_K_K@Z 000000018000f500 f i ivan.obj
+ 0001:0000e530       ?AtomicCompareExchangeU32@@YAIPECIII@Z 000000018000f530 f i ivan.obj
+ 0001:0000e570       ?BeginAssetLock@@YAXPEAUgame_assets@@@Z 000000018000f570 f i ivan.obj
+ 0001:0000e5b0       ?BeginGeneration@@YAIPEAUgame_assets@@@Z 000000018000f5b0 f i ivan.obj
+ 0001:0000e640       ?BeginRenderGroup@@YA?AUrender_group@@PEAUgame_assets@@PEAUgame_render_commands@@I@Z 000000018000f640 f i ivan.obj
+ 0001:0000e750       ?BeginTaskWithMemory_@@YAPEAUtask_with_memory@@PEAU1@H@Z 000000018000f750 f i ivan.obj
+ 0001:0000e820       ?BeginTemporaryMemory@@YA?AUtemporary_memory@@PEAUmemory_arena@@@Z 000000018000f820 f i ivan.obj
+ 0001:0000e880       ?BeginTicketMutex@@YAXPEAUticket_mutex@@@Z 000000018000f880 f i ivan.obj
+ 0001:0000e8c0       ?CameraTransform@@YA?AUmat4@@Tvec3@@000@Z 000000018000f8c0 f i ivan.obj
+ 0001:0000ea50       ?Cos@@YAMM@Z               000000018000fa50 f i ivan.obj
+ 0001:0000ea80       ?Cross@@YA?ATvec3@@T1@0@Z  000000018000fa80 f i ivan.obj
+ 0001:0000eb70       ?DoFaceWorkAtBack@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 000000018000fb70 f i ivan.obj
+ 0001:0000ee30       ?DoFaceWorkAtBottom@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 000000018000fe30 f i ivan.obj
+ 0001:0000f0f0       ?DoFaceWorkAtFront@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 00000001800100f0 f i ivan.obj
+ 0001:0000f3b0       ?DoFaceWorkAtLeft@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 00000001800103b0 f i ivan.obj
+ 0001:0000f670       ?DoFaceWorkAtRight@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 0000000180010670 f i ivan.obj
+ 0001:0000f930       ?DoFaceWorkAtTop@@YAXPEAUvoxel_chunk_mesh@@Tvec3@@E@Z 0000000180010930 f i ivan.obj
+ 0001:0000fbf0       ?Dot@@YAMTvec2@@0@Z        0000000180010bf0 f i ivan.obj
+ 0001:0000fc20       ?Dot@@YAMTvec3@@0@Z        0000000180010c20 f i ivan.obj
+ 0001:0000fc70       ?EndAssetLock@@YAXPEAUgame_assets@@@Z 0000000180010c70 f i ivan.obj
+ 0001:0000fc90       ?EndGeneration@@YAXPEAUgame_assets@@I@Z 0000000180010c90 f i ivan.obj
+ 0001:0000fd40       ?EndTemporaryMemory@@YAXUtemporary_memory@@@Z 0000000180010d40 f i ivan.obj
+ 0001:0000fdb0       ?EndTicketMutex@@YAXPEAUticket_mutex@@@Z 0000000180010db0 f i ivan.obj
+ 0001:0000fde0       ?FindPairInVoxelHashTable@@YAPEAUvoxel_table_pair@@PEAPEAU1@I_K@Z 0000000180010de0 f i ivan.obj
+ 0001:0000fe70       ?FreeVoxelHashTable@@YAXPEAPEAUvoxel_table_pair@@I@Z 0000000180010e70 f i ivan.obj
+ 0001:0000fef0       ?FreeVoxelMeshGenerationQueue@@YAXPEAUvoxel_mesh_generation_queue@@@Z 0000000180010ef0 f i ivan.obj
+ 0001:0000ff40       ?GenerateKeyForChunkIndices@@YA_KHH@Z 0000000180010f40 f i ivan.obj
+ 0001:0000ff70       ?GetAlignmentOffset@@YA_KPEAUmemory_arena@@_K@Z 0000000180010f70 f i ivan.obj
+ 0001:0000fff0       ?GetAsset@@YAPEAUasset_memory_header@@PEAUgame_assets@@II@Z 0000000180010ff0 f i ivan.obj
+ 0001:000100c0       ?GetBestMatchBitmapFrom@@YA?AUbitmap_id@@PEAUgame_assets@@W4asset_type_id@@PEAUasset_vector@@2@Z 00000001800110c0 f i ivan.obj
+ 0001:000100c0       ?GetBestMatchVoxelAtlasFrom@@YA?AUvoxel_atlas_id@@PEAUgame_assets@@W4asset_type_id@@PEAUasset_vector@@2@Z 00000001800110c0 f i ivan.obj
+ 0001:00010100       ?GetBitmapDim@@YA?AUbitmap_dimension@@PEAUrender_group@@PEAUloaded_bitmap@@MTvec3@@M@Z 0000000180011100 f i ivan.obj
+ 0001:00010260       ?GetCurrChunkIndexBasedOnCamera@@YAXTvec3@@PEAH1@Z 0000000180011260 f i ivan.obj
+ 0001:00010310       ?GetEncodedVertexData@@YAITvec3@@EW4voxel_texture_vert_type@@E@Z 0000000180011310 f i ivan.obj
+ 0001:000103b0       ?GetFile@@YAPEAUasset_file@@PEAUgame_assets@@I@Z 00000001800113b0 f i ivan.obj
+ 0001:00010400       ?GetFileHandleFor@@YAPEAUplatform_file_handle@@PEAUgame_assets@@I@Z 0000000180011400 f i ivan.obj
+ 0001:00010450       ?GetFirstSoundFrom@@YA?AUsound_id@@PEAUgame_assets@@W4asset_type_id@@@Z 0000000180011450 f i ivan.obj
+ 0001:00010480       ?GetNextSoundInChain@@YA?AUsound_id@@PEAUgame_assets@@U1@@Z 0000000180011480 f i ivan.obj
+ 0001:000104f0       ?GetPosForVoxelChunk@@YA?ATvec3@@PEAUvoxel_chunk@@@Z 00000001800114f0 f i ivan.obj
+ 0001:00010570       ?GetRenderEntityBasisP@@YA?AUentity_basis_p_result@@PEAUrender_group_transform@@Tvec3@@@Z 0000000180011570 f i ivan.obj
+ 0001:00010920       ?GetVoxelAtlas@@YAPEAUloaded_voxel_atlas@@PEAUgame_assets@@Uvoxel_atlas_id@@I@Z 0000000180011920 f i ivan.obj
+ 0001:00010920       ?GetBitmap@@YAPEAUloaded_bitmap@@PEAUgame_assets@@Ubitmap_id@@I@Z 0000000180011920 f i ivan.obj
+ 0001:00010920       ?GetSound@@YAPEAUloaded_sound@@PEAUgame_assets@@Usound_id@@I@Z 0000000180011920 f i ivan.obj
+ 0001:00010980       ?GetSoundInfo@@YAPEAUdda_sound@@PEAUgame_assets@@Usound_id@@@Z 0000000180011980 f i ivan.obj
+ 0001:000109d0       ?Hadamard@@YA?ATvec2@@T1@0@Z 00000001800119d0 f i ivan.obj
+ 0001:00010a40       ?InitializeMemoryArena@@YAXPEAUmemory_arena@@_KPEAX@Z 0000000180011a40 f i ivan.obj
+ 0001:00010a80       ?InsertAssetHeaderAtFront@@YAXPEAUgame_assets@@PEAUasset_memory_header@@@Z 0000000180011a80 f i ivan.obj
+ 0001:00010ae0       ?InsertChunkHeaderAtFront@@YAXPEAUvoxel_chunk_header@@0@Z 0000000180011ae0 f i ivan.obj
  0001:00010b30       ?InsertPairToVoxelHashTable@@YAXPEAPEAUvoxel_table_pair@@IU1@@Z 0000000180011b30 f i ivan.obj
  0001:00010c40       ?IsValid@@YAHUsound_id@@@Z 0000000180011c40 f i ivan.obj
  0001:00010c70       ?LookAt@@YA?AUmat4@@Tvec3@@00@Z 0000000180011c70 f i ivan.obj
@@ -203,14 +203,14 @@
  0001:000151e0       __GSHandlerCheckCommon     00000001800161e0 f   LIBCMTD:_gshandler_.obj
  0001:000152f0       __security_check_cookie    00000001800162f0 f   LIBCMTD:_amdsecgs_.obj
  0001:00015710       _DllMainCRTStartup         0000000180016710 f   LIBCMTD:dll_dllmain.obj
- 0001:00015750       ??$__crt_fast_decode_pointer@PEAX@@YAPEAXQEAX@Z 0000000180016750 f i libvcruntimed:winapi_downlevel.obj
- 0001:00015750       ??$__crt_fast_decode_pointer@P6AXPEB_W00I_K@Z@@YAP6AXPEB_W00I_K@ZQ6AX000I1@Z@Z 0000000180016750 f i libucrtd:invalid_parameter.obj
- 0001:00015750       ??$__crt_fast_decode_pointer@P6AXH@Z@@YAP6AXH@ZQ6AXH@Z@Z 0000000180016750 f i libucrtd:signal.obj
  0001:00015750       ??$__crt_fast_decode_pointer@P6AH_K@Z@@YAP6AH_K@ZQ6AH0@Z@Z 0000000180016750 f i libucrtd:new_handler.obj
+ 0001:00015750       ??$__crt_fast_decode_pointer@P6AXPEB_W00I_K@Z@@YAP6AXPEB_W00I_K@ZQ6AX000I1@Z@Z 0000000180016750 f i libucrtd:invalid_parameter.obj
  0001:00015750       ??$__crt_fast_decode_pointer@P6AXXZ@@YAP6AXXZQ6AXXZ@Z 0000000180016750 f i libvcruntimed:purevirt.obj
- 0001:00015750       ??$__crt_fast_decode_pointer@P6AXPEAXK0@Z@@YAP6AXPEAXK0@ZQ6AX0K0@Z@Z 0000000180016750 f i libucrtd:exit.obj
- 0001:00015750       ??$__crt_fast_decode_pointer@P6AHPEAU_exception@@@Z@@YAP6AHPEAU_exception@@@ZQ6AH0@Z@Z 0000000180016750 f i libucrtd:matherr.obj
+ 0001:00015750       ??$__crt_fast_decode_pointer@P6AXH@Z@@YAP6AXH@ZQ6AXH@Z@Z 0000000180016750 f i libucrtd:signal.obj
  0001:00015750       ??$__crt_fast_decode_pointer@PEAP6AXXZ@@YAPEAP6AXXZQEAP6AXXZ@Z 0000000180016750 f i LIBCMTD:utility.obj
+ 0001:00015750       ??$__crt_fast_decode_pointer@P6AXPEAXK0@Z@@YAP6AXPEAXK0@ZQ6AX0K0@Z@Z 0000000180016750 f i libucrtd:exit.obj
+ 0001:00015750       ??$__crt_fast_decode_pointer@PEAX@@YAPEAXQEAX@Z 0000000180016750 f i libvcruntimed:winapi_downlevel.obj
+ 0001:00015750       ??$__crt_fast_decode_pointer@P6AHPEAU_exception@@@Z@@YAP6AHPEAU_exception@@@ZQ6AH0@Z@Z 0000000180016750 f i libucrtd:matherr.obj
  0001:00015790       ?__crt_rotate_pointer_value@@YA_K_KH@Z 0000000180016790 f i LIBCMTD:utility.obj
  0001:000157b0       ?configure_argv@__scrt_narrow_argv_policy@@SAHXZ 00000001800167b0 f i LIBCMTD:utility.obj
  0001:00015930       NtCurrentTeb               0000000180016930 f i LIBCMTD:utility.obj
@@ -253,17 +253,17 @@
  0001:00016b30       __vcrt_thread_detach       0000000180017b30 f   libvcruntimed:initialization.obj
  0001:00016b50       __vcrt_uninitialize        0000000180017b50 f   libvcruntimed:initialization.obj
  0001:00016b80       __vcrt_uninitialize_critical 0000000180017b80 f   libvcruntimed:initialization.obj
- 0001:00016b90       ??1?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAA@XZ 0000000180017b90 f i libvcruntimed:per_thread_data.obj
  0001:00016b90       ??1?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAA@XZ 0000000180017b90 f i libvcruntimed:std_type_info.obj
- 0001:00016bb0       ??B?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:argv_parsing.obj
+ 0001:00016b90       ??1?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAA@XZ 0000000180017b90 f i libvcruntimed:per_thread_data.obj
+ 0001:00016bb0       ??B?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libvcruntimed:std_type_info.obj
+ 0001:00016bb0       ??B?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:mbctype.obj
+ 0001:00016bb0       ??B?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libvcruntimed:std_exception.obj
  0001:00016bb0       ??B?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:osfinfo.obj
  0001:00016bb0       ??B?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:per_thread_data.obj
- 0001:00016bb0       ??B?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libvcruntimed:std_type_info.obj
- 0001:00016bb0       ??B?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libvcruntimed:std_exception.obj
- 0001:00016bb0       ??B?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:mbctype.obj
  0001:00016bb0       ??B?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libvcruntimed:per_thread_data.obj
- 0001:00016bd0       ?release@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAXXZ 0000000180017bd0 f i libvcruntimed:std_type_info.obj
+ 0001:00016bb0       ??B?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBA_NXZ 0000000180017bb0 f i libucrtd:argv_parsing.obj
  0001:00016bd0       ?release@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000180017bd0 f i libvcruntimed:per_thread_data.obj
+ 0001:00016bd0       ?release@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAXXZ 0000000180017bd0 f i libvcruntimed:std_type_info.obj
  0001:00016c00       __std_type_info_compare    0000000180017c00 f   libvcruntimed:std_type_info.obj
  0001:00016c40       __std_type_info_destroy_list 0000000180017c40 f   libvcruntimed:std_type_info.obj
  0001:00016cb0       _local_unwind              0000000180017cb0 f   libvcruntimed:_jmpuwind_.obj
@@ -271,23 +271,23 @@
  0001:00016d00       __NLG_Dispatch2            0000000180017d00 f   libvcruntimed:_jmpuwind_.obj
  0001:00016d10       __NLG_Return2              0000000180017d10 f   libvcruntimed:_jmpuwind_.obj
  0001:00016d20       __except_validate_context_record 0000000180017d20 f   libvcruntimed:jbcxrval.obj
- 0001:00016dc0       ?begin@?$argument_list@D@?A0xfeb59491@@QEBAPEAPEADXZ 0000000180017dc0 f i libucrtd:argv_wildcards.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBAPEADXZ 0000000180017dc0 f i libvcruntimed:std_exception.obj
- 0001:00016dc0       ?get@?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEBAPEAXXZ 0000000180017dc0 f i libucrtd:crtmbox.obj
- 0001:00016dc0       ?get@?$__crt_scoped_stack_ptr@_W@@QEBAPEA_WXZ 0000000180017dc0 f i libucrtd:getstringtypea.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBAPEAEXZ 0000000180017dc0 f i libucrtd:argv_parsing.obj
- 0001:00016dc0       ??C__crt_stdio_stream@@QEBAPEAU__crt_stdio_stream_data@@XZ 0000000180017dc0 f i libucrtd:output.obj
- 0001:00016dc0       ?save_state@?$c_string_character_source@_W@__crt_strtox@@QEBAPEB_WXZ 0000000180017dc0 f i libucrtd:atox.obj
- 0001:00016dc0       ?get@?$__crt_unique_handle_t@U__crt_findfile_traits@@@@QEBAPEAXXZ 0000000180017dc0 f i libucrtd:argv_wildcards.obj
  0001:00016dc0       ?public_stream@__crt_stdio_stream@@QEBAPEAU_iobuf@@XZ 0000000180017dc0 f i libucrtd:output.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEBAPEAU__vcrt_ptd@@XZ 0000000180017dc0 f i libvcruntimed:per_thread_data.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBAPEADXZ 0000000180017dc0 f i libvcruntimed:std_type_info.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEBAPEAPEADXZ 0000000180017dc0 f i libucrtd:argv_parsing.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBAPEAU__crt_multibyte_data@@XZ 0000000180017dc0 f i libucrtd:mbctype.obj
- 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBAPEAU__acrt_ptd@@XZ 0000000180017dc0 f i libucrtd:per_thread_data.obj
+ 0001:00016dc0       ?get@?$__crt_scoped_stack_ptr@_W@@QEBAPEA_WXZ 0000000180017dc0 f i libucrtd:getstringtypea.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBAPEADXZ 0000000180017dc0 f i libvcruntimed:std_exception.obj
  0001:00016dc0       ?get@?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEBAPEAUHINSTANCE__@@XZ 0000000180017dc0 f i libucrtd:exit.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEBAPEAPEADXZ 0000000180017dc0 f i libucrtd:argv_parsing.obj
+ 0001:00016dc0       ??C__crt_stdio_stream@@QEBAPEAU__crt_stdio_stream_data@@XZ 0000000180017dc0 f i libucrtd:output.obj
+ 0001:00016dc0       ?get@?$__crt_unique_handle_t@U__crt_findfile_traits@@@@QEBAPEAXXZ 0000000180017dc0 f i libucrtd:argv_wildcards.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBAPEAU__crt_multibyte_data@@XZ 0000000180017dc0 f i libucrtd:mbctype.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBAPEAEXZ 0000000180017dc0 f i libucrtd:argv_parsing.obj
+ 0001:00016dc0       ?get@?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEBAPEAXXZ 0000000180017dc0 f i libucrtd:crtmbox.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBAPEADXZ 0000000180017dc0 f i libvcruntimed:std_type_info.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEBAPEAU__vcrt_ptd@@XZ 0000000180017dc0 f i libvcruntimed:per_thread_data.obj
+ 0001:00016dc0       ?begin@?$argument_list@D@?A0xfeb59491@@QEBAPEAPEADXZ 0000000180017dc0 f i libucrtd:argv_wildcards.obj
  0001:00016dc0       ?save_state@?$c_string_character_source@D@__crt_strtox@@QEBAPEBDXZ 0000000180017dc0 f i libucrtd:atox.obj
  0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEBAPEAU__crt_lowio_handle_data@@XZ 0000000180017dc0 f i libucrtd:osfinfo.obj
+ 0001:00016dc0       ?get@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBAPEAU__acrt_ptd@@XZ 0000000180017dc0 f i libucrtd:per_thread_data.obj
+ 0001:00016dc0       ?save_state@?$c_string_character_source@_W@__crt_strtox@@QEBAPEB_WXZ 0000000180017dc0 f i libucrtd:atox.obj
  0001:00016e00       __vcrt_freefls             0000000180017e00 f   libvcruntimed:per_thread_data.obj
  0001:00016e40       __vcrt_freeptd             0000000180017e40 f   libvcruntimed:per_thread_data.obj
  0001:00016ea0       __vcrt_getptd              0000000180017ea0 f   libvcruntimed:per_thread_data.obj
@@ -298,11 +298,11 @@
  0001:00017170       __vcrt_uninitialize_locks  0000000180018170 f   libvcruntimed:locks.obj
  0001:000171d0       ??$__crt_interlocked_compare_exchange_pointer@X$$T$$T@@YAPEAXPEDSEAX$$T1@Z 00000001800181d0 f i libvcruntimed:winapi_downlevel.obj
  0001:000171d0       ??$__crt_interlocked_compare_exchange_pointer@UHINSTANCE__@@$$T$$T@@YAPEAUHINSTANCE__@@PEDSEAU0@$$T1@Z 00000001800181d0 f i libvcruntimed:winapi_downlevel.obj
+ 0001:00017210       ??$__crt_interlocked_exchange_pointer@XPEAX@@YAPEAXPEDSEAXQEAX@Z 0000000180018210 f i libvcruntimed:winapi_downlevel.obj
  0001:00017210       ??$__crt_interlocked_exchange_pointer@UHINSTANCE__@@PEAU1@@@YAPEAUHINSTANCE__@@PEDSEAU0@QEAU0@@Z 0000000180018210 f i libvcruntimed:winapi_downlevel.obj
  0001:00017210       ??$__crt_interlocked_exchange_pointer@UHINSTANCE__@@PEAX@@YAPEAUHINSTANCE__@@PEDSEAU0@QEAX@Z 0000000180018210 f i libvcruntimed:winapi_downlevel.obj
- 0001:00017210       ??$__crt_interlocked_exchange_pointer@XPEAX@@YAPEAXPEDSEAXQEAX@Z 0000000180018210 f i libvcruntimed:winapi_downlevel.obj
- 0001:00017230       ??$__crt_interlocked_read_pointer@UHINSTANCE__@@@@YAPEAUHINSTANCE__@@PEDSEAU0@@Z 0000000180018230 f i libvcruntimed:winapi_downlevel.obj
  0001:00017230       ??$__crt_interlocked_read_pointer@X@@YAPEAXPEDSEAX@Z 0000000180018230 f i libvcruntimed:winapi_downlevel.obj
+ 0001:00017230       ??$__crt_interlocked_read_pointer@UHINSTANCE__@@@@YAPEAUHINSTANCE__@@PEDSEAU0@@Z 0000000180018230 f i libvcruntimed:winapi_downlevel.obj
  0001:00017250       ?__crt_fast_encode_pointer@@YA?AU__crt_fast_encoded_nullptr_t@@$$T@Z 0000000180018250 f i libvcruntimed:winapi_downlevel.obj
  0001:00017710       __vcrt_FlsAlloc            0000000180018710 f   libvcruntimed:winapi_downlevel.obj
  0001:00017760       __vcrt_FlsFree             0000000180018760 f   libvcruntimed:winapi_downlevel.obj
@@ -311,10 +311,10 @@
  0001:00017860       __vcrt_InitializeCriticalSectionEx 0000000180018860 f   libvcruntimed:winapi_downlevel.obj
  0001:000178c0       __vcrt_initialize_winapi_thunks 00000001800188c0 f   libvcruntimed:winapi_downlevel.obj
  0001:00017940       __vcrt_uninitialize_winapi_thunks 0000000180018940 f   libvcruntimed:winapi_downlevel.obj
- 0001:000179e0       ??$?B$$A6AXH@Z@__crt_fast_encoded_nullptr_t@@QEBAP6AXH@ZXZ 00000001800189e0 f i libucrtd:signal.obj
- 0001:000179e0       ??$?B$$A6AXXZ@__crt_fast_encoded_nullptr_t@@QEBAP6AXXZXZ 00000001800189e0 f i libvcruntimed:purevirt_data.obj
  0001:000179e0       ??$?B$$A6AXPEAXK0@Z@__crt_fast_encoded_nullptr_t@@QEBAP6AXPEAXK0@ZXZ 00000001800189e0 f i libucrtd:exit.obj
+ 0001:000179e0       ??$?B$$A6AXXZ@__crt_fast_encoded_nullptr_t@@QEBAP6AXXZXZ 00000001800189e0 f i libvcruntimed:purevirt_data.obj
  0001:000179e0       ??$?BP6AXXZ@__crt_fast_encoded_nullptr_t@@QEBAPEAP6AXXZXZ 00000001800189e0 f i libucrtd:onexit.obj
+ 0001:000179e0       ??$?B$$A6AXH@Z@__crt_fast_encoded_nullptr_t@@QEBAP6AXH@ZXZ 00000001800189e0 f i libucrtd:signal.obj
  0001:000179e0       ??$?BX@__crt_fast_encoded_nullptr_t@@QEBAPEAXXZ 00000001800189e0 f i libvcruntimed:winapi_downlevel.obj
  0001:00017a00       __vcrt_initialize_pure_virtual_call_handler 0000000180018a00 f   libvcruntimed:purevirt_data.obj
  0001:00017a30       _vsprintf_s_l              0000000180018a30 f i libvcruntimed:undname.obj
@@ -336,11 +336,11 @@
  0001:00019450       ?__crt_interlocked_read_32@@YAHPEDH@Z 000000018001a450 f i libucrtd:exit.obj
  0001:00019490       ?close@?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAAXXZ 000000018001a490 f i libucrtd:exit.obj
  0001:000194d0       ?close@__crt_hmodule_traits@@SA_NPEAUHINSTANCE__@@@Z 000000018001a4d0 f i libucrtd:exit.obj
- 0001:000196a0       ?get_address_of@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEAPEADXZ 000000018001a6a0 f i libucrtd:argv_parsing.obj
- 0001:000196a0       ?dangerous_get_state_array@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAPEAPEAU__crt_locale_data@@XZ 000000018001a6a0 f i libucrtd:per_thread_data.obj
  0001:000196a0       ?get_address_of@?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAAPEAPEAUHINSTANCE__@@XZ 000000018001a6a0 f i libucrtd:exit.obj
- 0001:000196b0       ?get_current_state_index@__crt_state_management@@YA_KXZ 000000018001a6b0 f i libucrtd:environment_initialization.obj
+ 0001:000196a0       ?dangerous_get_state_array@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAPEAPEAU__crt_locale_data@@XZ 000000018001a6a0 f i libucrtd:per_thread_data.obj
+ 0001:000196a0       ?get_address_of@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEAPEADXZ 000000018001a6a0 f i libucrtd:argv_parsing.obj
  0001:000196b0       ?get_invalid_value@__crt_hmodule_traits@@SAPEAUHINSTANCE__@@XZ 000000018001a6b0 f i libucrtd:exit.obj
+ 0001:000196b0       ?get_current_state_index@__crt_state_management@@YA_KXZ 000000018001a6b0 f i libucrtd:environment_initialization.obj
  0001:00019880       __acrt_initialize_thread_local_exit_callback 000000018001a880 f   libucrtd:exit.obj
  0001:000198a0       _cexit                     000000018001a8a0 f   libucrtd:exit.obj
  0001:000198c0       _exit                      000000018001a8c0 f   libucrtd:exit.obj
@@ -355,49 +355,49 @@
  0001:0001a604       __dcrt_uninitialize_environments_nolock 000000018001b604 f   libucrtd:environment_initialization.obj
  0001:0001a63c       _initialize_narrow_environment 000000018001b63c f   libucrtd:environment_initialization.obj
  0001:0001a644       _invoke_watson_if_error    000000018001b644 f i libucrtd:environment_initialization.obj
- 0001:0001a680       ??$?RPEAU__crt_stdio_stream_data@@@__crt_internal_free_policy@@QEBAXQEBQEAU__crt_stdio_stream_data@@@Z 000000018001b680 f i libucrtd:_file.obj
  0001:0001a680       ??$?RP6AXXZ@__crt_internal_free_policy@@QEBAXQEBQ6AXXZ@Z 000000018001b680 f i libucrtd:onexit.obj
+ 0001:0001a680       ??$?RPEAU__crt_stdio_stream_data@@@__crt_internal_free_policy@@QEBAXQEBQEAU__crt_stdio_stream_data@@@Z 000000018001b680 f i libucrtd:_file.obj
+ 0001:0001a680       ??$?RPEAD@__crt_internal_free_policy@@QEBAXQEBQEAD@Z 000000018001b680 f i libucrtd:argv_parsing.obj
  0001:0001a680       ??$?RE@__crt_internal_free_policy@@QEBAXQEBE@Z 000000018001b680 f i libucrtd:argv_parsing.obj
  0001:0001a680       ??$?RU__crt_lowio_handle_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_lowio_handle_data@@@Z 000000018001b680 f i libucrtd:osfinfo.obj
  0001:0001a680       ??$?RD@__crt_internal_free_policy@@QEBAXQEBD@Z 000000018001b680 f i libvcruntimed:std_type_info.obj
- 0001:0001a680       ??$?RU__acrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__acrt_ptd@@@Z 000000018001b680 f i libucrtd:per_thread_data.obj
- 0001:0001a680       ??$?RPEAD@__crt_internal_free_policy@@QEBAXQEBQEAD@Z 000000018001b680 f i libucrtd:argv_parsing.obj
- 0001:0001a680       ??$?RU__crt_multibyte_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_multibyte_data@@@Z 000000018001b680 f i libucrtd:mbctype.obj
  0001:0001a680       ??$?RU__vcrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__vcrt_ptd@@@Z 000000018001b680 f i libvcruntimed:per_thread_data.obj
+ 0001:0001a680       ??$?RU__acrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__acrt_ptd@@@Z 000000018001b680 f i libucrtd:per_thread_data.obj
+ 0001:0001a680       ??$?RU__crt_multibyte_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_multibyte_data@@@Z 000000018001b680 f i libucrtd:mbctype.obj
  0001:0001a6b0       ??$?RV<lambda_b0d8f1f77f5878de4f648f281b223c15>@@AEAV<lambda_942beefa13ab35ff55f86422493ffd6a>@@V<lambda_7adb6fc9c0d6a5bd4e2d9c212ec7cdcc>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_b0d8f1f77f5878de4f648f281b223c15>@@AEAV<lambda_942beefa13ab35ff55f86422493ffd6a>@@$$QEAV<lambda_7adb6fc9c0d6a5bd4e2d9c212ec7cdcc>@@@Z 000000018001b6b0 f i libucrtd:onexit.obj
  0001:0001a700       ??$?RV<lambda_d22e02de4d14401f49897516b29a2b7c>@@AEAV<lambda_e971338317bfa523bb8920b43d823727>@@V<lambda_b0b8599c9027f5b14541fbbd6863d1f1>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_d22e02de4d14401f49897516b29a2b7c>@@AEAV<lambda_e971338317bfa523bb8920b43d823727>@@$$QEAV<lambda_b0b8599c9027f5b14541fbbd6863d1f1>@@@Z 000000018001b700 f i libucrtd:onexit.obj
  0001:0001a750       ??$__acrt_lock_and_call@V<lambda_942beefa13ab35ff55f86422493ffd6a>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_942beefa13ab35ff55f86422493ffd6a>@@@Z 000000018001b750 f i libucrtd:onexit.obj
  0001:0001a7c0       ??$__acrt_lock_and_call@V<lambda_e971338317bfa523bb8920b43d823727>@@@@YAHW4__acrt_lock_id@@$$QEAV<lambda_e971338317bfa523bb8920b43d823727>@@@Z 000000018001b7c0 f i libucrtd:onexit.obj
- 0001:0001a830       ??$__crt_fast_encode_pointer@P6AXH@Z@@YAP6AXH@ZQ6AXH@Z@Z 000000018001b830 f i libucrtd:signal.obj
- 0001:0001a830       ??$__crt_fast_encode_pointer@PEAX@@YAPEAXQEAX@Z 000000018001b830 f i libvcruntimed:winapi_downlevel.obj
- 0001:0001a830       ??$__crt_fast_encode_pointer@P6AHXZ@@YAP6AHXZQ6AHXZ@Z 000000018001b830 f i libucrtd:onexit.obj
- 0001:0001a830       ??$__crt_fast_encode_pointer@P6AXXZ@@YAP6AXXZQ6AXXZ@Z 000000018001b830 f i libvcruntimed:purevirt_data.obj
  0001:0001a830       ??$__crt_fast_encode_pointer@PEAP6AXXZ@@YAPEAP6AXXZQEAP6AXXZ@Z 000000018001b830 f i LIBCMTD:utility.obj
  0001:0001a830       ??$__crt_fast_encode_pointer@P6AXPEAXK0@Z@@YAP6AXPEAXK0@ZQ6AX0K0@Z@Z 000000018001b830 f i libucrtd:exit.obj
- 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:osfinfo.obj
- 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:mbctype.obj
+ 0001:0001a830       ??$__crt_fast_encode_pointer@P6AXXZ@@YAP6AXXZQ6AXXZ@Z 000000018001b830 f i libvcruntimed:purevirt_data.obj
+ 0001:0001a830       ??$__crt_fast_encode_pointer@P6AHXZ@@YAP6AHXZQ6AHXZ@Z 000000018001b830 f i libucrtd:onexit.obj
+ 0001:0001a830       ??$__crt_fast_encode_pointer@PEAX@@YAPEAXQEAX@Z 000000018001b830 f i libvcruntimed:winapi_downlevel.obj
+ 0001:0001a830       ??$__crt_fast_encode_pointer@P6AXH@Z@@YAP6AXH@ZQ6AXH@Z@Z 000000018001b830 f i libucrtd:signal.obj
  0001:0001a870       ??1?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:argv_parsing.obj
- 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:per_thread_data.obj
- 0001:0001a870       ??1?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:onexit.obj
- 0001:0001a870       ??1?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:_file.obj
  0001:0001a870       ??1?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:argv_parsing.obj
- 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:per_thread_data.obj
+ 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:per_thread_data.obj
+ 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:osfinfo.obj
+ 0001:0001a870       ??1?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:_file.obj
+ 0001:0001a870       ??1?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:mbctype.obj
+ 0001:0001a870       ??1?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAA@XZ 000000018001b870 f i libucrtd:onexit.obj
+ 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:osfinfo.obj
+ 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:onexit.obj
  0001:0001adc0       ?release@?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:_file.obj
+ 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:argv_parsing.obj
+ 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:per_thread_data.obj
  0001:0001adc0       ?release@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:argv_parsing.obj
  0001:0001adc0       ?release@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:mbctype.obj
- 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:osfinfo.obj
- 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:argv_parsing.obj
- 0001:0001adc0       ?release@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAXXZ 000000018001bdc0 f i libucrtd:onexit.obj
  0001:0001ae00       _crt_atexit                000000018001be00 f   libucrtd:onexit.obj
  0001:0001ae20       _execute_onexit_table      000000018001be20 f   libucrtd:onexit.obj
  0001:0001ae50       _initialize_onexit_table   000000018001be50 f   libucrtd:onexit.obj
  0001:0001aed0       _register_onexit_function  000000018001bed0 f   libucrtd:onexit.obj
  0001:0001afa0       __acrt_uninitialize_command_line 000000018001bfa0 f   libucrtd:argv_data.obj
- 0001:0001b130       ?initialize@?$dual_state_global@P6AXH@Z@__crt_state_management@@QEAAXQ6AXH@Z@Z 000000018001c130 f i libucrtd:signal.obj
- 0001:0001b130       ?initialize@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAXQ6AHPEAU_exception@@@Z@Z 000000018001c130 f i libucrtd:matherr.obj
  0001:0001b130       ?initialize@?$dual_state_global@P6AXPEB_W00I_K@Z@__crt_state_management@@QEAAXQ6AXPEB_W00I_K@Z@Z 000000018001c130 f i libucrtd:invalid_parameter.obj
- 0001:0001b130       ?initialize@?$dual_state_global@P6AH_K@Z@__crt_state_management@@QEAAXQ6AH_K@Z@Z 000000018001c130 f i libucrtd:new_handler.obj
+ 0001:0001b130       ?initialize@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAXQ6AHPEAU_exception@@@Z@Z 000000018001c130 f i libucrtd:matherr.obj
+ 0001:0001b130       ?initialize@?$dual_state_global@P6AXH@Z@__crt_state_management@@QEAAXQ6AXH@Z@Z 000000018001c130 f i libucrtd:signal.obj
  0001:0001b130       ?initialize@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAXQEAU__crt_locale_data@@@Z 000000018001c130 f i libucrtd:initialization.obj
+ 0001:0001b130       ?initialize@?$dual_state_global@P6AH_K@Z@__crt_state_management@@QEAAXQ6AH_K@Z@Z 000000018001c130 f i libucrtd:new_handler.obj
  0001:0001b180       __acrt_initialize          000000018001c180 f   libucrtd:initialization.obj
  0001:0001b1b0       __acrt_thread_attach       000000018001c1b0 f   libucrtd:initialization.obj
  0001:0001b1d0       __acrt_thread_detach       000000018001c1d0 f   libucrtd:initialization.obj
@@ -430,8 +430,8 @@
  0001:0001e5b0       strcmp                     000000018001f5b0 f   libucrtd:strcmp.obj
  0001:0001e630       strlen                     000000018001f630 f   libucrtd:strlen.obj
  0001:0001e6e0       abort                      000000018001f6e0 f   libucrtd:abort.obj
- 0001:0001f4d0       ??$get_module_file_name@AEAPEAUHINSTANCE__@@AEAY0BAF@DK@?$__crt_char_traits@D@@SAKAEAPEAUHINSTANCE__@@AEAY0BAF@D$$QEAK@Z 00000001800204d0 f i libucrtd:dbgrpt.obj
  0001:0001f4d0       ??$get_module_file_name@$$TAEAY0BAF@DH@?$__crt_char_traits@D@@SAK$$QEA$$TAEAY0BAF@D$$QEAH@Z 00000001800204d0 f i libucrtd:argv_parsing.obj
+ 0001:0001f4d0       ??$get_module_file_name@AEAPEAUHINSTANCE__@@AEAY0BAF@DK@?$__crt_char_traits@D@@SAKAEAPEAUHINSTANCE__@@AEAY0BAF@D$$QEAK@Z 00000001800204d0 f i libucrtd:dbgrpt.obj
  0001:0001f510       ??$get_module_file_name@AEAPEAUHINSTANCE__@@AEAY0BAF@_WK@?$__crt_char_traits@_W@@SAKAEAPEAUHINSTANCE__@@AEAY0BAF@_W$$QEAK@Z 0000000180020510 f i libucrtd:dbgrpt.obj
  0001:0001f550       ??$tcscpy_s@AEAY0BAF@D_KPEBD@?$__crt_char_traits@D@@SAHAEAY0BAF@D$$QEA_K$$QEAPEBD@Z 0000000180020550 f i libucrtd:dbgrpt.obj
  0001:0001f590       ??$tcscpy_s@AEAY0BAF@_W_KPEB_W@?$__crt_char_traits@_W@@SAHAEAY0BAF@_W$$QEA_K$$QEAPEB_W@Z 0000000180020590 f i libucrtd:dbgrpt.obj
@@ -453,10 +453,10 @@
  0001:00021400       ??$data@D@formatting_buffer@__crt_stdio_output@@QEAAPEADXZ 0000000180022400 f i libucrtd:output.obj
  0001:00021400       ??$data@_W@formatting_buffer@__crt_stdio_output@@QEAAPEA_WXZ 0000000180022400 f i libucrtd:output.obj
  0001:00021450       ??$ensure_buffer_is_big_enough@D@formatting_buffer@__crt_stdio_output@@QEAA_N_K@Z 0000000180022450 f i libucrtd:output.obj
- 0001:00021580       ??$extract_argument_from_va_list@C_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022580 f i libucrtd:output.obj
  0001:00021580       ??$extract_argument_from_va_list@C_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022580 f i libucrtd:output.obj
- 0001:000215c0       ??$extract_argument_from_va_list@E_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800225c0 f i libucrtd:output.obj
+ 0001:00021580       ??$extract_argument_from_va_list@C_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022580 f i libucrtd:output.obj
  0001:000215c0       ??$extract_argument_from_va_list@E_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800225c0 f i libucrtd:output.obj
+ 0001:000215c0       ??$extract_argument_from_va_list@E_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800225c0 f i libucrtd:output.obj
  0001:00021600       ??$extract_argument_from_va_list@F_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022600 f i libucrtd:output.obj
  0001:00021600       ??$extract_argument_from_va_list@F_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022600 f i libucrtd:output.obj
  0001:00021640       ??$extract_argument_from_va_list@GD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAD@Z 0000000180022640 f i libucrtd:output.obj
@@ -464,38 +464,38 @@
  0001:00021670       ??$extract_argument_from_va_list@G_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022670 f i libucrtd:output.obj
  0001:000216b0       ??$extract_argument_from_va_list@H_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800226b0 f i libucrtd:output.obj
  0001:000216b0       ??$extract_argument_from_va_list@H_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800226b0 f i libucrtd:output.obj
- 0001:000216e0       ??$extract_argument_from_va_list@I_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800226e0 f i libucrtd:output.obj
  0001:000216e0       ??$extract_argument_from_va_list@I_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800226e0 f i libucrtd:output.obj
+ 0001:000216e0       ??$extract_argument_from_va_list@I_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800226e0 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 0000000180022710 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 0000000180022710 f i libucrtd:output.obj
  0001:00021710       ??$extract_argument_from_va_list@PEADPEAD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 0000000180022710 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@_J_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@_K_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@_K_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
+ 0001:00021710       ??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 0000000180022710 f i libucrtd:output.obj
  0001:00021710       ??$extract_argument_from_va_list@_J_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
  0001:00021710       ??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@_K_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 0000000180022710 f i libucrtd:output.obj
  0001:00021710       ??$extract_argument_from_va_list@PEADPEAD@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@_J_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021710       ??$extract_argument_from_va_list@_K_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 0000000180022710 f i libucrtd:output.obj
- 0001:00021740       ??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 0000000180022740 f i libucrtd:output.obj
  0001:00021740       ??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 0000000180022740 f i libucrtd:output.obj
- 0001:00021790       ??$extract_argument_from_va_list@_W_W@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 0000000180022790 f i libucrtd:output.obj
+ 0001:00021740       ??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 0000000180022740 f i libucrtd:output.obj
  0001:00021790       ??$extract_argument_from_va_list@_W_W@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 0000000180022790 f i libucrtd:output.obj
+ 0001:00021790       ??$extract_argument_from_va_list@_W_W@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 0000000180022790 f i libucrtd:output.obj
  0001:000217c0       ??$is_wide_character_specifier@D@__crt_stdio_output@@YA_N_KDW4length_modifier@0@@Z 00000001800227c0 f i libucrtd:output.obj
  0001:00021860       ??$is_wide_character_specifier@_W@__crt_stdio_output@@YA_N_K_WW4length_modifier@0@@Z 0000000180022860 f i libucrtd:output.obj
  0001:00021930       ??$read_va_arg@E@__crt_stdio_output@@YAEAEAPEAD@Z 0000000180022930 f i libucrtd:output.obj
  0001:00021930       ??$read_va_arg@C@__crt_stdio_output@@YACAEAPEAD@Z 0000000180022930 f i libucrtd:output.obj
- 0001:000219a0       ??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 00000001800229a0 f i libucrtd:output.obj
- 0001:000219a0       ??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 00000001800229a0 f i libucrtd:output.obj
- 0001:000219a0       ??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 00000001800229a0 f i libucrtd:output.obj
- 0001:00021a10       ??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 0000000180022a10 f i libucrtd:output.obj
- 0001:00021a10       ??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 0000000180022a10 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@U_CRT_DOUBLE@@@__crt_stdio_output@@YA?AU_CRT_DOUBLE@@AEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@_J@__crt_stdio_output@@YA_JAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@PEAX@__crt_stdio_output@@YAPEAXAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
- 0001:00021a70       ??$read_va_arg@PEAD@__crt_stdio_output@@YAPEADAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
+ 0001:000219a0       ??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 00000001800229a0 f i libucrtd:output.obj
+ 0001:000219a0       ??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 00000001800229a0 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@PEAD@__crt_stdio_output@@YAPEADAEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@_J@__crt_stdio_output@@YA_JAEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@PEAX@__crt_stdio_output@@YAPEAXAEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@U_CRT_DOUBLE@@@__crt_stdio_output@@YA?AU_CRT_DOUBLE@@AEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a00       ??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 0000000180022a00 f i libucrtd:output.obj
+ 0001:00021a70       ??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
+ 0001:00021a70       ??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
+ 0001:00021a70       ??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 0000000180022a70 f i libucrtd:output.obj
  0001:00021ae0       ??$scratch_count@D@formatting_buffer@__crt_stdio_output@@QEBA_KXZ 0000000180022ae0 f i libucrtd:output.obj
  0001:00021b00       ??$scratch_data@D@formatting_buffer@__crt_stdio_output@@QEAAPEADXZ 0000000180022b00 f i libucrtd:output.obj
  0001:00021b70       ??$tcstol@PEBDPEAPEADH@?$__crt_char_traits@D@@SAJ$$QEAPEBD$$QEAPEAPEAD$$QEAH@Z 0000000180022b70 f i libucrtd:output.obj
@@ -516,12 +516,12 @@
  0001:00022540       ??0formatting_buffer@__crt_stdio_output@@QEAA@XZ 0000000180023540 f i libucrtd:output.obj
  0001:00022580       ??1?$common_data@D@__crt_stdio_output@@QEAA@XZ 0000000180023580 f i libucrtd:output.obj
  0001:00022580       ??1?$common_data@_W@__crt_stdio_output@@QEAA@XZ 0000000180023580 f i libucrtd:output.obj
- 0001:000225a0       ??1?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001800235a0 f i libucrtd:output.obj
  0001:000225a0       ??1?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001800235a0 f i libucrtd:output.obj
+ 0001:000225a0       ??1?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001800235a0 f i libucrtd:output.obj
  0001:000225c0       ??1?$output_adapter_data@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001800235c0 f i libucrtd:output.obj
  0001:000225c0       ??1?$output_adapter_data@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 00000001800235c0 f i libucrtd:output.obj
- 0001:000225e0       ??1?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAA@XZ 00000001800235e0 f i libucrtd:output.obj
  0001:000225e0       ??1?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAA@XZ 00000001800235e0 f i libucrtd:output.obj
+ 0001:000225e0       ??1?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAA@XZ 00000001800235e0 f i libucrtd:output.obj
  0001:00022600       ??1?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 0000000180023600 f i libucrtd:output.obj
  0001:00022600       ??1?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@QEAA@XZ 0000000180023600 f i libucrtd:output.obj
  0001:00022620       ??1__crt_errno_guard@@QEAA@XZ 0000000180023620 f i libucrtd:output.obj
@@ -529,15 +529,15 @@
  0001:00022680       ??4?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAAEAV0@$$QEAV0@@Z 0000000180023680 f i libucrtd:output.obj
  0001:000226c0       ?adjust_hexit@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 00000001800236c0 f i libucrtd:output.obj
  0001:000226c0       ?adjust_hexit@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 00000001800236c0 f i libucrtd:output.obj
- 0001:00022710       ?advance_to_next_pass@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180023710 f i libucrtd:output.obj
  0001:00022710       ?advance_to_next_pass@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180023710 f i libucrtd:output.obj
+ 0001:00022710       ?advance_to_next_pass@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180023710 f i libucrtd:output.obj
  0001:00022760       ?crop_zeroes@__crt_stdio_output@@YAXPEADQEAU__crt_locale_pointers@@@Z 0000000180023760 f i libucrtd:output.obj
  0001:000228a0       ?find_next_state@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA?AW4state@2@DW432@@Z 00000001800238a0 f i libucrtd:output.obj
  0001:00022940       ?find_next_state@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA?AW4state@2@_WW432@@Z 0000000180023940 f i libucrtd:output.obj
  0001:000229e0       ?force_decimal_point@__crt_stdio_output@@YAXPEADQEAU__crt_locale_pointers@@@Z 00000001800239e0 f i libucrtd:output.obj
  0001:00022ac0       ?get_flags@__crt_stdio_stream@@QEBAJXZ 0000000180023ac0 f i libucrtd:output.obj
- 0001:00022af0       ?has_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000180023af0 f i libucrtd:output.obj
  0001:00022af0       ?has_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000180023af0 f i libucrtd:output.obj
+ 0001:00022af0       ?has_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000180023af0 f i libucrtd:output.obj
  0001:00022b30       ?is_string_backed@__crt_stdio_stream@@QEBA_NXZ 0000000180023b30 f i libucrtd:output.obj
  0001:00022b70       ?narrow_null_string@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@CAPEADXZ 0000000180023b70 f i libucrtd:output.obj
  0001:00022b70       ?narrow_null_string@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@CAPEADXZ 0000000180023b70 f i libucrtd:output.obj
@@ -545,17 +545,17 @@
  0001:00022c60       ?parse_int_from_format_string@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 0000000180023c60 f i libucrtd:output.obj
  0001:00022d40       ?process@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAAHXZ 0000000180023d40 f i libucrtd:output.obj
  0001:000230a0       ?process@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAAHXZ 00000001800240a0 f i libucrtd:output.obj
- 0001:00023400       ?set_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180024400 f i libucrtd:output.obj
  0001:00023400       ?set_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180024400 f i libucrtd:output.obj
+ 0001:00023400       ?set_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180024400 f i libucrtd:output.obj
+ 0001:00023420       ?validate_state_for_type_case_a@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024420 f i libucrtd:output.obj
+ 0001:00023420       ?validate_and_update_state_at_beginning_of_format_character@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
+ 0001:00023420       ?should_format@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
  0001:00023420       ?validate_and_update_state_at_beginning_of_format_character@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
  0001:00023420       ?validate_state_for_type_case_a@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024420 f i libucrtd:output.obj
- 0001:00023420       ?should_format@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
  0001:00023420       ?should_format@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
- 0001:00023420       ?validate_and_update_state_at_beginning_of_format_character@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024420 f i libucrtd:output.obj
- 0001:00023420       ?validate_state_for_type_case_a@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024420 f i libucrtd:output.obj
- 0001:00023430       ?should_skip_type_state_output@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024430 f i libucrtd:output.obj
  0001:00023430       ?should_skip_type_state_output@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024430 f i libucrtd:output.obj
  0001:00023430       ?should_skip_normal_state_processing@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024430 f i libucrtd:output.obj
+ 0001:00023430       ?should_skip_type_state_output@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180024430 f i libucrtd:output.obj
  0001:00023430       ?should_skip_normal_state_processing@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180024430 f i libucrtd:output.obj
  0001:00023440       ?state_case_dot@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180024440 f i libucrtd:output.obj
  0001:00023440       ?state_case_dot@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180024440 f i libucrtd:output.obj
@@ -577,8 +577,8 @@
  0001:00024840       ?state_case_type@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180025840 f i libucrtd:output.obj
  0001:00024d10       ?state_case_width@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180025d10 f i libucrtd:output.obj
  0001:00024da0       ?state_case_width@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180025da0 f i libucrtd:output.obj
- 0001:00024e30       ?state_count@?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@KAIXZ 0000000180025e30 f i libucrtd:output.obj
  0001:00024e30       ?state_count@?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@KAIXZ 0000000180025e30 f i libucrtd:output.obj
+ 0001:00024e30       ?state_count@?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@KAIXZ 0000000180025e30 f i libucrtd:output.obj
  0001:00024e40       ?state_transition_table@?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@KAPEBEXZ 0000000180025e40 f i libucrtd:output.obj
  0001:00024e40       ?state_transition_table@?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@KAPEBEXZ 0000000180025e40 f i libucrtd:output.obj
  0001:00024e50       ?to_integer_size@__crt_stdio_output@@YA_KW4length_modifier@1@@Z 0000000180025e50 f i libucrtd:output.obj
@@ -610,12 +610,12 @@
  0001:00026d20       ?type_case_u@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180027d20 f i libucrtd:output.obj
  0001:00026d40       ?type_case_x@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180027d40 f i libucrtd:output.obj
  0001:00026d60       ?type_case_x@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000180027d60 f i libucrtd:output.obj
- 0001:00026d80       ?unset_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180027d80 f i libucrtd:output.obj
  0001:00026d80       ?unset_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180027d80 f i libucrtd:output.obj
+ 0001:00026d80       ?unset_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAXI@Z 0000000180027d80 f i libucrtd:output.obj
  0001:00026db0       ?update_field_width@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180027db0 f i libucrtd:output.obj
  0001:00026db0       ?update_field_width@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180027db0 f i libucrtd:output.obj
- 0001:00026de0       ?update_precision@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180027de0 f i libucrtd:output.obj
  0001:00026de0       ?update_precision@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180027de0 f i libucrtd:output.obj
+ 0001:00026de0       ?update_precision@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 0000000180027de0 f i libucrtd:output.obj
  0001:00026e10       ?validate@?$string_output_adapter@D@__crt_stdio_output@@QEBA_NXZ 0000000180027e10 f i libucrtd:output.obj
  0001:00026ed0       ?validate@?$string_output_adapter@_W@__crt_stdio_output@@QEBA_NXZ 0000000180027ed0 f i libucrtd:output.obj
  0001:00026f90       ?validate_and_update_state_at_end_of_format_string@?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000180027f90 f i libucrtd:output.obj
@@ -635,10 +635,10 @@
  0001:00027990       ??$is_overflow_condition@K@__crt_strtox@@YA_NIK@Z 0000000180028990 f i libucrtd:atox.obj
  0001:00027a00       ??$parse_integer@KV?$c_string_character_source@D@__crt_strtox@@@__crt_strtox@@YAKQEAU__crt_locale_pointers@@V?$c_string_character_source@D@0@H_N@Z 0000000180028a00 f i libucrtd:atox.obj
  0001:00027e90       ??$parse_integer@KV?$c_string_character_source@_W@__crt_strtox@@@__crt_strtox@@YAKQEAU__crt_locale_pointers@@V?$c_string_character_source@_W@0@H_N@Z 0000000180028e90 f i libucrtd:atox.obj
- 0001:00028340       ??0?$c_string_character_source@D@__crt_strtox@@QEAA@QEBDQEAPEBD@Z 0000000180029340 f i libucrtd:atox.obj
  0001:00028340       ??0?$c_string_character_source@_W@__crt_strtox@@QEAA@QEB_WQEAPEB_W@Z 0000000180029340 f i libucrtd:atox.obj
- 0001:00028390       ??1?$c_string_character_source@D@__crt_strtox@@QEAA@XZ 0000000180029390 f i libucrtd:atox.obj
+ 0001:00028340       ??0?$c_string_character_source@D@__crt_strtox@@QEAA@QEBDQEAPEBD@Z 0000000180029340 f i libucrtd:atox.obj
  0001:00028390       ??1?$c_string_character_source@_W@__crt_strtox@@QEAA@XZ 0000000180029390 f i libucrtd:atox.obj
+ 0001:00028390       ??1?$c_string_character_source@D@__crt_strtox@@QEAA@XZ 0000000180029390 f i libucrtd:atox.obj
  0001:000283c0       ?get@?$c_string_character_source@D@__crt_strtox@@QEAADXZ 00000001800293c0 f i libucrtd:atox.obj
  0001:00028400       ?get@?$c_string_character_source@_W@__crt_strtox@@QEAA_WXZ 0000000180029400 f i libucrtd:atox.obj
  0001:00028440       ?is_space@__crt_strtox@@YA_NDQEAU__crt_locale_pointers@@@Z 0000000180029440 f i libucrtd:atox.obj
@@ -647,8 +647,8 @@
  0001:000284e0       ?minimum_signed_value@__crt_strtox@@YAJK@Z 00000001800294e0 f i libucrtd:atox.obj
  0001:000284f0       ?parse_digit@__crt_strtox@@YAID@Z 00000001800294f0 f i libucrtd:atox.obj
  0001:00028560       ?parse_digit@__crt_strtox@@YAI_W@Z 0000000180029560 f i libucrtd:atox.obj
- 0001:000285f0       ?restore_state@?$c_string_character_source@_W@__crt_strtox@@QEAA_NQEB_W@Z 00000001800295f0 f i libucrtd:atox.obj
  0001:000285f0       ?restore_state@?$c_string_character_source@D@__crt_strtox@@QEAA_NQEBD@Z 00000001800295f0 f i libucrtd:atox.obj
+ 0001:000285f0       ?restore_state@?$c_string_character_source@_W@__crt_strtox@@QEAA_NQEB_W@Z 00000001800295f0 f i libucrtd:atox.obj
  0001:00028610       ?unget@?$c_string_character_source@D@__crt_strtox@@QEAAXD@Z 0000000180029610 f i libucrtd:atox.obj
  0001:000286f0       ?unget@?$c_string_character_source@_W@__crt_strtox@@QEAAX_W@Z 00000001800296f0 f i libucrtd:atox.obj
  0001:000287d0       ?validate@?$c_string_character_source@D@__crt_strtox@@QEBA_NXZ 00000001800297d0 f i libucrtd:atox.obj
@@ -715,9 +715,9 @@
  0001:0002bc10       _errno                     000000018002cc10 f   libucrtd:errno.obj
  0001:0002c630       ??$find_first_file_ex@AEBQEADW4_FINDEX_INFO_LEVELS@@PEAU_WIN32_FIND_DATAA@@W4_FINDEX_SEARCH_OPS@@$$TH@?$__crt_char_traits@D@@SAPEAXAEBQEAD$$QEAW4_FINDEX_INFO_LEVELS@@$$QEAPEAU_WIN32_FIND_DATAA@@$$QEAW4_FINDEX_SEARCH_OPS@@$$QEA$$T$$QEAH@Z 000000018002d630 f i libucrtd:argv_wildcards.obj
  0001:0002c690       ??$find_next_file@PEAXPEAU_WIN32_FIND_DATAA@@@?$__crt_char_traits@D@@SAH$$QEAPEAX$$QEAPEAU_WIN32_FIND_DATAA@@@Z 000000018002d690 f i libucrtd:argv_wildcards.obj
- 0001:0002c6c0       ??$tcsncpy_s@PEADAEB_KAEBQEBDAEB_K@?$__crt_char_traits@D@@SAH$$QEAPEADAEB_KAEBQEBD1@Z 000000018002d6c0 f i libucrtd:argv_wildcards.obj
  0001:0002c6c0       ??$tcsncpy_s@PEAD$$CB_KAEBQEBDAEB_K@?$__crt_char_traits@D@@SAH$$QEAPEAD$$QEB_KAEBQEBDAEB_K@Z 000000018002d6c0 f i libucrtd:argv_wildcards.obj
  0001:0002c6c0       ??$tcsncpy_s@AEAPEAD_KAEAPEADAEB_K@?$__crt_char_traits@D@@SAHAEAPEAD$$QEA_K0AEB_K@Z 000000018002d6c0 f i libucrtd:argv_wildcards.obj
+ 0001:0002c6c0       ??$tcsncpy_s@PEADAEB_KAEBQEBDAEB_K@?$__crt_char_traits@D@@SAH$$QEAPEADAEB_KAEBQEBD1@Z 000000018002d6c0 f i libucrtd:argv_wildcards.obj
  0001:0002c710       ??$tcspbrk@AEAPEADAEAY02$$CBD@?$__crt_char_traits@D@@SAPEADAEAPEADAEAY02$$CBD@Z 000000018002d710 f i libucrtd:argv_wildcards.obj
  0001:0002c740       ??0?$argument_list@D@?A0xfeb59491@@QEAA@XZ 000000018002d740 f i libucrtd:argv_wildcards.obj
  0001:0002c780       ??1?$__crt_unique_handle_t@U__crt_findfile_traits@@@@QEAA@XZ 000000018002d780 f i libucrtd:argv_wildcards.obj
@@ -732,34 +732,34 @@
  0001:0002cbd0       __acrt_expand_narrow_argv_wildcards 000000018002dbd0 f   libucrtd:argv_wildcards.obj
  0001:0002cc00       ??$?RV<lambda_441f2315ac0f593d45428a8fceb6abe6>@@AEAV<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@V<lambda_1d10a5a8ccb596b49763520e59d5af47>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_441f2315ac0f593d45428a8fceb6abe6>@@AEAV<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@$$QEAV<lambda_1d10a5a8ccb596b49763520e59d5af47>@@@Z 000000018002dc00 f i libucrtd:mbctype.obj
  0001:0002cc40       ??$__acrt_lock_and_call@V<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@@@YAXW4__acrt_lock_id@@$$QEAV<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@@Z 000000018002dc40 f i libucrtd:mbctype.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAA@QEAPEAU__crt_stdio_stream_data@@@Z 000000018002dcb0 f   libucrtd:_file.obj
- 0001:0002ccb0       ??0?$string_output_adapter@_W@__crt_stdio_output@@QEAA@QEAU?$string_output_adapter_context@_W@1@@Z 000000018002dcb0 f   libucrtd:output.obj
- 0001:0002ccb0       ??0__crt_stdio_stream@@QEAA@QEAU_iobuf@@@Z 000000018002dcb0 f   libucrtd:output.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAA@QEAPEAD@Z 000000018002dcb0 f   libucrtd:argv_parsing.obj
- 0001:0002ccb0       ??0?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAA@QEAUHINSTANCE__@@@Z 000000018002dcb0 f   libucrtd:exit.obj
- 0001:0002ccb0       ??0?$__crt_scoped_stack_ptr_tag@_W@@QEAA@QEA_W@Z 000000018002dcb0 f   libucrtd:getstringtypea.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAA@QEAU__acrt_ptd@@@Z 000000018002dcb0 f   libucrtd:per_thread_data.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAA@QEAD@Z 000000018002dcb0 f   libvcruntimed:std_type_info.obj
  0001:0002ccb0       ??0?$string_output_adapter@D@__crt_stdio_output@@QEAA@QEAU?$string_output_adapter_context@D@1@@Z 000000018002dcb0 f   libucrtd:output.obj
  0001:0002ccb0       ??0__crt_stdio_stream@@QEAA@QEAU__crt_stdio_stream_data@@@Z 000000018002dcb0 f   libucrtd:fflush.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAA@QEAD@Z 000000018002dcb0 f   libvcruntimed:std_exception.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAA@QEAD@Z 000000018002dcb0 f   libvcruntimed:std_type_info.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAA@QEAU__crt_lowio_handle_data@@@Z 000000018002dcb0 f   libucrtd:osfinfo.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@QEAU__crt_multibyte_data@@@Z 000000018002dcb0 f   libucrtd:mbctype.obj
+ 0001:0002ccb0       ??0__crt_stdio_stream@@QEAA@QEAU_iobuf@@@Z 000000018002dcb0 f   libucrtd:output.obj
  0001:0002ccb0       ??0?$__crt_unique_handle_t@U__crt_findfile_traits@@@@QEAA@QEAX@Z 000000018002dcb0 f   libucrtd:argv_wildcards.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAA@QEAP6AXXZ@Z 000000018002dcb0 f   libucrtd:onexit.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAA@QEAU__acrt_ptd@@@Z 000000018002dcb0 f   libucrtd:per_thread_data.obj
  0001:0002ccb0       ??0?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAA@QEAE@Z 000000018002dcb0 f   libucrtd:argv_parsing.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAA@QEAU__crt_lowio_handle_data@@@Z 000000018002dcb0 f   libucrtd:osfinfo.obj
+ 0001:0002ccb0       ??0?$string_output_adapter@_W@__crt_stdio_output@@QEAA@QEAU?$string_output_adapter_context@_W@1@@Z 000000018002dcb0 f   libucrtd:output.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAA@QEAD@Z 000000018002dcb0 f   libvcruntimed:std_exception.obj
+ 0001:0002ccb0       ??0?$__crt_unique_handle_t@U__crt_hmodule_traits@@@@QEAA@QEAUHINSTANCE__@@@Z 000000018002dcb0 f   libucrtd:exit.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAA@QEAU__crt_multibyte_data@@@Z 000000018002dcb0 f   libucrtd:mbctype.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAA@QEAPEAD@Z 000000018002dcb0 f   libucrtd:argv_parsing.obj
+ 0001:0002ccb0       ??0?$__crt_scoped_stack_ptr_tag@_W@@QEAA@QEA_W@Z 000000018002dcb0 f   libucrtd:getstringtypea.obj
  0001:0002ccb0       ??0?$__crt_scoped_stack_ptr@_W@@QEAA@U?$__crt_scoped_stack_ptr_tag@_W@@@Z 000000018002dcb0 f   libucrtd:getstringtypea.obj
- 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAA@QEAU__vcrt_ptd@@@Z 000000018002dcb0 f   libvcruntimed:per_thread_data.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAA@QEAP6AXXZ@Z 000000018002dcb0 f   libucrtd:onexit.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAA@QEAPEAU__crt_stdio_stream_data@@@Z 000000018002dcb0 f   libucrtd:_file.obj
  0001:0002ccb0       ??0?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEAA@QEAX@Z 000000018002dcb0 f   libucrtd:crtmbox.obj
+ 0001:0002ccb0       ??0?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAA@QEAU__vcrt_ptd@@@Z 000000018002dcb0 f   libvcruntimed:per_thread_data.obj
  0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libucrtd:argv_parsing.obj
- 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libvcruntimed:std_exception.obj
- 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libucrtd:per_thread_data.obj
- 0001:0002cfb0       ??B?$__crt_scoped_stack_ptr@_W@@QEBA_NXZ 000000018002dfb0 f i libucrtd:lcmapstringa.obj
- 0001:0002cfb0       ?valid@__crt_stdio_stream@@QEBA_NXZ 000000018002dfb0 f i libucrtd:output.obj
- 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libvcruntimed:std_type_info.obj
  0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libvcruntimed:per_thread_data.obj
  0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libucrtd:osfinfo.obj
+ 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libvcruntimed:std_type_info.obj
+ 0001:0002cfb0       ??B?$__crt_scoped_stack_ptr@_W@@QEBA_NXZ 000000018002dfb0 f i libucrtd:lcmapstringa.obj
+ 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libucrtd:per_thread_data.obj
  0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libucrtd:mbctype.obj
+ 0001:0002cfb0       ?valid@__crt_stdio_stream@@QEBA_NXZ 000000018002dfb0 f i libucrtd:output.obj
+ 0001:0002cfb0       ?is_valid@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBA_NXZ 000000018002dfb0 f i libvcruntimed:std_exception.obj
  0001:0002d6f0       __acrt_initialize_multibyte 000000018002e6f0 f   libucrtd:mbctype.obj
  0001:0002d720       __acrt_update_thread_multibyte_data 000000018002e720 f   libucrtd:mbctype.obj
  0001:0002d830       _setmbcp_nolock            000000018002e830 f   libucrtd:mbctype.obj
@@ -778,11 +778,11 @@
  0001:0002ea10       _query_new_handler         000000018002fa10 f   libucrtd:new_handler.obj
  0001:0002ea50       ??$?RV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@V<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@?$__crt_seh_guarded_call@P6AXH@Z@@QEAAP6AXH@Z$$QEAV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@$$QEAV<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@Z 000000018002fa50 f i libucrtd:signal.obj
  0001:0002eaa0       ??$__acrt_lock_and_call@V<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@@@YAP6AXH@ZW4__acrt_lock_id@@$$QEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@@Z 000000018002faa0 f i libucrtd:signal.obj
- 0001:0002ec30       ?value@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAAEAP6AHPEAU_exception@@@ZXZ 000000018002fc30 f i libucrtd:matherr.obj
- 0001:0002ec30       ?value@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAAEAPEAU__crt_locale_data@@XZ 000000018002fc30 f i libucrtd:per_thread_data.obj
  0001:0002ec30       ?value@?$dual_state_global@P6AXH@Z@__crt_state_management@@QEAAAEAP6AXH@ZXZ 000000018002fc30 f i libucrtd:signal.obj
+ 0001:0002ec30       ?value@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAAEAP6AHPEAU_exception@@@ZXZ 000000018002fc30 f i libucrtd:matherr.obj
  0001:0002ec30       ?value@?$dual_state_global@P6AXPEB_W00I_K@Z@__crt_state_management@@QEAAAEAP6AXPEB_W00I_K@ZXZ 000000018002fc30 f i libucrtd:invalid_parameter.obj
  0001:0002ec30       ?value@?$dual_state_global@P6AH_K@Z@__crt_state_management@@QEAAAEAP6AH_K@ZXZ 000000018002fc30 f i libucrtd:new_handler.obj
+ 0001:0002ec30       ?value@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAAEAPEAU__crt_locale_data@@XZ 000000018002fc30 f i libucrtd:per_thread_data.obj
  0001:0002ec50       __acrt_get_sigabrt_handler 000000018002fc50 f   libucrtd:signal.obj
  0001:0002ec70       __acrt_initialize_signal_handlers 000000018002fc70 f   libucrtd:signal.obj
  0001:0002ecd0       __fpecode                  000000018002fcd0 f   libucrtd:signal.obj
@@ -817,24 +817,24 @@
  0001:000316b0       _vsnprintf_s_l             00000001800326b0 f i libucrtd:dbgrptt.obj
  0001:00031730       _vsnwprintf_s              0000000180032730 f i libucrtd:dbgrptt.obj
  0001:00031780       wcslen                     0000000180032780 f   libucrtd:wcslen.obj
- 0001:000319c0       ??$message_box@$$TAEAPEB_WAEAPEB_WAEAI@?$__crt_char_traits@_W@@SAH$$QEA$$TAEAPEB_W1AEAI@Z 00000001800329c0 f i libucrtd:crtmbox.obj
  0001:000319c0       ??$message_box@$$TAEBQEB_WAEBQEB_WK@?$__crt_char_traits@_W@@SAH$$QEA$$TAEBQEB_W1$$QEAK@Z 00000001800329c0 f i libucrtd:crtmbox.obj
  0001:000319c0       ??$message_box@PEAUHWND__@@AEBQEB_WAEBQEB_WAEBI@?$__crt_char_traits@_W@@SAH$$QEAPEAUHWND__@@AEBQEB_W1AEBI@Z 00000001800329c0 f i libucrtd:crtmbox.obj
+ 0001:000319c0       ??$message_box@$$TAEAPEB_WAEAPEB_WAEAI@?$__crt_char_traits@_W@@SAH$$QEA$$TAEAPEB_W1AEAI@Z 00000001800329c0 f i libucrtd:crtmbox.obj
  0001:00031a70       ??$output_debug_string@AEBQEB_W@?$__crt_char_traits@_W@@SAXAEBQEB_W@Z 0000000180032a70 f i libucrtd:crtmbox.obj
  0001:00031a90       ??1?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEAA@XZ 0000000180032a90 f i libucrtd:crtmbox.obj
  0001:00031ab0       ??B?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEBA_NXZ 0000000180032ab0 f i libucrtd:crtmbox.obj
  0001:00031ad0       ?close@?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEAAXXZ 0000000180032ad0 f i libucrtd:crtmbox.obj
  0001:00031b10       ?close@__crt_handle_traits@@SA_NPEAX@Z 0000000180032b10 f i libucrtd:crtmbox.obj
- 0001:00031b50       ?get_invalid_value@__crt_findfile_traits@@SAPEAXXZ 0000000180032b50 f i libucrtd:argv_wildcards.obj
  0001:00031b50       ?get_invalid_value@__crt_handle_traits@@SAPEAXXZ 0000000180032b50 f i libucrtd:crtmbox.obj
+ 0001:00031b50       ?get_invalid_value@__crt_findfile_traits@@SAPEAXXZ 0000000180032b50 f i libucrtd:argv_wildcards.obj
  0001:00031b60       ?is_valid@?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEBA_NXZ 0000000180032b60 f i libucrtd:crtmbox.obj
  0001:00031ba0       __acrt_show_wide_message_box 0000000180032ba0 f   libucrtd:crtmbox.obj
  0001:00031bf0       _isdigit_l                 0000000180032bf0 f i libucrtd:_ctype.obj
  0001:00031c40       isdigit                    0000000180032c40 f i libucrtd:_ctype.obj
  0001:00032010       _tolower_l                 0000000180033010 f   libucrtd:tolower_toupper.obj
  0001:00032040       tolower                    0000000180033040 f   libucrtd:tolower_toupper.obj
- 0001:000320a0       ??$make_c_string_character_source@DPEAPEAD@__crt_strtox@@YA?AV?$c_string_character_source@D@0@QEBDQEAPEAD@Z 00000001800330a0 f i libucrtd:strtox.obj
  0001:000320a0       ??$make_c_string_character_source@_WPEAPEA_W@__crt_strtox@@YA?AV?$c_string_character_source@_W@0@QEB_WQEAPEA_W@Z 00000001800330a0 f i libucrtd:strtox.obj
+ 0001:000320a0       ??$make_c_string_character_source@DPEAPEAD@__crt_strtox@@YA?AV?$c_string_character_source@D@0@QEBDQEAPEAD@Z 00000001800330a0 f i libucrtd:strtox.obj
  0001:000320e0       ??$parse_integer_from_string@JDPEAPEAD@__crt_strtox@@YAJQEBDQEAPEADHQEAU__crt_locale_pointers@@@Z 00000001800330e0 f i libucrtd:strtox.obj
  0001:00032130       ??$parse_integer_from_string@J_WPEAPEA_W@__crt_strtox@@YAJQEB_WQEAPEA_WHQEAU__crt_locale_pointers@@@Z 0000000180033130 f i libucrtd:strtox.obj
  0001:00032180       strtol                     0000000180033180 f   libucrtd:strtox.obj
@@ -887,8 +887,8 @@
  0001:00036be0       __acrt_update_thread_locale_data 0000000180037be0 f   libucrtd:locale_refcounting.obj
  0001:00036c90       _updatetlocinfoEx_nolock   0000000180037c90 f   libucrtd:locale_refcounting.obj
  0001:00036ef0       __acrt_DownlevelLocaleNameToLCID 0000000180037ef0 f   libucrtd:lcidtoname_downlevel.obj
- 0001:00036f50       ??1?$__crt_simd_cleanup_guard@$0A@@@QEAA@XZ 0000000180037f50 f i libucrtd:strnlen.obj
  0001:00036f50       ??1scoped_global_state_reset@__crt_state_management@@QEAA@XZ 0000000180037f50 f i libucrtd:qsort.obj
+ 0001:00036f50       ??1?$__crt_simd_cleanup_guard@$0A@@@QEAA@XZ 0000000180037f50 f i libucrtd:strnlen.obj
  0001:00036f50       _guard_check_icall_nop     0000000180037f50 f i LIBCMTD:guard_support.obj
  0001:000370e0       qsort                      00000001800380e0 f   libucrtd:qsort.obj
  0001:00037ec0       wcsncpy_s                  0000000180038ec0 f   libucrtd:wcsncpy_s.obj
@@ -902,15 +902,15 @@
  0001:000388c0       __acrt_GetStringTypeA      00000001800398c0 f   libucrtd:getstringtypea.obj
  0001:00038b20       _freea_crt                 0000000180039b20 f i libucrtd:getstringtypea.obj
  0001:000391b0       __acrt_LCMapStringA        000000018003a1b0 f   libucrtd:lcmapstringa.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_multibyte_data@@XZ 000000018003a260 f i libucrtd:mbctype.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEADXZ 000000018003a260 f i libucrtd:argv_parsing.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_lowio_handle_data@@XZ 000000018003a260 f i libucrtd:osfinfo.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAAPEAPEAU__crt_stdio_stream_data@@XZ 000000018003a260 f i libucrtd:_file.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAPEAEXZ 000000018003a260 f i libucrtd:argv_parsing.obj
+ 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__acrt_ptd@@XZ 000000018003a260 f i libucrtd:per_thread_data.obj
  0001:00039260       ?detach@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAAPEADXZ 000000018003a260 f i libvcruntimed:std_exception.obj
  0001:00039260       ?detach@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAPEAP6AXXZXZ 000000018003a260 f i libucrtd:onexit.obj
  0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__vcrt_ptd@@XZ 000000018003a260 f i libvcruntimed:per_thread_data.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_lowio_handle_data@@XZ 000000018003a260 f i libucrtd:osfinfo.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_multibyte_data@@XZ 000000018003a260 f i libucrtd:mbctype.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAPEAEXZ 000000018003a260 f i libucrtd:argv_parsing.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEADXZ 000000018003a260 f i libucrtd:argv_parsing.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAAPEAPEAU__crt_stdio_stream_data@@XZ 000000018003a260 f i libucrtd:_file.obj
- 0001:00039260       ?detach@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__acrt_ptd@@XZ 000000018003a260 f i libucrtd:per_thread_data.obj
  0001:00039290       __acrt_lowio_create_handle_array 000000018003a290 f   libucrtd:osfinfo.obj
  0001:00039420       __acrt_lowio_destroy_handle_array 000000018003a420 f   libucrtd:osfinfo.obj
  0001:000394a0       __acrt_lowio_ensure_fh_exists 000000018003a4a0 f   libucrtd:osfinfo.obj
@@ -945,8 +945,8 @@
  0001:0003e4c0       ??0big_integer@__crt_strtox@@QEAA@XZ 000000018003f4c0 f i libucrtd:cfout.obj
  0001:0003e500       ??0scoped_fp_state_reset@?A0xce32f86b@@QEAA@XZ 000000018003f500 f i libucrtd:cfout.obj
  0001:0003e550       ??1scoped_fp_state_reset@?A0xce32f86b@@QEAA@XZ 000000018003f550 f i libucrtd:cfout.obj
- 0001:0003e580       ??4big_integer@__crt_strtox@@QEAAAEAU01@AEBU01@@Z 000000018003f580 f i libucrtd:cfout.obj
  0001:0003e580       ??0big_integer@__crt_strtox@@QEAA@AEBU01@@Z 000000018003f580 f i libucrtd:cfout.obj
+ 0001:0003e580       ??4big_integer@__crt_strtox@@QEAAAEAU01@AEBU01@@Z 000000018003f580 f i libucrtd:cfout.obj
  0001:0003e5e0       ??8__crt_strtox@@YA_NAEBUbig_integer@0@0@Z 000000018003f5e0 f i libucrtd:cfout.obj
  0001:0003e650       ??9__crt_strtox@@YA_NAEBUbig_integer@0@0@Z 000000018003f650 f i libucrtd:cfout.obj
  0001:0003e690       ?add_carry@__crt_strtox@@YAIAEAIII@Z 000000018003f690 f i libucrtd:cfout.obj
@@ -1007,8 +1007,8 @@
  0001:00043ea0       ??3@YAXPEAX_K@Z            0000000180044ea0 f   LIBCMTD:delete_scalar_size.obj
  0001:00043ec0       ??3@YAXPEAX@Z              0000000180044ec0 f   LIBCMTD:delete_scalar.obj
  0001:00043ede       RtlUnwindEx                0000000180044ede f   kernel32:KERNEL32.dll
- 0001:00043f00       memcpy                     0000000180044f00 f   libvcruntimed:memcpy.obj
  0001:00043f00       memmove                    0000000180044f00 f   libvcruntimed:memcpy.obj
+ 0001:00043f00       memcpy                     0000000180044f00 f   libvcruntimed:memcpy.obj
  0001:00044350       memset                     0000000180045350 f   libvcruntimed:memset.obj
  0001:00044500       memcmp                     0000000180045500 f   libvcruntimed:memcmp.obj
  0001:000445d0       strrchr                    00000001800455d0 f   libvcruntimed:strrchr.obj
@@ -1210,8 +1210,8 @@
  0002:00000910       __xmm@3f8000003f8000003f8000003f800000 000000018004a910     ivan.obj
  0002:00000920       __xmm@80000000000000008000000000000000 000000018004a920     ivan.obj
  0002:00000930       __xmm@80000000800000008000000080000000 000000018004a930     ivan.obj
- 0002:00000950       _pDefaultRawDllMain        000000018004a950     LIBCMTD:dll_dllmain.obj
  0002:00000950       _pRawDllMain               000000018004a950     LIBCMTD:dll_dllmain.obj
+ 0002:00000950       _pDefaultRawDllMain        000000018004a950     LIBCMTD:dll_dllmain.obj
  0002:00000958       ??_C@_0DN@JAECLCAP@f?3?2dd?2vctools?2crt?2vcruntime?2src?2@ 000000018004a958     libvcruntimed:per_thread_data.obj
  0002:000009b8       ??_C@_1BC@DNHGCMLG@?$AAa?$AAd?$AAv?$AAa?$AAp?$AAi?$AA3?$AA2?$AA?$AA@ 000000018004a9b8     libvcruntimed:winapi_downlevel.obj
  0002:000009d0       ??_C@_1DM@KHCHBNEB@?$AAa?$AAp?$AAi?$AA?9?$AAm?$AAs?$AA?9?$AAw?$AAi?$AAn?$AA?9?$AAc?$AAo?$AAr?$AAe?$AA?9?$AAf?$AAi?$AAb?$AAe?$AAr?$AAs?$AA?9?$AAl?$AA1?$AA?9?$AA1?$AA?9?$AA1?$AA?$AA@ 000000018004a9d0     libvcruntimed:winapi_downlevel.obj
@@ -2453,9 +2453,9 @@
  0001:0000aef0       ?GenerateVoxelChunk@@YAXPEAUvoxel_chunk_header@@PEAUvoxel_chunk_manager@@@Z 000000018000bef0 f   ivan.obj
  0001:0000afe0       ?GenerateVoxelMesh@@YAXPEAUvoxel_chunk_header@@PEAUvoxel_chunk_manager@@@Z 000000018000bfe0 f   ivan.obj
  0001:0000b0e0       ?UpdateVoxelChunks@@YAXPEAUvoxel_chunk_manager@@PEAUrender_group@@Tvec3@@@Z 000000018000c0e0 f   ivan.obj
- 0001:0000ba10       ?AllocateVoxelChunkManager@@YAPEAUvoxel_chunk_manager@@PEAUtransient_state@@PEAUgame_assets@@@Z 000000018000ca10 f   ivan.obj
- 0001:0000c200       ?UpdateCameraVectors@@YAXPEAUcamera_transform@@MMMTvec3@@@Z 000000018000d200 f   ivan.obj
- 0001:0000dce0       init_memcpy_functions      000000018000ece0 f i libvcruntimed:initialization.obj
+ 0001:0000ba20       ?AllocateVoxelChunkManager@@YAPEAUvoxel_chunk_manager@@PEAUtransient_state@@PEAUgame_assets@@@Z 000000018000ca20 f   ivan.obj
+ 0001:0000c210       ?UpdateCameraVectors@@YAXPEAUcamera_transform@@MMMTvec3@@@Z 000000018000d210 f   ivan.obj
+ 0001:0000dcf0       init_memcpy_functions      000000018000ecf0 f i libvcruntimed:initialization.obj
  0001:00012954       $LN32                      0000000180013954     ivan.obj
  0001:000150e0       capture_previous_context   00000001800160e0 f   LIBCMTD:gs_report.obj
  0001:000152e0       $$000000                   00000001800162e0     LIBCMTD:_amdsecgs_.obj
@@ -2824,20 +2824,20 @@
  0001:000486b1       __FrameUnwindToState$fin$1 00000001800496b1 f   libvcruntimed:frame.obj
  0002:000002f0       $SG7210                    000000018004a2f0     ivan.obj
  0002:000002f4       $SG7211                    000000018004a2f4     ivan.obj
- 0002:000002f8       $SG18696                   000000018004a2f8     ivan.obj
- 0002:00000300       $SG18698                   000000018004a300     ivan.obj
- 0002:00000328       $SG18700                   000000018004a328     ivan.obj
- 0002:00000348       $SG18704                   000000018004a348     ivan.obj
+ 0002:000002f8       $SG18692                   000000018004a2f8     ivan.obj
+ 0002:00000300       $SG18694                   000000018004a300     ivan.obj
+ 0002:00000328       $SG18696                   000000018004a328     ivan.obj
+ 0002:00000348       $SG18700                   000000018004a348     ivan.obj
  0002:0000035c       $SG6622                    000000018004a35c     ivan.obj
- 0002:00000368       $SG20012                   000000018004a368     ivan.obj
+ 0002:00000368       $SG20008                   000000018004a368     ivan.obj
  0002:0000037c       $SG6715                    000000018004a37c     ivan.obj
  0002:00000384       $SG6716                    000000018004a384     ivan.obj
  0002:00000390       ?stbsp__bot@@3QBNB         000000018004a390     ivan.obj
- 0002:00000448       $SG20371                   000000018004a448     ivan.obj
+ 0002:00000448       $SG20367                   000000018004a448     ivan.obj
  0002:00000460       ?stbsp__negbot@@3QBNB      000000018004a460     ivan.obj
  0002:00000510       ?stbsp__negboterr@@3QBNB   000000018004a510     ivan.obj
  0002:000005c0       ?stbsp__top@@3QBNB         000000018004a5c0     ivan.obj
- 0002:00000628       $SG20388                   000000018004a628     ivan.obj
+ 0002:00000628       $SG20384                   000000018004a628     ivan.obj
  0002:00000640       ?stbsp__negtop@@3QBNB      000000018004a640     ivan.obj
  0002:000006b0       ?stbsp__toperr@@3QBNB      000000018004a6b0     ivan.obj
  0002:00000720       ?stbsp__negtoperr@@3QBNB   000000018004a720     ivan.obj
@@ -4724,8 +4724,8 @@
  0004:000012cc       $pdata$??$extract_argument_from_va_list@_J_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001800652cc     libucrtd:output.obj
  0004:000012cc       $pdata$??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 00000001800652cc     libucrtd:output.obj
  0004:000012cc       $pdata$??$extract_argument_from_va_list@PEADPEAD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 00000001800652cc     libucrtd:output.obj
- 0004:000012cc       $pdata$??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 00000001800652cc     libucrtd:output.obj
  0004:000012cc       $pdata$??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 00000001800652cc     libucrtd:output.obj
+ 0004:000012cc       $pdata$??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 00000001800652cc     libucrtd:output.obj
  0004:000012d8       $pdata$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001800652d8     libucrtd:output.obj
  0004:000012d8       $pdata$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001800652d8     libucrtd:output.obj
  0004:000012e4       $pdata$??$extract_argument_from_va_list@_W_W@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 00000001800652e4     libucrtd:output.obj
@@ -4734,18 +4734,18 @@
  0004:000012fc       $pdata$??$is_wide_character_specifier@_W@__crt_stdio_output@@YA_N_K_WW4length_modifier@0@@Z 00000001800652fc     libucrtd:output.obj
  0004:00001308       $pdata$??$read_va_arg@E@__crt_stdio_output@@YAEAEAPEAD@Z 0000000180065308     libucrtd:output.obj
  0004:00001308       $pdata$??$read_va_arg@C@__crt_stdio_output@@YACAEAPEAD@Z 0000000180065308     libucrtd:output.obj
- 0004:00001314       $pdata$??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 0000000180065314     libucrtd:output.obj
- 0004:00001314       $pdata$??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 0000000180065314     libucrtd:output.obj
- 0004:00001314       $pdata$??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 0000000180065314     libucrtd:output.obj
- 0004:00001320       $pdata$??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 0000000180065320     libucrtd:output.obj
- 0004:00001320       $pdata$??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 0000000180065320     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@_J@__crt_stdio_output@@YA_JAEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@PEAX@__crt_stdio_output@@YAPEAXAEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@U_CRT_DOUBLE@@@__crt_stdio_output@@YA?AU_CRT_DOUBLE@@AEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@PEAD@__crt_stdio_output@@YAPEADAEAPEAD@Z 000000018006532c     libucrtd:output.obj
- 0004:0000132c       $pdata$??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 000000018006532c     libucrtd:output.obj
+ 0004:00001314       $pdata$??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 0000000180065314     libucrtd:output.obj
+ 0004:00001314       $pdata$??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 0000000180065314     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@U_CRT_DOUBLE@@@__crt_stdio_output@@YA?AU_CRT_DOUBLE@@AEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@_J@__crt_stdio_output@@YA_JAEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@PEAD@__crt_stdio_output@@YAPEADAEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@PEAX@__crt_stdio_output@@YAPEAXAEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:00001320       $pdata$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 0000000180065320     libucrtd:output.obj
+ 0004:0000132c       $pdata$??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 000000018006532c     libucrtd:output.obj
+ 0004:0000132c       $pdata$??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 000000018006532c     libucrtd:output.obj
+ 0004:0000132c       $pdata$??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 000000018006532c     libucrtd:output.obj
  0004:00001338       $pdata$??$scratch_count@D@formatting_buffer@__crt_stdio_output@@QEBA_KXZ 0000000180065338     libucrtd:output.obj
  0004:00001344       $pdata$??$scratch_data@D@formatting_buffer@__crt_stdio_output@@QEAAPEADXZ 0000000180065344     libucrtd:output.obj
  0004:00001350       $pdata$??$tcstol@PEBDPEAPEADH@?$__crt_char_traits@D@@SAJ$$QEAPEBD$$QEAPEAPEAD$$QEAH@Z 0000000180065350     libucrtd:output.obj

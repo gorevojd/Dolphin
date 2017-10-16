@@ -1,6 +1,6 @@
  win32_ivan
 
- Timestamp is 59e3051c (Sun Oct 15 10:50:04 2017)
+ Timestamp is 59e4952a (Mon Oct 16 15:16:58 2017)
 
  Preferred load address is 0000000140000000
 
@@ -2851,21 +2851,21 @@
  0001:0003f120       ?fin$0@?0???$?RV<lambda_b0d8f1f77f5878de4f648f281b223c15>@@AEAV<lambda_942beefa13ab35ff55f86422493ffd6a>@@V<lambda_7adb6fc9c0d6a5bd4e2d9c212ec7cdcc>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_b0d8f1f77f5878de4f648f281b223c15>@@AEAV<lambda_942beefa13ab35ff55f86422493ffd6a>@@$$QEAV<lambda_7adb6fc9c0d6a5bd4e2d9c212ec7cdcc>@@@Z@4HA 0000000140040120 f   libucrtd:onexit.obj
  0001:0003f120       ?fin$0@?0???$?RV<lambda_d22e02de4d14401f49897516b29a2b7c>@@AEAV<lambda_e971338317bfa523bb8920b43d823727>@@V<lambda_b0b8599c9027f5b14541fbbd6863d1f1>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_d22e02de4d14401f49897516b29a2b7c>@@AEAV<lambda_e971338317bfa523bb8920b43d823727>@@$$QEAV<lambda_b0b8599c9027f5b14541fbbd6863d1f1>@@@Z@4HA 0000000140040120 f   libucrtd:onexit.obj
  0001:0003f120       ?fin$0@?0???$?RV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@V<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@?$__crt_seh_guarded_call@P6AXH@Z@@QEAAP6AXH@Z$$QEAV<lambda_c36588078e9f5dfd39652860aa6b3aaf>@@AEAV<lambda_ec61778202f4f5fc7e7711acc23c3bca>@@$$QEAV<lambda_dc9d2797ccde5d239b4a0efae8ebd7db>@@@Z@4HA 0000000140040120 f   libucrtd:signal.obj
- 0001:0003f140       __BuildCatchObjectHelper$filt$0 0000000140040140 f   libvcruntimed:frame.obj
  0001:0003f140       ?filt$0@?0??is_bad_read_pointer@@YA_NQEBX_K@Z@4HA 0000000140040140 f   libucrtd:debug_heap.obj
+ 0001:0003f140       __BuildCatchObjectHelper$filt$0 0000000140040140 f   libvcruntimed:frame.obj
  0001:0003f140       __BuildCatchObject$filt$0  0000000140040140 f   libvcruntimed:frame.obj
  0001:0003f140       terminate$filt$0           0000000140040140 f   libucrtd:terminate.obj
  0001:0003f160       ?fin$0@?0??validate_heap_if_required_nolock@@YAXXZ@4HA 0000000140040160 f   libucrtd:debug_heap.obj
- 0001:0003f180       _CrtMemCheckpoint$fin$0    0000000140040180 f   libucrtd:debug_heap.obj
  0001:0003f180       ?fin$0@?0??heap_alloc_dbg_internal@@YAPEAX_KHQEBDH@Z@4HA 0000000140040180 f   libucrtd:debug_heap.obj
- 0001:0003f1a0       _CrtCheckMemory$fin$0      00000001400401a0 f   libucrtd:debug_heap.obj
- 0001:0003f1a0       _CrtMemDumpAllObjectsSince$fin$0 00000001400401a0 f   libucrtd:debug_heap.obj
+ 0001:0003f180       _CrtMemCheckpoint$fin$0    0000000140040180 f   libucrtd:debug_heap.obj
  0001:0003f1a0       _CrtSetDbgFlag$fin$0       00000001400401a0 f   libucrtd:debug_heap.obj
- 0001:0003f1a0       _realloc_dbg$fin$0         00000001400401a0 f   libucrtd:debug_heap.obj
+ 0001:0003f1a0       _CrtMemDumpAllObjectsSince$fin$0 00000001400401a0 f   libucrtd:debug_heap.obj
  0001:0003f1a0       _msize_dbg$fin$0           00000001400401a0 f   libucrtd:debug_heap.obj
+ 0001:0003f1a0       _realloc_dbg$fin$0         00000001400401a0 f   libucrtd:debug_heap.obj
+ 0001:0003f1a0       _CrtCheckMemory$fin$0      00000001400401a0 f   libucrtd:debug_heap.obj
  0001:0003f1c0       ?fin$0@?0???$?RV<lambda_441f2315ac0f593d45428a8fceb6abe6>@@AEAV<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@V<lambda_1d10a5a8ccb596b49763520e59d5af47>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_441f2315ac0f593d45428a8fceb6abe6>@@AEAV<lambda_2f900415df1f7f624cdaaefe86d0b1c0>@@$$QEAV<lambda_1d10a5a8ccb596b49763520e59d5af47>@@@Z@4HA 00000001400401c0 f   libucrtd:mbctype.obj
- 0001:0003f1c0       ?fin$0@?0???$?RV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@V<lambda_2c95662d60720604e97e3009a1ee1859>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@$$QEAV<lambda_2c95662d60720604e97e3009a1ee1859>@@@Z@4HA 00000001400401c0 f   libucrtd:per_thread_data.obj
  0001:0003f1c0       ?fin$0@?0???$?RV<lambda_fb3a7dec4e47f37f22dae91bb15c9095>@@AEAV<lambda_698284760c8add0bfb0756c19673e34b>@@V<lambda_dfb8eca1e75fef3034a8fb18dd509707>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_fb3a7dec4e47f37f22dae91bb15c9095>@@AEAV<lambda_698284760c8add0bfb0756c19673e34b>@@$$QEAV<lambda_dfb8eca1e75fef3034a8fb18dd509707>@@@Z@4HA 00000001400401c0 f   libucrtd:per_thread_data.obj
+ 0001:0003f1c0       ?fin$0@?0???$?RV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@V<lambda_2c95662d60720604e97e3009a1ee1859>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@$$QEAV<lambda_2c95662d60720604e97e3009a1ee1859>@@@Z@4HA 00000001400401c0 f   libucrtd:per_thread_data.obj
  0001:0003f1c0       ?fin$0@?0???$?RV<lambda_72d1df2b273a38828b1ce30cbf4cdab5>@@AEAV<lambda_876a65b173b8412d3a47c70a915b0cf4>@@V<lambda_41932305e351933ebe8f8be3ed8bb5dc>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_72d1df2b273a38828b1ce30cbf4cdab5>@@AEAV<lambda_876a65b173b8412d3a47c70a915b0cf4>@@$$QEAV<lambda_41932305e351933ebe8f8be3ed8bb5dc>@@@Z@4HA 00000001400401c0 f   libucrtd:per_thread_data.obj
  0001:0003f1c0       ?fin$0@?0???$?RV<lambda_5e887d1dcbef67a5eb4283622ba103bf>@@AEAV<lambda_4466841279450cc726390878d4a41900>@@V<lambda_341c25c0346d94847f1f3c463c57e077>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_5e887d1dcbef67a5eb4283622ba103bf>@@AEAV<lambda_4466841279450cc726390878d4a41900>@@$$QEAV<lambda_341c25c0346d94847f1f3c463c57e077>@@@Z@4HA 00000001400401c0 f   libucrtd:per_thread_data.obj
  0001:0003f1e0       __acrt_update_thread_multibyte_data$fin$0 00000001400401e0 f   libucrtd:mbctype.obj
@@ -2904,146 +2904,146 @@
  0002:00000500       ?post_pgo_initializer@@3P6AHXZEA 0000000140041500     LIBCMTD:exe_winmain.obj
  0002:00000560       $SG7209                    0000000140041560     win32_ivan.obj
  0002:00000564       $SG7210                    0000000140041564     win32_ivan.obj
- 0002:00000568       $SG100415                  0000000140041568     win32_ivan.obj
- 0002:00000580       $SG100416                  0000000140041580     win32_ivan.obj
- 0002:00000598       $SG100417                  0000000140041598     win32_ivan.obj
- 0002:000005b0       $SG100450                  00000001400415b0     win32_ivan.obj
- 0002:000005c0       $SG100452                  00000001400415c0     win32_ivan.obj
- 0002:000005d0       $SG100454                  00000001400415d0     win32_ivan.obj
- 0002:000005e0       $SG100456                  00000001400415e0     win32_ivan.obj
- 0002:000005f0       $SG100458                  00000001400415f0     win32_ivan.obj
- 0002:00000600       $SG100460                  0000000140041600     win32_ivan.obj
- 0002:00000610       $SG100461                  0000000140041610     win32_ivan.obj
- 0002:00000620       $SG100623                  0000000140041620     win32_ivan.obj
- 0002:00000630       $SG100625                  0000000140041630     win32_ivan.obj
- 0002:00000648       $SG100627                  0000000140041648     win32_ivan.obj
- 0002:00000660       $SG100628                  0000000140041660     win32_ivan.obj
- 0002:00000680       $SG100629                  0000000140041680     win32_ivan.obj
- 0002:000006a0       $SG100633                  00000001400416a0     win32_ivan.obj
- 0002:000006c0       $SG100635                  00000001400416c0     win32_ivan.obj
- 0002:000006e0       $SG100696                  00000001400416e0     win32_ivan.obj
- 0002:00000700       $SG100697                  0000000140041700     win32_ivan.obj
- 0002:00000720       $SG100698                  0000000140041720     win32_ivan.obj
- 0002:00000738       $SG100699                  0000000140041738     win32_ivan.obj
- 0002:00000750       $SG100700                  0000000140041750     win32_ivan.obj
- 0002:00000770       $SG100701                  0000000140041770     win32_ivan.obj
- 0002:00000788       $SG100702                  0000000140041788     win32_ivan.obj
- 0002:000007a0       $SG100703                  00000001400417a0     win32_ivan.obj
- 0002:000007b0       $SG100704                  00000001400417b0     win32_ivan.obj
- 0002:000007c0       $SG100705                  00000001400417c0     win32_ivan.obj
- 0002:000007d0       $SG100706                  00000001400417d0     win32_ivan.obj
- 0002:000007e0       $SG100707                  00000001400417e0     win32_ivan.obj
- 0002:000007f0       $SG100708                  00000001400417f0     win32_ivan.obj
- 0002:00000800       $SG100709                  0000000140041800     win32_ivan.obj
- 0002:00000810       $SG100710                  0000000140041810     win32_ivan.obj
- 0002:00000828       $SG100711                  0000000140041828     win32_ivan.obj
- 0002:00000840       $SG100712                  0000000140041840     win32_ivan.obj
- 0002:00000858       $SG100713                  0000000140041858     win32_ivan.obj
- 0002:00000868       $SG100714                  0000000140041868     win32_ivan.obj
- 0002:00000878       $SG100715                  0000000140041878     win32_ivan.obj
- 0002:00000888       $SG100716                  0000000140041888     win32_ivan.obj
- 0002:00000898       $SG100717                  0000000140041898     win32_ivan.obj
- 0002:000008a8       $SG100718                  00000001400418a8     win32_ivan.obj
- 0002:000008b8       $SG100719                  00000001400418b8     win32_ivan.obj
- 0002:000008c8       $SG100720                  00000001400418c8     win32_ivan.obj
- 0002:000008e0       $SG100721                  00000001400418e0     win32_ivan.obj
- 0002:000008f8       $SG100722                  00000001400418f8     win32_ivan.obj
- 0002:00000910       $SG100723                  0000000140041910     win32_ivan.obj
- 0002:00000920       $SG100724                  0000000140041920     win32_ivan.obj
- 0002:00000930       $SG100725                  0000000140041930     win32_ivan.obj
- 0002:00000948       $SG100726                  0000000140041948     win32_ivan.obj
- 0002:00000958       $SG100727                  0000000140041958     win32_ivan.obj
- 0002:00000970       $SG100728                  0000000140041970     win32_ivan.obj
- 0002:00000980       $SG100729                  0000000140041980     win32_ivan.obj
- 0002:00000990       $SG100730                  0000000140041990     win32_ivan.obj
- 0002:000009a0       $SG100731                  00000001400419a0     win32_ivan.obj
- 0002:000009b0       $SG100732                  00000001400419b0     win32_ivan.obj
- 0002:000009c0       $SG100733                  00000001400419c0     win32_ivan.obj
- 0002:000009d0       $SG100734                  00000001400419d0     win32_ivan.obj
- 0002:000009e0       $SG100735                  00000001400419e0     win32_ivan.obj
- 0002:000009f0       $SG100736                  00000001400419f0     win32_ivan.obj
- 0002:00000a08       $SG100737                  0000000140041a08     win32_ivan.obj
- 0002:00000a20       $SG100738                  0000000140041a20     win32_ivan.obj
- 0002:00000a30       $SG100740                  0000000140041a30     win32_ivan.obj
- 0002:00000a48       $SG100741                  0000000140041a48     win32_ivan.obj
- 0002:00000a60       $SG100742                  0000000140041a60     win32_ivan.obj
- 0002:00000a78       $SG100743                  0000000140041a78     win32_ivan.obj
- 0002:00000a98       $SG100744                  0000000140041a98     win32_ivan.obj
- 0002:00000ab0       $SG99760                   0000000140041ab0     win32_ivan.obj
- 0002:00000ac8       $SG99763                   0000000140041ac8     win32_ivan.obj
- 0002:00000ae0       $SG99766                   0000000140041ae0     win32_ivan.obj
- 0002:00000af8       $SG99767                   0000000140041af8     win32_ivan.obj
- 0002:00000b00       $SG99768                   0000000140041b00     win32_ivan.obj
- 0002:00000b0c       $SG99769                   0000000140041b0c     win32_ivan.obj
- 0002:00000b18       $SG99770                   0000000140041b18     win32_ivan.obj
- 0002:00000b28       $SG99789                   0000000140041b28     win32_ivan.obj
- 0002:00000b40       $SG99792                   0000000140041b40     win32_ivan.obj
- 0002:00000b58       $SG99797                   0000000140041b58     win32_ivan.obj
- 0002:00000b80       $SG99798                   0000000140041b80     win32_ivan.obj
- 0002:00000ba8       $SG99799                   0000000140041ba8     win32_ivan.obj
- 0002:00000bb4       $SG99800                   0000000140041bb4     win32_ivan.obj
- 0002:00000bbc       $SG99801                   0000000140041bbc     win32_ivan.obj
- 0002:00000bc8       $SG99802                   0000000140041bc8     win32_ivan.obj
- 0002:00000bd8       $SG99803                   0000000140041bd8     win32_ivan.obj
- 0002:00000be8       $SG99804                   0000000140041be8     win32_ivan.obj
- 0002:00000bf8       $SG99805                   0000000140041bf8     win32_ivan.obj
- 0002:00000c0c       $SG6621                    0000000140041c0c     win32_ivan.obj
- 0002:00000c18       $SG99806                   0000000140041c18     win32_ivan.obj
- 0002:00000c30       $SG99807                   0000000140041c30     win32_ivan.obj
- 0002:00000c48       $SG100852                  0000000140041c48     win32_ivan.obj
- 0002:00000c58       $SG100891                  0000000140041c58     win32_ivan.obj
- 0002:00000c68       $SG100916                  0000000140041c68     win32_ivan.obj
+ 0002:00000568       $SG100411                  0000000140041568     win32_ivan.obj
+ 0002:00000580       $SG100412                  0000000140041580     win32_ivan.obj
+ 0002:00000598       $SG100413                  0000000140041598     win32_ivan.obj
+ 0002:000005b0       $SG100446                  00000001400415b0     win32_ivan.obj
+ 0002:000005c0       $SG100448                  00000001400415c0     win32_ivan.obj
+ 0002:000005d0       $SG100450                  00000001400415d0     win32_ivan.obj
+ 0002:000005e0       $SG100452                  00000001400415e0     win32_ivan.obj
+ 0002:000005f0       $SG100454                  00000001400415f0     win32_ivan.obj
+ 0002:00000600       $SG100456                  0000000140041600     win32_ivan.obj
+ 0002:00000610       $SG100457                  0000000140041610     win32_ivan.obj
+ 0002:00000620       $SG100619                  0000000140041620     win32_ivan.obj
+ 0002:00000630       $SG100621                  0000000140041630     win32_ivan.obj
+ 0002:00000648       $SG100623                  0000000140041648     win32_ivan.obj
+ 0002:00000660       $SG100624                  0000000140041660     win32_ivan.obj
+ 0002:00000680       $SG100625                  0000000140041680     win32_ivan.obj
+ 0002:000006a0       $SG100629                  00000001400416a0     win32_ivan.obj
+ 0002:000006c0       $SG100631                  00000001400416c0     win32_ivan.obj
+ 0002:000006e0       $SG100692                  00000001400416e0     win32_ivan.obj
+ 0002:00000700       $SG100693                  0000000140041700     win32_ivan.obj
+ 0002:00000720       $SG100694                  0000000140041720     win32_ivan.obj
+ 0002:00000738       $SG100695                  0000000140041738     win32_ivan.obj
+ 0002:00000750       $SG100696                  0000000140041750     win32_ivan.obj
+ 0002:00000770       $SG100697                  0000000140041770     win32_ivan.obj
+ 0002:00000788       $SG100698                  0000000140041788     win32_ivan.obj
+ 0002:000007a0       $SG100699                  00000001400417a0     win32_ivan.obj
+ 0002:000007b0       $SG100700                  00000001400417b0     win32_ivan.obj
+ 0002:000007c0       $SG100701                  00000001400417c0     win32_ivan.obj
+ 0002:000007d0       $SG100702                  00000001400417d0     win32_ivan.obj
+ 0002:000007e0       $SG100703                  00000001400417e0     win32_ivan.obj
+ 0002:000007f0       $SG100704                  00000001400417f0     win32_ivan.obj
+ 0002:00000800       $SG100705                  0000000140041800     win32_ivan.obj
+ 0002:00000810       $SG100706                  0000000140041810     win32_ivan.obj
+ 0002:00000828       $SG100707                  0000000140041828     win32_ivan.obj
+ 0002:00000840       $SG100708                  0000000140041840     win32_ivan.obj
+ 0002:00000858       $SG100709                  0000000140041858     win32_ivan.obj
+ 0002:00000868       $SG100710                  0000000140041868     win32_ivan.obj
+ 0002:00000878       $SG100711                  0000000140041878     win32_ivan.obj
+ 0002:00000888       $SG100712                  0000000140041888     win32_ivan.obj
+ 0002:00000898       $SG100713                  0000000140041898     win32_ivan.obj
+ 0002:000008a8       $SG100714                  00000001400418a8     win32_ivan.obj
+ 0002:000008b8       $SG100715                  00000001400418b8     win32_ivan.obj
+ 0002:000008c8       $SG100716                  00000001400418c8     win32_ivan.obj
+ 0002:000008e0       $SG100717                  00000001400418e0     win32_ivan.obj
+ 0002:000008f8       $SG100718                  00000001400418f8     win32_ivan.obj
+ 0002:00000910       $SG100719                  0000000140041910     win32_ivan.obj
+ 0002:00000920       $SG100720                  0000000140041920     win32_ivan.obj
+ 0002:00000930       $SG100721                  0000000140041930     win32_ivan.obj
+ 0002:00000948       $SG100722                  0000000140041948     win32_ivan.obj
+ 0002:00000958       $SG100723                  0000000140041958     win32_ivan.obj
+ 0002:00000970       $SG100724                  0000000140041970     win32_ivan.obj
+ 0002:00000980       $SG100725                  0000000140041980     win32_ivan.obj
+ 0002:00000990       $SG100726                  0000000140041990     win32_ivan.obj
+ 0002:000009a0       $SG100727                  00000001400419a0     win32_ivan.obj
+ 0002:000009b0       $SG100728                  00000001400419b0     win32_ivan.obj
+ 0002:000009c0       $SG100729                  00000001400419c0     win32_ivan.obj
+ 0002:000009d0       $SG100730                  00000001400419d0     win32_ivan.obj
+ 0002:000009e0       $SG100731                  00000001400419e0     win32_ivan.obj
+ 0002:000009f0       $SG100732                  00000001400419f0     win32_ivan.obj
+ 0002:00000a08       $SG100733                  0000000140041a08     win32_ivan.obj
+ 0002:00000a20       $SG100734                  0000000140041a20     win32_ivan.obj
+ 0002:00000a30       $SG100736                  0000000140041a30     win32_ivan.obj
+ 0002:00000a48       $SG100737                  0000000140041a48     win32_ivan.obj
+ 0002:00000a60       $SG100738                  0000000140041a60     win32_ivan.obj
+ 0002:00000a78       $SG100739                  0000000140041a78     win32_ivan.obj
+ 0002:00000a98       $SG100740                  0000000140041a98     win32_ivan.obj
+ 0002:00000ab0       $SG99756                   0000000140041ab0     win32_ivan.obj
+ 0002:00000ac8       $SG99759                   0000000140041ac8     win32_ivan.obj
+ 0002:00000ae0       $SG99762                   0000000140041ae0     win32_ivan.obj
+ 0002:00000af8       $SG99763                   0000000140041af8     win32_ivan.obj
+ 0002:00000b00       $SG99764                   0000000140041b00     win32_ivan.obj
+ 0002:00000b0c       $SG99765                   0000000140041b0c     win32_ivan.obj
+ 0002:00000b18       $SG99766                   0000000140041b18     win32_ivan.obj
+ 0002:00000b28       $SG99785                   0000000140041b28     win32_ivan.obj
+ 0002:00000b40       $SG99788                   0000000140041b40     win32_ivan.obj
+ 0002:00000b58       $SG99793                   0000000140041b58     win32_ivan.obj
+ 0002:00000b80       $SG99794                   0000000140041b80     win32_ivan.obj
+ 0002:00000ba8       $SG99795                   0000000140041ba8     win32_ivan.obj
+ 0002:00000bb4       $SG99796                   0000000140041bb4     win32_ivan.obj
+ 0002:00000bbc       $SG99797                   0000000140041bbc     win32_ivan.obj
+ 0002:00000bc8       $SG99798                   0000000140041bc8     win32_ivan.obj
+ 0002:00000bd8       $SG99799                   0000000140041bd8     win32_ivan.obj
+ 0002:00000be8       $SG99800                   0000000140041be8     win32_ivan.obj
+ 0002:00000bf8       $SG99801                   0000000140041bf8     win32_ivan.obj
+ 0002:00000c10       $SG99802                   0000000140041c10     win32_ivan.obj
+ 0002:00000c28       $SG99803                   0000000140041c28     win32_ivan.obj
+ 0002:00000c3c       $SG6621                    0000000140041c3c     win32_ivan.obj
+ 0002:00000c48       $SG100848                  0000000140041c48     win32_ivan.obj
+ 0002:00000c58       $SG100887                  0000000140041c58     win32_ivan.obj
+ 0002:00000c68       $SG100912                  0000000140041c68     win32_ivan.obj
  0002:00000c88       $SG6714                    0000000140041c88     win32_ivan.obj
  0002:00000c90       $SG6715                    0000000140041c90     win32_ivan.obj
- 0002:00000c98       $SG99932                   0000000140041c98     win32_ivan.obj
- 0002:00000ca0       $SG99938                   0000000140041ca0     win32_ivan.obj
- 0002:00000cb8       $SG99941                   0000000140041cb8     win32_ivan.obj
- 0002:00000cd0       $SG99944                   0000000140041cd0     win32_ivan.obj
- 0002:00000ce8       $SG99947                   0000000140041ce8     win32_ivan.obj
- 0002:00000d08       $SG99949                   0000000140041d08     win32_ivan.obj
- 0002:00000d20       $SG100012                  0000000140041d20     win32_ivan.obj
- 0002:00000d40       $SG100014                  0000000140041d40     win32_ivan.obj
- 0002:00000d68       $SG100016                  0000000140041d68     win32_ivan.obj
- 0002:00000d90       $SG100018                  0000000140041d90     win32_ivan.obj
- 0002:00000db8       $SG100020                  0000000140041db8     win32_ivan.obj
- 0002:00000de0       $SG100022                  0000000140041de0     win32_ivan.obj
- 0002:00000e08       $SG100025                  0000000140041e08     win32_ivan.obj
- 0002:00000e28       $SG100027                  0000000140041e28     win32_ivan.obj
- 0002:00000e50       $SG100029                  0000000140041e50     win32_ivan.obj
- 0002:00000e78       $SG100031                  0000000140041e78     win32_ivan.obj
- 0002:00000ea0       $SG100033                  0000000140041ea0     win32_ivan.obj
- 0002:00000ec8       $SG100035                  0000000140041ec8     win32_ivan.obj
- 0002:00000ef0       $SG100040                  0000000140041ef0     win32_ivan.obj
- 0002:00000f10       $SG100042                  0000000140041f10     win32_ivan.obj
- 0002:00000f38       $SG100044                  0000000140041f38     win32_ivan.obj
- 0002:00000f60       $SG100046                  0000000140041f60     win32_ivan.obj
- 0002:00000f88       $SG100048                  0000000140041f88     win32_ivan.obj
- 0002:00000fb0       $SG100050                  0000000140041fb0     win32_ivan.obj
- 0002:00000fd8       $SG100054                  0000000140041fd8     win32_ivan.obj
- 0002:00000ff8       $SG100056                  0000000140041ff8     win32_ivan.obj
- 0002:00001020       $SG100058                  0000000140042020     win32_ivan.obj
- 0002:00001048       $SG100060                  0000000140042048     win32_ivan.obj
- 0002:00001070       $SG100062                  0000000140042070     win32_ivan.obj
- 0002:00001098       $SG100064                  0000000140042098     win32_ivan.obj
- 0002:000010c0       $SG100067                  00000001400420c0     win32_ivan.obj
- 0002:000010e0       $SG100069                  00000001400420e0     win32_ivan.obj
- 0002:00001108       $SG100071                  0000000140042108     win32_ivan.obj
- 0002:00001130       $SG100073                  0000000140042130     win32_ivan.obj
- 0002:00001158       $SG100075                  0000000140042158     win32_ivan.obj
- 0002:00001180       $SG100077                  0000000140042180     win32_ivan.obj
- 0002:000011a8       $SG101107                  00000001400421a8     win32_ivan.obj
- 0002:000011b8       $SG101108                  00000001400421b8     win32_ivan.obj
- 0002:000011c8       $SG101109                  00000001400421c8     win32_ivan.obj
- 0002:000011d8       $SG101110                  00000001400421d8     win32_ivan.obj
- 0002:000011e8       $SG101111                  00000001400421e8     win32_ivan.obj
- 0002:000011f8       $SG101112                  00000001400421f8     win32_ivan.obj
- 0002:00001210       $SG101113                  0000000140042210     win32_ivan.obj
- 0002:00001228       $SG101114                  0000000140042228     win32_ivan.obj
- 0002:00001238       $SG100162                  0000000140042238     win32_ivan.obj
- 0002:00001268       $SG100164                  0000000140042268     win32_ivan.obj
- 0002:00001298       $SG100187                  0000000140042298     win32_ivan.obj
+ 0002:00000c98       $SG99928                   0000000140041c98     win32_ivan.obj
+ 0002:00000ca0       $SG99934                   0000000140041ca0     win32_ivan.obj
+ 0002:00000cb8       $SG99937                   0000000140041cb8     win32_ivan.obj
+ 0002:00000cd0       $SG99940                   0000000140041cd0     win32_ivan.obj
+ 0002:00000ce8       $SG99943                   0000000140041ce8     win32_ivan.obj
+ 0002:00000d08       $SG99945                   0000000140041d08     win32_ivan.obj
+ 0002:00000d20       $SG100008                  0000000140041d20     win32_ivan.obj
+ 0002:00000d40       $SG100010                  0000000140041d40     win32_ivan.obj
+ 0002:00000d68       $SG100012                  0000000140041d68     win32_ivan.obj
+ 0002:00000d90       $SG100014                  0000000140041d90     win32_ivan.obj
+ 0002:00000db8       $SG100016                  0000000140041db8     win32_ivan.obj
+ 0002:00000de0       $SG100018                  0000000140041de0     win32_ivan.obj
+ 0002:00000e08       $SG100021                  0000000140041e08     win32_ivan.obj
+ 0002:00000e28       $SG100023                  0000000140041e28     win32_ivan.obj
+ 0002:00000e50       $SG100025                  0000000140041e50     win32_ivan.obj
+ 0002:00000e78       $SG100027                  0000000140041e78     win32_ivan.obj
+ 0002:00000ea0       $SG100029                  0000000140041ea0     win32_ivan.obj
+ 0002:00000ec8       $SG100031                  0000000140041ec8     win32_ivan.obj
+ 0002:00000ef0       $SG100036                  0000000140041ef0     win32_ivan.obj
+ 0002:00000f10       $SG100038                  0000000140041f10     win32_ivan.obj
+ 0002:00000f38       $SG100040                  0000000140041f38     win32_ivan.obj
+ 0002:00000f60       $SG100042                  0000000140041f60     win32_ivan.obj
+ 0002:00000f88       $SG100044                  0000000140041f88     win32_ivan.obj
+ 0002:00000fb0       $SG100046                  0000000140041fb0     win32_ivan.obj
+ 0002:00000fd8       $SG100050                  0000000140041fd8     win32_ivan.obj
+ 0002:00000ff8       $SG100052                  0000000140041ff8     win32_ivan.obj
+ 0002:00001020       $SG100054                  0000000140042020     win32_ivan.obj
+ 0002:00001048       $SG100056                  0000000140042048     win32_ivan.obj
+ 0002:00001070       $SG100058                  0000000140042070     win32_ivan.obj
+ 0002:00001098       $SG100060                  0000000140042098     win32_ivan.obj
+ 0002:000010c0       $SG100063                  00000001400420c0     win32_ivan.obj
+ 0002:000010e0       $SG100065                  00000001400420e0     win32_ivan.obj
+ 0002:00001108       $SG100067                  0000000140042108     win32_ivan.obj
+ 0002:00001130       $SG100069                  0000000140042130     win32_ivan.obj
+ 0002:00001158       $SG100071                  0000000140042158     win32_ivan.obj
+ 0002:00001180       $SG100073                  0000000140042180     win32_ivan.obj
+ 0002:000011a8       $SG101103                  00000001400421a8     win32_ivan.obj
+ 0002:000011b8       $SG101104                  00000001400421b8     win32_ivan.obj
+ 0002:000011c8       $SG101105                  00000001400421c8     win32_ivan.obj
+ 0002:000011d8       $SG101106                  00000001400421d8     win32_ivan.obj
+ 0002:000011e8       $SG101107                  00000001400421e8     win32_ivan.obj
+ 0002:000011f8       $SG101108                  00000001400421f8     win32_ivan.obj
+ 0002:00001210       $SG101109                  0000000140042210     win32_ivan.obj
+ 0002:00001228       $SG101110                  0000000140042228     win32_ivan.obj
+ 0002:00001238       $SG100158                  0000000140042238     win32_ivan.obj
+ 0002:00001268       $SG100160                  0000000140042268     win32_ivan.obj
+ 0002:00001298       $SG100183                  0000000140042298     win32_ivan.obj
  0002:000012b0       ?stbsp__bot@@3QBNB         00000001400422b0     win32_ivan.obj
- 0002:00001368       $SG100289                  0000000140042368     win32_ivan.obj
+ 0002:00001368       $SG100285                  0000000140042368     win32_ivan.obj
  0002:00001380       ?stbsp__negbot@@3QBNB      0000000140042380     win32_ivan.obj
  0002:00001430       ?stbsp__negboterr@@3QBNB   0000000140042430     win32_ivan.obj
  0002:000014e0       ?stbsp__top@@3QBNB         00000001400424e0     win32_ivan.obj
@@ -3051,19 +3051,19 @@
  0002:000015c0       ?stbsp__toperr@@3QBNB      00000001400425c0     win32_ivan.obj
  0002:00001630       ?stbsp__negtoperr@@3QBNB   0000000140042630     win32_ivan.obj
  0002:000016a0       ?stbsp__powten@@3QB_KB     00000001400426a0     win32_ivan.obj
- 0002:00001740       $SG100160                  0000000140042740     win32_ivan.obj
- 0002:00001770       $SG100166                  0000000140042770     win32_ivan.obj
- 0002:000017a0       $SG100168                  00000001400427a0     win32_ivan.obj
- 0002:000017d0       $SG100170                  00000001400427d0     win32_ivan.obj
- 0002:00001800       $SG100174                  0000000140042800     win32_ivan.obj
- 0002:00001830       $SG100176                  0000000140042830     win32_ivan.obj
- 0002:00001860       $SG100178                  0000000140042860     win32_ivan.obj
- 0002:00001890       $SG100180                  0000000140042890     win32_ivan.obj
- 0002:000018c0       $SG100182                  00000001400428c0     win32_ivan.obj
- 0002:000018f0       $SG100184                  00000001400428f0     win32_ivan.obj
- 0002:00001920       $SG100288                  0000000140042920     win32_ivan.obj
- 0002:00001930       $SG100313                  0000000140042930     win32_ivan.obj
- 0002:00001940       $SG100314                  0000000140042940     win32_ivan.obj
+ 0002:00001740       $SG100156                  0000000140042740     win32_ivan.obj
+ 0002:00001770       $SG100162                  0000000140042770     win32_ivan.obj
+ 0002:000017a0       $SG100164                  00000001400427a0     win32_ivan.obj
+ 0002:000017d0       $SG100166                  00000001400427d0     win32_ivan.obj
+ 0002:00001800       $SG100170                  0000000140042800     win32_ivan.obj
+ 0002:00001830       $SG100172                  0000000140042830     win32_ivan.obj
+ 0002:00001860       $SG100174                  0000000140042860     win32_ivan.obj
+ 0002:00001890       $SG100176                  0000000140042890     win32_ivan.obj
+ 0002:000018c0       $SG100178                  00000001400428c0     win32_ivan.obj
+ 0002:000018f0       $SG100180                  00000001400428f0     win32_ivan.obj
+ 0002:00001920       $SG100284                  0000000140042920     win32_ivan.obj
+ 0002:00001930       $SG100309                  0000000140042930     win32_ivan.obj
+ 0002:00001940       $SG100310                  0000000140042940     win32_ivan.obj
  0002:00001c10       GS_ExceptionPointers       0000000140042c10     LIBCMTD:gs_report.obj
  0002:00001c60       ?module_names@?A0x679b24ab@@3QBQEB_WB 0000000140042c60     libvcruntimed:winapi_downlevel.obj
  0002:00001ed0       ?candidate_modules@?1??try_get_FlsAlloc@@YAP6AKP6AXPEAX@Z@ZXZ@4QBW4module_id@?A0x679b24ab@@B 0000000140042ed0     libvcruntimed:winapi_downlevel.obj

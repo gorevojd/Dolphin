@@ -573,7 +573,7 @@ UpdateVoxelChunks(
 				NewPair.Key = KeyToFind;
 				NewPair.Value = NewHeader;
 				InsertPairToVoxelHashTable(HashTable, VOXEL_HASH_TABLE_SIZE, NewPair);
-				InsertChunkHeaderAtFront(Manager, NewHeader);
+				InsertChunkHeaderAtFront(Manager->VoxelChunkSentinel, NewHeader);
 			}
 		}
 	}
