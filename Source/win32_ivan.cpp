@@ -1997,6 +1997,7 @@ int WINAPI WinMain(
         if(ExecutableNeedsToBeReloaded){
             Win32CompleteAllWork(&HighPriorityQueue);
             Win32CompleteAllWork(&LowPriorityQueue);
+            Win32CompleteAllWork(&VoxelMeshQueue);
             DEBUGSetEventRecording(false);
         }
 

@@ -162,18 +162,18 @@ DEBUGEventToText(char* Buffer, char* End, debug_element* Element, debug_event* E
 	char* At = Buffer;
 
 	if(Flags & DEBUGVarToText_AddDebugUI){
-		At += FormatString(End - At, At, "#define DEBUGUI_");
+		At += PrintFormatto(End - At, At, "#define DEBUGUI_");
 	}
 
 	if(Flags & DEBUGVarToText_AddName){
 		char* UseName = (Flags & DEBUGVarToText_ShowEntireGUID) ? Event->GUID : Event->Name;
-		At += FormatString(End - At, At, "%s%s", UseName, (Flags & DEBUGVarToText_Colon) ? ":" : "");
+		At += PrintFormatto(End - At, At, "%s%s", UseName, (Flags & DEBUGVarToText_Colon) ? ":" : "");
 	}
 
 	if(Flags & DEBUGVarToText_AddValue){
 		switch(Event->Type){
 			case DebugType_real32:{
-				At += FormatString(End - At, At, "%f", Event->Value_real32);
+				At += PrintFormatto(End - At, At, "%f", Event->Value_real32);
 				if(Flags & DEBUGVarToText_FloatSuffix){
 					*At++ = 'f';
 				}
@@ -181,35 +181,35 @@ DEBUGEventToText(char* Buffer, char* End, debug_element* Element, debug_event* E
 
 			case DebugType_bool32{
 				if(Flags & DEBUGVarToText_PrettyBools){
-					At += FormatString(End - At, At, "%s",
+					At += PrintFormatto(End - At, At, "%s",
 						Event-Value_bool32 ? "true" : "false");
 				}
 				else{
-					At += FormatString(End - At, At, "%d", Event->Value_bool32);
+					At += PrintFormatto(End - At, At, "%d", Event->Value_bool32);
 				}
 			} break;
 
 			case DebugType_int32{
-				At += FormatString(End - At, At, "%d", Event->Value_int32);
+				At += PrintFormatto(End - At, At, "%d", Event->Value_int32);
 			}break;
 
 			case DebugType_uint32:{
-				At += FormatString(End - At, At, "%u", Event->Value_uint32);
+				At += PrintFormatto(End - At, At, "%u", Event->Value_uint32);
 			}break;
 
 			case DebugType_vec2:{
-				At += FormatString(End - At, At, "Vec2(%f, %f)", Event->Value_vec2.x, Event->Value_vec2.y);
+				At += PrintFormatto(End - At, At, "Vec2(%f, %f)", Event->Value_vec2.x, Event->Value_vec2.y);
 			}break;
 
 			case DebugType_vec3:{
-				At += FormatString(End - At, At, "Vec3(%f, %f, %f)", 
+				At += PrintFormatto(End - At, At, "Vec3(%f, %f, %f)", 
 					Event->Value_vec3.x, 
 					Event->Value_vec3.y, 
 					Event->Value_vec3.z);
 			}break;
 
 			case DebugType_vec4:{
-				At += FormatString(End - At, At, "Vec4(%f, %f, %f, %f)",
+				At += PrintFormatto(End - At, At, "Vec4(%f, %f, %f, %f)",
 					Event->Value_vec4.x,
 					Event->Value_vec4.y,
 					Event->Value_vec4.z,
@@ -217,7 +217,7 @@ DEBUGEventToText(char* Buffer, char* End, debug_element* Element, debug_event* E
 			}break;
 
 			case DebugType_rectangle2:{
-				At += FormatString(End - At, At, "Rect2(%f, %f, %f -> %f, %f, %f)",
+				At += PrintFormatto(End - At, At, "Rect2(%f, %f, %f -> %f, %f, %f)",
 					Event->Value_rectangle3.Min.x,
 					Event->Value_rectangle3.Min.y,
 					Event->Value_rectangle3.Min.z,
@@ -231,7 +231,7 @@ DEBUGEventToText(char* Buffer, char* End, debug_element* Element, debug_event* E
 			}break;
 
 			default:{
-				At += FormatString(End - At, At, "UNHANDLED: %s", Event->GUID);
+				At += PrintFormatto(End - At, At, "UNHANDLED: %s", Event->GUID);
 			}break;
 		}
 	}
@@ -699,7 +699,7 @@ INTERNAL_FUNCTION void DEBUGEnd(debug_state* DebugState, game_input* Input){
 	debug_platform_memory_stats MemStats = Platform.DEBUGGetMemoryStats();
 
 	debug_frame* MostRecentFrame = DebugState->Frames + DebugState->ViewingFrameOrdinal;
-	FormatString(DebugState->RootInfoSize, DebugState->RootInfo,
+	PrintFormatto(DebugState->RootInfoSize, DebugState->RootInfo,
 		"%.02fms %de %dp %dd - Mem: %lu blocks, %lu used",
 		MostRecentFrame->WallSecondsElapsed * 1000.0f,
 		MostRecentFrame->StoredEventCount,

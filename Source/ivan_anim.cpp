@@ -144,14 +144,15 @@ INTERNAL_FUNCTION animation_node* PlayAnimation(animator_controller* Controller,
 		/*Remove slot from free list*/
 		Result->NextInList->PrevInList = Result->PrevInList;
 		Result->PrevInList->NextInList = Result->NextInList;
-
-		/*Push slot to playing list*/
-		Result->NextInList = Controller->FirstSentinel->NextInList;
-		Result->PrevInList = Controller->FirstSentinel;
-
-		Result->NextInList->PrevInList = Result->PrevInList;
-		Result->PrevInList->NextInList = Result->NextInList;
 	}
+
+
+	/*Push slot to playing list*/
+	Result->NextInList = Controller->FirstSentinel->NextInList;
+	Result->PrevInList = Controller->FirstSentinel;
+
+	Result->NextInList->PrevInList = Result;
+	Result->PrevInList->NextInList = Result;
 
 	playing_animation* RequestedAnim = &Result->Animation;
 
@@ -160,10 +161,12 @@ INTERNAL_FUNCTION animation_node* PlayAnimation(animator_controller* Controller,
 	RequestedAnim->PlaybackSpeed = 1;
 	RequestedAnim->Type = PlayingAnimation_Looping;
 	RequestedAnim->ID = ID;
+
+	return(Result);
 }
 
-INTERNAL_FUNCTION UpdateAnimatorController(
-	animator_controller* Controller, 
+INTERNAL_FUNCTION void UpdateAnimatorController(
+	animator_controller* Controller,
 	real32  DeltaTime)
 {
 	Controller->GenerationID = BeginGeneration(Controller->Assets);
@@ -187,7 +190,7 @@ INTERNAL_FUNCTION UpdateAnimatorController(
 	EndGeneration(Controller->Assets, Controller->GenerationID);
 }
 
-INTERNAL_FUNCTION InitializeAnimatorController(
+INTERNAL_FUNCTION void InitializeAnimatorController(
 	animator_controller* Animator, 
 	memory_arena* PermanentArena,
 	game_assets* Assets)
@@ -198,7 +201,12 @@ INTERNAL_FUNCTION InitializeAnimatorController(
 	SubArena(&Animator->Arena, PermanentArena, IVAN_KILOBYTES(100));
 
 	Animator->FirstSentinel = PushStruct(&Animator->Arena, animaion_node);
+	Animator->FirstSentinel->NextInList = Animator->FirstSentinel;
+	Animator->FirstSentinel->PrevInList = Animator->FirstSentinel
+
 	Animator->FirstFreeSentinel = PushStruct(&Animator->Arena, animation_node);
+	Animator->FirstFreeSentinel->NextInList = Animator->FirstFreeSentinel;
+	Animator->FirstFreeSentinel->PrevInList = Animator->FirstFreeSentinel;
 
 	return(Animator);
 }

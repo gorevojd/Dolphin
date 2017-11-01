@@ -21,6 +21,44 @@ INTERNAL_FUNCTION void BuildColumnForChunk(
 			}
 		}
 	}
+	else{
+#if 0
+		Assert(LocalXIndex >= -16 && LocalXIndex < 32);
+		Assert(LocalZIndex >= -16 && LocalZIndex < 32);
+
+		int32 NeededLocalX = 0;
+		int32 NeededLocalZ = 0;
+
+		voxel_chunk* NeededChunk = Chunk;
+
+		if(LocalXIndex < 0 && Chunk->LeftNeighbour){
+			NeededLocalX = LocalXIndex + 16;
+			NeededChunk = NeededChunk->LeftNeighbour;
+		}
+		else if(LocalXIndex >= 16 && Chunk->RightNeighbour){
+			NeededLocalX = LocalXIndex - 16;
+			NeededChunk = NeededChunk->RightNeighbour;
+		}
+
+		if(LocalZIndex < 0 && Chunk->FrontNeighbour){
+			NeededLocalZ = LocalZIndex + 16;
+			NeededChunk = NeededChunk->FrontNeighbour;
+		}else if(LocalZIndex >= 16 && Chunk->BackNeighbour){
+			NeededLocalZ = LocalZIndex - 16;
+			NeededChunk = NeededChunk->BackNeighbour;
+		}
+
+#if 1
+		BuildColumnForChunk(NeededChunk, NeededLocalX, NeededLocalZ, StartHeight, Height, Material);
+#else
+		for(int k = StartHeight; k < StartHeight + Height; k++){
+			if(k < IVAN_VOXEL_CHUNK_HEIGHT){
+				Chunk->NeededChunk[k * IVAN_VOXEL_CHUNK_LAYER_COUNT + NeededLocalZ * IVAN_VOXEL_CHUNK_WIDTH + NeededLocalX] = Material;
+			}
+		}
+#endif
+#endif
+	}
 }
 
 INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Series){
@@ -40,7 +78,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 
 			float NoiseScale1 = 3.0f;
 			float NoiseScale2 = 25.0f;
-			float NoiseScale3 = 100.0f;
+			float NoiseScale3 = 160.0f;
 
 			uint8_t DirtIndex = VoxelMaterial_Ground;
 			uint8_t GroundIndex = VoxelMaterial_GrassyGround;
@@ -51,9 +89,9 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				(float)(ChunkPos.z + j) / 64.0f, 0, 0, 0);
 
 			float Noise2 = stb_perlin_noise3(
-				(float)(ChunkPos.x + i) / 256.0f, 
-				(float)ChunkPos.y / 256.0f, 
-				(float)(ChunkPos.z + j) / 256.0f, 0, 0, 0);
+				(float)(ChunkPos.x + i) / 128.0f, 
+				(float)ChunkPos.y / 128.0f, 
+				(float)(ChunkPos.z + j) / 128.0f, 0, 0, 0);
 
 			float Noise3 = stb_perlin_noise3(
 				(float)(ChunkPos.x + i) / 256.0f, 
@@ -78,7 +116,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				DirtIndex = VoxelMaterial_Sand;
 				GroundIndex = VoxelMaterial_Sand;
 			}
-			else if(BiomNoise >= 0.1f && BiomNoise < 0.6f){
+			else if(BiomNoise >= 0.1f && BiomNoise < 0.9f){
 #if 0
 				DirtIndex = VoxelMaterial_Ground;
 				GroundIndex = VoxelMaterial_GrassyGround;
@@ -86,6 +124,10 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(voxel_chunk* Chunk, random_series* Ser
 				DirtIndex = VoxelMaterial_Ground;
 				GroundIndex = VoxelMaterial_GrassyGround;
 #endif
+			}
+			else{
+				DirtIndex = VoxelMaterial_WinterGround;
+				GroundIndex = VoxelMaterial_SnowGround;
 			}
 #endif
 
@@ -222,7 +264,6 @@ struct generate_chunk_work{
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	generate_chunk_work* Work = (generate_chunk_work*)Data;
 
-
 	voxel_chunk* Chunk = Work->Header->Chunk;
 	voxel_chunk_mesh* Mesh = Work->Header->Mesh;
 
@@ -246,68 +287,6 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	Work->Header->ChunkTask = Work->Task;
 
 	//NOTE(Dima): Task will be ended when elements gets removed from the list
-}
-
-INTERNAL_FUNCTION void GenerateVoxelChunk(
-	voxel_chunk_header* Header,
-	voxel_chunk_manager* Manager)
-{
-	
-	if(AtomicCompareExchangeU32((uint32 volatile *)&Header->ChunkState,
-            VoxelChunkState_InProcess,
-            VoxelChunkState_Unloaded) == VoxelChunkState_Unloaded)
-	{
-		task_with_memory* Task = BeginChunkTaskWithMemory(Manager->TranState);
-
-		generate_chunk_work Work;
-		Work.Task = Task;
-		Work.Header = Header;
-		Work.Series = &Manager->RandomSeries;
-
-		if(Task){
-			generate_chunk_work* ChunkWork = PushStruct(&Task->Arena, generate_chunk_work);
-			*ChunkWork = Work;
-			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelChunkWork, ChunkWork);
-		}
-		else{
-			//Not enough tasks. High usage
-			INVALID_CODE_PATH;
-		}
-	}
-	else{
-
-	}
-}
-
-INTERNAL_FUNCTION void GenerateVoxelMesh(
-	voxel_chunk_header* Header,
-	voxel_chunk_manager* Manager)
-{
-	if(AtomicCompareExchangeU32((uint32 volatile*)&Header->MeshState,
-		VoxelMeshState_InProcess,
-		VoxelMeshState_Unloaded) == VoxelMeshState_Unloaded)
-	{
-		task_with_memory* Task = BeginMeshTaskWithMemory(Manager->TranState);
-
-		generate_mesh_work Work;
-		Work.Task = Task;
-		Work.Assets = Manager->TranState->Assets;
-		Work.Header = Header;
-		Work.VoxelAtlasID = Manager->VoxelAtlasID;
-
-		if(Task){
-			generate_mesh_work* MeshWork = PushStruct(&Task->Arena, generate_mesh_work);
-			*MeshWork = Work;
-			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelMeshWork, MeshWork);
-		}
-		else{
-			//Not enough tasks. High usage
-			INVALID_CODE_PATH;
-		}
-	}
-	else{
-
-	}
 }
 
 inline void InsertPairToVoxelHashTable(
@@ -364,7 +343,19 @@ FindPairInVoxelHashTable(
 	return(Result);
 }
 
-inline void FreeVoxelHashTable(
+INTERNAL_FUNCTION void ClearVoxelHashTable(
+	voxel_table_pair** Table,
+	uint32_t TableSize)
+{
+	for(int32_t TableIt = 0;
+		TableIt < TableSize;
+		TableIt++)
+	{
+		Table[TableIt] = 0;
+	}
+}
+
+INTERNAL_FUNCTION void FreeVoxelHashTable(
 	voxel_table_pair** Table,
 	uint32_t TableSize)
 {
@@ -378,6 +369,7 @@ inline void FreeVoxelHashTable(
 			free(Pair);
 			Pair = NextPair;
 		}
+		Table[TableIt] = 0;
 	}
 }
 
@@ -443,6 +435,113 @@ inline int32_t NeighboursWasChanged(
 	return(Result);	
 }
 
+INTERNAL_FUNCTION void GenerateVoxelChunk(
+	voxel_chunk_header* Header,
+	voxel_chunk_manager* Manager,
+	voxel_table_pair** Table)
+{
+	if(AtomicCompareExchangeU32((uint32 volatile *)&Header->ChunkState,
+            VoxelChunkState_InProcess,
+            VoxelChunkState_Unloaded) == VoxelChunkState_Unloaded)
+	{
+		task_with_memory* Task = BeginChunkTaskWithMemory(Manager->TranState);
+
+		generate_chunk_work Work;
+		Work.Task = Task;
+		Work.Header = Header;
+		Work.Series = &Manager->RandomSeries;
+
+		if(Task){
+			generate_chunk_work* ChunkWork = PushStruct(&Task->Arena, generate_chunk_work);
+
+			voxel_chunk* Chunk = PushStruct(&Task->Arena, voxel_chunk);
+			Work.Header->Chunk = Chunk;
+			Chunk->HorizontalIndex = Header->HorzIndex;
+			Chunk->VerticalIndex = Header->VertIndex;
+			*ChunkWork = Work;
+
+#if 0
+			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelChunkWork, ChunkWork);
+#else
+			Chunk->Voxels = 0;
+			Chunk->VoxelsCount = 0;
+			Chunk->LeftNeighbour = 0;
+			Chunk->RightNeighbour = 0;
+			Chunk->FrontNeighbour = 0;
+			Chunk->BackNeighbour = 0;
+
+			SetNeighboursForChunk(
+				Chunk, 
+				Chunk->HorizontalIndex,
+				Chunk->VerticalIndex,
+				Table);
+			Chunk->Voxels = PushArray(&Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
+
+			Assert(Chunk->Voxels);
+
+			GenerateVoxelChunk(Chunk, &Manager->RandomSeries);
+
+			IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
+			Header->ChunkState = VoxelChunkState_Generated;
+			Header->ChunkTask = Task;
+#endif
+		}
+		else{
+			//Not enough tasks. High usage
+			INVALID_CODE_PATH;
+		}
+	}
+	else{
+
+	}
+}
+
+INTERNAL_FUNCTION void GenerateVoxelMesh(
+	voxel_chunk_header* Header,
+	voxel_chunk_manager* Manager)
+{
+	if(AtomicCompareExchangeU32((uint32 volatile*)&Header->MeshState,
+		VoxelMeshState_InProcess,
+		VoxelMeshState_Unloaded) == VoxelMeshState_Unloaded)
+	{
+		task_with_memory* Task = BeginMeshTaskWithMemory(Manager->TranState);
+
+		generate_mesh_work Work;
+		Work.Task = Task;
+		Work.Assets = Manager->TranState->Assets;
+		Work.Header = Header;
+		Work.VoxelAtlasID = Manager->VoxelAtlasID;
+
+		if(Task){
+			voxel_chunk_mesh* Mesh = PushStruct(&Task->Arena, voxel_chunk_mesh);
+			Work.Header->Mesh = Mesh;
+			generate_mesh_work* MeshWork = PushStruct(&Task->Arena, generate_mesh_work);
+			*MeshWork = Work;
+
+#if 1
+			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelMeshWork, MeshWork);
+#else
+			*Header->Mesh = {};
+
+			voxel_mesh_generation_context Context = InitVoxelMeshGeneration(Header->Chunk, Manager->TranState->Assets, Manager->VoxelAtlasID);
+			Header->Mesh->PUVN = (ivan_vertex_type*)Platform.AllocateMemory(Context.MemoryRequired);
+			FinalizeVoxelMeshGeneration(Header->Mesh, &Context);
+
+			IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
+			Header->MeshTask = Task;
+			Header->MeshState = VoxelMeshState_Generated;
+#endif
+		}
+		else{
+			//Not enough tasks. High usage
+			INVALID_CODE_PATH;
+		}
+	}
+	else{
+
+	}
+}
+
 //NOTE(DIMA): Chunk size dependent
 inline int32_t TestChunkOnPlane(vec4 Pl, voxel_chunk* Chunk){
 	int32_t Result = 0;
@@ -472,247 +571,51 @@ inline int32_t TestChunkOnPlane(vec4 Pl, voxel_chunk* Chunk){
 }
 
 #define IVAN_CHUNK_ABS(x) ((x) >= 0 ? (x) : -(x))
-#if !(IVAN_VOXEL_WORLD_MULTITHREADED)
-INTERNAL_FUNCTION void 
-UpdateVoxelChunks(
-	voxel_chunk_manager* Manager,
-	render_group* RenderGroup,
-	vec3 CamPos)
-{
-	TIMED_FUNCTION();
 
-	voxel_chunk_header* Index = 0;
-
-	temporary_memory HashTempMem = BeginTemporaryMemory(&Manager->HashTableArena);
-	temporary_memory TempTempMem = BeginTemporaryMemory(&Manager->TempArena);
-
-	voxel_table_pair** HashTable = PushArray(HashTempMem.Arena, VOXEL_HASH_TABLE_SIZE, voxel_table_pair*);
-	
-	for(int32_t ClearIndex = 0;
-		ClearIndex < VOXEL_HASH_TABLE_SIZE;
-		ClearIndex++)
-	{
-		HashTable[ClearIndex] = 0;
-	}
-
-	int32_t IndX;
-	int32_t IndY;
-
-	GetCurrChunkIndexBasedOnCamera(CamPos, &IndX, &IndY);
-
-	if((Manager->CurrHorizontalIndex != IndX) ||
-		(Manager->CurrVerticalIndex != IndY))
-	{
-		//NOTE(Dima): First - check for elements that are already in the list. Removing
-		Index = Manager->VoxelChunkSentinel->Next;
-		for(Index; !Index->IsSentinel; Index = Index->Next){
-			if((IVAN_CHUNK_ABS(IndX - Index->Chunk->HorizontalIndex) > Manager->ChunksViewDistance) ||
-				(IVAN_CHUNK_ABS(IndY - Index->Chunk->VerticalIndex) > Manager->ChunksViewDistance))
-			{
-
-				if(Index->ChunkTask && (Index->ChunkState == VoxelChunkState_Generated)){
-					EndTaskWithMemory(Index->ChunkTask);
-				}
-
-				if(Index->MeshTask && (Index->MeshState == VoxelMeshState_Generated)){
-					Platform.DeallocateMemory(Index->Mesh->PUVN);
-					EndTaskWithMemory(Index->MeshTask);
-				}
-
-				if(Index->ChunkState == VoxelChunkState_Generated &&
-					Index->MeshState == VoxelMeshState_Generated)
-				{
-					Index->Prev->Next = Index->Next;
-					Index->Next->Prev = Index->Prev;
-					
-					Index->Next = Manager->FirstFreeSentinel->Next;
-					Index->Prev = Manager->FirstFreeSentinel;
-					Index->Next->Prev = Index;
-					Index->Prev->Next = Index;
-				}
-
-			}
-		}
-	}
-
-	Index = Manager->VoxelChunkSentinel->Prev;
-	for(Index; !Index->IsSentinel; Index = Index->Prev){
-		
-		voxel_table_pair NewPair = {};
-		NewPair.Key = GenerateKeyForChunkIndices(
-			Index->Chunk->HorizontalIndex, 
-			Index->Chunk->VerticalIndex);
-		NewPair.NextPair = 0;
-		NewPair.Value = Index;
-
-		InsertPairToVoxelHashTable(
-			HashTable, 
-			VOXEL_HASH_TABLE_SIZE,
-			NewPair);
-	}
-
-	//NOTE(Dima): Second - check for elements that we are moving towards. Adding
-	int32_t MinX = IndX - Manager->ChunksViewDistance;
-	int32_t MaxX = IndX + Manager->ChunksViewDistance;
-	int32_t MinY = IndY - Manager->ChunksViewDistance;
-	int32_t MaxY = IndY + Manager->ChunksViewDistance;
-
-	int32_t NewListInserts = 0;
-	for(int VertIndex = MinY; VertIndex <= MaxY; VertIndex++){
-		for(int HorzIndex = MinX; HorzIndex <= MaxX; HorzIndex++){
-			
-			uint64_t KeyToFind = GenerateKeyForChunkIndices(HorzIndex, VertIndex);
-			voxel_table_pair* FoundPair = FindPairInVoxelHashTable(
-				HashTable, 
-				VOXEL_HASH_TABLE_SIZE, 
-				KeyToFind);
-
-			if(!FoundPair){
-				voxel_chunk_header* NewHeader;
-
-				if(!Manager->FirstFreeSentinel->Next->IsSentinel){
-					NewHeader = Manager->FirstFreeSentinel->Next;
-
-					NewHeader->Next->Prev = NewHeader->Prev;
-					NewHeader->Prev->Next = NewHeader->Next;
-				}
-				else{
-					NewHeader = PushStruct(&Manager->ListArena, voxel_chunk_header);
-				}
-
-				NewHeader->IsSentinel = false;
-				NewHeader->Chunk = PushStruct(&Manager->ListArena, voxel_chunk);
-				NewHeader->Mesh = PushStruct(&Manager->ListArena, voxel_chunk_mesh);
-				NewHeader->Chunk->HorizontalIndex = HorzIndex;
-				NewHeader->Chunk->VerticalIndex = VertIndex;
-				NewHeader->NeedsToBeGenerated = true;
-				
-				GenerateVoxelChunk(NewHeader, Manager);
-
-				voxel_table_pair NewPair = {};
-				NewPair.Key = KeyToFind;
-				NewPair.Value = NewHeader;
-				InsertPairToVoxelHashTable(HashTable, VOXEL_HASH_TABLE_SIZE, NewPair);
-				InsertChunkHeaderAtFront(Manager->VoxelChunkSentinel, NewHeader);
-			}
-		}
-	}
-
-	int ChunksTotal = 0;
-	int ChunksInFrustrum = 0;
-	Index = Manager->VoxelChunkSentinel->Next;
-	for(Index; !Index->IsSentinel; Index = Index->Next){
-		
-		if(Index->ChunkState == VoxelChunkState_Generated){			
-			voxel_chunk* Chunk = Index->Chunk;
-			voxel_chunk* OldLeft = Chunk->LeftNeighbour;
-			voxel_chunk* OldRight = Chunk->RightNeighbour;
-			voxel_chunk* OldFront = Chunk->FrontNeighbour;
-			voxel_chunk* OldBack = Chunk->BackNeighbour;
-
-			IVAN_COMPLETE_READS_BEFORE_FUTURE;
-
-			SetNeighboursForChunk(
-				Chunk, 
-				Chunk->HorizontalIndex,
-				Chunk->VerticalIndex,
-				HashTable);
-
-			IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
-
-			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
-
-				if(Index->MeshTask && Index->MeshState == VoxelMeshState_Generated){
-					Index->MeshState = VoxelMeshState_Unloaded;
-					Platform.DeallocateMemory(Index->Mesh->PUVN);
-					EndTaskWithMemory(Index->MeshTask);
-				}
-
-				GenerateVoxelMesh(Index, Manager);
-			}
-
-			if(Index->MeshState == VoxelMeshState_Generated){
-				ChunksTotal++;
-				vec4* Planes = RenderGroup->LastRenderSetup.Planes;
-
-				int32_t TestResult = 1;
-#if IVAN_VOXEL_WORLD_FRUSTUM_CULLING
-				for(int PlaneIndex = 0;
-					PlaneIndex < CameraPlane_Count;
-					PlaneIndex++)
-				{										
-					if(!TestChunkOnPlane(Planes[PlaneIndex], Index->Chunk)){
-						TestResult = 0;
-						break;
-					}
-				}
-#endif
-
-				if(TestResult){
-					ChunksInFrustrum++;
-				    PushVoxelChunkMesh(
-				    	RenderGroup, 
-				    	Index->Mesh,
-			        	Manager->VoxelAtlasID, 
-			        	GetPosForVoxelChunk(Index->Chunk));
-				}
-			}
-		}
-	}
-
-	FreeVoxelHashTable(HashTable, VOXEL_HASH_TABLE_SIZE);
-
-	EndTemporaryMemory(HashTempMem);
-	EndTemporaryMemory(TempTempMem);
-
-	Manager->CurrHorizontalIndex = IndX;
-	Manager->CurrVerticalIndex = IndY;
-}
-
-#else
 struct update_voxel_chunk_work{
+	int32_t MinXOffset;
+	int32_t MaxXOffset;
+	int32_t MinYOffset;
+	int32_t MaxYOffset;
+
 	int32_t CamIndexX;
 	int32_t CamIndexY;
 
 	int32_t PrevCamIndexX;
 	int32_t PrevCamIndexY;
 
-	int32_t MinXOffset;
-	int32_t MaxXOffset;
-	int32_t MinYOffset;
-	int32_t MaxYOffset;
-
-	temporary_memory HashTempMem;
-	voxel_table_pair** HashTable;
-
-	int32_t ChunksViewDistance;
-
 	voxel_chunk_thread_context* Context;
+
+	voxel_table_pair** ReadTable;
+
+	voxel_chunk_manager* Manager;
 
 	render_group* RenderGroup;
 };
 
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
+	TIMED_FUNCTION();
+
 	update_voxel_chunk_work* Work = (update_voxel_chunk_work*)Data;
 
 	voxel_chunk_thread_context* Context = Work->Context;
-
-	temporary_memory TempTempMem = BeginTemporaryMemory(&Context->TempArena);
 
 	voxel_chunk_header* Index = 0;
 
 	if((Work->PrevCamIndexX != Work->CamIndexX) ||
 		(Work->PrevCamIndexY != Work->CamIndexY))
 	{
+		//NOTE(Dima): First - check for elements that are already in the list. Removing
 		Index = Context->VoxelChunkSentinel->Next;
-		for(Index; !Index->IsSentinel; Index = Index->Next){
-			if((IVAN_CHUNK_ABS(Work->CamIndexX - Index->Chunk->HorizontalIndex) > Work->ChunksViewDistance) ||
-				(IVAN_CHUNK_ABS(Work->CamIndexY - Index->Chunk->VerticalIndex) > Work->ChunksViewDistance))
+		for(Index; !Index->IsSentinel;){
+			
+			voxel_chunk_header* NextForIndex = Index->Next;
+			
+			if((IVAN_CHUNK_ABS(Work->CamIndexX - Index->Chunk->HorizontalIndex) > Context->Manager->ChunksViewDistance) ||
+				(IVAN_CHUNK_ABS(Work->CamIndexY - Index->Chunk->VerticalIndex) > Context->Manager->ChunksViewDistance))
 			{
-				IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 
-				if(Index->ChunkTask && (Index->ChunkState == VoxelChunkState_Generated))
-				{
+				if(Index->ChunkTask && (Index->ChunkState == VoxelChunkState_Generated)){
 					EndTaskWithMemory(Index->ChunkTask);
 
 					AtomicCompareExchangeU32(
@@ -721,11 +624,10 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
         				VoxelChunkState_Generated);
 				}
 
-				if(Index->MeshTask && (Index->MeshState == VoxelMeshState_Generated))
-				{
+				if(Index->MeshTask && (Index->MeshState == VoxelMeshState_Generated)){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
-					
+
 					AtomicCompareExchangeU32(
 						(uint32 volatile *)&Index->MeshState,
         				VoxelMeshState_Unloaded,
@@ -737,80 +639,67 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 				{
 					Index->Prev->Next = Index->Next;
 					Index->Next->Prev = Index->Prev;
-
+					
 					Index->Next = Context->FirstFreeSentinel->Next;
 					Index->Prev = Context->FirstFreeSentinel;
 					Index->Next->Prev = Index;
 					Index->Prev->Next = Index;
 				}
 			}
+			
+			Index = NextForIndex;
 		}
 	}
 
-	Index = Context->VoxelChunkSentinel->Prev;
-	for(Index; !Index->IsSentinel; Index = Index->Prev){
-		voxel_table_pair NewPair = {};
-		NewPair.Key = GenerateKeyForChunkIndices(
-			Index->Chunk->HorizontalIndex, 
-			Index->Chunk->VerticalIndex);
-		NewPair.NextPair = 0;
-		NewPair.Value = Index;
 
-		InsertPairToVoxelHashTable(
-			Work->HashTable, 
-			VOXEL_HASH_TABLE_SIZE,
-			NewPair);
-	}
-
+	//NOTE(Dima): Second - check for elements that we are moving towards. Adding
 	int32_t MinX = Work->CamIndexX + Work->MinXOffset;
 	int32_t MaxX = Work->CamIndexX + Work->MaxXOffset;
 	int32_t MinY = Work->CamIndexY + Work->MinYOffset;
 	int32_t MaxY = Work->CamIndexY + Work->MaxYOffset;
 
+	int32_t NewListInserts = 0;
 	for(int VertIndex = MinY; VertIndex <= MaxY; VertIndex++){
 		for(int HorzIndex = MinX; HorzIndex <= MaxX; HorzIndex++){
 			
 			uint64_t KeyToFind = GenerateKeyForChunkIndices(HorzIndex, VertIndex);
 			voxel_table_pair* FoundPair = FindPairInVoxelHashTable(
-				Work->HashTable, 
+				Work->ReadTable, 
 				VOXEL_HASH_TABLE_SIZE, 
 				KeyToFind);
 
 			if(!FoundPair){
-				voxel_chunk_header* NewHeader = 0;
-				if(Context->FirstFreeSentinel->Next->IsSentinel){
-					NewHeader = PushStruct(&Context->ListArena, voxel_chunk_header);
-				}
-				else{
+				voxel_chunk_header* NewHeader;
+
+				if(!Context->FirstFreeSentinel->Next->IsSentinel){
 					NewHeader = Context->FirstFreeSentinel->Next;
 
-					NewHeader->Prev->Next = NewHeader->Next;
 					NewHeader->Next->Prev = NewHeader->Prev;
+					NewHeader->Prev->Next = NewHeader->Next;
 				}
-				NewHeader->IsSentinel = false;
-				NewHeader->Chunk = PushStruct(&Context->ListArena, voxel_chunk);
-				NewHeader->Mesh = PushStruct(&Context->ListArena, voxel_chunk_mesh);
-				NewHeader->Chunk->HorizontalIndex = HorzIndex;
-				NewHeader->Chunk->VerticalIndex = VertIndex;
-				NewHeader->NeedsToBeGenerated = true;
-				
-				GenerateVoxelChunk(NewHeader, Context->Manager);
+				else{
+					NewHeader = PushStruct(&Context->ListArena, voxel_chunk_header);
+				}
 
-				voxel_table_pair NewPair = {};
-				NewPair.Key = KeyToFind;
-				NewPair.Value = NewHeader;
+				NewHeader->IsSentinel = false;
+				NewHeader->HorzIndex = HorzIndex;
+				NewHeader->VertIndex = VertIndex;
 				
-				InsertPairToVoxelHashTable(Work->HashTable, VOXEL_HASH_TABLE_SIZE, NewPair);
+				InsertChunkHeaderAtFront(Context->VoxelChunkSentinel, NewHeader);
 				
-				InsertChunkHeaderAtFront(Context, NewHeader);
+				//Think about writing to temp table...
+				//InsertPairToVoxelHashTable(TempTable, VOXEL_HASH_TABLE_SIZE, NewPair);
 			}
 		}
 	}
 
+	int ChunksTotal = 0;
+	int ChunksInFrustrum = 0;
 	Index = Context->VoxelChunkSentinel->Next;
 	for(Index; !Index->IsSentinel; Index = Index->Next){
+		GenerateVoxelChunk(Index, Context->Manager, Work->ReadTable);
 		
-		if(Index->ChunkState == VoxelChunkState_Generated){			
+		if(Index->ChunkState == VoxelChunkState_Generated){
 			voxel_chunk* Chunk = Index->Chunk;
 			voxel_chunk* OldLeft = Chunk->LeftNeighbour;
 			voxel_chunk* OldRight = Chunk->RightNeighbour;
@@ -821,26 +710,28 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 				Chunk, 
 				Chunk->HorizontalIndex,
 				Chunk->VerticalIndex,
-				Work->HashTable);
+				Work->ReadTable);
 
 			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
 
-				if(Index->MeshTask && Index->MeshState == VoxelMeshState_Generated)
-				{
+				if(Index->MeshTask && Index->MeshState == VoxelMeshState_Generated){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);
-					
+
 					AtomicCompareExchangeU32(
 						(uint32 volatile *)&Index->MeshState,
         				VoxelMeshState_Unloaded,
         				VoxelMeshState_Generated);
 				}
 
-				GenerateVoxelMesh(Index, Context->Manager);
+				if(Index->MeshState == VoxelMeshState_Unloaded){
+					GenerateVoxelMesh(Index, Context->Manager);
+				}
 			}
 
-
-			if(Index->MeshState == VoxelMeshState_Generated && Index->MeshTask){
+			if(Index->MeshState == VoxelMeshState_Generated){
+				ChunksTotal++;
+				//BeginTicketMutex(&Work->RenderGroup->PlanesMutex);
 				vec4* Planes = Work->RenderGroup->LastRenderSetup.Planes;
 
 				int32_t TestResult = 1;
@@ -855,50 +746,54 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 					}
 				}
 #endif
+				//EndTicketMutex(&Work->RenderGroup->PlanesMutex);
+
 				Index->FrustumCullingTestResult = TestResult;
 			}
 		}
 	}
-
-	EndTemporaryMemory(TempTempMem);
 }
 
-INTERNAL_FUNCTION void UpdateVoxelChunksMultithreaded(
+INTERNAL_FUNCTION void ScanVoxelChunks(
 	voxel_chunk_manager* Manager,
-	render_group* RenderGroup,
-	vec3 CamPos)
+	render_group* RenderGroup)
 {
 	int32_t IndX;
 	int32_t IndY;
 
+	BeginTicketMutex(&Manager->ChangeMutex);
+	vec3 CamPos = Manager->CamPos;
+	EndTicketMutex(&Manager->ChangeMutex);
+
 	GetCurrChunkIndexBasedOnCamera(CamPos, &IndX, &IndY);
 
 	update_voxel_chunk_work Works[ArrayCount(Manager->Contexts)];
+
+	uint32 ReadTableIndex = Manager->TableIndex;
+	uint32 WriteTableIndex;
+	if(ReadTableIndex){
+		WriteTableIndex = 0;
+	}
+	else{
+		WriteTableIndex = 1;
+	}
+
+	voxel_table_pair** ReadTable = Manager->Tables[ReadTableIndex];
+	voxel_table_pair** WriteTable = Manager->Tables[WriteTableIndex];
 
 	for(int32_t ContextIndex = 0;
 		ContextIndex < ArrayCount(Manager->Contexts);
 		ContextIndex++)
 	{
 		voxel_chunk_thread_context* Context = &Manager->Contexts[ContextIndex];
+		
 		if(Context->IsValid){
-			temporary_memory ContextHashTableTempMem = BeginTemporaryMemory(&Context->HashTableArena);
-			voxel_table_pair** ContextHashTable = PushArray(
-				ContextHashTableTempMem.Arena, 
-				VOXEL_HASH_TABLE_SIZE, 
-				voxel_table_pair*);
-
-
-			for(int32_t ClearIndex = 0;
-				ClearIndex < VOXEL_HASH_TABLE_SIZE;
-				ClearIndex++)
-			{
-				ContextHashTable[ClearIndex] = 0;
-			}
-
 			update_voxel_chunk_work* Work = &Works[ContextIndex];
 
 			Work->CamIndexX = IndX;
 			Work->CamIndexY = IndY;
+
+			Work->ReadTable = ReadTable;
 
 			Work->PrevCamIndexX = Manager->CurrHorizontalIndex;
 			Work->PrevCamIndexY = Manager->CurrVerticalIndex;
@@ -908,12 +803,6 @@ INTERNAL_FUNCTION void UpdateVoxelChunksMultithreaded(
 			Work->MinYOffset = Context->MinYOffset;
 			Work->MaxYOffset = Context->MaxYOffset;
 
-			/*Create new hash table for each thread context*/
-			Work->HashTable = ContextHashTable;
-			Work->HashTempMem = ContextHashTableTempMem;
-
-			Work->ChunksViewDistance = Manager->ChunksViewDistance;
-
 			Work->Context = Context;
 			Work->RenderGroup = RenderGroup;
 
@@ -921,8 +810,10 @@ INTERNAL_FUNCTION void UpdateVoxelChunksMultithreaded(
 		}
 	}
 	Platform.CompleteAllWork(Manager->TranState->VoxelMeshQueue);
+	
+	FreeVoxelHashTable(WriteTable, VOXEL_HASH_TABLE_SIZE);
 
-	for(int32_t ContextIndex = 0;
+	for(uint32 ContextIndex = 0;
 		ContextIndex < ArrayCount(Manager->Contexts);
 		ContextIndex++)
 	{
@@ -930,37 +821,128 @@ INTERNAL_FUNCTION void UpdateVoxelChunksMultithreaded(
 		if(Context->IsValid){
 			update_voxel_chunk_work* Work = &Works[ContextIndex];
 
-			int ChunksTotal = 0;
-			int ChunksInFrustrum = 0;
 			voxel_chunk_header* Index = Context->VoxelChunkSentinel->Prev;
 			for(Index; !Index->IsSentinel; Index = Index->Prev){
-				if((Index->MeshState == VoxelMeshState_Generated) && Index->MeshTask){
-					ChunksTotal++;
+				
+				voxel_table_pair NewPair;
+				NewPair.Key = GenerateKeyForChunkIndices(
+					Index->Chunk->HorizontalIndex, 
+					Index->Chunk->VerticalIndex);
+				NewPair.NextPair = 0;
+				NewPair.Value = Index;
 
+				InsertPairToVoxelHashTable(
+					WriteTable, 
+					VOXEL_HASH_TABLE_SIZE,
+					NewPair);
+
+				if((Index->MeshState == VoxelMeshState_Generated) && Index->MeshTask){
 					if(Index->FrustumCullingTestResult){
-						ChunksInFrustrum++;
-						
 						Assert(Index->Mesh->PUVN != 0);
-					    PushVoxelChunkMesh(
-					    	Work->RenderGroup, 
-					    	Index->Mesh,
-				        	Context->Manager->VoxelAtlasID, 
-				        	GetPosForVoxelChunk(Index->Chunk));
+#if !(IVAN_VOXEL_WORLD_MULTITHREADED)
+						PushVoxelChunkMesh(
+							RenderGroup,
+							Index->Mesh,
+							Context->Manager->VoxelAtlasID,
+							GetPosForVoxelChunk(Index->Chunk));
+#else
+						BeginTicketMutex(&Context->ResultMutex);
+
+						voxel_chunk_header* Header = 0;
+						if(Context->ResultFree->Next != Context->ResultFree){
+							Header = Context->ResultFree->Next;
+
+							Context->ResultFree->Next = Header->Next;
+							Context->ResultFree->Next->Prev = Context->ResultFree;
+						}
+						else{
+							Header = PushStruct(&Context->ListArena, voxel_chunk_header);
+						}
+
+						Header->Next = Context->Result->Next;
+						Header->Prev = Context->Result;
+						
+						Header->Next->Prev = Header;
+						Header->Prev->Next = Header;
+
+						EndTicketMutex(&Context->ResultMutex);
+#endif
 					}
 				}
 			}
-			
-			FreeVoxelHashTable(Work->HashTable, VOXEL_HASH_TABLE_SIZE);
-			
-			EndTemporaryMemory(Work->HashTempMem);
 		}
 	}
 
+	Assert(WriteTableIndex != ReadTableIndex);
+	AtomicCompareExchangeU32((uint32* volatile)&Manager->TableIndex,
+		WriteTableIndex,
+		ReadTableIndex);
+
 	Manager->CurrHorizontalIndex = IndX;
 	Manager->CurrVerticalIndex = IndY;
-
 }
+
+struct scan_voxel_chunks_work{
+	render_group* RenderGroup;
+
+	voxel_chunk_manager* Manager;
+};
+
+INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(ScanVoxelChunksLoopWork){
+	scan_voxel_chunks_work* Work = (scan_voxel_chunks_work*)Data;
+
+	while(Work->Manager->LoopCanBeContinued){
+		ScanVoxelChunks(Work->Manager, Work->RenderGroup);
+	}
+}
+
+void UpdateVoxelChunks(voxel_chunk_manager* Manager, render_group* RenderGroup, vec3 CamPos){
+	
+	BeginTicketMutex(&Manager->ChangeMutex);
+	Manager->CamPos = CamPos;
+	EndTicketMutex(&Manager->ChangeMutex);
+
+#if IVAN_VOXEL_WORLD_MULTITHREADED
+	for(uint32 ContextIndex = 0;
+		ContextIndex < ArrayCount(Manager->Contexts);
+		ContextIndex++)
+	{
+		voxel_chunk_thread_context* Context = &Manager->Contexts[ContextIndex];
+		
+		if(Context->IsValid){
+			BeginTicketMutex(&Context->ResultMutex);
+
+			voxel_chunk_header* Index = Context->Result->Next;
+
+			for(Index; Index != Context->Result;){
+
+				voxel_chunk_header* Next = Index->Next;
+
+				PushVoxelChunkMesh(
+					RenderGroup,
+					Index->Mesh,
+					Context->Manager->VoxelAtlasID,
+					GetPosForVoxelChunk(Index->Chunk));
+
+				Index->Next->Prev = Index->Prev;
+				Index->Prev->Next = Index->Next;
+
+				Index->Prev = Context->ResultFree;
+				Index->Next = Context->ResultFree->Next;
+
+				Index->Next->Prev = Index;
+				Index->Prev->Next = Index;
+
+				Index = Next;
+			}
+
+			EndTicketMutex(&Context->ResultMutex);
+		}
+	}
+#else
+	ScanVoxelChunks(Manager, RenderGroup);
 #endif
+}
 
 INTERNAL_FUNCTION voxel_chunk_manager* 
 AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
@@ -968,12 +950,8 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 	voxel_chunk_manager* Result = PushStruct(&TranState->TranArena, voxel_chunk_manager);
     
     Result->TranState = TranState;
-    Result->ListMutex = {};
-    Result->ListArenaMutex = {};
-    Result->HashTableMutex = {};
-    Result->HashTableArenaMutex = {};
-    Result->TempArenaMutex = {};
-    Result->RenderPushMutex = {};
+
+    Result->ChangeMutex = {};
 
     asset_vector VAMatchVector = {};
     VAMatchVector.Data[Tag_VoxelAtlasType] = VoxelAtlasType_Default;
@@ -981,25 +959,19 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
     VAWeightVector.Data[Tag_VoxelAtlasType] = 10.0f;
     Result->VoxelAtlasID = GetBestMatchVoxelAtlasFrom(Assets, Asset_VoxelAtlas, &VAMatchVector, &VAWeightVector);
 
-    Result->VoxelChunkSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
-    Result->FirstFreeSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
-
-    Result->VoxelChunkSentinel->Next = Result->VoxelChunkSentinel;
-    Result->VoxelChunkSentinel->Prev = Result->VoxelChunkSentinel;
-    Result->VoxelChunkSentinel->IsSentinel = true;
-
-    Result->FirstFreeSentinel->Next = Result->FirstFreeSentinel;
-    Result->FirstFreeSentinel->Prev = Result->FirstFreeSentinel;
-    Result->FirstFreeSentinel->IsSentinel = true;
-
     Result->RandomSeries = RandomSeed(123);
     Result->ChunksViewDistance = 20;
     Result->CurrHorizontalIndex = 0;
     Result->CurrVerticalIndex = 0;
 
 	SubArena(&Result->HashTableArena, &TranState->TranArena, IVAN_KILOBYTES(500));
-	SubArena(&Result->ListArena, &TranState->TranArena, IVAN_MEGABYTES(5));
-	SubArena(&Result->TempArena, &TranState->TranArena, IVAN_KILOBYTES(500));
+
+	Result->TableIndex = 0;
+	Result->Tables[0] = PushArray(&Result->HashTableArena, VOXEL_HASH_TABLE_SIZE, voxel_table_pair*);
+	Result->Tables[1] = PushArray(&Result->HashTableArena, VOXEL_HASH_TABLE_SIZE, voxel_table_pair*);
+
+	ClearVoxelHashTable(Result->Tables[0], VOXEL_HASH_TABLE_SIZE);
+	ClearVoxelHashTable(Result->Tables[1], VOXEL_HASH_TABLE_SIZE);
 
 	for(int32_t ContextIndex = 0;
 		ContextIndex < ArrayCount(Result->Contexts);
@@ -1010,7 +982,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 		*Context = {};
 	}
 
-	int32_t SideContextsCount = Sqrt(IVAN_VOXEL_CHUNK_CONTEXTS_COUNT);
+	int32_t SideContextsCount = Sqrt(IVAN_VOXEL_CONTEXTS_COUNT);
 	float SideDeltaReal = (float)(Result->ChunksViewDistance * 2 + 1) / (float)SideContextsCount;
 	int32_t SideDeltaInt = (int32_t)(SideDeltaReal + 0.5f);
 	
@@ -1021,6 +993,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 	int32_t StartYIndex = -Result->ChunksViewDistance;
 	int32_t CurrYIndex = StartYIndex;
 
+	uint32 ContextsValid = 0;
 	for(int32_t ContextVertIndex = 0;
 		ContextVertIndex < SideContextsCount;
 		ContextVertIndex++)
@@ -1036,6 +1009,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 				&Result->Contexts[ContextVertIndex * SideContextsCount + ContextHorzIndex];
 			
 			Context->IsValid = true;
+			ContextsValid++;
 
 			Context->MinXOffset = CurrXIndex;
 			Context->MinYOffset = CurrYIndex;
@@ -1055,6 +1029,10 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 		CurrYIndex += SideDeltaInt;
 	}
 
+    uint32 ListArenaMemSize = IVAN_MEGABYTES(5);
+
+    uint32 ContextListMemory = ListArenaMemSize / ContextsValid;
+
 	for(int32_t ContextIndex = 0; 
 		ContextIndex < ArrayCount(Result->Contexts);
 		ContextIndex++)
@@ -1062,24 +1040,39 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 		voxel_chunk_thread_context* Context = &Result->Contexts[ContextIndex];
 
 		if(Context->IsValid){
+			SubArena(&Context->ListArena, &TranState->TranArena, ContextListMemory);
 
-			SubArena(&Context->HashTableArena, &TranState->TranArena, IVAN_KILOBYTES(20));
-			SubArena(&Context->ListArena, &TranState->TranArena, IVAN_KILOBYTES(100));
-			SubArena(&Context->TempArena, &TranState->TranArena, IVAN_KILOBYTES(10));
-
-			Context->VoxelChunkSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
+			Context->VoxelChunkSentinel = PushStruct(&Context->ListArena, voxel_chunk_header);
 			Context->VoxelChunkSentinel->Next = Context->VoxelChunkSentinel;
 			Context->VoxelChunkSentinel->Prev = Context->VoxelChunkSentinel;
 			Context->VoxelChunkSentinel->IsSentinel = true;
 
-			Context->FirstFreeSentinel = PushStruct(&TranState->TranArena, voxel_chunk_header);
+			Context->FirstFreeSentinel = PushStruct(&Context->ListArena, voxel_chunk_header);
 			Context->FirstFreeSentinel->Next = Context->FirstFreeSentinel;
 			Context->FirstFreeSentinel->Prev = Context->FirstFreeSentinel;
 			Context->FirstFreeSentinel->IsSentinel = true;
 
 			Context->Manager = Result;
+
+			Context->ResultMutex = {};
+
+			Context->Result = PushStruct(&Context->ListArena, voxel_chunk_header);
+			Context->Result->Next = Context->Result;
+			Context->Result->Prev = Context->Result;
+			Context->Result->IsSentinel = true;
+
+			Context->ResultFree = PushStruct(&Context->ListArena, voxel_chunk_header);
+			Context->ResultFree->Next = Context->ResultFree;
+			Context->ResultFree->Prev = Context->ResultFree;
+			Context->ResultFree->IsSentinel = true;
 		}
 	}
+
+/*	Result->LoopCanBeContinued = true;
+	scan_voxel_chunks_work* ScanWork = PushStruct(TranState->TranArena, scan_voxel_chunks_work);
+	ScanWork->RenderGroup = TranState->RenderGroup;
+	ScanWork->Manager = Result;
+	Platform.AddEntry(Manager->TranState->HighPriorityQueue, ScanVoxelChunksLoopWork, ScanWork);*/
 
 	return(Result);
 }

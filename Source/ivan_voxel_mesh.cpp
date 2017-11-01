@@ -20,12 +20,8 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelMeshWork){
 
 	*Mesh = {};
 
-	IVAN_COMPLETE_READS_BEFORE_FUTURE;
-
 	voxel_mesh_generation_context Context = InitVoxelMeshGeneration(Chunk, Work->Assets, Work->VoxelAtlasID);
-	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	Mesh->PUVN = (ivan_vertex_type*)Platform.AllocateMemory(Context.MemoryRequired);
-	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;
 	FinalizeVoxelMeshGeneration(Mesh, &Context);
 
 	IVAN_COMPLETE_WRITES_BEFORE_FUTURE;

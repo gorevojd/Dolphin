@@ -1655,6 +1655,8 @@ INTERNAL_FUNCTION void WriteVoxelAtlases(){
     DescribeByIndex(Atlas, 3, 0, VoxelMaterial_GrassyGround, VoxelFaceTypeIndex_Side);
     DescribeByIndex(Atlas, 4, 1, VoxelMaterial_Tree, VoxelFaceTypeIndex_Side);
     DescribeByIndex(Atlas, 5, 1, VoxelMaterial_Tree, VoxelFaceTypeIndex_TopBottom);
+    DescribeByIndex(Atlas, 5, 8, VoxelMaterial_Leaves, VoxelFaceTypeIndex_All);
+    DescribeByIndex(Atlas, 0, 3, VoxelMaterial_Sand, VoxelFaceTypeIndex_All);
 
 
     BeginAssetType(Assets, Asset_VoxelAtlasTexture);

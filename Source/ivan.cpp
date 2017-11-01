@@ -296,11 +296,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
 
-#if IVAN_VOXEL_WORLD_MULTITHREADED
-    UpdateVoxelChunksMultithreaded(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
-#else
     UpdateVoxelChunks(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
-#endif
 
     hero_bitmap_ids HeroBitmaps = {};
     asset_vector MatchVector = {};

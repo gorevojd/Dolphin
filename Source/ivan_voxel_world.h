@@ -21,6 +21,7 @@
 #define IVAN_VOXEL_WORLD_H
 
 #define IVAN_VOXEL_WORLD_MULTITHREADED 0
+#define IVAN_VOXEL_CONTEXTS_COUNT 16
 
 #include "ivan_voxel_shared.h"
 
@@ -62,8 +63,10 @@ struct voxel_chunk_header{
 	volatile voxel_chunk_state ChunkState;
 	volatile voxel_mesh_state MeshState;
 
+	int32 HorzIndex;
+	int32 VertIndex;
+
 	int32_t IsSentinel;
-	int32_t NeedsToBeGenerated;
 
 	int32_t FrustumCullingTestResult;
 
@@ -81,9 +84,7 @@ struct voxel_table_pair{
 struct voxel_chunk_thread_context{
 	int32_t IsValid;
 
-	memory_arena TempArena;
 	memory_arena ListArena;
-	memory_arena HashTableArena;
 
 	int32_t MinXOffset;
 	int32_t MaxXOffset;
@@ -92,28 +93,30 @@ struct voxel_chunk_thread_context{
 
 	struct voxel_chunk_manager* Manager;
 
+	ticket_mutex ResultMutex;
+
+	voxel_chunk_header* Result;
+	voxel_chunk_header* ResultFree;
+
 	voxel_chunk_header* VoxelChunkSentinel;
 	voxel_chunk_header* FirstFreeSentinel;
 };
 
 struct voxel_chunk_manager{
+	ticket_mutex ChangeMutex;
+	bool32 LoopCanBeContinued;
+
 	voxel_chunk_header* VoxelChunkSentinel;
 	voxel_chunk_header* FirstFreeSentinel;
 
-	ticket_mutex ListMutex;
-	ticket_mutex ListArenaMutex;
-	ticket_mutex HashTableMutex;
-	ticket_mutex HashTableArenaMutex;
-	ticket_mutex TempArenaMutex;
-
-	ticket_mutex RenderPushMutex;
+	voxel_table_pair** Tables[2];
+	volatile uint32 TableIndex;
 
 	transient_state* TranState;
 	random_series RandomSeries;
 
 	memory_arena HashTableArena;
 	memory_arena ListArena;
-	memory_arena TempArena;
 
 	int32_t CurrHorizontalIndex;
 	int32_t CurrVerticalIndex;
@@ -121,16 +124,28 @@ struct voxel_chunk_manager{
 	int32_t ChunksViewDistance;
 	voxel_atlas_id VoxelAtlasID;
 
-#define IVAN_VOXEL_CHUNK_CONTEXTS_COUNT 64
-	voxel_chunk_thread_context Contexts[IVAN_VOXEL_CHUNK_CONTEXTS_COUNT];
+	vec3 CamPos;
+
+	voxel_chunk_thread_context Contexts[IVAN_VOXEL_CONTEXTS_COUNT];
 };
 
+#define VOXEL_DLIST_INSERT(Sentinel, Entry)	\
+	(Entry)->Prev = Sentinel;			\
+	(Entry)->Next = Sentinel->Next;		\
+										\
+	(Entry)->Prev->Next = Entry;		\
+	(Entry)->Next->Prev = Entry;
+
 inline void InsertChunkHeaderAtFront(voxel_chunk_header* Sentinel, voxel_chunk_header* Header){
+#if 1
 	Header->Prev = Sentinel;
 	Header->Next = Sentinel->Next;
 
 	Header->Prev->Next = Header;
 	Header->Next->Prev = Header;
+#else
+	VOXEL_DLIST_INSERT(Sentinel, Header);
+#endif
 }
 
 inline uint32_t VoxelHashFunc(uint64_t Key){

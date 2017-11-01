@@ -3,7 +3,6 @@
 
 #define IVAN_INTERNAL 0
 
-
 #include <stdio.h>
 
 #ifndef IVAN_BIT
@@ -185,17 +184,36 @@ typedef uint32_t uint32;
 typedef int32_t int32;
 typedef uint64_t uint64;
 typedef int64_t int64;
+
 #endif
 #endif
 
 typedef float real32;
 typedef double real64;
 
-#include <stdio.h>
+typedef uint8 u8;
+typedef uint16 u16;
+typedef uint32 u32;
+typedef uint64 u64;
+
+typedef int8 s8;
+typedef int16 s16;
+typedef int32 s32;
+typedef int64 s64;
+
+typedef float f32;
+typedef float r32;
+typedef double f64;
+typedef double r64;
+
 typedef uintptr_t uintptr;
-typedef intptr_t  intptr;
+typedef intptr_t intptr;
+
+typedef intptr_t  smm;
+typedef uintptr_t umm;
 
 typedef int32 bool32;
+typedef s32 b32;
 
 #define F32_MIN 1.175494351e-38F  
 #define F32_MAX 3.402823466e+38F
