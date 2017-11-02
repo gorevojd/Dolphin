@@ -35,10 +35,17 @@ struct voxel_chunk{
 	uint8_t* Voxels;
 	uint32_t VoxelsCount;
 
+#if 1
 	voxel_chunk* LeftNeighbour;
 	voxel_chunk* RightNeighbour;
 	voxel_chunk* FrontNeighbour;
 	voxel_chunk* BackNeighbour;
+#endif
+
+	voxel_chunk* RightChunk;
+	voxel_chunk* LeftChunk;
+	voxel_chunk* FrontChunk;
+	voxel_chunk* BackChunk;
 };
 
 enum voxel_chunk_state{
@@ -95,9 +102,6 @@ struct voxel_chunk_thread_context{
 
 	ticket_mutex ResultMutex;
 
-	voxel_chunk_header* Result;
-	voxel_chunk_header* ResultFree;
-
 	voxel_chunk_header* VoxelChunkSentinel;
 	voxel_chunk_header* FirstFreeSentinel;
 };
@@ -109,6 +113,7 @@ struct voxel_chunk_manager{
 	voxel_chunk_header* VoxelChunkSentinel;
 	voxel_chunk_header* FirstFreeSentinel;
 
+	/*Table index points to the read table*/
 	voxel_table_pair** Tables[2];
 	volatile uint32 TableIndex;
 
@@ -210,5 +215,10 @@ inline vec3 GetPosForVoxelChunk(voxel_chunk* Chunk){
 INTERNAL_FUNCTION void GenerateVoxelChunk(
 	memory_arena* Arena, voxel_chunk* Chunk, 
 	int32_t HorizontalIndex, int32_t VerticalIndex);
+
+INTERNAL_FUNCTION voxel_chunk* GetChunkAtIndices(
+	voxel_table_pair** Table, 
+	int32_t HorizontalIndex, 
+	int32_t VerticalIndex);
 
 #endif

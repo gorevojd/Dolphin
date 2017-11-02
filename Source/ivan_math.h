@@ -700,7 +700,6 @@ inline float DistanceToPoint(vec4 Plane, vec3 P){
 }
 
 /*Interpolations*/
-
 inline float Lerp(float a, float b, float t){
 	float Result = a * (1.0f - t) + b * t;
 	return(Result);

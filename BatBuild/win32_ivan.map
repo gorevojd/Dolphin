@@ -1,6 +1,6 @@
  win32_ivan
 
- Timestamp is 59fa21f1 (Wed Nov  1 21:35:13 2017)
+ Timestamp is 59fb810d (Thu Nov  2 22:33:17 2017)
 
  Preferred load address is 0000000140000000
 
@@ -1162,32 +1162,32 @@
  0002:00000548       __xp_z                     0000000140041548     LIBCMTD:initializers.obj
  0002:00000550       __xt_a                     0000000140041550     LIBCMTD:initializers.obj
  0002:00000558       __xt_z                     0000000140041558     LIBCMTD:initializers.obj
- 0002:00001980       ??_C@_0CL@MOGIOII@GL_INVALID_ENUM?3370?3OpenGLRender@ 0000000140042980     win32_ivan.obj
- 0002:000019b0       ??_C@_0CM@JFBGDKKD@GL_INVALID_VALUE?3370?3OpenGLRende@ 00000001400429b0     win32_ivan.obj
- 0002:000019e0       ??_C@_0DA@KIPCEMEG@GL_INVALID_OPERATION?3370?3OpenGLR@ 00000001400429e0     win32_ivan.obj
- 0002:00001a10       ??_C@_0CN@EDEJGJF@GL_STACK_OVERFLOW?3370?3OpenGLRend@ 0000000140042a10     win32_ivan.obj
- 0002:00001a40       ??_C@_0CO@NCJBPPGL@GL_STACK_UNDERFLOW?3370?3OpenGLRen@ 0000000140042a40     win32_ivan.obj
- 0002:00001a70       ??_C@_0CM@PFFAJEBD@GL_OUT_OF_MEMORY?3370?3OpenGLRende@ 0000000140042a70     win32_ivan.obj
- 0002:00001aa0       ??_C@_0CL@JNKMDEHO@GL_INVALID_ENUM?3394?3OpenGLRender@ 0000000140042aa0     win32_ivan.obj
- 0002:00001ad0       ??_C@_0CM@EFMIAFF@GL_INVALID_VALUE?3394?3OpenGLRende@ 0000000140042ad0     win32_ivan.obj
- 0002:00001b00       ??_C@_0DA@DJLIPGLA@GL_INVALID_OPERATION?3394?3OpenGLR@ 0000000140042b00     win32_ivan.obj
- 0002:00001b30       ??_C@_0CN@JFHOCMGD@GL_STACK_OVERFLOW?3394?3OpenGLRend@ 0000000140042b30     win32_ivan.obj
- 0002:00001b60       ??_C@_0CO@EDNLEFJN@GL_STACK_UNDERFLOW?3394?3OpenGLRen@ 0000000140042b60     win32_ivan.obj
- 0002:00001b90       ??_C@_0CM@GEBKCOOF@GL_OUT_OF_MEMORY?3394?3OpenGLRende@ 0000000140042b90     win32_ivan.obj
- 0002:00001bbc       __real@00000000            0000000140042bbc     win32_ivan.obj
- 0002:00001bc0       __real@38d1b717            0000000140042bc0     win32_ivan.obj
- 0002:00001bc4       __real@3f000000            0000000140042bc4     win32_ivan.obj
- 0002:00001bc8       __real@3f800000            0000000140042bc8     win32_ivan.obj
- 0002:00001bcc       __real@40000000            0000000140042bcc     win32_ivan.obj
- 0002:00001bd0       __real@40400000            0000000140042bd0     win32_ivan.obj
- 0002:00001bd8       __real@408f400000000000    0000000140042bd8     win32_ivan.obj
- 0002:00001be0       __real@4090000000000000    0000000140042be0     win32_ivan.obj
- 0002:00001be8       __real@40c00000            0000000140042be8     win32_ivan.obj
- 0002:00001bec       __real@41200000            0000000140042bec     win32_ivan.obj
- 0002:00001bf0       __real@41700000            0000000140042bf0     win32_ivan.obj
- 0002:00001bf4       __real@46fffe00            0000000140042bf4     win32_ivan.obj
- 0002:00001bf8       __real@47000000            0000000140042bf8     win32_ivan.obj
- 0002:00001bfc       __real@bf800000            0000000140042bfc     win32_ivan.obj
+ 0002:00001978       ??_C@_0CL@MOGIOII@GL_INVALID_ENUM?3370?3OpenGLRender@ 0000000140042978     win32_ivan.obj
+ 0002:000019a8       ??_C@_0CM@JFBGDKKD@GL_INVALID_VALUE?3370?3OpenGLRende@ 00000001400429a8     win32_ivan.obj
+ 0002:000019d8       ??_C@_0DA@KIPCEMEG@GL_INVALID_OPERATION?3370?3OpenGLR@ 00000001400429d8     win32_ivan.obj
+ 0002:00001a08       ??_C@_0CN@EDEJGJF@GL_STACK_OVERFLOW?3370?3OpenGLRend@ 0000000140042a08     win32_ivan.obj
+ 0002:00001a38       ??_C@_0CO@NCJBPPGL@GL_STACK_UNDERFLOW?3370?3OpenGLRen@ 0000000140042a38     win32_ivan.obj
+ 0002:00001a68       ??_C@_0CM@PFFAJEBD@GL_OUT_OF_MEMORY?3370?3OpenGLRende@ 0000000140042a68     win32_ivan.obj
+ 0002:00001a98       ??_C@_0CL@JNKMDEHO@GL_INVALID_ENUM?3394?3OpenGLRender@ 0000000140042a98     win32_ivan.obj
+ 0002:00001ac8       ??_C@_0CM@EFMIAFF@GL_INVALID_VALUE?3394?3OpenGLRende@ 0000000140042ac8     win32_ivan.obj
+ 0002:00001af8       ??_C@_0DA@DJLIPGLA@GL_INVALID_OPERATION?3394?3OpenGLR@ 0000000140042af8     win32_ivan.obj
+ 0002:00001b28       ??_C@_0CN@JFHOCMGD@GL_STACK_OVERFLOW?3394?3OpenGLRend@ 0000000140042b28     win32_ivan.obj
+ 0002:00001b58       ??_C@_0CO@EDNLEFJN@GL_STACK_UNDERFLOW?3394?3OpenGLRen@ 0000000140042b58     win32_ivan.obj
+ 0002:00001b88       ??_C@_0CM@GEBKCOOF@GL_OUT_OF_MEMORY?3394?3OpenGLRende@ 0000000140042b88     win32_ivan.obj
+ 0002:00001bb4       __real@00000000            0000000140042bb4     win32_ivan.obj
+ 0002:00001bb8       __real@38d1b717            0000000140042bb8     win32_ivan.obj
+ 0002:00001bbc       __real@3f000000            0000000140042bbc     win32_ivan.obj
+ 0002:00001bc0       __real@3f800000            0000000140042bc0     win32_ivan.obj
+ 0002:00001bc4       __real@40000000            0000000140042bc4     win32_ivan.obj
+ 0002:00001bc8       __real@40400000            0000000140042bc8     win32_ivan.obj
+ 0002:00001bd0       __real@408f400000000000    0000000140042bd0     win32_ivan.obj
+ 0002:00001bd8       __real@4090000000000000    0000000140042bd8     win32_ivan.obj
+ 0002:00001be0       __real@40c00000            0000000140042be0     win32_ivan.obj
+ 0002:00001be4       __real@41200000            0000000140042be4     win32_ivan.obj
+ 0002:00001be8       __real@41700000            0000000140042be8     win32_ivan.obj
+ 0002:00001bec       __real@46fffe00            0000000140042bec     win32_ivan.obj
+ 0002:00001bf0       __real@47000000            0000000140042bf0     win32_ivan.obj
+ 0002:00001bf4       __real@bf800000            0000000140042bf4     win32_ivan.obj
  0002:00001c00       __xmm@80000000000000008000000000000000 0000000140042c00     win32_ivan.obj
  0002:00001c10       __xmm@80000000800000008000000080000000 0000000140042c10     win32_ivan.obj
  0002:00001c20       GUID_NULL                  0000000140042c20     uuid:cguid_i.obj
@@ -2905,177 +2905,177 @@
  0002:000004e0       ?pre_cpp_initializer@@3P6AXXZEA 00000001400414e0     LIBCMTD:exe_winmain.obj
  0002:000004f8       ?pre_c_initializer@@3P6AHXZEA 00000001400414f8     LIBCMTD:exe_winmain.obj
  0002:00000500       ?post_pgo_initializer@@3P6AHXZEA 0000000140041500     LIBCMTD:exe_winmain.obj
- 0002:00000560       $SG100386                  0000000140041560     win32_ivan.obj
- 0002:00000567       $SG97238                   0000000140041567     win32_ivan.obj
- 0002:00000568       $SG100392                  0000000140041568     win32_ivan.obj
- 0002:0000057c       $SG7224                    000000014004157c     win32_ivan.obj
- 0002:00000580       $SG100395                  0000000140041580     win32_ivan.obj
- 0002:00000598       $SG100398                  0000000140041598     win32_ivan.obj
- 0002:000005b0       $SG100401                  00000001400415b0     win32_ivan.obj
- 0002:000005d0       $SG100403                  00000001400415d0     win32_ivan.obj
- 0002:000005e8       $SG7225                    00000001400415e8     win32_ivan.obj
- 0002:000005ec       $SG97243                   00000001400415ec     win32_ivan.obj
- 0002:000005f0       $SG100466                  00000001400415f0     win32_ivan.obj
- 0002:00000610       $SG100468                  0000000140041610     win32_ivan.obj
- 0002:00000634       $SG6729                    0000000140041634     win32_ivan.obj
- 0002:0000063c       $SG100223                  000000014004163c     win32_ivan.obj
- 0002:00000644       $SG97247                   0000000140041644     win32_ivan.obj
- 0002:00000648       $SG100470                  0000000140041648     win32_ivan.obj
- 0002:00000670       $SG100472                  0000000140041670     win32_ivan.obj
- 0002:00000694       $SG97249                   0000000140041694     win32_ivan.obj
- 0002:00000698       $SG100474                  0000000140041698     win32_ivan.obj
- 0002:000006bc       $SG97253                   00000001400416bc     win32_ivan.obj
- 0002:000006c0       $SG100476                  00000001400416c0     win32_ivan.obj
- 0002:000006e4       $SG6730                    00000001400416e4     win32_ivan.obj
- 0002:000006ec       $SG97256                   00000001400416ec     win32_ivan.obj
- 0002:000006f0       $SG100479                  00000001400416f0     win32_ivan.obj
- 0002:00000710       $SG100481                  0000000140041710     win32_ivan.obj
- 0002:00000734       $SG100255                  0000000140041734     win32_ivan.obj
- 0002:0000073c       $SG97259                   000000014004173c     win32_ivan.obj
- 0002:00000740       $SG100483                  0000000140041740     win32_ivan.obj
- 0002:00000768       $SG100485                  0000000140041768     win32_ivan.obj
- 0002:00000790       $SG100487                  0000000140041790     win32_ivan.obj
- 0002:000007b8       $SG100489                  00000001400417b8     win32_ivan.obj
- 0002:000007e0       $SG100494                  00000001400417e0     win32_ivan.obj
- 0002:00000800       $SG100496                  0000000140041800     win32_ivan.obj
- 0002:00000828       $SG100498                  0000000140041828     win32_ivan.obj
- 0002:00000850       $SG100500                  0000000140041850     win32_ivan.obj
- 0002:00000878       $SG100502                  0000000140041878     win32_ivan.obj
- 0002:000008a0       $SG100504                  00000001400418a0     win32_ivan.obj
- 0002:000008c8       $SG100508                  00000001400418c8     win32_ivan.obj
- 0002:000008e8       $SG100510                  00000001400418e8     win32_ivan.obj
- 0002:00000910       $SG100512                  0000000140041910     win32_ivan.obj
- 0002:00000938       $SG100514                  0000000140041938     win32_ivan.obj
- 0002:00000960       $SG100516                  0000000140041960     win32_ivan.obj
- 0002:00000988       $SG100518                  0000000140041988     win32_ivan.obj
- 0002:000009b0       $SG100521                  00000001400419b0     win32_ivan.obj
- 0002:000009d0       $SG100523                  00000001400419d0     win32_ivan.obj
- 0002:000009f8       $SG100525                  00000001400419f8     win32_ivan.obj
- 0002:00000a20       $SG100527                  0000000140041a20     win32_ivan.obj
- 0002:00000a48       $SG100529                  0000000140041a48     win32_ivan.obj
- 0002:00000a70       $SG100531                  0000000140041a70     win32_ivan.obj
- 0002:00000a98       $SG101561                  0000000140041a98     win32_ivan.obj
- 0002:00000aa8       $SG101562                  0000000140041aa8     win32_ivan.obj
- 0002:00000ab8       $SG101563                  0000000140041ab8     win32_ivan.obj
- 0002:00000ac8       $SG101564                  0000000140041ac8     win32_ivan.obj
- 0002:00000ad8       $SG101565                  0000000140041ad8     win32_ivan.obj
- 0002:00000ae8       $SG101566                  0000000140041ae8     win32_ivan.obj
- 0002:00000b00       $SG101567                  0000000140041b00     win32_ivan.obj
- 0002:00000b18       $SG101568                  0000000140041b18     win32_ivan.obj
- 0002:00000b28       $SG100614                  0000000140041b28     win32_ivan.obj
- 0002:00000b58       $SG100616                  0000000140041b58     win32_ivan.obj
- 0002:00000b88       $SG100618                  0000000140041b88     win32_ivan.obj
- 0002:00000bb8       $SG100620                  0000000140041bb8     win32_ivan.obj
- 0002:00000be8       $SG100622                  0000000140041be8     win32_ivan.obj
- 0002:00000c18       $SG100624                  0000000140041c18     win32_ivan.obj
- 0002:00000c48       $SG100628                  0000000140041c48     win32_ivan.obj
- 0002:00000c78       $SG100630                  0000000140041c78     win32_ivan.obj
- 0002:00000ca8       $SG100632                  0000000140041ca8     win32_ivan.obj
- 0002:00000cd8       $SG100634                  0000000140041cd8     win32_ivan.obj
- 0002:00000d08       $SG100636                  0000000140041d08     win32_ivan.obj
- 0002:00000d38       $SG100638                  0000000140041d38     win32_ivan.obj
- 0002:00000d68       $SG100641                  0000000140041d68     win32_ivan.obj
- 0002:00000d80       $SG100742                  0000000140041d80     win32_ivan.obj
- 0002:00000d90       $SG100743                  0000000140041d90     win32_ivan.obj
- 0002:00000da8       $SG100767                  0000000140041da8     win32_ivan.obj
- 0002:00000db8       $SG100768                  0000000140041db8     win32_ivan.obj
- 0002:00000dd4       $SG6636                    0000000140041dd4     win32_ivan.obj
- 0002:00000de0       $SG100869                  0000000140041de0     win32_ivan.obj
- 0002:00000df8       $SG100870                  0000000140041df8     win32_ivan.obj
- 0002:00000e10       $SG100871                  0000000140041e10     win32_ivan.obj
- 0002:00000e28       $SG100904                  0000000140041e28     win32_ivan.obj
- 0002:00000e38       $SG100906                  0000000140041e38     win32_ivan.obj
- 0002:00000e48       $SG100908                  0000000140041e48     win32_ivan.obj
- 0002:00000e58       $SG100910                  0000000140041e58     win32_ivan.obj
- 0002:00000e68       $SG100912                  0000000140041e68     win32_ivan.obj
- 0002:00000e78       $SG100914                  0000000140041e78     win32_ivan.obj
- 0002:00000e88       $SG100915                  0000000140041e88     win32_ivan.obj
- 0002:00000e98       $SG101077                  0000000140041e98     win32_ivan.obj
- 0002:00000ea8       $SG101079                  0000000140041ea8     win32_ivan.obj
- 0002:00000ec0       $SG101081                  0000000140041ec0     win32_ivan.obj
- 0002:00000ed8       $SG101082                  0000000140041ed8     win32_ivan.obj
- 0002:00000ef8       $SG101083                  0000000140041ef8     win32_ivan.obj
- 0002:00000f18       $SG101087                  0000000140041f18     win32_ivan.obj
- 0002:00000f38       $SG101089                  0000000140041f38     win32_ivan.obj
- 0002:00000f58       $SG101150                  0000000140041f58     win32_ivan.obj
- 0002:00000f78       $SG101151                  0000000140041f78     win32_ivan.obj
- 0002:00000f98       $SG101152                  0000000140041f98     win32_ivan.obj
- 0002:00000fb0       ?stbsp__bot@@3QBNB         0000000140041fb0     win32_ivan.obj
- 0002:00001068       $SG101153                  0000000140042068     win32_ivan.obj
- 0002:00001080       ?stbsp__negbot@@3QBNB      0000000140042080     win32_ivan.obj
- 0002:00001130       ?stbsp__negboterr@@3QBNB   0000000140042130     win32_ivan.obj
- 0002:000011e0       ?stbsp__top@@3QBNB         00000001400421e0     win32_ivan.obj
- 0002:00001248       $SG101155                  0000000140042248     win32_ivan.obj
- 0002:00001260       ?stbsp__negtop@@3QBNB      0000000140042260     win32_ivan.obj
- 0002:000012c8       $SG101156                  00000001400422c8     win32_ivan.obj
- 0002:000012e0       ?stbsp__toperr@@3QBNB      00000001400422e0     win32_ivan.obj
- 0002:00001348       $SG101164                  0000000140042348     win32_ivan.obj
- 0002:00001360       ?stbsp__negtoperr@@3QBNB   0000000140042360     win32_ivan.obj
- 0002:000013c8       $SG101165                  00000001400423c8     win32_ivan.obj
- 0002:000013e0       ?stbsp__powten@@3QB_KB     00000001400423e0     win32_ivan.obj
- 0002:00001480       $SG101154                  0000000140042480     win32_ivan.obj
- 0002:000014a0       $SG101157                  00000001400424a0     win32_ivan.obj
- 0002:000014b0       $SG101158                  00000001400424b0     win32_ivan.obj
- 0002:000014c0       $SG101159                  00000001400424c0     win32_ivan.obj
- 0002:000014d0       $SG101160                  00000001400424d0     win32_ivan.obj
- 0002:000014e0       $SG101161                  00000001400424e0     win32_ivan.obj
- 0002:000014f0       $SG101162                  00000001400424f0     win32_ivan.obj
- 0002:00001500       $SG101163                  0000000140042500     win32_ivan.obj
- 0002:00001510       $SG101166                  0000000140042510     win32_ivan.obj
- 0002:00001528       $SG101167                  0000000140042528     win32_ivan.obj
- 0002:00001538       $SG101168                  0000000140042538     win32_ivan.obj
- 0002:00001548       $SG101169                  0000000140042548     win32_ivan.obj
- 0002:00001558       $SG101170                  0000000140042558     win32_ivan.obj
- 0002:00001568       $SG101171                  0000000140042568     win32_ivan.obj
- 0002:00001578       $SG101172                  0000000140042578     win32_ivan.obj
- 0002:00001588       $SG101173                  0000000140042588     win32_ivan.obj
- 0002:00001598       $SG101174                  0000000140042598     win32_ivan.obj
- 0002:000015b0       $SG101175                  00000001400425b0     win32_ivan.obj
- 0002:000015c8       $SG101176                  00000001400425c8     win32_ivan.obj
- 0002:000015e0       $SG101177                  00000001400425e0     win32_ivan.obj
- 0002:000015f0       $SG101178                  00000001400425f0     win32_ivan.obj
- 0002:00001600       $SG101179                  0000000140042600     win32_ivan.obj
- 0002:00001618       $SG101180                  0000000140042618     win32_ivan.obj
- 0002:00001628       $SG101181                  0000000140042628     win32_ivan.obj
- 0002:00001640       $SG101182                  0000000140042640     win32_ivan.obj
- 0002:00001650       $SG101183                  0000000140042650     win32_ivan.obj
- 0002:00001660       $SG101184                  0000000140042660     win32_ivan.obj
- 0002:00001670       $SG101185                  0000000140042670     win32_ivan.obj
- 0002:00001680       $SG101186                  0000000140042680     win32_ivan.obj
- 0002:00001690       $SG101187                  0000000140042690     win32_ivan.obj
- 0002:000016a0       $SG101188                  00000001400426a0     win32_ivan.obj
- 0002:000016b0       $SG101189                  00000001400426b0     win32_ivan.obj
- 0002:000016c0       $SG101190                  00000001400426c0     win32_ivan.obj
- 0002:000016d8       $SG101191                  00000001400426d8     win32_ivan.obj
- 0002:000016f0       $SG101192                  00000001400426f0     win32_ivan.obj
- 0002:00001700       $SG101194                  0000000140042700     win32_ivan.obj
- 0002:00001718       $SG101195                  0000000140042718     win32_ivan.obj
- 0002:00001730       $SG101196                  0000000140042730     win32_ivan.obj
- 0002:00001748       $SG101197                  0000000140042748     win32_ivan.obj
- 0002:00001768       $SG101198                  0000000140042768     win32_ivan.obj
- 0002:00001780       $SG100214                  0000000140042780     win32_ivan.obj
- 0002:00001798       $SG100217                  0000000140042798     win32_ivan.obj
- 0002:000017b0       $SG100220                  00000001400427b0     win32_ivan.obj
- 0002:000017c8       $SG100221                  00000001400427c8     win32_ivan.obj
- 0002:000017d0       $SG100222                  00000001400427d0     win32_ivan.obj
- 0002:000017e0       $SG100224                  00000001400427e0     win32_ivan.obj
- 0002:000017f0       $SG100243                  00000001400427f0     win32_ivan.obj
- 0002:00001808       $SG100246                  0000000140042808     win32_ivan.obj
- 0002:00001820       $SG100251                  0000000140042820     win32_ivan.obj
- 0002:00001848       $SG100252                  0000000140042848     win32_ivan.obj
- 0002:00001870       $SG100253                  0000000140042870     win32_ivan.obj
- 0002:0000187c       $SG100254                  000000014004287c     win32_ivan.obj
- 0002:00001888       $SG100256                  0000000140042888     win32_ivan.obj
- 0002:00001898       $SG100257                  0000000140042898     win32_ivan.obj
- 0002:000018a8       $SG100258                  00000001400428a8     win32_ivan.obj
- 0002:000018b8       $SG100259                  00000001400428b8     win32_ivan.obj
- 0002:000018d0       $SG100260                  00000001400428d0     win32_ivan.obj
- 0002:000018e8       $SG100261                  00000001400428e8     win32_ivan.obj
- 0002:00001900       $SG101306                  0000000140042900     win32_ivan.obj
- 0002:00001910       $SG97222                   0000000140042910     win32_ivan.obj
- 0002:00001930       $SG101345                  0000000140042930     win32_ivan.obj
- 0002:00001940       $SG97270                   0000000140042940     win32_ivan.obj
- 0002:00001960       $SG101370                  0000000140042960     win32_ivan.obj
+ 0002:00000560       $SG101376                  0000000140041560     win32_ivan.obj
+ 0002:0000057d       $SG97238                   000000014004157d     win32_ivan.obj
+ 0002:00000580       $SG100392                  0000000140041580     win32_ivan.obj
+ 0002:00000588       $SG100398                  0000000140041588     win32_ivan.obj
+ 0002:0000059c       $SG7224                    000000014004159c     win32_ivan.obj
+ 0002:000005a0       $SG100401                  00000001400415a0     win32_ivan.obj
+ 0002:000005b8       $SG100404                  00000001400415b8     win32_ivan.obj
+ 0002:000005d0       $SG100407                  00000001400415d0     win32_ivan.obj
+ 0002:000005ec       $SG7225                    00000001400415ec     win32_ivan.obj
+ 0002:000005f0       $SG100409                  00000001400415f0     win32_ivan.obj
+ 0002:00000608       $SG100472                  0000000140041608     win32_ivan.obj
+ 0002:00000628       $SG100474                  0000000140041628     win32_ivan.obj
+ 0002:0000064c       $SG6729                    000000014004164c     win32_ivan.obj
+ 0002:00000654       $SG100229                  0000000140041654     win32_ivan.obj
+ 0002:0000065c       $SG97243                   000000014004165c     win32_ivan.obj
+ 0002:00000660       $SG100476                  0000000140041660     win32_ivan.obj
+ 0002:00000688       $SG100478                  0000000140041688     win32_ivan.obj
+ 0002:000006ac       $SG97247                   00000001400416ac     win32_ivan.obj
+ 0002:000006b0       $SG100480                  00000001400416b0     win32_ivan.obj
+ 0002:000006d4       $SG97249                   00000001400416d4     win32_ivan.obj
+ 0002:000006d8       $SG100482                  00000001400416d8     win32_ivan.obj
+ 0002:000006fc       $SG6730                    00000001400416fc     win32_ivan.obj
+ 0002:00000704       $SG97253                   0000000140041704     win32_ivan.obj
+ 0002:00000708       $SG100485                  0000000140041708     win32_ivan.obj
+ 0002:00000728       $SG100487                  0000000140041728     win32_ivan.obj
+ 0002:0000074c       $SG100261                  000000014004174c     win32_ivan.obj
+ 0002:00000754       $SG97256                   0000000140041754     win32_ivan.obj
+ 0002:00000758       $SG100489                  0000000140041758     win32_ivan.obj
+ 0002:00000780       $SG100491                  0000000140041780     win32_ivan.obj
+ 0002:000007a4       $SG97259                   00000001400417a4     win32_ivan.obj
+ 0002:000007a8       $SG100493                  00000001400417a8     win32_ivan.obj
+ 0002:000007d0       $SG100495                  00000001400417d0     win32_ivan.obj
+ 0002:000007f8       $SG100500                  00000001400417f8     win32_ivan.obj
+ 0002:00000818       $SG100502                  0000000140041818     win32_ivan.obj
+ 0002:00000840       $SG100504                  0000000140041840     win32_ivan.obj
+ 0002:00000868       $SG100506                  0000000140041868     win32_ivan.obj
+ 0002:00000890       $SG100508                  0000000140041890     win32_ivan.obj
+ 0002:000008b8       $SG100510                  00000001400418b8     win32_ivan.obj
+ 0002:000008e0       $SG100514                  00000001400418e0     win32_ivan.obj
+ 0002:00000900       $SG100516                  0000000140041900     win32_ivan.obj
+ 0002:00000928       $SG100518                  0000000140041928     win32_ivan.obj
+ 0002:00000950       $SG100520                  0000000140041950     win32_ivan.obj
+ 0002:00000978       $SG100522                  0000000140041978     win32_ivan.obj
+ 0002:000009a0       $SG100524                  00000001400419a0     win32_ivan.obj
+ 0002:000009c8       $SG100527                  00000001400419c8     win32_ivan.obj
+ 0002:000009e8       $SG100529                  00000001400419e8     win32_ivan.obj
+ 0002:00000a10       $SG100531                  0000000140041a10     win32_ivan.obj
+ 0002:00000a38       $SG100533                  0000000140041a38     win32_ivan.obj
+ 0002:00000a60       $SG100535                  0000000140041a60     win32_ivan.obj
+ 0002:00000a88       $SG100537                  0000000140041a88     win32_ivan.obj
+ 0002:00000ab0       $SG101567                  0000000140041ab0     win32_ivan.obj
+ 0002:00000ac0       $SG101568                  0000000140041ac0     win32_ivan.obj
+ 0002:00000ad0       $SG101569                  0000000140041ad0     win32_ivan.obj
+ 0002:00000ae0       $SG101570                  0000000140041ae0     win32_ivan.obj
+ 0002:00000af0       $SG101571                  0000000140041af0     win32_ivan.obj
+ 0002:00000b00       $SG101572                  0000000140041b00     win32_ivan.obj
+ 0002:00000b18       $SG101573                  0000000140041b18     win32_ivan.obj
+ 0002:00000b30       $SG101574                  0000000140041b30     win32_ivan.obj
+ 0002:00000b40       $SG100620                  0000000140041b40     win32_ivan.obj
+ 0002:00000b70       $SG100622                  0000000140041b70     win32_ivan.obj
+ 0002:00000ba0       $SG100624                  0000000140041ba0     win32_ivan.obj
+ 0002:00000bd0       $SG100626                  0000000140041bd0     win32_ivan.obj
+ 0002:00000c00       $SG100628                  0000000140041c00     win32_ivan.obj
+ 0002:00000c30       $SG100630                  0000000140041c30     win32_ivan.obj
+ 0002:00000c60       $SG100634                  0000000140041c60     win32_ivan.obj
+ 0002:00000c90       $SG100636                  0000000140041c90     win32_ivan.obj
+ 0002:00000cc0       $SG100638                  0000000140041cc0     win32_ivan.obj
+ 0002:00000cf0       $SG100640                  0000000140041cf0     win32_ivan.obj
+ 0002:00000d20       $SG100642                  0000000140041d20     win32_ivan.obj
+ 0002:00000d50       $SG100644                  0000000140041d50     win32_ivan.obj
+ 0002:00000d80       $SG100647                  0000000140041d80     win32_ivan.obj
+ 0002:00000d98       $SG100748                  0000000140041d98     win32_ivan.obj
+ 0002:00000da8       $SG100749                  0000000140041da8     win32_ivan.obj
+ 0002:00000dc0       $SG100773                  0000000140041dc0     win32_ivan.obj
+ 0002:00000dd0       $SG100774                  0000000140041dd0     win32_ivan.obj
+ 0002:00000dec       $SG6636                    0000000140041dec     win32_ivan.obj
+ 0002:00000df8       $SG100875                  0000000140041df8     win32_ivan.obj
+ 0002:00000e10       $SG100876                  0000000140041e10     win32_ivan.obj
+ 0002:00000e28       $SG100877                  0000000140041e28     win32_ivan.obj
+ 0002:00000e40       $SG100910                  0000000140041e40     win32_ivan.obj
+ 0002:00000e50       $SG100912                  0000000140041e50     win32_ivan.obj
+ 0002:00000e60       $SG100914                  0000000140041e60     win32_ivan.obj
+ 0002:00000e70       $SG100916                  0000000140041e70     win32_ivan.obj
+ 0002:00000e80       $SG100918                  0000000140041e80     win32_ivan.obj
+ 0002:00000e90       $SG100920                  0000000140041e90     win32_ivan.obj
+ 0002:00000ea0       $SG100921                  0000000140041ea0     win32_ivan.obj
+ 0002:00000eb0       $SG101083                  0000000140041eb0     win32_ivan.obj
+ 0002:00000ec0       $SG101085                  0000000140041ec0     win32_ivan.obj
+ 0002:00000ed8       $SG101087                  0000000140041ed8     win32_ivan.obj
+ 0002:00000ef0       $SG101088                  0000000140041ef0     win32_ivan.obj
+ 0002:00000f10       $SG101089                  0000000140041f10     win32_ivan.obj
+ 0002:00000f30       $SG101093                  0000000140041f30     win32_ivan.obj
+ 0002:00000f50       $SG101095                  0000000140041f50     win32_ivan.obj
+ 0002:00000f70       ?stbsp__bot@@3QBNB         0000000140041f70     win32_ivan.obj
+ 0002:00001028       $SG101158                  0000000140042028     win32_ivan.obj
+ 0002:00001040       ?stbsp__negbot@@3QBNB      0000000140042040     win32_ivan.obj
+ 0002:000010f0       ?stbsp__negboterr@@3QBNB   00000001400420f0     win32_ivan.obj
+ 0002:000011a0       ?stbsp__top@@3QBNB         00000001400421a0     win32_ivan.obj
+ 0002:00001208       $SG101159                  0000000140042208     win32_ivan.obj
+ 0002:00001220       ?stbsp__negtop@@3QBNB      0000000140042220     win32_ivan.obj
+ 0002:00001288       $SG101161                  0000000140042288     win32_ivan.obj
+ 0002:000012a0       ?stbsp__toperr@@3QBNB      00000001400422a0     win32_ivan.obj
+ 0002:00001308       $SG101162                  0000000140042308     win32_ivan.obj
+ 0002:00001320       ?stbsp__negtoperr@@3QBNB   0000000140042320     win32_ivan.obj
+ 0002:00001388       $SG101170                  0000000140042388     win32_ivan.obj
+ 0002:000013a0       ?stbsp__powten@@3QB_KB     00000001400423a0     win32_ivan.obj
+ 0002:00001440       $SG101156                  0000000140042440     win32_ivan.obj
+ 0002:00001460       $SG101157                  0000000140042460     win32_ivan.obj
+ 0002:00001480       $SG101160                  0000000140042480     win32_ivan.obj
+ 0002:000014a0       $SG101163                  00000001400424a0     win32_ivan.obj
+ 0002:000014b0       $SG101164                  00000001400424b0     win32_ivan.obj
+ 0002:000014c0       $SG101165                  00000001400424c0     win32_ivan.obj
+ 0002:000014d0       $SG101166                  00000001400424d0     win32_ivan.obj
+ 0002:000014e0       $SG101167                  00000001400424e0     win32_ivan.obj
+ 0002:000014f0       $SG101168                  00000001400424f0     win32_ivan.obj
+ 0002:00001500       $SG101169                  0000000140042500     win32_ivan.obj
+ 0002:00001510       $SG101171                  0000000140042510     win32_ivan.obj
+ 0002:00001528       $SG101172                  0000000140042528     win32_ivan.obj
+ 0002:00001540       $SG101173                  0000000140042540     win32_ivan.obj
+ 0002:00001550       $SG101174                  0000000140042550     win32_ivan.obj
+ 0002:00001560       $SG101175                  0000000140042560     win32_ivan.obj
+ 0002:00001570       $SG101176                  0000000140042570     win32_ivan.obj
+ 0002:00001580       $SG101177                  0000000140042580     win32_ivan.obj
+ 0002:00001590       $SG101178                  0000000140042590     win32_ivan.obj
+ 0002:000015a0       $SG101179                  00000001400425a0     win32_ivan.obj
+ 0002:000015b0       $SG101180                  00000001400425b0     win32_ivan.obj
+ 0002:000015c8       $SG101181                  00000001400425c8     win32_ivan.obj
+ 0002:000015e0       $SG101182                  00000001400425e0     win32_ivan.obj
+ 0002:000015f8       $SG101183                  00000001400425f8     win32_ivan.obj
+ 0002:00001608       $SG101184                  0000000140042608     win32_ivan.obj
+ 0002:00001618       $SG101185                  0000000140042618     win32_ivan.obj
+ 0002:00001630       $SG101186                  0000000140042630     win32_ivan.obj
+ 0002:00001640       $SG101187                  0000000140042640     win32_ivan.obj
+ 0002:00001658       $SG101188                  0000000140042658     win32_ivan.obj
+ 0002:00001668       $SG101189                  0000000140042668     win32_ivan.obj
+ 0002:00001678       $SG101190                  0000000140042678     win32_ivan.obj
+ 0002:00001688       $SG101191                  0000000140042688     win32_ivan.obj
+ 0002:00001698       $SG101192                  0000000140042698     win32_ivan.obj
+ 0002:000016a8       $SG101193                  00000001400426a8     win32_ivan.obj
+ 0002:000016b8       $SG101194                  00000001400426b8     win32_ivan.obj
+ 0002:000016c8       $SG101195                  00000001400426c8     win32_ivan.obj
+ 0002:000016d8       $SG101196                  00000001400426d8     win32_ivan.obj
+ 0002:000016f0       $SG101197                  00000001400426f0     win32_ivan.obj
+ 0002:00001708       $SG101198                  0000000140042708     win32_ivan.obj
+ 0002:00001718       $SG101200                  0000000140042718     win32_ivan.obj
+ 0002:00001730       $SG101201                  0000000140042730     win32_ivan.obj
+ 0002:00001748       $SG101202                  0000000140042748     win32_ivan.obj
+ 0002:00001760       $SG101203                  0000000140042760     win32_ivan.obj
+ 0002:00001780       $SG101204                  0000000140042780     win32_ivan.obj
+ 0002:00001798       $SG100220                  0000000140042798     win32_ivan.obj
+ 0002:000017b0       $SG100223                  00000001400427b0     win32_ivan.obj
+ 0002:000017c8       $SG100226                  00000001400427c8     win32_ivan.obj
+ 0002:000017e0       $SG100227                  00000001400427e0     win32_ivan.obj
+ 0002:000017e8       $SG100228                  00000001400427e8     win32_ivan.obj
+ 0002:000017f8       $SG100230                  00000001400427f8     win32_ivan.obj
+ 0002:00001808       $SG100249                  0000000140042808     win32_ivan.obj
+ 0002:00001820       $SG100252                  0000000140042820     win32_ivan.obj
+ 0002:00001838       $SG100257                  0000000140042838     win32_ivan.obj
+ 0002:00001860       $SG100258                  0000000140042860     win32_ivan.obj
+ 0002:00001888       $SG100259                  0000000140042888     win32_ivan.obj
+ 0002:00001894       $SG100260                  0000000140042894     win32_ivan.obj
+ 0002:000018a0       $SG100262                  00000001400428a0     win32_ivan.obj
+ 0002:000018b0       $SG100263                  00000001400428b0     win32_ivan.obj
+ 0002:000018c0       $SG100264                  00000001400428c0     win32_ivan.obj
+ 0002:000018d0       $SG100265                  00000001400428d0     win32_ivan.obj
+ 0002:000018e8       $SG100266                  00000001400428e8     win32_ivan.obj
+ 0002:00001900       $SG100267                  0000000140042900     win32_ivan.obj
+ 0002:00001918       $SG101312                  0000000140042918     win32_ivan.obj
+ 0002:00001928       $SG97222                   0000000140042928     win32_ivan.obj
+ 0002:00001948       $SG101351                  0000000140042948     win32_ivan.obj
+ 0002:00001958       $SG97270                   0000000140042958     win32_ivan.obj
  0002:00001c30       GS_ExceptionPointers       0000000140042c30     LIBCMTD:gs_report.obj
  0002:00001c80       ?module_names@?A0x679b24ab@@3QBQEB_WB 0000000140042c80     libvcruntimed:winapi_downlevel.obj
  0002:00001ef0       ?candidate_modules@?1??try_get_FlsAlloc@@YAP6AKP6AXPEAX@Z@ZXZ@4QBW4module_id@?A0x679b24ab@@B 0000000140042ef0     libvcruntimed:winapi_downlevel.obj
@@ -3224,10 +3224,10 @@
  0002:00011e74       $unwind$?Win32AllocateMemory@@YAPEAX_K@Z 0000000140052e74     win32_ivan.obj
  0002:00011e7c       $unwind$?Win32DeallocateMemory@@YAXPEAX@Z 0000000140052e7c     win32_ivan.obj
  0002:00011e84       $unwind$?Win32WindowProcessing@@YA_JPEAUHWND__@@I_K_J@Z 0000000140052e84     win32_ivan.obj
- 0002:00011e94       $unwind$?Sqrt@@YAMM@Z      0000000140052e94     win32_ivan.obj
  0002:00011e94       $unwind$roundf             0000000140052e94     libucrtd:roundf.obj
- 0002:00011e94       $unwind$?Clamp01@@YAMM@Z   0000000140052e94     win32_ivan.obj
  0002:00011e94       $unwind$?RoundReal32ToInt32@@YAHM@Z 0000000140052e94     win32_ivan.obj
+ 0002:00011e94       $unwind$?Clamp01@@YAMM@Z   0000000140052e94     win32_ivan.obj
+ 0002:00011e94       $unwind$?Sqrt@@YAMM@Z      0000000140052e94     win32_ivan.obj
  0002:00011e9c       $unwind$?Vec2@@YA?ATvec2@@MM@Z 0000000140052e9c     win32_ivan.obj
  0002:00011eac       $unwind$?Sub@@YA?ATvec3@@T1@0@Z 0000000140052eac     win32_ivan.obj
  0002:00011eb4       $unwind$?Mul@@YA?ATvec3@@T1@M@Z 0000000140052eb4     win32_ivan.obj
@@ -3237,38 +3237,38 @@
  0002:00011edc       $unwind$?AspectRatioFit@@YA?AUrectangle2i@@IIII@Z 0000000140052edc     win32_ivan.obj
  0002:00011ef0       $unwind$?Identity@@YA?AUmat4@@XZ 0000000140052ef0     win32_ivan.obj
  0002:00011f04       $unwind$?Translate@@YA?AUmat4@@U1@Tvec3@@@Z 0000000140052f04     win32_ivan.obj
- 0002:00011f10       $unwind$?SafeRatioN@@YAMMMM@Z 0000000140052f10     win32_ivan.obj
  0002:00011f10       $unwind$?Clamp@@YAMMMM@Z   0000000140052f10     win32_ivan.obj
- 0002:00011f18       $unwind$?Clamp01MapToRange@@YAMMMM@Z 0000000140052f18     win32_ivan.obj
+ 0002:00011f10       $unwind$?SafeRatioN@@YAMMMM@Z 0000000140052f10     win32_ivan.obj
  0002:00011f18       $unwind$_invoke_watson_if_oneof 0000000140052f18     libucrtd:debug_heap.obj
+ 0002:00011f18       $unwind$?Clamp01MapToRange@@YAMMMM@Z 0000000140052f18     win32_ivan.obj
  0002:00011f20       $unwind$?SafeRatio1@@YAMMM@Z 0000000140052f20     win32_ivan.obj
  0002:00011f28       $unwind$?DefaultRenderCommands@@YA?AUgame_render_commands@@IPEAEII@Z 0000000140052f28     win32_ivan.obj
- 0002:00011f34       $unwind$?set_flags@__crt_stdio_stream@@QEBA_NJ@Z 0000000140052f34     libucrtd:_sftbuf.obj
  0002:00011f34       $unwind$??R<lambda_f5be1f167794094e7b43d690e4bace6f>@@QEBA_ND@Z 0000000140052f34     libucrtd:argv_wildcards.obj
- 0002:00011f34       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@H@Z 0000000140052f34     win32_ivan.obj
- 0002:00011f34       $unwind$?has_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000140052f34     libucrtd:output.obj
- 0002:00011f34       $unwind$?siglookup@@YAPEAU__crt_signal_action_t@@HQEAU1@@Z 0000000140052f34     libucrtd:signal.obj
  0002:00011f34       $unwind$?unset_flags@__crt_stdio_stream@@QEBA_NJ@Z 0000000140052f34     libucrtd:_sftbuf.obj
+ 0002:00011f34       $unwind$?has_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000140052f34     libucrtd:output.obj
+ 0002:00011f34       $unwind$?set_flags@__crt_stdio_stream@@QEBA_NJ@Z 0000000140052f34     libucrtd:_sftbuf.obj
+ 0002:00011f34       $unwind$?siglookup@@YAPEAU__crt_signal_action_t@@HQEAU1@@Z 0000000140052f34     libucrtd:signal.obj
  0002:00011f34       $unwind$?has_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA_NI@Z 0000000140052f34     libucrtd:output.obj
+ 0002:00011f34       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@H@Z 0000000140052f34     win32_ivan.obj
  0002:00011f3c       $unwind$?OpenGLSetScreenSpace@@YAXHH@Z 0000000140052f3c     win32_ivan.obj
  0002:00011f4c       $unwind$?Win32GetLastFileWriteTime@@YA?AU_FILETIME@@PEAD@Z 0000000140052f4c     win32_ivan.obj
- 0002:00011f60       $unwind$capture_previous_context 0000000140052f60     LIBCMTD:gs_report.obj
- 0002:00011f60       $unwind$?capture_current_context@@YAXQEAU_CONTEXT@@@Z 0000000140052f60     libucrtd:invalid_parameter.obj
  0002:00011f60       $unwind$capture_current_context 0000000140052f60     LIBCMTD:gs_report.obj
- 0002:00011f68       $unwind$??$tcsncpy_s@AEAPEAD_KAEAPEADAEB_K@?$__crt_char_traits@D@@SAHAEAPEAD$$QEA_K0AEB_K@Z 0000000140052f68     libucrtd:argv_wildcards.obj
- 0002:00011f68       $unwind$??$message_box@$$TAEAPEB_WAEAPEB_WAEAI@?$__crt_char_traits@_W@@SAH$$QEA$$TAEAPEB_W1AEAI@Z 0000000140052f68     libucrtd:crtmbox.obj
- 0002:00011f68       $unwind$??$message_box@PEAUHWND__@@AEBQEB_WAEBQEB_WAEBI@?$__crt_char_traits@_W@@SAH$$QEAPEAUHWND__@@AEBQEB_W1AEBI@Z 0000000140052f68     libucrtd:crtmbox.obj
- 0002:00011f68       $unwind$??$message_box@$$TAEBQEB_WAEBQEB_WK@?$__crt_char_traits@_W@@SAH$$QEA$$TAEBQEB_W1$$QEAK@Z 0000000140052f68     libucrtd:crtmbox.obj
- 0002:00011f68       $unwind$??0?$output_adapter_data@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA@AEBV?$string_output_adapter@_W@1@_KQEB_WQEAU__crt_locale_pointers@@QEAD@Z 0000000140052f68     libucrtd:output.obj
+ 0002:00011f60       $unwind$?capture_current_context@@YAXQEAU_CONTEXT@@@Z 0000000140052f60     libucrtd:invalid_parameter.obj
+ 0002:00011f60       $unwind$capture_previous_context 0000000140052f60     LIBCMTD:gs_report.obj
  0002:00011f68       $unwind$??$tcsncpy_s@PEAD$$CB_KAEBQEBDAEB_K@?$__crt_char_traits@D@@SAH$$QEAPEAD$$QEB_KAEBQEBDAEB_K@Z 0000000140052f68     libucrtd:argv_wildcards.obj
- 0002:00011f68       $unwind$__GSHandlerCheck   0000000140052f68     LIBCMTD:_gshandler_.obj
- 0002:00011f68       $unwind$wcsncpy_s          0000000140052f68     libucrtd:wcsncpy_s.obj
  0002:00011f68       $unwind$??$tcsncpy_s@PEADAEB_KAEBQEBDAEB_K@?$__crt_char_traits@D@@SAH$$QEAPEADAEB_KAEBQEBD1@Z 0000000140052f68     libucrtd:argv_wildcards.obj
- 0002:00011f68       $unwind$_invoke_watson     0000000140052f68     libucrtd:invalid_parameter.obj
- 0002:00011f68       $unwind$?shift_bytes@@YAXQEAD_K0H@Z 0000000140052f68     libucrtd:cvt.obj
- 0002:00011f68       $unwind$strncpy_s          0000000140052f68     libucrtd:strncpy_s.obj
- 0002:00011f68       $unwind$??0?$output_adapter_data@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA@AEBV?$string_output_adapter@D@1@_KQEBDQEAU__crt_locale_pointers@@QEAD@Z 0000000140052f68     libucrtd:output.obj
+ 0002:00011f68       $unwind$??$tcsncpy_s@AEAPEAD_KAEAPEADAEB_K@?$__crt_char_traits@D@@SAHAEAPEAD$$QEA_K0AEB_K@Z 0000000140052f68     libucrtd:argv_wildcards.obj
  0002:00011f68       $unwind$?_CallMemberFunction2@@YAXPEAXP6AX0@Z0H@Z 0000000140052f68     libvcruntimed:frame.obj
+ 0002:00011f68       $unwind$??$message_box@$$TAEAPEB_WAEAPEB_WAEAI@?$__crt_char_traits@_W@@SAH$$QEA$$TAEAPEB_W1AEAI@Z 0000000140052f68     libucrtd:crtmbox.obj
+ 0002:00011f68       $unwind$_invoke_watson     0000000140052f68     libucrtd:invalid_parameter.obj
+ 0002:00011f68       $unwind$??$message_box@PEAUHWND__@@AEBQEB_WAEBQEB_WAEBI@?$__crt_char_traits@_W@@SAH$$QEAPEAUHWND__@@AEBQEB_W1AEBI@Z 0000000140052f68     libucrtd:crtmbox.obj
+ 0002:00011f68       $unwind$__GSHandlerCheck   0000000140052f68     LIBCMTD:_gshandler_.obj
+ 0002:00011f68       $unwind$strncpy_s          0000000140052f68     libucrtd:strncpy_s.obj
+ 0002:00011f68       $unwind$??0?$output_adapter_data@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA@AEBV?$string_output_adapter@_W@1@_KQEB_WQEAU__crt_locale_pointers@@QEAD@Z 0000000140052f68     libucrtd:output.obj
+ 0002:00011f68       $unwind$wcsncpy_s          0000000140052f68     libucrtd:wcsncpy_s.obj
+ 0002:00011f68       $unwind$??$message_box@$$TAEBQEB_WAEBQEB_WK@?$__crt_char_traits@_W@@SAH$$QEA$$TAEBQEB_W1$$QEAK@Z 0000000140052f68     libucrtd:crtmbox.obj
+ 0002:00011f68       $unwind$??0?$output_adapter_data@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA@AEBV?$string_output_adapter@D@1@_KQEBDQEAU__crt_locale_pointers@@QEAD@Z 0000000140052f68     libucrtd:output.obj
+ 0002:00011f68       $unwind$?shift_bytes@@YAXQEAD_K0H@Z 0000000140052f68     libucrtd:cvt.obj
  0002:00011f70       $xdatasym                  0000000140052f70     LIBCMTD:_chkstk_.obj
  0002:00011f78       $xdatasym                  0000000140052f78     LIBCMTD:_amdsecgs_.obj
  0002:00011f7c       $unwind$?__scrt_common_main_seh@@YAHXZ 0000000140052f7c     LIBCMTD:exe_winmain.obj
@@ -3291,18 +3291,18 @@
  0002:00012050       $xdatasym                  0000000140053050     LIBCMTD:_guard_dispatch_.obj
  0002:00012058       $xdatasym                  0000000140053058     libvcruntimed:_jmpuwind_.obj
  0002:0001206c       $unwind$__vcrt_getptd_noexit 000000014005306c     libvcruntimed:per_thread_data.obj
- 0002:00012074       $unwind$__acrt_initialize_winapi_thunks 0000000140053074     libucrtd:winapi_thunks.obj
- 0002:00012074       $unwind$__vcrt_initialize_winapi_thunks 0000000140053074     libvcruntimed:winapi_downlevel.obj
  0002:00012074       $unwind$__acrt_get_parent_window 0000000140053074     libucrtd:winapi_thunks.obj
+ 0002:00012074       $unwind$__vcrt_initialize_winapi_thunks 0000000140053074     libvcruntimed:winapi_downlevel.obj
+ 0002:00012074       $unwind$__acrt_initialize_winapi_thunks 0000000140053074     libucrtd:winapi_thunks.obj
  0002:00012074       $unwind$__acrt_initialize_stdio 0000000140053074     libucrtd:_file.obj
  0002:0001207c       $unwind$_isatty            000000014005307c     libucrtd:isatty.obj
  0002:0001207c       $unwind$_set_error_mode    000000014005307c     libucrtd:set_error_mode.obj
  0002:0001207c       $unwind$?write_requires_double_translation_nolock@@YA_NH@Z 000000014005307c     libucrtd:write.obj
- 0002:0001207c       $unwind$_set_new_mode      000000014005307c     libucrtd:new_mode.obj
+ 0002:0001207c       $unwind$__acrt_uninitialize_winapi_thunks 000000014005307c     libucrtd:winapi_thunks.obj
  0002:0001207c       $unwind$_set_fmode         000000014005307c     libucrtd:setmode.obj
  0002:0001207c       $unwind$_get_osfhandle     000000014005307c     libucrtd:osfinfo.obj
  0002:0001207c       $unwind$?try_cor_exit_process@@YAXI@Z 000000014005307c     libucrtd:exit.obj
- 0002:0001207c       $unwind$__acrt_uninitialize_winapi_thunks 000000014005307c     libucrtd:winapi_thunks.obj
+ 0002:0001207c       $unwind$_set_new_mode      000000014005307c     libucrtd:new_mode.obj
  0002:0001207c       $unwind$__vcrt_uninitialize_winapi_thunks 000000014005307c     libvcruntimed:winapi_downlevel.obj
  0002:00012084       $unwind$?try_get_module@@YAPEAUHINSTANCE__@@W4module_id@?A0x679b24ab@@@Z 0000000140053084     libvcruntimed:winapi_downlevel.obj
  0002:00012084       $unwind$_close             0000000140053084     libucrtd:close.obj
@@ -3318,57 +3318,57 @@
  0002:000120c8       $unwind$??$free_environment@_W@@YAXQEAPEA_W@Z 00000001400530c8     libucrtd:environment_initialization.obj
  0002:000120c8       $unwind$??$free_environment@D@@YAXQEAPEAD@Z 00000001400530c8     libucrtd:environment_initialization.obj
  0002:000120d4       $unwind$??$create_environment@D@@YAQEAPEADQEAD@Z 00000001400530d4     libucrtd:environment_initialization.obj
- 0002:000120f0       $unwind$__acrt_uninitialize 00000001400530f0     libucrtd:initialization.obj
  0002:000120f0       $unwind$__acrt_uninitialize_ptd 00000001400530f0     libucrtd:per_thread_data.obj
- 0002:000120f0       $unwind$__scrt_initialize_crt 00000001400530f0     LIBCMTD:utility.obj
- 0002:000120f0       $unwind$__acrt_unlock      00000001400530f0     libucrtd:locks.obj
- 0002:000120f0       $unwind$__acrt_lowio_lock_fh 00000001400530f0     libucrtd:osfinfo.obj
  0002:000120f0       $unwind$uninitialize_allocated_memory 00000001400530f0     libucrtd:initialization.obj
+ 0002:000120f0       $unwind$__scrt_initialize_crt 00000001400530f0     LIBCMTD:utility.obj
+ 0002:000120f0       $unwind$__acrt_uninitialize 00000001400530f0     libucrtd:initialization.obj
  0002:000120f0       $unwind$_exit              00000001400530f0     libucrtd:exit.obj
- 0002:000120f0       $unwind$?do_locale_initialization@@YAXD@Z 00000001400530f0     libucrtd:argv_winmain.obj
- 0002:000120f0       $unwind$report_memory_leaks 00000001400530f0     libucrtd:initialization.obj
- 0002:000120f0       $unwind$_configure_narrow_argv 00000001400530f0     libucrtd:argv_parsing.obj
- 0002:000120f0       $unwind$_setfpcontrolword  00000001400530f0     libucrtd:_fenvutils.obj
- 0002:000120f0       $unwind$exit               00000001400530f0     libucrtd:exit.obj
- 0002:000120f0       $unwind$__vcrt_uninitialize 00000001400530f0     libvcruntimed:initialization.obj
- 0002:000120f0       $unwind$?do_locale_initialization@@YAXD@Z 00000001400530f0     libucrtd:argv_parsing.obj
- 0002:000120f0       $unwind$uninitialize_vcruntime 00000001400530f0     libucrtd:initialization.obj
- 0002:000120f0       $unwind$__scrt_release_startup_lock 00000001400530f0     LIBCMTD:utility.obj
- 0002:000120f0       $unwind$__report_securityfailure 00000001400530f0     LIBCMTD:gs_report.obj
+ 0002:000120f0       $unwind$__acrt_lowio_unlock_fh 00000001400530f0     libucrtd:osfinfo.obj
  0002:000120f0       $unwind$uninitialize_environment 00000001400530f0     libucrtd:initialization.obj
  0002:000120f0       $unwind$__acrt_lock        00000001400530f0     libucrtd:locks.obj
- 0002:000120f0       $unwind$__acrt_lowio_unlock_fh 00000001400530f0     libucrtd:osfinfo.obj
+ 0002:000120f0       $unwind$report_memory_leaks 00000001400530f0     libucrtd:initialization.obj
+ 0002:000120f0       $unwind$_configure_narrow_argv 00000001400530f0     libucrtd:argv_parsing.obj
+ 0002:000120f0       $unwind$?do_locale_initialization@@YAXD@Z 00000001400530f0     libucrtd:argv_winmain.obj
+ 0002:000120f0       $unwind$__report_securityfailure 00000001400530f0     LIBCMTD:gs_report.obj
+ 0002:000120f0       $unwind$__vcrt_uninitialize 00000001400530f0     libvcruntimed:initialization.obj
+ 0002:000120f0       $unwind$_setfpcontrolword  00000001400530f0     libucrtd:_fenvutils.obj
  0002:000120f0       $unwind$?exit_or_terminate_process@@YAXI@Z 00000001400530f0     libucrtd:exit.obj
- 0002:000120f8       $unwind$__vcrt_initialize_pure_virtual_call_handler 00000001400530f8     libvcruntimed:purevirt_data.obj
+ 0002:000120f0       $unwind$?do_locale_initialization@@YAXD@Z 00000001400530f0     libucrtd:argv_parsing.obj
+ 0002:000120f0       $unwind$exit               00000001400530f0     libucrtd:exit.obj
+ 0002:000120f0       $unwind$__acrt_lowio_lock_fh 00000001400530f0     libucrtd:osfinfo.obj
+ 0002:000120f0       $unwind$uninitialize_vcruntime 00000001400530f0     libucrtd:initialization.obj
+ 0002:000120f0       $unwind$__scrt_release_startup_lock 00000001400530f0     LIBCMTD:utility.obj
+ 0002:000120f0       $unwind$__acrt_unlock      00000001400530f0     libucrtd:locks.obj
+ 0002:000120f8       $unwind$?invoke_main@@YAHXZ 00000001400530f8     LIBCMTD:exe_winmain.obj
  0002:000120f8       $unwind$abort              00000001400530f8     libucrtd:abort.obj
- 0002:000120f8       $unwind$initialize_pointers 00000001400530f8     libucrtd:initialization.obj
+ 0002:000120f8       $unwind$?should_write_error_to_console@@YA_NXZ 00000001400530f8     libucrtd:report_runtime_error.obj
  0002:000120f8       $unwind$?Win32GetWallClock@@YA?AT_LARGE_INTEGER@@XZ 00000001400530f8     win32_ivan.obj
- 0002:000120f8       $unwind$?should_call_terminate_process@@YA_NXZ 00000001400530f8     libucrtd:exit.obj
  0002:000120f8       $unwind$__acrt_can_show_message_box 00000001400530f8     libucrtd:winapi_thunks.obj
- 0002:000120f8       $unwind$_statusfp          00000001400530f8     libucrtd:ieee.obj
  0002:000120f8       $unwind$__pctype_func      00000001400530f8     libucrtd:ctype.obj
+ 0002:000120f8       $unwind$__acrt_initialize_locks 00000001400530f8     libucrtd:locks.obj
  0002:000120f8       $unwind$__acrt_has_user_matherr 00000001400530f8     libucrtd:matherr.obj
- 0002:000120f8       $unwind$__vcrt_initialize_locks 00000001400530f8     libvcruntimed:locks.obj
+ 0002:000120f8       $unwind$initialize_pointers 00000001400530f8     libucrtd:initialization.obj
+ 0002:000120f8       $unwind$_statusfp          00000001400530f8     libucrtd:ieee.obj
  0002:000120f8       $unwind$__scrt_initialize_default_local_stdio_options 00000001400530f8     LIBCMTD:default_local_stdio_options.obj
  0002:000120f8       $unwind$__doserrno         00000001400530f8     libucrtd:errno.obj
- 0002:000120f8       $unwind$?pre_c_initialization@@YAHXZ 00000001400530f8     LIBCMTD:exe_winmain.obj
+ 0002:000120f8       $unwind$__vcrt_initialize_locks 00000001400530f8     libvcruntimed:locks.obj
  0002:000120f8       $unwind$_errno             00000001400530f8     libucrtd:errno.obj
- 0002:000120f8       $unwind$_clearfp           00000001400530f8     libucrtd:ieee.obj
+ 0002:000120f8       $unwind$?try_get_ptd_head@@YAPEAU__acrt_ptd@@XZ 00000001400530f8     libucrtd:per_thread_data.obj
  0002:000120f8       $unwind$_statfp            00000001400530f8     libucrtd:fpctrl.obj
+ 0002:000120f8       $unwind$?should_call_terminate_process@@YA_NXZ 00000001400530f8     libucrtd:exit.obj
  0002:000120f8       $unwind$__acrt_locale_changed 00000001400530f8     libucrtd:debug_heap.obj
  0002:000120f8       $unwind$__acrt_uninitialize_stdio 00000001400530f8     libucrtd:_file.obj
  0002:000120f8       $unwind$__vcrt_uninitialize_locks 00000001400530f8     libvcruntimed:locks.obj
- 0002:000120f8       $unwind$?is_managed_app@@YA_NXZ 00000001400530f8     libucrtd:exit.obj
- 0002:000120f8       $unwind$?invoke_main@@YAHXZ 00000001400530f8     LIBCMTD:exe_winmain.obj
- 0002:000120f8       $unwind$__acrt_initialize_locks 00000001400530f8     libucrtd:locks.obj
- 0002:000120f8       $unwind$__acrt_get_sigabrt_handler 00000001400530f8     libucrtd:signal.obj
  0002:000120f8       $unwind$_clrfp             00000001400530f8     libucrtd:fpctrl.obj
- 0002:000120f8       $unwind$?should_write_error_to_console@@YA_NXZ 00000001400530f8     libucrtd:report_runtime_error.obj
+ 0002:000120f8       $unwind$?is_managed_app@@YA_NXZ 00000001400530f8     libucrtd:exit.obj
+ 0002:000120f8       $unwind$_clearfp           00000001400530f8     libucrtd:ieee.obj
+ 0002:000120f8       $unwind$?pre_c_initialization@@YAHXZ 00000001400530f8     LIBCMTD:exe_winmain.obj
+ 0002:000120f8       $unwind$__acrt_get_sigabrt_handler 00000001400530f8     libucrtd:signal.obj
  0002:000120f8       $unwind$_invalid_parameter_noinfo 00000001400530f8     libucrtd:invalid_parameter.obj
- 0002:000120f8       $unwind$?try_get_ptd_head@@YAPEAU__acrt_ptd@@XZ 00000001400530f8     libucrtd:per_thread_data.obj
  0002:000120f8       $unwind$__scrt_is_managed_app 00000001400530f8     LIBCMTD:utility_desktop.obj
- 0002:000120f8       $unwind$__vcrt_getptd      00000001400530f8     libvcruntimed:per_thread_data.obj
  0002:000120f8       $unwind$?initialize_multibyte@@YAHXZ 00000001400530f8     libucrtd:multibyte_initializer.obj
+ 0002:000120f8       $unwind$__vcrt_getptd      00000001400530f8     libvcruntimed:per_thread_data.obj
+ 0002:000120f8       $unwind$__vcrt_initialize_pure_virtual_call_handler 00000001400530f8     libvcruntimed:purevirt_data.obj
  0002:000120f8       $unwind$__acrt_getptd      00000001400530f8     libucrtd:per_thread_data.obj
  0002:00012100       $unwind$?common_exit@@YAXHW4_crt_exit_cleanup_mode@@W4_crt_exit_return_mode@@@Z 0000000140053100     libucrtd:exit.obj
  0002:00012130       $unwind$__acrt_uninitialize_locale 0000000140053130     libucrtd:wsetlocale.obj
@@ -3387,52 +3387,52 @@
  0002:00012278       $unwind$_msize_dbg         0000000140053278     libucrtd:debug_heap.obj
  0002:00012298       $unwind$_realloc_dbg       0000000140053298     libucrtd:debug_heap.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libucrtd:wsetlocale.obj
- 0002:000122b8       $unwind$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$?advance_to_next_pass@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$_CrtSetDumpClient  00000001400532b8     libucrtd:debug_heap.obj
+ 0002:000122b8       $unwind$?advance_to_next_pass@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$??$read_va_arg@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@@__crt_stdio_output@@YAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@0@AEAA_NXZ@AEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?get@?$c_string_character_source@_W@__crt_strtox@@QEAA_WXZ 00000001400532b8     libucrtd:atox.obj
- 0002:000122b8       $unwind$??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$??$read_va_arg@_K@__crt_stdio_output@@YA_KAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?get@?$c_string_character_source@D@__crt_strtox@@QEAADXZ 00000001400532b8     libucrtd:atox.obj
- 0002:000122b8       $unwind$_MallocaComputeSize 00000001400532b8     libucrtd:getstringtypea.obj
- 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_multibyte_data@@XZ 00000001400532b8     libucrtd:wsetlocale.obj
  0002:000122b8       $unwind$_handle_nan        00000001400532b8     libucrtd:libm_error.obj
+ 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEADXZ 00000001400532b8     libucrtd:argv_parsing.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAPEAP6AXXZXZ 00000001400532b8     libucrtd:onexit.obj
  0002:000122b8       $unwind$?is_zero@__crt_strtox@@YA_NAEBUbig_integer@1@@Z 00000001400532b8     libucrtd:cfout.obj
+ 0002:000122b8       $unwind$_MallocaComputeSize 00000001400532b8     libucrtd:getstringtypea.obj
  0002:000122b8       $unwind$?__acrt_fp_is_negative@@YA_NAEBN@Z 00000001400532b8     libucrtd:cvt.obj
  0002:000122b8       $unwind$?__acrt_fp_classify@@YA?AW4__acrt_fp_class@@AEBN@Z 00000001400532b8     libucrtd:cvt.obj
- 0002:000122b8       $unwind$??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$??$read_va_arg@I@__crt_stdio_output@@YAIAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libucrtd:argv_parsing.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAAPEAPEAU__crt_stdio_stream_data@@XZ 00000001400532b8     libucrtd:_file.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAPEAEXZ 00000001400532b8     libucrtd:argv_parsing.obj
- 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAPEAPEADXZ 00000001400532b8     libucrtd:argv_parsing.obj
  0002:000122b8       $unwind$?what@exception@std@@UEBAPEBDXZ 00000001400532b8     libvcruntimed:frame.obj
+ 0002:000122b8       $unwind$??$read_va_arg@F@__crt_stdio_output@@YAFAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?__crt_fast_encode_pointer@@YA?AU__crt_fast_encoded_nullptr_t@@$$T@Z 00000001400532b8     libvcruntimed:winapi_downlevel.obj
  0002:000122b8       $unwind$??$read_va_arg@E@__crt_stdio_output@@YAEAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$??$read_va_arg@C@__crt_stdio_output@@YACAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$??$read_va_arg@H@__crt_stdio_output@@YAHAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$??$read_va_arg@_J@__crt_stdio_output@@YA_JAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$_CrtSetDumpClient  00000001400532b8     libucrtd:debug_heap.obj
+ 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_multibyte_data@@XZ 00000001400532b8     libucrtd:wsetlocale.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libucrtd:osfinfo.obj
- 0002:000122b8       $unwind$??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$??$read_va_arg@G@__crt_stdio_output@@YAGAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$__acrt_get_locale_data_prefix 00000001400532b8     libucrtd:debug_heap.obj
- 0002:000122b8       $unwind$??B?$__crt_scoped_stack_ptr@_W@@QEBA_NXZ 00000001400532b8     libucrtd:lcmapstringa.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAPEAU__crt_lowio_handle_data@@XZ 00000001400532b8     libucrtd:osfinfo.obj
+ 0002:000122b8       $unwind$??B?$__crt_scoped_stack_ptr@_W@@QEBA_NXZ 00000001400532b8     libucrtd:lcmapstringa.obj
+ 0002:000122b8       $unwind$??$read_va_arg@_W@__crt_stdio_output@@YA_WAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?GetWidth@@YAHUrectangle2i@@@Z 00000001400532b8     win32_ivan.obj
  0002:000122b8       $unwind$?GetHeight@@YAHUrectangle2i@@@Z 00000001400532b8     win32_ivan.obj
  0002:000122b8       $unwind$??$read_va_arg@PEAD@__crt_stdio_output@@YAPEADAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libvcruntimed:per_thread_data.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__vcrt_ptd@@XZ 00000001400532b8     libvcruntimed:per_thread_data.obj
  0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAAPEADXZ 00000001400532b8     libvcruntimed:std_exception.obj
- 0002:000122b8       $unwind$?advance_to_next_pass@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?__crt_interlocked_read_32@@YAHPEDH@Z 00000001400532b8     libucrtd:exit.obj
+ 0002:000122b8       $unwind$?advance_to_next_pass@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NXZ 00000001400532b8     libucrtd:output.obj
  0002:000122b8       $unwind$?setSBCS@@YAXPEAU__crt_multibyte_data@@@Z 00000001400532b8     libucrtd:mbctype.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEBA_NXZ 00000001400532b8     libvcruntimed:std_exception.obj
- 0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libucrtd:per_thread_data.obj
  0002:000122b8       $unwind$?valid@__crt_stdio_stream@@QEBA_NXZ 00000001400532b8     libucrtd:output.obj
- 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__acrt_ptd@@XZ 00000001400532b8     libucrtd:per_thread_data.obj
+ 0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libucrtd:per_thread_data.obj
  0002:000122b8       $unwind$??$read_va_arg@PEAX@__crt_stdio_output@@YAPEAXAEAPEAD@Z 00000001400532b8     libucrtd:output.obj
+ 0002:000122b8       $unwind$?detach@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAPEAU__acrt_ptd@@XZ 00000001400532b8     libucrtd:per_thread_data.obj
  0002:000122b8       $unwind$?is_valid@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEBA_NXZ 00000001400532b8     libvcruntimed:std_type_info.obj
  0002:000122b8       $unwind$wcslen             00000001400532b8     libucrtd:wcslen.obj
  0002:000122b8       $unwind$?SafeTruncateUInt64@@YAI_K@Z 00000001400532b8     win32_ivan.obj
@@ -3441,10 +3441,10 @@
  0002:000122c0       $unwind$_chvalidchk_l      00000001400532c0     libucrtd:debug_heap.obj
  0002:000122c8       $unwind$??0_LocaleUpdate@@QEAA@QEAU__crt_locale_pointers@@@Z 00000001400532c8     libucrtd:debug_heap.obj
  0002:000122d4       $unwind$?check_bytes@@YA_NQEBEE_K@Z 00000001400532d4     libucrtd:debug_heap.obj
- 0002:000122d4       $unwind$??$is_wide_character_specifier@D@__crt_stdio_output@@YA_N_KDW4length_modifier@0@@Z 00000001400532d4     libucrtd:output.obj
- 0002:000122d4       $unwind$?add_carry@__crt_strtox@@YAIAEAIII@Z 00000001400532d4     libucrtd:cfout.obj
- 0002:000122d4       $unwind$?multiply_core@__crt_strtox@@YAIQEAIII@Z 00000001400532d4     libucrtd:cfout.obj
  0002:000122d4       $unwind$_CrtIsValidPointer 00000001400532d4     libucrtd:debug_heap.obj
+ 0002:000122d4       $unwind$?add_carry@__crt_strtox@@YAIAEAIII@Z 00000001400532d4     libucrtd:cfout.obj
+ 0002:000122d4       $unwind$??$is_wide_character_specifier@D@__crt_stdio_output@@YA_N_KDW4length_modifier@0@@Z 00000001400532d4     libucrtd:output.obj
+ 0002:000122d4       $unwind$?multiply_core@__crt_strtox@@YAIQEAIII@Z 00000001400532d4     libucrtd:cfout.obj
  0002:000122dc       $unwind$?is_bad_read_pointer@@YA_NQEBX_K@Z 00000001400532dc     libucrtd:debug_heap.obj
  0002:000122fc       $unwind$?validate_heap_if_required_nolock@@YAXXZ 00000001400532fc     libucrtd:debug_heap.obj
  0002:0001231c       $unwind$?heap_alloc_dbg_internal@@YAPEAX_KHQEBDH@Z 000000014005331c     libucrtd:debug_heap.obj
@@ -3453,110 +3453,110 @@
  0002:00012344       $unwind$?expand_if_necessary@?$argument_list@D@?A0xfeb59491@@AEAAHXZ 0000000140053344     libucrtd:argv_wildcards.obj
  0002:0001234c       $unwind$?print_block_data@@YAXQEAU__crt_locale_pointers@@QEAU_CrtMemBlockHeader@@@Z 000000014005334c     libucrtd:debug_heap.obj
  0002:0001235c       $unwind$?dump_all_object_since_nolock@@YAXQEBU_CrtMemState@@@Z 000000014005335c     libucrtd:debug_heap.obj
- 0002:00012364       $unwind$__acrt_show_wide_message_box 0000000140053364     libucrtd:crtmbox.obj
- 0002:00012364       $unwind$strcpy_s           0000000140053364     libucrtd:strcpy_s.obj
- 0002:00012364       $unwind$??$tcstol@PEBDPEAPEADH@?$__crt_char_traits@D@@SAJ$$QEAPEBD$$QEAPEAPEAD$$QEAH@Z 0000000140053364     libucrtd:output.obj
  0002:00012364       $unwind$??$get_module_file_name@AEAPEAUHINSTANCE__@@AEAY0BAF@_WK@?$__crt_char_traits@_W@@SAKAEAPEAUHINSTANCE__@@AEAY0BAF@_W$$QEAK@Z 0000000140053364     libucrtd:dbgrpt.obj
- 0002:00012364       $unwind$?StringsAreEqual@@YAH_KPEAD1@Z 0000000140053364     win32_ivan.obj
+ 0002:00012364       $unwind$wcstol             0000000140053364     libucrtd:strtox.obj
+ 0002:00012364       $unwind$??$tcstol@PEBDPEAPEADH@?$__crt_char_traits@D@@SAJ$$QEAPEBD$$QEAPEAPEAD$$QEAH@Z 0000000140053364     libucrtd:output.obj
  0002:00012364       $unwind$??$tcscpy_s@AEAY0BAF@_W_KPEB_W@?$__crt_char_traits@_W@@SAHAEAY0BAF@_W$$QEA_K$$QEAPEB_W@Z 0000000140053364     libucrtd:dbgrpt.obj
+ 0002:00012364       $unwind$?StringsAreEqual@@YAH_KPEAD1@Z 0000000140053364     win32_ivan.obj
+ 0002:00012364       $unwind$strcpy_s           0000000140053364     libucrtd:strcpy_s.obj
  0002:00012364       $unwind$?_CallMemberFunction1@@YAXPEAXP6AX0@Z0@Z 0000000140053364     libvcruntimed:frame.obj
+ 0002:00012364       $unwind$??$tcscpy_s@AEAY0BAF@D_KPEBD@?$__crt_char_traits@D@@SAHAEAY0BAF@D$$QEA_K$$QEAPEBD@Z 0000000140053364     libucrtd:dbgrpt.obj
  0002:00012364       $unwind$?__GetCurrentState@@YAHPEA_KPEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@@Z 0000000140053364     libvcruntimed:ehstate.obj
  0002:00012364       $unwind$strcat_s           0000000140053364     libucrtd:strcat_s.obj
- 0002:00012364       $unwind$wcstol             0000000140053364     libucrtd:strtox.obj
+ 0002:00012364       $unwind$wcscpy_s           0000000140053364     libucrtd:wcscpy_s.obj
  0002:00012364       $unwind$??$get_module_file_name@$$TAEAY0BAF@DH@?$__crt_char_traits@D@@SAK$$QEA$$TAEAY0BAF@D$$QEAH@Z 0000000140053364     libucrtd:argv_parsing.obj
- 0002:00012364       $unwind$??$tcscpy_s@AEAY0BAF@D_KPEBD@?$__crt_char_traits@D@@SAHAEAY0BAF@D$$QEA_K$$QEAPEBD@Z 0000000140053364     libucrtd:dbgrpt.obj
  0002:00012364       $unwind$?__wcsnicmp_ascii@@YAHPEB_W0_K@Z 0000000140053364     libucrtd:lcidtoname_downlevel.obj
  0002:00012364       $unwind$wcscat_s           0000000140053364     libucrtd:wcscat_s.obj
- 0002:00012364       $unwind$wcscpy_s           0000000140053364     libucrtd:wcscpy_s.obj
  0002:00012364       $unwind$??$get_module_file_name@AEAPEAUHINSTANCE__@@AEAY0BAF@DK@?$__crt_char_traits@D@@SAKAEAPEAUHINSTANCE__@@AEAY0BAF@D$$QEAK@Z 0000000140053364     libucrtd:dbgrpt.obj
+ 0002:00012364       $unwind$__acrt_show_wide_message_box 0000000140053364     libucrtd:crtmbox.obj
  0002:00012364       $unwind$mbtowc             0000000140053364     libucrtd:mbtowc.obj
- 0002:00012364       $unwind$??$make_c_string_character_source@_WPEAPEA_W@__crt_strtox@@YA?AV?$c_string_character_source@_W@0@QEB_WQEAPEA_W@Z 0000000140053364     libucrtd:strtox.obj
  0002:00012364       $unwind$strtol             0000000140053364     libucrtd:strtox.obj
- 0002:00012364       $unwind$??$make_c_string_character_source@DPEAPEAD@__crt_strtox@@YA?AV?$c_string_character_source@D@0@QEBDQEAPEAD@Z 0000000140053364     libucrtd:strtox.obj
  0002:00012364       $unwind$??$tcstol@PEB_WPEAPEA_WH@?$__crt_char_traits@_W@@SAJ$$QEAPEB_W$$QEAPEAPEA_W$$QEAH@Z 0000000140053364     libucrtd:output.obj
+ 0002:00012364       $unwind$??$make_c_string_character_source@_WPEAPEA_W@__crt_strtox@@YA?AV?$c_string_character_source@_W@0@QEB_WQEAPEA_W@Z 0000000140053364     libucrtd:strtox.obj
+ 0002:00012364       $unwind$??$make_c_string_character_source@DPEAPEAD@__crt_strtox@@YA?AV?$c_string_character_source@D@0@QEBDQEAPEAD@Z 0000000140053364     libucrtd:strtox.obj
  0002:00012370       $xdatasym                  0000000140053370     libucrtd:strcmp.obj
  0002:00012378       $xdatasym                  0000000140053378     libucrtd:strlen.obj
- 0002:0001237c       $unwind$__acrt_MessageWindowW 000000014005337c     libucrtd:dbgrpt.obj
- 0002:0001237c       $unwind$__acrt_MessageWindowA 000000014005337c     libucrtd:dbgrpt.obj
+ 0002:0001237c       $unwind$_invoke_watson_if_error 000000014005337c     libucrtd:report_runtime_error.obj
  0002:0001237c       $unwind$??$write_multiple_characters@V?$string_output_adapter@_W@__crt_stdio_output@@D@__crt_stdio_output@@YAXAEBV?$string_output_adapter@_W@0@DHQEAH@Z 000000014005337c     libucrtd:output.obj
  0002:0001237c       $unwind$??$write_multiple_characters@V?$string_output_adapter@D@__crt_stdio_output@@D@__crt_stdio_output@@YAXAEBV?$string_output_adapter@D@0@DHQEAH@Z 000000014005337c     libucrtd:output.obj
- 0002:0001237c       $unwind$_invoke_watson_if_error 000000014005337c     libucrtd:report_runtime_error.obj
+ 0002:0001237c       $unwind$__acrt_MessageWindowA 000000014005337c     libucrtd:dbgrpt.obj
+ 0002:0001237c       $unwind$__acrt_MessageWindowW 000000014005337c     libucrtd:dbgrpt.obj
  0002:00012384       $unwind$??$common_message_window@D@@YAHHQEAXQEBD111@Z 0000000140053384     libucrtd:dbgrpt.obj
  0002:00012398       $unwind$??$common_message_window@_W@@YAHHQEAXQEB_W111@Z 0000000140053398     libucrtd:dbgrpt.obj
- 0002:000123ac       $unwind$__std_type_info_compare 00000001400533ac     libvcruntimed:std_type_info.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@I_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??4?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAAEAV0@$$QEAV0@@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$common_strnlen@E@@YA_KQEBE_K@Z 00000001400533ac     libucrtd:strnlen.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@F_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$_FindPESection     00000001400533ac     LIBCMTD:pesect.obj
- 0002:000123ac       $unwind$??$tcspbrk@AEAPEADAEAY02$$CBD@?$__crt_char_traits@D@@SAPEADAEAPEADAEAY02$$CBD@Z 00000001400533ac     libucrtd:argv_wildcards.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@_J_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@G_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$?RD@__crt_public_free_policy@@QEBAXQEBD@Z 00000001400533ac     libvcruntimed:std_exception.obj
+ 0002:000123ac       $unwind$?replace_current_thread_locale_nolock@@YAXQEAU__acrt_ptd@@QEAU__crt_locale_data@@@Z 00000001400533ac     libucrtd:per_thread_data.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@E_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$?__StateFromControlPc@@YAHPEBU_s_FuncInfo@@PEAU_xDISPATCHER_CONTEXT@@@Z 00000001400533ac     libvcruntimed:ehstate.obj
+ 0002:000123ac       $unwind$_FindPESection     00000001400533ac     LIBCMTD:pesect.obj
+ 0002:000123ac       $unwind$??$?RU__acrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__acrt_ptd@@@Z 00000001400533ac     libucrtd:per_thread_data.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@H_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$tcspbrk@AEAPEADAEAY02$$CBD@?$__crt_char_traits@D@@SAPEADAEAPEADAEAY02$$CBD@Z 00000001400533ac     libucrtd:argv_wildcards.obj
+ 0002:000123ac       $unwind$?expand_argv_wildcards@@YAHQEAPEADQEAPEAPEAD@Z 00000001400533ac     libucrtd:argv_parsing.obj
+ 0002:000123ac       $unwind$??$?RP6AXXZ@__crt_internal_free_policy@@QEBAXQEBQ6AXXZ@Z 00000001400533ac     libucrtd:onexit.obj
+ 0002:000123ac       $unwind$??3@YAXPEAX_K@Z    00000001400533ac     LIBCMTD:delete_scalar_size.obj
+ 0002:000123ac       $unwind$__std_type_info_compare 00000001400533ac     libvcruntimed:std_type_info.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@PEADPEAD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$common_strnlen@G@@YA_KQEBG_K@Z 00000001400533ac     libucrtd:strnlen.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@C_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$?RE@__crt_internal_free_policy@@QEBAXQEBE@Z 00000001400533ac     libucrtd:argv_parsing.obj
+ 0002:000123ac       $unwind$??$find_next_file@PEAXPEAU_WIN32_FIND_DATAA@@@?$__crt_char_traits@D@@SAH$$QEAPEAX$$QEAPEAU_WIN32_FIND_DATAA@@@Z 00000001400533ac     libucrtd:argv_wildcards.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@_J_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@GD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAD@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$?RU__vcrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__vcrt_ptd@@@Z 00000001400533ac     libvcruntimed:per_thread_data.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@I_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$?crop_zeroes@__crt_stdio_output@@YAXPEADQEAU__crt_locale_pointers@@@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$?RU__crt_lowio_handle_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_lowio_handle_data@@@Z 00000001400533ac     libucrtd:osfinfo.obj
+ 0002:000123ac       $unwind$strnlen            00000001400533ac     libucrtd:strnlen.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@H_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@PEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ@PEAU1?1??234@AEAA_NXZ@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAUansi_string@?1??type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@1@AEAA_NXZ@@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@H_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$?__StateFromControlPc@@YAHPEBU_s_FuncInfo@@PEAU_xDISPATCHER_CONTEXT@@@Z 00000001400533ac     libvcruntimed:ehstate.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@G_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$?RP6AXXZ@__crt_internal_free_policy@@QEBAXQEBQ6AXXZ@Z 00000001400533ac     libucrtd:onexit.obj
- 0002:000123ac       $unwind$?expand_argv_wildcards@@YAHQEAPEADQEAPEAPEAD@Z 00000001400533ac     libucrtd:argv_parsing.obj
- 0002:000123ac       $unwind$?replace_current_thread_locale_nolock@@YAXQEAU__acrt_ptd@@QEAU__crt_locale_data@@@Z 00000001400533ac     libucrtd:per_thread_data.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@E_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$?RPEAU__crt_stdio_stream_data@@@__crt_internal_free_policy@@QEBAXQEBQEAU__crt_stdio_stream_data@@@Z 00000001400533ac     libucrtd:_file.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@G_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@F_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$?RU__vcrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__vcrt_ptd@@@Z 00000001400533ac     libvcruntimed:per_thread_data.obj
- 0002:000123ac       $unwind$??$find_next_file@PEAXPEAU_WIN32_FIND_DATAA@@@?$__crt_char_traits@D@@SAH$$QEAPEAX$$QEAPEAU_WIN32_FIND_DATAA@@@Z 00000001400533ac     libucrtd:argv_wildcards.obj
- 0002:000123ac       $unwind$??$?RE@__crt_internal_free_policy@@QEBAXQEBE@Z 00000001400533ac     libucrtd:argv_parsing.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@E_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??3@YAXPEAX_K@Z    00000001400533ac     LIBCMTD:delete_scalar_size.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@PEADPEAD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@GD@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAD@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??4?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAAEAV0@$$QEAV0@@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$_fd_int            00000001400533ac     libucrtd:_test.obj
- 0002:000123ac       $unwind$?crop_zeroes@__crt_stdio_output@@YAXPEADQEAU__crt_locale_pointers@@@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$?RU__acrt_ptd@@@__crt_internal_free_policy@@QEBAXQEBU__acrt_ptd@@@Z 00000001400533ac     libucrtd:per_thread_data.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@C_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@I_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$?RPEAD@__crt_internal_free_policy@@QEBAXQEBQEAD@Z 00000001400533ac     libucrtd:argv_parsing.obj
  0002:000123ac       $unwind$__acrt_update_multibyte_info 00000001400533ac     libucrtd:locale_update.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@_W_W@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$__acrt_update_locale_info 00000001400533ac     libucrtd:locale_update.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@G_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$?RU__crt_multibyte_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_multibyte_data@@@Z 00000001400533ac     libucrtd:wsetlocale.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@_J_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$?_CallMemberFunction0@@YAXPEAXP6AX0@Z@Z 00000001400533ac     libvcruntimed:frame.obj
- 0002:000123ac       $unwind$??$common_strnlen@E@@YA_KQEBE_K@Z 00000001400533ac     libucrtd:strnlen.obj
- 0002:000123ac       $unwind$??$?RU__crt_lowio_handle_data@@@__crt_internal_free_policy@@QEBAXQEBU__crt_lowio_handle_data@@@Z 00000001400533ac     libucrtd:osfinfo.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@_J_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@_W_W@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@F_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$?RD@__crt_internal_free_policy@@QEBAXQEBD@Z 00000001400533ac     libvcruntimed:std_type_info.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@PEAXPEAX@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAX@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@PEADPEAD@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAPEAD@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$?strpbrk@@YAPEADQEADQEBD@Z 00000001400533ac     libucrtd:argv_wildcards.obj
  0002:000123ac       $unwind$__acrt_expand_narrow_argv_wildcards 00000001400533ac     libucrtd:argv_wildcards.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@_W_W@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$?RD@__crt_internal_free_policy@@QEBAXQEBD@Z 00000001400533ac     libvcruntimed:std_type_info.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@_K_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$??$extract_argument_from_va_list@C_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$wcsnlen            00000001400533ac     libucrtd:strnlen.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@E_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$??$extract_argument_from_va_list@_K_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
- 0002:000123ac       $unwind$strnlen            00000001400533ac     libucrtd:strnlen.obj
- 0002:000123ac       $unwind$??0bad_exception@std@@QEAA@AEBV01@@Z 00000001400533ac     libvcruntimed:frame.obj
- 0002:000123ac       $unwind$??$__crt_get_proc_address@P6AXI@Z@@YAP6AXI@ZQEAUHINSTANCE__@@QEBD@Z 00000001400533ac     libucrtd:exit.obj
+ 0002:000123ac       $unwind$??$?RPEAU__crt_stdio_stream_data@@@__crt_internal_free_policy@@QEBAXQEBQEAU__crt_stdio_stream_data@@@Z 00000001400533ac     libucrtd:_file.obj
+ 0002:000123ac       $unwind$_fd_int            00000001400533ac     libucrtd:_test.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@C_J@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
  0002:000123ac       $unwind$?previous_character@@YAPEADQEAD0@Z 00000001400533ac     libucrtd:argv_wildcards.obj
- 0002:000123ac       $unwind$??$common_strnlen@G@@YA_KQEBG_K@Z 00000001400533ac     libucrtd:strnlen.obj
- 0002:000123b4       $unwind$?write_string@?$string_output_adapter@_W@__crt_stdio_output@@QEBAXQEB_WHQEAH1@Z 00000001400533b4     libucrtd:output.obj
+ 0002:000123ac       $unwind$??0bad_exception@std@@QEAA@AEBV01@@Z 00000001400533ac     libvcruntimed:frame.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@_W_W@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_W@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$extract_argument_from_va_list@_K_J@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEA_J@Z 00000001400533ac     libucrtd:output.obj
+ 0002:000123ac       $unwind$??$__crt_get_proc_address@P6AXI@Z@@YAP6AXI@ZQEAUHINSTANCE__@@QEBD@Z 00000001400533ac     libucrtd:exit.obj
  0002:000123b4       $unwind$_vsnwprintf_s_l    00000001400533b4     libucrtd:dbgrpt.obj
- 0002:000123b4       $unwind$_invalid_parameter 00000001400533b4     libucrtd:invalid_parameter.obj
- 0002:000123b4       $unwind$_vsnprintf_s_l     00000001400533b4     libucrtd:dbgrptt.obj
  0002:000123b4       $unwind$_recalloc_dbg      00000001400533b4     libucrtd:debug_heap.obj
  0002:000123b4       $unwind$?_GetEstablisherFrame@@YAPEA_KPEA_KPEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@0@Z 00000001400533b4     libvcruntimed:trnsctrl.obj
  0002:000123b4       $unwind$?write_string@?$string_output_adapter@D@__crt_stdio_output@@QEBAXQEBDHQEAH1@Z 00000001400533b4     libucrtd:output.obj
+ 0002:000123b4       $unwind$?write_string@?$string_output_adapter@_W@__crt_stdio_output@@QEBAXQEB_WHQEAH1@Z 00000001400533b4     libucrtd:output.obj
+ 0002:000123b4       $unwind$_invalid_parameter 00000001400533b4     libucrtd:invalid_parameter.obj
  0002:000123b4       $unwind$??$type_case_integer_parse_into_buffer@_K@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAX_KI_N@Z 00000001400533b4     libucrtd:output.obj
  0002:000123b4       $unwind$??$type_case_integer_parse_into_buffer@_K@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAAX_KI_N@Z 00000001400533b4     libucrtd:output.obj
+ 0002:000123b4       $unwind$_vsnprintf_s_l     00000001400533b4     libucrtd:dbgrptt.obj
  0002:000123b4       $unwind$?__SehTransFilter@@YAHPEAU_EXCEPTION_POINTERS@@PEAUEHExceptionRecord@@PEA_KPEAU_CONTEXT@@PEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@PEAH@Z 00000001400533b4     libvcruntimed:trnsctrl.obj
  0002:000123b4       $unwind$_raise_exc_ex      00000001400533b4     libucrtd:fpexcept.obj
  0002:000123bc       $unwind$??$common_vsprintf@Vformat_validation_base@__crt_stdio_output@@D@@YAH_KQEAD0QEBDQEAU__crt_locale_pointers@@1@Z 00000001400533bc     libucrtd:output.obj
  0002:000123bc       $unwind$??$common_vsprintf@Vformat_validation_base@__crt_stdio_output@@_W@@YAH_KQEA_W0QEB_WQEAU__crt_locale_pointers@@QEAD@Z 00000001400533bc     libucrtd:output.obj
  0002:000123d0       $unwind$?state_case_type@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400533d0     libucrtd:output.obj
- 0002:000123d8       $unwind$?type_case_s_compute_narrow_string_length@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBAHHD@Z 00000001400533d8     libucrtd:output.obj
  0002:000123d8       $unwind$_lseeki64_nolock   00000001400533d8     libucrtd:lseek.obj
+ 0002:000123d8       $unwind$?type_case_s_compute_narrow_string_length@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBAHHD@Z 00000001400533d8     libucrtd:output.obj
  0002:000123e0       $unwind$?type_case_a@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400533e0     libucrtd:output.obj
  0002:000123e0       $unwind$?type_case_a@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 00000001400533e0     libucrtd:output.obj
  0002:000123e8       $unwind$?type_case_integer@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NI_N@Z 00000001400533e8     libucrtd:output.obj
@@ -3564,40 +3564,40 @@
  0002:000123f0       $unwind$?write_stored_string_tchar@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_ND@Z 00000001400533f0     libucrtd:output.obj
  0002:00012400       $unwind$?find_next_state@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA?AW4state@2@DW432@@Z 0000000140053400     libucrtd:output.obj
  0002:00012400       $unwind$??$common_lseek_nolock@_J@@YA_JH_JH@Z 0000000140053400     libucrtd:lseek.obj
- 0002:00012408       $unwind$?state_case_size@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
- 0002:00012408       $unwind$?type_case_n@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
- 0002:00012408       $unwind$__acrt_report_runtime_error 0000000140053408     libucrtd:report_runtime_error.obj
- 0002:00012408       $unwind$?state_case_size@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
  0002:00012408       $unwind$?process@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAAHXZ 0000000140053408     libucrtd:output.obj
  0002:00012408       $unwind$?process@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@QEAAHXZ 0000000140053408     libucrtd:output.obj
  0002:00012408       $unwind$?type_case_n@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
  0002:00012408       $unwind$_fclose_nolock     0000000140053408     libucrtd:fclose.obj
+ 0002:00012408       $unwind$?type_case_n@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
+ 0002:00012408       $unwind$?state_case_size@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
+ 0002:00012408       $unwind$?state_case_size@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053408     libucrtd:output.obj
+ 0002:00012408       $unwind$__acrt_report_runtime_error 0000000140053408     libucrtd:report_runtime_error.obj
  0002:00012410       $unwind$?state_case_type@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053410     libucrtd:output.obj
  0002:00012420       $unwind$?parse_int_from_format_string@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 0000000140053420     libucrtd:output.obj
- 0002:00012420       $unwind$?parse_int_from_format_string@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 0000000140053420     libucrtd:output.obj
  0002:00012420       $unwind$?write_stored_string_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 0000000140053420     libucrtd:output.obj
+ 0002:00012420       $unwind$?parse_int_from_format_string@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NQEAH@Z 0000000140053420     libucrtd:output.obj
  0002:00012428       $unwind$?__FrameUnwindToEmptyState@@YAXPEA_KPEAU_xDISPATCHER_CONTEXT@@PEBU_s_FuncInfo@@@Z 0000000140053428     libvcruntimed:trnsctrl.obj
  0002:00012428       $unwind$?find_next_state@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEBA?AW4state@2@_WW432@@Z 0000000140053428     libucrtd:output.obj
  0002:00012430       $unwind$?adjust_hexit@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 0000000140053430     libucrtd:output.obj
  0002:00012430       $unwind$?adjust_hexit@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@CADH_N@Z 0000000140053430     libucrtd:output.obj
  0002:00012438       $unwind$?state_case_normal_tchar@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_ND@Z 0000000140053438     libucrtd:output.obj
  0002:00012438       $unwind$?unget@?$c_string_character_source@D@__crt_strtox@@QEAAXD@Z 0000000140053438     libucrtd:atox.obj
- 0002:00012440       $unwind$__acrt_execute_initializers 0000000140053440     libucrtd:shared_initialization.obj
- 0002:00012440       $unwind$?unget@?$c_string_character_source@_W@__crt_strtox@@QEAAX_W@Z 0000000140053440     libucrtd:atox.obj
- 0002:00012440       $unwind$_initterm_e        0000000140053440     libucrtd:initterm.obj
  0002:00012440       $unwind$__std_exception_copy 0000000140053440     libvcruntimed:std_exception.obj
- 0002:00012440       $unwind$?construct_ptd@@YAXQEAU__acrt_ptd@@QEAPEAU__crt_locale_data@@@Z 0000000140053440     libucrtd:per_thread_data.obj
  0002:00012440       $unwind$?IsInExceptionSpec@@YAEPEAUEHExceptionRecord@@PEBU_s_ESTypeList@@@Z 0000000140053440     libvcruntimed:frame.obj
+ 0002:00012440       $unwind$?unget@?$c_string_character_source@_W@__crt_strtox@@QEAAX_W@Z 0000000140053440     libucrtd:atox.obj
  0002:00012440       $unwind$??$ensure_buffer_is_big_enough@D@formatting_buffer@__crt_stdio_output@@QEAA_N_K@Z 0000000140053440     libucrtd:output.obj
- 0002:00012448       $unwind$_handle_errorf     0000000140053448     libucrtd:libm_error.obj
+ 0002:00012440       $unwind$?construct_ptd@@YAXQEAU__acrt_ptd@@QEAPEAU__crt_locale_data@@@Z 0000000140053440     libucrtd:per_thread_data.obj
+ 0002:00012440       $unwind$__acrt_execute_initializers 0000000140053440     libucrtd:shared_initialization.obj
+ 0002:00012440       $unwind$_initterm_e        0000000140053440     libucrtd:initterm.obj
  0002:00012448       $unwind$_handle_error      0000000140053448     libucrtd:libm_error.obj
- 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:osfinfo.obj
- 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:onexit.obj
- 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:argv_parsing.obj
+ 0002:00012448       $unwind$_handle_errorf     0000000140053448     libucrtd:libm_error.obj
  0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@U__acrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:per_thread_data.obj
- 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:argv_parsing.obj
  0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@PEAU__crt_stdio_stream_data@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:_file.obj
+ 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@PEADU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:argv_parsing.obj
+ 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@U__crt_lowio_handle_data@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:osfinfo.obj
  0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@U__crt_multibyte_data@@U__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:wsetlocale.obj
+ 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@EU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:argv_parsing.obj
+ 0002:00012458       $unwind$?release@?$__crt_unique_heap_ptr@P6AXXZU__crt_internal_free_policy@@@@QEAAXXZ 0000000140053458     libucrtd:onexit.obj
  0002:00012460       $unwind$??$?RV<lambda_72d1df2b273a38828b1ce30cbf4cdab5>@@AEAV<lambda_876a65b173b8412d3a47c70a915b0cf4>@@V<lambda_41932305e351933ebe8f8be3ed8bb5dc>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_72d1df2b273a38828b1ce30cbf4cdab5>@@AEAV<lambda_876a65b173b8412d3a47c70a915b0cf4>@@$$QEAV<lambda_41932305e351933ebe8f8be3ed8bb5dc>@@@Z 0000000140053460     libucrtd:per_thread_data.obj
  0002:00012480       $unwind$??$?RV<lambda_5e887d1dcbef67a5eb4283622ba103bf>@@AEAV<lambda_4466841279450cc726390878d4a41900>@@V<lambda_341c25c0346d94847f1f3c463c57e077>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_5e887d1dcbef67a5eb4283622ba103bf>@@AEAV<lambda_4466841279450cc726390878d4a41900>@@$$QEAV<lambda_341c25c0346d94847f1f3c463c57e077>@@@Z 0000000140053480     libucrtd:per_thread_data.obj
  0002:000124a0       $unwind$??$?RV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@V<lambda_2c95662d60720604e97e3009a1ee1859>@@@?$__crt_seh_guarded_call@X@@QEAAX$$QEAV<lambda_8773731b9ba2edf4362dda13ebc82854>@@AEAV<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@$$QEAV<lambda_2c95662d60720604e97e3009a1ee1859>@@@Z 00000001400534a0     libucrtd:per_thread_data.obj
@@ -3608,60 +3608,60 @@
  0002:000124fc       $unwind$??$common_tcsncpy_s@D@@YAHQEAD_KQEBD1@Z 00000001400534fc     libucrtd:strncpy_s.obj
  0002:000124fc       $unwind$??$common_tcsncpy_s@_W@@YAHQEA_W_KQEB_W1@Z 00000001400534fc     libucrtd:wcsncpy_s.obj
  0002:00012504       $unwind$??$common_show_message_box@_W@@YAHQEB_W0I@Z 0000000140053504     libucrtd:crtmbox.obj
- 0002:0001250c       $unwind$_putwch_nolock     000000014005350c     libucrtd:putwch.obj
- 0002:0001250c       $unwind$_free_base         000000014005350c     libucrtd:free_base.obj
- 0002:0001250c       $unwind$_unlock_file       000000014005350c     libucrtd:_file.obj
- 0002:0001250c       $unwind$?state_case_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
- 0002:0001250c       $unwind$__acrt_FlsAlloc    000000014005350c     libucrtd:winapi_thunks.obj
  0002:0001250c       $unwind$?close@__crt_handle_traits@@SA_NPEAX@Z 000000014005350c     libucrtd:crtmbox.obj
+ 0002:0001250c       $unwind$__acrt_FlsAlloc    000000014005350c     libucrtd:winapi_thunks.obj
+ 0002:0001250c       $unwind$atexit             000000014005350c     LIBCMTD:utility.obj
+ 0002:0001250c       $unwind$?close@__crt_hmodule_traits@@SA_NPEAUHINSTANCE__@@@Z 000000014005350c     libucrtd:exit.obj
+ 0002:0001250c       $unwind$?state_case_flag@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
  0002:0001250c       $unwind$?is_valid@?$__crt_unique_handle_t@U__crt_handle_traits@@@@QEBA_NXZ 000000014005350c     libucrtd:crtmbox.obj
  0002:0001250c       $unwind$??$message_box_wait_thread@_W@@YAKQEAX@Z 000000014005350c     libucrtd:crtmbox.obj
- 0002:0001250c       $unwind$_lock_file         000000014005350c     libucrtd:_file.obj
- 0002:0001250c       $unwind$??R<lambda_a8f98972ebaa5f7148d35bffe53bd70d>@@QEBAHXZ 000000014005350c     libucrtd:close.obj
  0002:0001250c       $unwind$?release@?$__crt_unique_heap_ptr@DU__crt_public_free_policy@@@@QEAAXXZ 000000014005350c     libvcruntimed:std_exception.obj
- 0002:0001250c       $unwind$__scrt_unhandled_exception_filter 000000014005350c     LIBCMTD:utility_desktop.obj
- 0002:0001250c       $unwind$?is_in_use@__crt_stdio_stream@@QEBA_NXZ 000000014005350c     libucrtd:fflush.obj
- 0002:0001250c       $unwind$_fflush_nolock     000000014005350c     libucrtd:fflush.obj
- 0002:0001250c       $unwind$atexit             000000014005350c     LIBCMTD:utility.obj
- 0002:0001250c       $unwind$??R<lambda_385c9462a7c084859dd3c0da461c81cb>@@QEBAHXZ 000000014005350c     libucrtd:argv_parsing.obj
- 0002:0001250c       $unwind$?type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
- 0002:0001250c       $unwind$?release@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 000000014005350c     libvcruntimed:per_thread_data.obj
- 0002:0001250c       $unwind$__setusermatherr   000000014005350c     libucrtd:matherr.obj
+ 0002:0001250c       $unwind$_callnewh          000000014005350c     libucrtd:new_handler.obj
+ 0002:0001250c       $unwind$__report_gsfailure 000000014005350c     LIBCMTD:gs_report.obj
+ 0002:0001250c       $unwind$__acrt_invoke_user_matherr 000000014005350c     libucrtd:matherr.obj
  0002:0001250c       $unwind$__vcrt_FlsAlloc    000000014005350c     libvcruntimed:winapi_downlevel.obj
  0002:0001250c       $unwind$_initialize_onexit_table 000000014005350c     libucrtd:onexit.obj
+ 0002:0001250c       $unwind$?parse_digit@__crt_strtox@@YAI_W@Z 000000014005350c     libucrtd:atox.obj
+ 0002:0001250c       $unwind$?release@?$__crt_unique_heap_ptr@U__vcrt_ptd@@U__crt_internal_free_policy@@@@QEAAXXZ 000000014005350c     libvcruntimed:per_thread_data.obj
+ 0002:0001250c       $unwind$?is_block_an_aligned_allocation@@YA_NQEBX@Z 000000014005350c     libucrtd:debug_heap.obj
+ 0002:0001250c       $unwind$?type_case_Z@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
+ 0002:0001250c       $unwind$_register_thread_local_exe_atexit_callback 000000014005350c     libucrtd:exit.obj
+ 0002:0001250c       $unwind$_set_statfp        000000014005350c     libucrtd:fpctrl.obj
+ 0002:0001250c       $unwind$__acrt_add_locale_ref 000000014005350c     libucrtd:locale_refcounting.obj
+ 0002:0001250c       $unwind$??R<lambda_385c9462a7c084859dd3c0da461c81cb>@@QEBAHXZ 000000014005350c     libucrtd:argv_parsing.obj
  0002:0001250c       $unwind$?type_case_s@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
  0002:0001250c       $unwind$?type_case_Z@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
- 0002:0001250c       $unwind$__acrt_invoke_user_matherr 000000014005350c     libucrtd:matherr.obj
- 0002:0001250c       $unwind$_execute_onexit_table 000000014005350c     libucrtd:onexit.obj
- 0002:0001250c       $unwind$_callnewh          000000014005350c     libucrtd:new_handler.obj
- 0002:0001250c       $unwind$__acrt_add_locale_ref 000000014005350c     libucrtd:locale_refcounting.obj
- 0002:0001250c       $unwind$__report_gsfailure 000000014005350c     LIBCMTD:gs_report.obj
+ 0002:0001250c       $unwind$__acrt_DownlevelLocaleNameToLCID 000000014005350c     libucrtd:lcidtoname_downlevel.obj
+ 0002:0001250c       $unwind$__acrt_release_locale_ref 000000014005350c     libucrtd:locale_refcounting.obj
+ 0002:0001250c       $unwind$??R<lambda_a8f98972ebaa5f7148d35bffe53bd70d>@@QEBAHXZ 000000014005350c     libucrtd:close.obj
+ 0002:0001250c       $unwind$__scrt_unhandled_exception_filter 000000014005350c     LIBCMTD:utility_desktop.obj
+ 0002:0001250c       $unwind$_lock_file         000000014005350c     libucrtd:_file.obj
  0002:0001250c       $unwind$fesetenv           000000014005350c     libucrtd:fesetenv.obj
  0002:0001250c       $unwind$?state_case_flag@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
  0002:0001250c       $unwind$feholdexcept       000000014005350c     libucrtd:feholdexcept.obj
  0002:0001250c       $unwind$?construct_ptd_array@@YAXQEAU__acrt_ptd@@@Z 000000014005350c     libucrtd:per_thread_data.obj
- 0002:0001250c       $unwind$__acrt_release_locale_ref 000000014005350c     libucrtd:locale_refcounting.obj
- 0002:0001250c       $unwind$_set_statfp        000000014005350c     libucrtd:fpctrl.obj
- 0002:0001250c       $unwind$??$scratch_data@D@formatting_buffer@__crt_stdio_output@@QEAAPEADXZ 000000014005350c     libucrtd:output.obj
- 0002:0001250c       $unwind$?destroy_ptd@@YAXQEAU__acrt_ptd@@@Z 000000014005350c     libucrtd:per_thread_data.obj
- 0002:0001250c       $unwind$__except_validate_context_record 000000014005350c     libvcruntimed:jbcxrval.obj
- 0002:0001250c       $unwind$?__acrt_stdio_reset_buffer@@YAXV__crt_stdio_stream@@@Z 000000014005350c     libucrtd:fflush.obj
- 0002:0001250c       $unwind$?try_load_library_from_system_directory@@YAPEAUHINSTANCE__@@QEB_W@Z 000000014005350c     libucrtd:winapi_thunks.obj
- 0002:0001250c       $unwind$__acrt_DownlevelLocaleNameToLCID 000000014005350c     libucrtd:lcidtoname_downlevel.obj
- 0002:0001250c       $unwind$_register_thread_local_exe_atexit_callback 000000014005350c     libucrtd:exit.obj
- 0002:0001250c       $unwind$?close@__crt_hmodule_traits@@SA_NPEAUHINSTANCE__@@@Z 000000014005350c     libucrtd:exit.obj
- 0002:0001250c       $unwind$?is_block_an_aligned_allocation@@YA_NQEBX@Z 000000014005350c     libucrtd:debug_heap.obj
- 0002:0001250c       $unwind$??1?$argument_list@D@?A0xfeb59491@@QEAA@XZ 000000014005350c     libucrtd:argv_wildcards.obj
- 0002:0001250c       $unwind$?parse_digit@__crt_strtox@@YAI_W@Z 000000014005350c     libucrtd:atox.obj
+ 0002:0001250c       $unwind$_unlock_file       000000014005350c     libucrtd:_file.obj
+ 0002:0001250c       $unwind$_execute_onexit_table 000000014005350c     libucrtd:onexit.obj
  0002:0001250c       $unwind$?BeginTicketMutex@@YAXPEAUticket_mutex@@@Z 000000014005350c     win32_ivan.obj
- 0002:0001250c       $unwind$??R<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@QEBAXXZ 000000014005350c     libucrtd:per_thread_data.obj
- 0002:0001250c       $unwind$_FindAndUnlinkFrame 000000014005350c     libvcruntimed:trnsctrl.obj
- 0002:0001250c       $unwind$_IsExceptionObjectToBeDestroyed 000000014005350c     libvcruntimed:trnsctrl.obj
- 0002:0001250c       $unwind$?close@__crt_findfile_traits@@SA_NPEAX@Z 000000014005350c     libucrtd:argv_wildcards.obj
- 0002:0001250c       $unwind$?type_case_s@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
- 0002:0001250c       $unwind$?release@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAXXZ 000000014005350c     libvcruntimed:std_type_info.obj
+ 0002:0001250c       $unwind$?destroy_ptd@@YAXQEAU__acrt_ptd@@@Z 000000014005350c     libucrtd:per_thread_data.obj
  0002:0001250c       $unwind$?try_load_library_from_system_directory@@YAPEAUHINSTANCE__@@QEB_W@Z 000000014005350c     libvcruntimed:winapi_downlevel.obj
+ 0002:0001250c       $unwind$??$scratch_data@D@formatting_buffer@__crt_stdio_output@@QEAAPEADXZ 000000014005350c     libucrtd:output.obj
+ 0002:0001250c       $unwind$?try_load_library_from_system_directory@@YAPEAUHINSTANCE__@@QEB_W@Z 000000014005350c     libucrtd:winapi_thunks.obj
+ 0002:0001250c       $unwind$_FindAndUnlinkFrame 000000014005350c     libvcruntimed:trnsctrl.obj
+ 0002:0001250c       $unwind$_free_base         000000014005350c     libucrtd:free_base.obj
+ 0002:0001250c       $unwind$?release@?$__crt_unique_heap_ptr@DU__crt_internal_free_policy@@@@QEAAXXZ 000000014005350c     libvcruntimed:std_type_info.obj
+ 0002:0001250c       $unwind$_IsExceptionObjectToBeDestroyed 000000014005350c     libvcruntimed:trnsctrl.obj
+ 0002:0001250c       $unwind$?is_in_use@__crt_stdio_stream@@QEBA_NXZ 000000014005350c     libucrtd:fflush.obj
+ 0002:0001250c       $unwind$??1?$argument_list@D@?A0xfeb59491@@QEAA@XZ 000000014005350c     libucrtd:argv_wildcards.obj
+ 0002:0001250c       $unwind$__except_validate_context_record 000000014005350c     libvcruntimed:jbcxrval.obj
+ 0002:0001250c       $unwind$__setusermatherr   000000014005350c     libucrtd:matherr.obj
+ 0002:0001250c       $unwind$?close@__crt_findfile_traits@@SA_NPEAX@Z 000000014005350c     libucrtd:argv_wildcards.obj
+ 0002:0001250c       $unwind$_putwch_nolock     000000014005350c     libucrtd:putwch.obj
+ 0002:0001250c       $unwind$?__acrt_stdio_reset_buffer@@YAXV__crt_stdio_stream@@@Z 000000014005350c     libucrtd:fflush.obj
+ 0002:0001250c       $unwind$?type_case_s@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 000000014005350c     libucrtd:output.obj
+ 0002:0001250c       $unwind$_fflush_nolock     000000014005350c     libucrtd:fflush.obj
  0002:0001250c       $unwind$?destroy_ptd_array@@YAXQEAU__acrt_ptd@@@Z 000000014005350c     libucrtd:per_thread_data.obj
+ 0002:0001250c       $unwind$??R<lambda_6ac21da2756cd333d25ba1adc9a0001e>@@QEBAXXZ 000000014005350c     libucrtd:per_thread_data.obj
  0002:0001250c       $unwind$?is_string_backed@__crt_stdio_stream@@QEBA_NXZ 000000014005350c     libucrtd:output.obj
  0002:00012514       $unwind$??$common_expand_argv_wildcards@D@@YAHQEAPEADQEAPEAPEAD@Z 0000000140053514     libucrtd:argv_wildcards.obj
  0002:0001251c       $unwind$??$expand_argument_wildcards@D@@YAHQEAD0AEAV?$argument_list@D@?A0xfeb59491@@@Z 000000014005351c     libucrtd:argv_wildcards.obj
@@ -3714,21 +3714,21 @@
  0002:000125fc       $unwind$_CrtDbgReport      00000001400535fc     libucrtd:dbgrpt.obj
  0002:00012604       $unwind$?validate@?$c_string_character_source@_W@__crt_strtox@@QEBA_NXZ 0000000140053604     libucrtd:atox.obj
  0002:00012604       $unwind$?Is_bad_exception_allowed@@YAEPEBU_s_ESTypeList@@@Z 0000000140053604     libvcruntimed:frame.obj
- 0002:00012604       $unwind$__acrt_lowio_destroy_handle_array 0000000140053604     libucrtd:osfinfo.obj
  0002:00012604       $unwind$?GetTableIndexFromLocaleName@@YAHPEB_W@Z 0000000140053604     libucrtd:lcidtoname_downlevel.obj
+ 0002:00012604       $unwind$__FrameUnwindFilter 0000000140053604     libvcruntimed:frame.obj
  0002:00012604       $unwind$__acrt_stdio_flush_nolock 0000000140053604     libucrtd:fflush.obj
  0002:00012604       $unwind$?issue_debug_notification@@YA_NQEB_W@Z 0000000140053604     libucrtd:report_runtime_error.obj
  0002:00012604       $unwind$?validate@?$string_output_adapter@_W@__crt_stdio_output@@QEBA_NXZ 0000000140053604     libucrtd:output.obj
  0002:00012604       $unwind$_fileno            0000000140053604     libucrtd:fileno.obj
  0002:00012604       $unwind$?validate@?$string_output_adapter@D@__crt_stdio_output@@QEBA_NXZ 0000000140053604     libucrtd:output.obj
  0002:00012604       $unwind$?state_case_normal@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053604     libucrtd:output.obj
- 0002:00012604       $unwind$?validate@?$c_string_character_source@D@__crt_strtox@@QEBA_NXZ 0000000140053604     libucrtd:atox.obj
  0002:00012604       $unwind$?state_case_normal@?$output_processor@DV?$string_output_adapter@D@__crt_stdio_output@@V?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_NXZ 0000000140053604     libucrtd:output.obj
  0002:00012604       $unwind$?validate_and_update_state_at_end_of_format_string@?$format_validation_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000140053604     libucrtd:output.obj
+ 0002:00012604       $unwind$??R<lambda_e9ab68cc08dfd839979545c079379e6e>@@QEBAHXZ 0000000140053604     libucrtd:commit.obj
  0002:00012604       $unwind$_malloc_base       0000000140053604     libucrtd:malloc_base.obj
  0002:00012604       $unwind$?validate_and_update_state_at_end_of_format_string@?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEBA_NXZ 0000000140053604     libucrtd:output.obj
- 0002:00012604       $unwind$??R<lambda_e9ab68cc08dfd839979545c079379e6e>@@QEBAHXZ 0000000140053604     libucrtd:commit.obj
- 0002:00012604       $unwind$__FrameUnwindFilter 0000000140053604     libvcruntimed:frame.obj
+ 0002:00012604       $unwind$__acrt_lowio_destroy_handle_array 0000000140053604     libucrtd:osfinfo.obj
+ 0002:00012604       $unwind$?validate@?$c_string_character_source@D@__crt_strtox@@QEBA_NXZ 0000000140053604     libucrtd:atox.obj
  0002:00012604       $unwind$_freea_crt         0000000140053604     libucrtd:getstringtypea.obj
  0002:00012604       $unwind$_onexit            0000000140053604     LIBCMTD:utility.obj
  0002:00012604       $unwind$__acrt_stdio_free_buffer_nolock 0000000140053604     libucrtd:_freebuf.obj
@@ -3751,26 +3751,26 @@
  0002:00012678       $unwind$??$common_strnlen_simd@$0A@G@@YA_KQEBG_K@Z 0000000140053678     libucrtd:strnlen.obj
  0002:00012678       $unwind$??$common_strnlen_simd@$0A@E@@YA_KQEBE_K@Z 0000000140053678     libucrtd:strnlen.obj
  0002:00012680       $unwind$??$common_strnlen_c@G@@YA_KQEBG_K@Z 0000000140053680     libucrtd:strnlen.obj
- 0002:00012680       $unwind$?initialize@?$dual_state_global@P6AXPEB_W00I_K@Z@__crt_state_management@@QEAAXQ6AXPEB_W00I_K@Z@Z 0000000140053680     libucrtd:invalid_parameter.obj
  0002:00012680       $unwind$?initialize@?$dual_state_global@P6AHPEAU_exception@@@Z@__crt_state_management@@QEAAXQ6AHPEAU_exception@@@Z@Z 0000000140053680     libucrtd:matherr.obj
+ 0002:00012680       $unwind$?initialize@?$dual_state_global@P6AXPEB_W00I_K@Z@__crt_state_management@@QEAAXQ6AXPEB_W00I_K@Z@Z 0000000140053680     libucrtd:invalid_parameter.obj
  0002:00012680       $unwind$??$common_strnlen_c@E@@YA_KQEBE_K@Z 0000000140053680     libucrtd:strnlen.obj
- 0002:00012680       $unwind$?Win32GetSecondsElapsed@@YAMT_LARGE_INTEGER@@0@Z 0000000140053680     win32_ivan.obj
+ 0002:00012680       $unwind$?AtomicAddU64@@YA_KPEC_K_K@Z 0000000140053680     win32_ivan.obj
  0002:00012680       $unwind$??8__crt_strtox@@YA_NAEBUbig_integer@0@0@Z 0000000140053680     libucrtd:cfout.obj
+ 0002:00012680       $unwind$?Win32GetSecondsElapsed@@YAMT_LARGE_INTEGER@@0@Z 0000000140053680     win32_ivan.obj
  0002:00012680       $unwind$?compare_equals@?$__crt_simd_traits@$0A@G@@SA?AT__m128i@@T2@0@Z 0000000140053680     libucrtd:strnlen.obj
- 0002:00012680       $unwind$?wcsncnt@@YA_KPEB_W_K@Z 0000000140053680     libucrtd:wcstombs.obj
  0002:00012680       $unwind$?initialize@?$dual_state_global@PEAU__crt_locale_data@@@__crt_state_management@@QEAAXQEAU__crt_locale_data@@@Z 0000000140053680     libucrtd:initialization.obj
  0002:00012680       $unwind$?StringsAreEqual@@YAHPEAD0@Z 0000000140053680     win32_ivan.obj
  0002:00012680       $unwind$?compare_equals@?$__crt_simd_traits@$0A@E@@SA?AT__m128i@@T2@0@Z 0000000140053680     libucrtd:strnlen.obj
  0002:00012680       $unwind$?initialize@?$dual_state_global@P6AH_K@Z@__crt_state_management@@QEAAXQ6AH_K@Z@Z 0000000140053680     libucrtd:new_handler.obj
  0002:00012680       $unwind$__strncnt          0000000140053680     libucrtd:strncnt.obj
- 0002:00012680       $unwind$?AtomicAddU64@@YA_KPEC_K_K@Z 0000000140053680     win32_ivan.obj
+ 0002:00012680       $unwind$?wcsncnt@@YA_KPEB_W_K@Z 0000000140053680     libucrtd:wcstombs.obj
  0002:00012680       $unwind$?initialize@?$dual_state_global@P6AXH@Z@__crt_state_management@@QEAAXQ6AXH@Z@Z 0000000140053680     libucrtd:signal.obj
  0002:00012680       $unwind$__AdjustPointer    0000000140053680     libvcruntimed:frame.obj
  0002:00012688       $unwind$__acrt_GetStringTypeA 0000000140053688     libucrtd:getstringtypea.obj
  0002:00012690       $unwind$__acrt_update_thread_locale_data 0000000140053690     libucrtd:locale_refcounting.obj
  0002:000126b0       $unwind$_initterm          00000001400536b0     libucrtd:initterm.obj
- 0002:000126b0       $unwind$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001400536b0     libucrtd:output.obj
  0002:000126b0       $unwind$??9__crt_strtox@@YA_NAEBUbig_integer@0@0@Z 00000001400536b0     libucrtd:cfout.obj
+ 0002:000126b0       $unwind$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001400536b0     libucrtd:output.obj
  0002:000126b0       $unwind$__acrt_execute_uninitializers 00000001400536b0     libucrtd:shared_initialization.obj
  0002:000126b0       $unwind$_CreateFrameInfo   00000001400536b0     libvcruntimed:trnsctrl.obj
  0002:000126b0       $unwind$?try_get_first_available_module@@YAPEAUHINSTANCE__@@QEBW4module_id@?A0x679b24ab@@0@Z 00000001400536b0     libvcruntimed:winapi_downlevel.obj
@@ -3782,8 +3782,8 @@
  0002:000126b0       $unwind$??$extract_argument_from_va_list@U_CRT_DOUBLE@@U1@@?$standard_base@DV?$string_output_adapter@D@__crt_stdio_output@@@__crt_stdio_output@@IEAA_NAEAU_CRT_DOUBLE@@@Z 00000001400536b0     libucrtd:output.obj
  0002:000126b0       $unwind$?append@?$argument_list@D@?A0xfeb59491@@QEAAHQEAD@Z 00000001400536b0     libucrtd:argv_wildcards.obj
  0002:000126b0       $unwind$_updatetlocinfoEx_nolock 00000001400536b0     libucrtd:locale_refcounting.obj
- 0002:000126b0       $unwind$?is_space@__crt_strtox@@YA_N_WPEAU__crt_locale_pointers@@@Z 00000001400536b0     libucrtd:atox.obj
  0002:000126b0       $unwind$?type_case_c_tchar@?$output_processor@_WV?$string_output_adapter@_W@__crt_stdio_output@@V?$format_validation_base@_WV?$string_output_adapter@_W@__crt_stdio_output@@@2@@__crt_stdio_output@@AEAA_N_W@Z 00000001400536b0     libucrtd:output.obj
+ 0002:000126b0       $unwind$?is_space@__crt_strtox@@YA_N_WPEAU__crt_locale_pointers@@@Z 00000001400536b0     libucrtd:atox.obj
  0002:000126b0       $unwind$iswctype           00000001400536b0     libucrtd:iswctype.obj
  0002:000126b0       $unwind$?try_get_first_available_module@@YAPEAUHINSTANCE__@@QEBW4module_id@?A0x1e999e58@@0@Z 00000001400536b0     libucrtd:winapi_thunks.obj
  0002:000126b0       $unwind$?force_decimal_point@__crt_stdio_output@@YAXPEADQEAU__crt_locale_pointers@@@Z 00000001400536b0     libucrtd:output.obj

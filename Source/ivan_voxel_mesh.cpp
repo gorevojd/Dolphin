@@ -29,7 +29,7 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelMeshWork){
 	Work->Header->MeshState = VoxelMeshState_Generated;
 }
 
-inline voxel_mesh_generation_queue MakeVoxelMeshGenerationQueue(){
+INTERNAL_FUNCTION voxel_mesh_generation_queue MakeVoxelMeshGenerationQueue(){
 	voxel_mesh_generation_queue Result = {};
 
 	Result.IsSentinel = 1;
@@ -73,7 +73,7 @@ inline void PushFaceWorkForNeighbourVoxel(
 	}
 }
 
-inline void FreeVoxelMeshGenerationQueue(voxel_mesh_generation_queue* Queue){
+INTERNAL_FUNCTION void FreeVoxelMeshGenerationQueue(voxel_mesh_generation_queue* Queue){
 	voxel_mesh_generation_queue* Temp = Queue->Next;
 
 	voxel_mesh_generation_queue* NextAddres = 0;
@@ -199,6 +199,18 @@ InitVoxelMeshGeneration(
 	voxel_mesh_generation_queue* BackQueue = &Context->BackQueue;
 	voxel_mesh_generation_queue* FrontQueue = &Context->FrontQueue;	
 
+#if 0
+	voxel_chunk* LeftChunk = Chunk->LeftChunk;
+	voxel_chunk* RightChunk = Chunk->RightChunk;
+	voxel_chunk* FrontChunk = Chunk->FrontChunk;
+	voxel_chunk* BackChunk = Chunk->BackChunk;
+#else
+	voxel_chunk* LeftChunk = Chunk->LeftNeighbour;
+	voxel_chunk* RightChunk = Chunk->RightNeighbour;
+	voxel_chunk* FrontChunk = Chunk->FrontNeighbour;
+	voxel_chunk* BackChunk = Chunk->BackNeighbour;
+#endif
+
 	for(int32_t k = 0; k < IVAN_VOXEL_CHUNK_HEIGHT ; k++){
 		for(int32_t j = 0; j < IVAN_VOXEL_CHUNK_WIDTH; j++){
 			for(int32_t i = 0; i < IVAN_VOXEL_CHUNK_WIDTH; i++){
@@ -255,10 +267,10 @@ InitVoxelMeshGeneration(
 						int32_t IndexInNeighbourChunk = 0;
 
 						if(i == 0){
-							if(Chunk->LeftNeighbour){
+							if(LeftChunk){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(IVAN_VOXEL_CHUNK_WIDTH - 1, j, k);
 
-								if(Chunk->LeftNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
+								if(LeftChunk->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
 									PushFaceWorkToQueue(LeftQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Left]);
 								}
 							}
@@ -269,10 +281,10 @@ InitVoxelMeshGeneration(
 							}
 						}
 						if(i == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							if(Chunk->RightNeighbour){
+							if(RightChunk){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(0, j, k);
 
-								if(Chunk->RightNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
+								if(RightChunk->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
 									PushFaceWorkToQueue(RightQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Right]);
 								}
 							}
@@ -283,10 +295,10 @@ InitVoxelMeshGeneration(
 							}
 						}
 						if(j == 0){
-							if(Chunk->FrontNeighbour){
+							if(FrontChunk){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(i, IVAN_VOXEL_CHUNK_WIDTH - 1, k);
 
-								if(Chunk->FrontNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
+								if(FrontChunk->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
 									PushFaceWorkToQueue(FrontQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Front]);
 								}
 							}
@@ -298,10 +310,10 @@ InitVoxelMeshGeneration(
 						}
 
 						if(j == (IVAN_VOXEL_CHUNK_WIDTH - 1)){
-							if(Chunk->BackNeighbour){
+							if(BackChunk){
 								IndexInNeighbourChunk = IVAN_GET_VOXEL_INDEX(i, 0, k);
 
-								if(Chunk->BackNeighbour->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
+								if(BackChunk->Voxels[IndexInNeighbourChunk] == VoxelMaterial_None){
 									PushFaceWorkToQueue(BackQueue, VoxelPos, TexSet->Sets[VoxelFaceTypeIndex_Back]);
 								}
 							}

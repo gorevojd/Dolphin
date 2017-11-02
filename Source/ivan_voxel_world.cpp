@@ -373,6 +373,21 @@ INTERNAL_FUNCTION void FreeVoxelHashTable(
 	}
 }
 
+INTERNAL_FUNCTION voxel_chunk* GetChunkAtIndices(voxel_table_pair** Table, int32_t HorizontalIndex, int32_t VerticalIndex){
+	voxel_chunk* Result = 0;
+	uint64_t Key = GenerateKeyForChunkIndices(HorizontalIndex, VerticalIndex);
+
+	voxel_table_pair* Pair = FindPairInVoxelHashTable(Table, VOXEL_HASH_TABLE_SIZE, Key);
+
+	if(Pair){
+		if(Pair->Value->ChunkState == VoxelChunkState_Generated){
+			Result = Pair->Value->Chunk;
+		}
+	}
+
+	return(Result);
+}
+
 inline void SetNeighboursForChunk(
 	voxel_chunk* Chunk,
 	int32_t HorzIndex,
@@ -460,11 +475,18 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 			Chunk->VerticalIndex = Header->VertIndex;
 			*ChunkWork = Work;
 
+			Work.Header->Chunk->LeftChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex - 1, Chunk->VerticalIndex);
+			Work.Header->Chunk->RightChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex + 1, Chunk->VerticalIndex);
+			Work.Header->Chunk->FrontChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex - 1);
+			Work.Header->Chunk->BackChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex + 1);
+
 #if 0
 			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelChunkWork, ChunkWork);
 #else
 			Chunk->Voxels = 0;
 			Chunk->VoxelsCount = 0;
+
+#if 1
 			Chunk->LeftNeighbour = 0;
 			Chunk->RightNeighbour = 0;
 			Chunk->FrontNeighbour = 0;
@@ -475,6 +497,8 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 				Chunk->HorizontalIndex,
 				Chunk->VerticalIndex,
 				Table);
+#endif
+
 			Chunk->Voxels = PushArray(&Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
 
 			Assert(Chunk->Voxels);
@@ -505,6 +529,7 @@ INTERNAL_FUNCTION void GenerateVoxelMesh(
 		VoxelMeshState_Unloaded) == VoxelMeshState_Unloaded)
 	{
 		task_with_memory* Task = BeginMeshTaskWithMemory(Manager->TranState);
+
 
 		generate_mesh_work Work;
 		Work.Task = Task;
@@ -651,7 +676,6 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 		}
 	}
 
-
 	//NOTE(Dima): Second - check for elements that we are moving towards. Adding
 	int32_t MinX = Work->CamIndexX + Work->MinXOffset;
 	int32_t MaxX = Work->CamIndexX + Work->MaxXOffset;
@@ -724,9 +748,9 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
         				VoxelMeshState_Generated);
 				}
 
-				if(Index->MeshState == VoxelMeshState_Unloaded){
-					GenerateVoxelMesh(Index, Context->Manager);
-				}
+			}
+			if(Index->MeshState == VoxelMeshState_Unloaded){
+				GenerateVoxelMesh(Index, Context->Manager);
 			}
 
 			if(Index->MeshState == VoxelMeshState_Generated){
@@ -754,16 +778,16 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 	}
 }
 
-INTERNAL_FUNCTION void ScanVoxelChunks(
+INTERNAL_FUNCTION void UpdateVoxelChunks(
 	voxel_chunk_manager* Manager,
-	render_group* RenderGroup)
+	render_group* RenderGroup,
+	vec3 CamPos)
 {
+
 	int32_t IndX;
 	int32_t IndY;
 
-	BeginTicketMutex(&Manager->ChangeMutex);
-	vec3 CamPos = Manager->CamPos;
-	EndTicketMutex(&Manager->ChangeMutex);
+	Manager->CamPos = CamPos;
 
 	GetCurrChunkIndexBasedOnCamera(CamPos, &IndX, &IndY);
 
@@ -839,34 +863,12 @@ INTERNAL_FUNCTION void ScanVoxelChunks(
 				if((Index->MeshState == VoxelMeshState_Generated) && Index->MeshTask){
 					if(Index->FrustumCullingTestResult){
 						Assert(Index->Mesh->PUVN != 0);
-#if !(IVAN_VOXEL_WORLD_MULTITHREADED)
 						PushVoxelChunkMesh(
 							RenderGroup,
 							Index->Mesh,
 							Context->Manager->VoxelAtlasID,
 							GetPosForVoxelChunk(Index->Chunk));
-#else
-						BeginTicketMutex(&Context->ResultMutex);
 
-						voxel_chunk_header* Header = 0;
-						if(Context->ResultFree->Next != Context->ResultFree){
-							Header = Context->ResultFree->Next;
-
-							Context->ResultFree->Next = Header->Next;
-							Context->ResultFree->Next->Prev = Context->ResultFree;
-						}
-						else{
-							Header = PushStruct(&Context->ListArena, voxel_chunk_header);
-						}
-
-						Header->Next = Context->Result->Next;
-						Header->Prev = Context->Result;
-						
-						Header->Next->Prev = Header;
-						Header->Prev->Next = Header;
-
-						EndTicketMutex(&Context->ResultMutex);
-#endif
 					}
 				}
 			}
@@ -882,67 +884,6 @@ INTERNAL_FUNCTION void ScanVoxelChunks(
 	Manager->CurrVerticalIndex = IndY;
 }
 
-struct scan_voxel_chunks_work{
-	render_group* RenderGroup;
-
-	voxel_chunk_manager* Manager;
-};
-
-INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(ScanVoxelChunksLoopWork){
-	scan_voxel_chunks_work* Work = (scan_voxel_chunks_work*)Data;
-
-	while(Work->Manager->LoopCanBeContinued){
-		ScanVoxelChunks(Work->Manager, Work->RenderGroup);
-	}
-}
-
-void UpdateVoxelChunks(voxel_chunk_manager* Manager, render_group* RenderGroup, vec3 CamPos){
-	
-	BeginTicketMutex(&Manager->ChangeMutex);
-	Manager->CamPos = CamPos;
-	EndTicketMutex(&Manager->ChangeMutex);
-
-#if IVAN_VOXEL_WORLD_MULTITHREADED
-	for(uint32 ContextIndex = 0;
-		ContextIndex < ArrayCount(Manager->Contexts);
-		ContextIndex++)
-	{
-		voxel_chunk_thread_context* Context = &Manager->Contexts[ContextIndex];
-		
-		if(Context->IsValid){
-			BeginTicketMutex(&Context->ResultMutex);
-
-			voxel_chunk_header* Index = Context->Result->Next;
-
-			for(Index; Index != Context->Result;){
-
-				voxel_chunk_header* Next = Index->Next;
-
-				PushVoxelChunkMesh(
-					RenderGroup,
-					Index->Mesh,
-					Context->Manager->VoxelAtlasID,
-					GetPosForVoxelChunk(Index->Chunk));
-
-				Index->Next->Prev = Index->Prev;
-				Index->Prev->Next = Index->Next;
-
-				Index->Prev = Context->ResultFree;
-				Index->Next = Context->ResultFree->Next;
-
-				Index->Next->Prev = Index;
-				Index->Prev->Next = Index;
-
-				Index = Next;
-			}
-
-			EndTicketMutex(&Context->ResultMutex);
-		}
-	}
-#else
-	ScanVoxelChunks(Manager, RenderGroup);
-#endif
-}
 
 INTERNAL_FUNCTION voxel_chunk_manager* 
 AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
@@ -1056,6 +997,7 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 
 			Context->ResultMutex = {};
 
+#if 0
 			Context->Result = PushStruct(&Context->ListArena, voxel_chunk_header);
 			Context->Result->Next = Context->Result;
 			Context->Result->Prev = Context->Result;
@@ -1065,14 +1007,9 @@ AllocateVoxelChunkManager(transient_state* TranState, game_assets* Assets)
 			Context->ResultFree->Next = Context->ResultFree;
 			Context->ResultFree->Prev = Context->ResultFree;
 			Context->ResultFree->IsSentinel = true;
+#endif
 		}
 	}
-
-/*	Result->LoopCanBeContinued = true;
-	scan_voxel_chunks_work* ScanWork = PushStruct(TranState->TranArena, scan_voxel_chunks_work);
-	ScanWork->RenderGroup = TranState->RenderGroup;
-	ScanWork->Manager = Result;
-	Platform.AddEntry(Manager->TranState->HighPriorityQueue, ScanVoxelChunksLoopWork, ScanWork);*/
 
 	return(Result);
 }
