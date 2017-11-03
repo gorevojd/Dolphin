@@ -1,7 +1,5 @@
 #ifndef ASSET_BUILDER_H
 
-#define BUILD_WITH_ANIMAITON 0
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,6 +10,13 @@
 #include "ivan_file_formats.h"
 
 #include "ivan_voxel_shared.h"
+
+#if BUILD_WITH_ASSIMP
+#include <assimp/Importer.hpp> 
+#include <assimp/scene.h>     
+#include <assimp/postprocess.h>
+#include <assimp/cimport.h>
+#endif
 
 #define USE_FONTS_FROM_WINDOWS 0
 
@@ -269,7 +274,7 @@ struct loaded_skinned_mesh{
 	uint32 IndicesCount;
 };
 
-#if BUILD_WITH_ANIMAITON
+#if BUILD_WITH_ASSIMP
 inline mat4 AiMatToOurs(aiMatrix4x4* aiMatr){
 	mat4 Result;
 
@@ -303,13 +308,13 @@ inline vec3 AiVec3ToOurs(aiVector3D aiVec){
 
 
 inline vec2 AiVec2ToOurs(aiVector2D aiVec){
-	vec3 Result;
+	vec2 Result;
 	Result.x = aiVec.x;
 	Result.y = aiVec.y;
 	return(Result);
 }
 
-inline quat AiQuatToOurs(AiQuaternion quater){
+inline quat AiQuatToOurs(aiQuaternion quater){
 	quat Result;
 	Result.x = quater.x;
 	Result.y = quater.y;

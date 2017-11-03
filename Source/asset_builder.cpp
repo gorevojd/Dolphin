@@ -1,12 +1,14 @@
 #include "asset_builder.h"
 
 /*
-    NOTE(Dima): Images are stored in gamma-corrected premultiplied-alpha format
+    NOTE(Dima): 
+		Images are stored in gamma-corrected premultiplied-alpha format
 */
 
 /*
     TODO(Dima):
         Font Atlas
+		Model asset type with animations baked into it
 */
 
 #pragma pack(push, 1)
@@ -179,7 +181,15 @@ enum load_mesh_flags{
     LoadMesh_UseExistingSkeleton = 8,
 };
 
-#if BUILD_WITH_ANIMATION
+#if BUILD_WITH_ASSIMP
+
+#include <map>
+#include <vector>
+
+struct loaded_skeleton {
+	std::map<std::string, uint32> BoneMapping;
+	std::vector<bone_transform_info> Bones;
+};
 
 INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
     aiMesh* Mesh,
@@ -216,7 +226,7 @@ INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
             WeightIndex < Mesh->mBones[BoneIndex]->mNumWeights;
             WeightIndex++)
         {
-            uint32 VertexIndex = VertexOffset + Mesh->mBones[BoneIndex]->mWeights[WeightIndex].mVertexId;
+            uint32 VertexIndex = VertexBase + Mesh->mBones[BoneIndex]->mWeights[WeightIndex].mVertexId;
             AddBoneVertexInfo(
                 &Infos[VertexIndex], 
                 Mesh->mBones[BoneIndex]->mWeights[WeightIndex].mWeight, 
@@ -252,7 +262,7 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
     {
         TotalVertexCount += AssimpScene->mMeshes[MeshIndex]->mNumVertices;
     }
-    Result->VerticesCount = TotalVertexCount;
+    Result.VerticesCount = TotalVertexCount;
 
     bone_vertex_info* VertexInfos = (bone_vertex_info*)calloc(TotalVertexCount, sizeof(bone_vertex_info));
 
@@ -260,7 +270,7 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
         MeshIndex < AssimpScene->mNumMeshes;
         MeshIndex++)
     {       
-        aiMesh* Mesh = &AssimpScene->mMeshes[MeshIndex];
+        aiMesh* Mesh = AssimpScene->mMeshes[MeshIndex];
 
         if(Mesh->mNumBones > 0){
             LoadBoneInfoFromAssimp(Mesh, VertexBase, VertexInfos, Skeleton);
@@ -274,29 +284,29 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
         MeshIndex < AssimpScene->mNumMeshes;
         MeshIndex++)
     {       
-        aiMesh* Mesh = &AssimpScene->mMeshes[MeshIndex];
+        aiMesh* Mesh = AssimpScene->mMeshes[MeshIndex];
 
         for(uint32 VertexIndex = 0; 
             VertexIndex < Mesh->mNumVertices;
             VertexIndex++)
         {
-            aiVector3D* RefP = &Mesh->mVertices[i];        
-            aiVector3D* RefN = &Mesh->mNormals[i];
+            aiVector3D* RefP = &Mesh->mVertices[VertexIndex];        
+            aiVector3D* RefN = &Mesh->mNormals[VertexIndex];
 
             Assert(VertexBase + VertexIndex <= MAX_VERTICES_COUNT);
-            scinned_vertex* NewVertex = &Result.Vertices[VertexBase + VertexIndex];
+            skinned_vertex* NewVertex = &Result.Vertices[VertexBase + VertexIndex];
 
-            Newvertex->P.x = RefP->x;
-            Newvertex->P.y = RefP->y;
-            Newvertex->P.z = RefP->z;
+            NewVertex->P.x = RefP->x;
+            NewVertex->P.y = RefP->y;
+            NewVertex->P.z = RefP->z;
 
             NewVertex->N.x = RefN->x;
             NewVertex->N.y = RefN->y;
-            NewVertex->N.z = refN->z;
+            NewVertex->N.z = RefN->z;
 
-            if(mesh->mTextureCoords[0]){
-                NewVertex->UV->x = mesh->mTextureCoords[0][i].x;
-                NewVertex->UV->y = mesh->mTextureCoords[0][i].y;
+            if(Mesh->mTextureCoords[0]){
+                NewVertex->UV.x = Mesh->mTextureCoords[0][VertexIndex].x;
+                NewVertex->UV.y = Mesh->mTextureCoords[0][VertexIndex].y;
             }
 
             for(int32 InfluenceBoneIndex = 0;
@@ -304,7 +314,7 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
                 InfluenceBoneIndex++)
             {
                 NewVertex->Weights[InfluenceBoneIndex] = VertexInfos[VertexBase + VertexIndex].Weights[InfluenceBoneIndex];
-                NewVertex->BoneIDs[InfluenceBoneIndex] = VertexInfos[VertexBase + VertexInfos].BoneIDs[InfluenceBoneIndex];
+                NewVertex->BoneIDs[InfluenceBoneIndex] = VertexInfos[VertexBase + VertexIndex].BoneIDs[InfluenceBoneIndex];
             }
         }
 
@@ -313,13 +323,13 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
             FaceIndex < Mesh->mNumFaces; 
             FaceIndex++)
         {
-            aiFace* AssimpFace = &Mesh->mNumFaces[FaceIndex];
+            aiFace* AssimpFace = &Mesh->mFaces[FaceIndex];
 
-            for(uint32 FaceVertexIndex = AssimFace->mNumIndices;
+            for(uint32 FaceVertexIndex = AssimpFace->mNumIndices;
                 FaceVertexIndex > 0; 
                 FaceVertexIndex--)
             {
-                Result.Indices[IndexBase + IndexIterator++] = AssimFace->mIndices[FaceVertexIndex - 1];
+                Result.Indices[IndexBase + IndexIterator++] = AssimpFace->mIndices[FaceVertexIndex - 1];
             }
         }
 
@@ -328,17 +338,17 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
                 FaceIndex < Mesh->mNumFaces; 
                 FaceIndex++)
             {
-                aiFace* AssimpFace = &Mesh->mNumFaces[FaceIndex];
+                aiFace* AssimpFace = &Mesh->mFaces[FaceIndex];
                 if(AssimpFace->mNumIndices == 3){
                     vec3 NewT;
 
-                    vec3 Vert1 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[0]]);
-                    vec3 Vert2 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[1]]);
-                    vec3 Vert3 = AiVec3ToOurs(Mesh->mVertices[AssimFace->mIndices[2]]);
+                    vec3 Vert1 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[0]]);
+                    vec3 Vert2 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[1]]);
+                    vec3 Vert3 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[2]]);
 
-                    vec2 UV1 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[0]]);
-                    vec2 UV2 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[1]]);
-                    vec2 UV3 = AiVec2ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[2]]);
+                    vec2 UV1 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[0]]).xy;
+                    vec2 UV2 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[1]]).xy;
+                    vec2 UV3 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[2]]).xy;
 
                     vec3 Edge1 = Vert2 - Vert1;
                     vec3 Edge2 = Vert3 - Vert1;
@@ -353,9 +363,9 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
                     NewT.z = f *(DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z);
                     NewT = Normalize(NewT);
                     
-                    Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
-                    Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
-                    Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
+                    Result.Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
+                    Result.Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
+                    Result.Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
                 }
             }
         }
@@ -367,11 +377,6 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
 
     free(VertexInfos);
 }
-
-struct loaded_skeleton{
-    std::map<std::string, uint32> BoneMapping;
-    std::vector<bone_transform_info> Bones;
-};
 
 inline aiNodeAnim* FindNodeAnimInAssimpAnimation(aiAnimation* Animation, char* NodeName){
     aiNodeAnim* Result = 0;
@@ -392,7 +397,7 @@ inline aiNodeAnim* FindNodeAnimInAssimpAnimation(aiAnimation* Animation, char* N
 }
 
 INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
-    loaded_skeletal_animation* SkAnimation, 
+    loaded_animation* SkAnimation, 
     aiNode* AssimpNode,
     aiAnimation* AssimpAnimation,
     loaded_skeleton* Skeleton)
@@ -428,7 +433,7 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
         TranslationFrameIndex++)
     {
         aiVectorKey* SrcFrame = &NodeAnim->mPositionKeys[TranslationFrameIndex];
-        translation_key_frame* DstFrame = &Animation->TranslationFrames[TranslationFrameIndex].Translation;
+        translation_key_frame* DstFrame = &Animation->TranslationFrames[TranslationFrameIndex];
         
         DstFrame->TimeStamp = (float)SrcFrame->mTime;
         DstFrame->Translation = AiVec3ToOurs(SrcFrame->mValue);
@@ -440,7 +445,7 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
         RotationFrameIndex++)
     {
         aiQuatKey* SrcFrame = &NodeAnim->mRotationKeys[RotationFrameIndex];
-        rotation_key_frame* DstFrame = &Animation->RotationFrames[RotationFrameIndex].Rotation;
+        rotation_key_frame* DstFrame = &Animation->RotationFrames[RotationFrameIndex];
 
         DstFrame->TimeStamp = (float)SrcFrame->mTime;
         DstFrame->Rotation = AiQuatToOurs(SrcFrame->mValue);
@@ -452,7 +457,7 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
         ScalingFrameIndex++)
     {
         aiVectorKey* SrcFrame = &NodeAnim->mScalingKeys[ScalingFrameIndex];
-        scaling_key_frame* DstFrame = &Animation->ScalingFrames[ScalingFrameIndex].Scaling;
+        scaling_key_frame* DstFrame = &Animation->ScalingFrames[ScalingFrameIndex];
 
         DstFrame->TimeStamp = (float)SrcFrame->mTime;
         DstFrame->Scaling = AiVec3ToOurs(SrcFrame->mValue);
@@ -460,14 +465,18 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
 
     char* CurrentBoneName = AssimpNode->mName.data;
     std::string CurrentBoneNameStr = std::string(CurrentBoneName);
-    bone_transform_info* CurrentBoneTransform = &(Skeleton->Bones.at([Skeleton->BoneMapping[CurrentBoneNameStr]]));    
+    bone_transform_info* CurrentBoneTransform = &(Skeleton->Bones.at(Skeleton->BoneMapping[CurrentBoneNameStr]));    
 
     //NOTE(Dima): Children processing
     if(AssimpNode->mNumChildren > 0){
         //NOTE(Dima): Allocating children
         CurrentBoneTransform->ChildrenCount = AssimpNode->mNumChildren;
+		/*
         CurrentBoneTransform->Children = (bone_transform_info*)
             malloc(sizeof(bone_transform_info) * CurrentBoneTransform->ChildrenCount);
+		*/
+
+		CurrentBoneTransform->Children = (uint32*)malloc(sizeof(uint32) * CurrentBoneTransform->ChildrenCount);
 
         //NOTE(Dima): Assigning children indices to current bone
         for(uint32 ChildIndex = 0;
@@ -496,22 +505,9 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
             ChildIndex < AssimpNode->mNumChildren;
             ChildIndex++)
         {
-            std::string ChildNodeName = std::string(AssimpNode->mChildren[ChildIndex]->mName.data);
-
-            uint32 ToLoadIndex = 0;
-            if(Skeleton->BoneMapping.find(ChildNodeName) != Skeleton->BoneMapping.end()){
-                ToLoadIndex = Skeleton->BoneMapping[ChildNodeName];
-            }
-            else{
-                //NOTE(Dima): This should not happen because child bone should be found
-                INVALID_CODE_PATH;
-            }
-
-            joint_animation* ToLoad = &SkAnimation->JointAnims[ToLoadIndex];
-
             LoadJointAnimationFromAssimpRecursively(
-                ToLoad,
-                pNode->mChildren[ChildIndex], 
+				SkAnimation,
+                AssimpNode->mChildren[ChildIndex], 
                 AssimpAnimation, 
                 Skeleton);
         }
@@ -522,14 +518,14 @@ INTERNAL_FUNCTION loaded_animations_result
 LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
 {
     Assimp::Importer Importer;
-    aiScene* AssimpScene = AssimpImporter.ReadFile(FileName, 0);
+    const aiScene* AssimpScene = Importer.ReadFile(FileName, 0);
 
     loaded_animations_result Result_ = {};
     loaded_animations_result* Result = &Result_;
 
     uint32 SrcAnimationsCount = AssimpScene->mNumAnimations;
     Result->AnimationsCount = SrcAnimationsCount;
-    Result->Animations = (loaded_skeletal_animation*)malloc(sizeof(loaded_skeletal_animation) * AnimationsCount);
+    Result->Animations = (loaded_animation*)malloc(sizeof(loaded_animation) * SrcAnimationsCount);
     Result->Free = (void*)Result->Animations;
 
     for(uint32 CurrentAnimationIndex = 0;
@@ -537,14 +533,14 @@ LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
         CurrentAnimationIndex++)
     {
         aiAnimation* SrcAnim = AssimpScene->mAnimations[CurrentAnimationIndex];
-        loaded_skeletal_animation* DstAnim = &Result->Animations[CurrentAnimationIndex];
+        loaded_animation* DstAnim = &Result->Animations[CurrentAnimationIndex];
 
         DstAnim->LengthTime = (float)SrcAnim->mDuration;
         DstAnim->PlayCursorTime = 0.0f;
         DstAnim->PlaybackSpeed = 1.0f;
         
         if(SrcAnim->mTicksPerSecond != 0){
-            DstAnim->TicksPerSecond = ScrAnim->mTicksPerSecond;
+            DstAnim->TicksPerSecond = SrcAnim->mTicksPerSecond;
         }
         else{
             DstAnim->TicksPerSecond = 25.0f;
@@ -1553,7 +1549,7 @@ INTERNAL_FUNCTION void Initialize(game_assets* Assets){
 }
 
 INTERNAL_FUNCTION void WriteAnimations(){
-#if BUILD_WITH_ANIMATION
+#if BUILD_WITH_ASSIMP
     game_assets Assets_;
     game_assets* Assets = &Assets_;
     Initialize(Assets);

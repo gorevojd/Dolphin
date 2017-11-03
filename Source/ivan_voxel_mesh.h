@@ -30,6 +30,14 @@
 		4 bits per x and z and 8 bits per y. So after
 		building mesh we can apply model transform
 		matrix to transpose our chunk to needed place.
+
+		5) Also we can do actually almost the same way.
+		But we can also build result big mesh in the end 
+		of the mesh building. But we will need twice more
+		memory. CAVEAT: I can deallocate mesh memory as 
+		needed, but I still want one-memory-per-chunk 
+		because of future collision detection. So I need
+		to THINK ABOUT IT. REAL TALK... 
 */
 
 #ifndef IVAN_VOXEL_MESH_H
