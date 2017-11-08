@@ -12,6 +12,37 @@ enum asset_voxel_atlas_type{
 	VoxelAtlasType_Minecraft = 1,
 };
 
+enum asset_animation_type {
+	AssetAnimationType_Unknown,
+
+	AssetAnimationType_RunForward,
+	AssetAnimationType_RunLeft,
+	AssetAnimationType_RunRight,
+	AssetAnimationType_RunBack,
+
+	AssetAnimationType_WalkForward,
+	AssetAnimationType_WalkLeft,
+	AssetAnimationType_WalkRight,
+	AssetAnimationType_WalkBack,
+
+	/*NOTE(Dima): Add as much as you need xD*/
+	AssetAnimationType_Idle00,
+	AssetAnimationType_Idle01,
+	AssetAnimationType_Idle02,
+	AssetAnimationType_Idle04,
+	AssetAnimationType_Idle05,
+	AssetAnimationType_Idle06,
+	AssetAnimationType_Idle07,
+	AssetAnimationType_Idle08,
+
+	AssetAnimationType_Atack01,
+	AssetAnimationType_Atack02,
+	AssetAnimationType_Atack03,
+
+	/*NOTE(Dima): Add animations type above this line*/
+	AssetAnimationType_Count,
+};
+
 enum asset_tag_id{	
 	Tag_FacingDirection,
 
@@ -62,6 +93,8 @@ enum asset_type_id{
 
 	Asset_VoxelAtlas,
 	Asset_VoxelAtlasTexture,
+
+	Asset_OldSchoolDima,
 
 	Asset_Count,
 };

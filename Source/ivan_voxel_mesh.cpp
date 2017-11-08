@@ -199,7 +199,7 @@ InitVoxelMeshGeneration(
 	voxel_mesh_generation_queue* BackQueue = &Context->BackQueue;
 	voxel_mesh_generation_queue* FrontQueue = &Context->FrontQueue;	
 
-#if 0
+#if 1
 	voxel_chunk* LeftChunk = Chunk->LeftChunk;
 	voxel_chunk* RightChunk = Chunk->RightChunk;
 	voxel_chunk* FrontChunk = Chunk->FrontChunk;

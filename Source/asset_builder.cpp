@@ -2,7 +2,17 @@
 
 /*
     NOTE(Dima): 
-		Images are stored in gamma-corrected premultiplied-alpha format
+		1) Images are stored in gamma-corrected 
+		premultiplied-alpha format
+
+		2) Animations will be baked into models. 
+		Later maybe if I need I should make that 
+		I can do it both ways.
+
+		3) IMPORTANT!!! 
+		If you bake multiple animations in a
+		single file, you should make sure that
+		theese animations are common by sence.
 */
 
 /*
@@ -183,14 +193,6 @@ enum load_mesh_flags{
 
 #if BUILD_WITH_ASSIMP
 
-#include <map>
-#include <vector>
-
-struct loaded_skeleton {
-	std::map<std::string, uint32> BoneMapping;
-	std::vector<bone_transform_info> Bones;
-};
-
 INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
     aiMesh* Mesh,
     uint32 VertexBase, 
@@ -235,25 +237,18 @@ INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
     }
 }
 
-INTERNAL_FUNCTION loaded_skinned_mesh 
-LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 Flags)
+
+INTERNAL_FUNCTION void
+LoadSkinnedMeshDataFromAssimp(
+	loaded_skinned_mesh* Result,
+	char* FileName, 
+	loaded_skeleton* Skeleton)
 {
-    loaded_skinned_mesh Result;
+	Assimp::Importer Importer;
+	const aiScene* AssimpScene = Importer.ReadFile(FileName, 0);
 
     uint32 IndexBase = 0;
     uint32 VertexBase = 0;
-
-    bool32 UseExistingSkeleton = Flags & LoadMesh_UseExistingSkeleton;
-    loaded_skeleton NewSkeleton = {};
-    loaded_skeleton* Skeleton;
-
-    if(UseExistingSkeleton){
-        Skeleton = Skeleton_;
-    }
-    else{
-        Skeleton = &NewSkeleton;
-        *Skeleton_ = NewSkeleton;
-    }
 
     uint32 TotalVertexCount = 0;
     for(uint32 MeshIndex = 0;
@@ -262,7 +257,7 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
     {
         TotalVertexCount += AssimpScene->mMeshes[MeshIndex]->mNumVertices;
     }
-    Result.VerticesCount = TotalVertexCount;
+    Result->VerticesCount = TotalVertexCount;
 
     bone_vertex_info* VertexInfos = (bone_vertex_info*)calloc(TotalVertexCount, sizeof(bone_vertex_info));
 
@@ -294,7 +289,7 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
             aiVector3D* RefN = &Mesh->mNormals[VertexIndex];
 
             Assert(VertexBase + VertexIndex <= MAX_VERTICES_COUNT);
-            skinned_vertex* NewVertex = &Result.Vertices[VertexBase + VertexIndex];
+            skinned_vertex* NewVertex = &Result->Vertices[VertexBase + VertexIndex];
 
             NewVertex->P.x = RefP->x;
             NewVertex->P.y = RefP->y;
@@ -329,51 +324,51 @@ LoadMeshDataFromAssimp(aiScene* AssimpScene, loaded_skeleton* Skeleton_, uint32 
                 FaceVertexIndex > 0; 
                 FaceVertexIndex--)
             {
-                Result.Indices[IndexBase + IndexIterator++] = AssimpFace->mIndices[FaceVertexIndex - 1];
+                Result->Indices[IndexBase + IndexIterator++] = AssimpFace->mIndices[FaceVertexIndex - 1];
             }
         }
+#if 1
+		//NOTE(Dima): Tangents calculation
+        for(uint32 FaceIndex = 0;
+            FaceIndex < Mesh->mNumFaces; 
+            FaceIndex++)
+        {
+            aiFace* AssimpFace = &Mesh->mFaces[FaceIndex];
+            if(AssimpFace->mNumIndices == 3){
+                vec3 NewT;
 
-        if(Flags & LoadMesh_CalculateTangents){ 
-            for(uint32 FaceIndex = 0;
-                FaceIndex < Mesh->mNumFaces; 
-                FaceIndex++)
-            {
-                aiFace* AssimpFace = &Mesh->mFaces[FaceIndex];
-                if(AssimpFace->mNumIndices == 3){
-                    vec3 NewT;
+                vec3 Vert1 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[0]]);
+                vec3 Vert2 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[1]]);
+                vec3 Vert3 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[2]]);
 
-                    vec3 Vert1 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[0]]);
-                    vec3 Vert2 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[1]]);
-                    vec3 Vert3 = AiVec3ToOurs(Mesh->mVertices[AssimpFace->mIndices[2]]);
+                vec2 UV1 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[0]]).xy;
+                vec2 UV2 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[1]]).xy;
+                vec2 UV3 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[2]]).xy;
 
-                    vec2 UV1 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[0]]).xy;
-                    vec2 UV2 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[1]]).xy;
-                    vec2 UV3 = AiVec3ToOurs(Mesh->mTextureCoords[0][AssimpFace->mIndices[2]]).xy;
+                vec3 Edge1 = Vert2 - Vert1;
+                vec3 Edge2 = Vert3 - Vert1;
 
-                    vec3 Edge1 = Vert2 - Vert1;
-                    vec3 Edge2 = Vert3 - Vert1;
+                vec2 DeltaUV1 = UV2 - UV1;
+                vec2 DeltaUV2 = UV3 - UV1;
 
-                    vec2 DeltaUV1 = UV2 - UV1;
-                    vec2 DeltaUV2 = UV3 - UV1;
+                float f = 1.0f / (DeltaUV1.x * DeltaUV2.y - DeltaUV2.x * DeltaUV1.y);
 
-                    float f = 1.0f / (DeltaUV1.x * DeltaUV2.y - DeltaUV2.x * DeltaUV1.y);
-
-                    NewT.x = f *(DeltaUV2.y * Edge1.x - DeltaUV1.y * Edge2.x);
-                    NewT.y = f *(DeltaUV2.y * Edge1.y - DeltaUV1.y * Edge2.y);
-                    NewT.z = f *(DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z);
-                    NewT = Normalize(NewT);
+                NewT.x = f *(DeltaUV2.y * Edge1.x - DeltaUV1.y * Edge2.x);
+                NewT.y = f *(DeltaUV2.y * Edge1.y - DeltaUV1.y * Edge2.y);
+                NewT.z = f *(DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z);
+                NewT = Normalize(NewT);
                     
-                    Result.Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
-                    Result.Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
-                    Result.Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
-                }
+                Result->Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
+                Result->Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
+                Result->Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
             }
         }
+#endif
 
         IndexBase += IndexIterator;
     }
 
-    Result.IndicesCount = IndexBase;
+    Result->IndicesCount = IndexBase;
 
     free(VertexInfos);
 }
@@ -402,7 +397,6 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
     aiAnimation* AssimpAnimation,
     loaded_skeleton* Skeleton)
 {
-    uint32 CurrentJointIndex;
     std::string CurrentJointName = std::string(AssimpNode->mName.data);
     uint32 CurrentJointIndex = Skeleton->BoneMapping[CurrentJointName];
 
@@ -515,7 +509,10 @@ INTERNAL_FUNCTION void LoadJointAnimationFromAssimpRecursively(
 }
 
 INTERNAL_FUNCTION loaded_animations_result
-LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
+LoadSkeletalAnimation(
+	char* FileName, 
+	loaded_skeleton* Skeleton, 
+	asset_animation_type AssetAnimationType)
 {
     Assimp::Importer Importer;
     const aiScene* AssimpScene = Importer.ReadFile(FileName, 0);
@@ -538,6 +535,7 @@ LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
         DstAnim->LengthTime = (float)SrcAnim->mDuration;
         DstAnim->PlayCursorTime = 0.0f;
         DstAnim->PlaybackSpeed = 1.0f;
+		DstAnim->Type = AssetAnimationType;
         
         if(SrcAnim->mTicksPerSecond != 0){
             DstAnim->TicksPerSecond = SrcAnim->mTicksPerSecond;
@@ -556,6 +554,8 @@ LoadSkeletalAnimation(char* FileName, loaded_skeleton* Skeleton)
             SrcAnim,
             Skeleton);
     }
+
+	return(Result_);
 }
 
 #endif
@@ -1184,20 +1184,62 @@ AddVoxelAtlasTextureAsset(game_assets* Assets, loaded_voxel_atlas* Atlas){
 }
 
 
-INTERNAL_FUNCTION animation_id 
-AddAnimationAsset(game_assets* Assets, loaded_animation* Animation){
-    added_asset Asset = AddAsset(Assets);
+#if BUILD_WITH_ASSIMP
+INTERNAL_FUNCTION animated_model_id
+AddAnimatedModelAsset(
+	game_assets* Assets, 
+	loaded_animated_model* AnimatedModel) 
+{
+	added_asset Asset = AddAsset(Assets);
 
-    Asset.Source->Type = AssetType_Animation;
-    Asset.Source->Animation.Animation = Animation;
+	Asset.Source->Type = AssetType_AnimatedModel;
+	Asset.Source->AnimatedModel.AnimatedModel = AnimatedModel;
 
-    Asset.DDA->Animation.JointAnimsCount = Animation->JointAnimsCount;
-    Asset.DDA->Animation.LengthTime = Animation->LengthTime;
-    Asset.DDA->Animation.TicksPerSecond = Animation->TicksPerSecond;
+	Asset.DDA->AnimatedModel.AnimationsCount = 0;
 
-    animation_id Result = {Asset.ID};
-    return(Result);
+	animated_model_id Result = { Asset.ID };
+	return(Result);
 }
+
+INTERNAL_FUNCTION void
+AddAnimationToModelAsset(
+	loaded_animated_model* Model, 
+	loaded_animation* Animation)
+{
+	Assert((Model->AnimationsCount) < MAX_ANIMATIONS_PER_MODEL);
+	Model->Animations[Model->AnimationsCount++] = Animation;
+}
+
+INTERNAL_FUNCTION void
+AddAnimationsToModelAsset(
+	loaded_animated_model* AnimatedModel,
+	char* FileName,
+	asset_animation_type AnimationType)
+{
+	loaded_animations_result Result = LoadSkeletalAnimation(
+		FileName,
+		&AnimatedModel->Skeleton,
+		AnimationType);
+
+	for (uint32 AnimationIndex = 0;
+		AnimationIndex < Result.AnimationsCount;
+		AnimationIndex++)
+	{
+		AddAnimationToModelAsset(AnimatedModel, &Result.Animations[AnimationIndex]);
+	}
+}
+
+INTERNAL_FUNCTION void 
+AddSkinnedMeshToModelAsset(
+	loaded_animated_model* AnimatedModel,
+	char* FileName)
+{
+	LoadSkinnedMeshDataFromAssimp(
+		&AnimatedModel->SkinnedMesh,
+		FileName,
+		&AnimatedModel->Skeleton);
+}
+#endif
 
 INTERNAL_FUNCTION voxel_atlas_id
 AddVoxelAtlasAsset(
@@ -1453,6 +1495,7 @@ WriteDDA(game_assets* Assets, char* FileName){
                 }break;
 
                 case(AssetType_Animation):{
+#if BUILD_WITH_ASSIMP
                     loaded_animation* Anim = Source->Animation.Animation;
 
                     Assert(Anim->JointAnimsCount <= DDA_ANIMATION_MAX_BONE_COUNT);
@@ -1489,7 +1532,7 @@ WriteDDA(game_assets* Assets, char* FileName){
                     }
 
                     DDA->Animation.TotalFileSize = TotalFileSize;
-
+#endif
                 }break;
 
                 case(AssetType_VoxelAtlas):{
@@ -1554,25 +1597,16 @@ INTERNAL_FUNCTION void WriteAnimations(){
     game_assets* Assets = &Assets_;
     Initialize(Assets);
 
-    loaded_animations_result* Results[] = {
-        LoadSkeletalAnimation("Dima_RunF01.fbx", ???);
-    };
+	loaded_animated_model OldSchoolDima = {};
+	AddSkinnedMeshToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/");
+	AddAnimationsToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/Dima_RunF01.fbx", AssetAnimationType_RunForward);
+	AddAnimationsToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/Dima_Idle01Idle01.fbx", AssetAnimationType_Idle00);
 
-    BeginAssetType(Assets, Asset_Animation);????
-    for(uint32 ResultIndex = 0;
-        ResultIndex < ArrayCount(Results);
-        ResultIndex++)
-    {
-        for(uint32 AnimationIndex = 0;
-            AnimationIndex < Results[ResultIndex].AnimationsCount;
-            AnimationIndex++)
-        {
-            AddAnimationAsset(&Results[ResultIndex]);
-        }
-    }
-    EndAssetType(Assets);
+	BeginAssetType(Assets, Asset_OldSchoolDima);
+	AddAnimatedModelAsset(Assets, &OldSchoolDima);
+	EndAssetType(Assets);
 
-    WriteDDA(Assets, "../Data/asset_pack_animations.dda");
+    WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_animations.dda");
     printf("Animation assets written successfully :D");
 #endif
 }
@@ -1614,7 +1648,7 @@ INTERNAL_FUNCTION void WriteFonts(){
     AddTag(Assets, Tag_FontType, FontType_Forsazh);
     EndAssetType(Assets);
 
-    WriteDDA(Assets, "../Data/asset_pack_fonts.dda");
+    WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_fonts.dda");
 	printf("Font assets written successfully :D\n");
 }
 
@@ -1624,8 +1658,8 @@ INTERNAL_FUNCTION void WriteVoxelAtlases(){
     Initialize(Assets);
 
     loaded_voxel_atlas* Atlases[] = {
-        LoadVoxelAtlas("../Data/Images/MyVoxelAtlas/VoxelAtlas.png", 256, 16),
-        LoadVoxelAtlas("../Data/Images/terrain.png", 256, 16),
+        LoadVoxelAtlas("../../IvanEngine/Data/Images/MyVoxelAtlas/VoxelAtlas.png", 256, 16),
+        LoadVoxelAtlas("../../IvanEngine/Data/Images/terrain.png", 256, 16),
     };
 
     loaded_voxel_atlas* Atlas = Atlases[0];
@@ -1671,7 +1705,7 @@ INTERNAL_FUNCTION void WriteVoxelAtlases(){
     AddTag(Assets, Tag_VoxelAtlasType, VoxelAtlasType_Minecraft);
     EndAssetType(Assets);
 
-	WriteDDA(Assets, "../Data/asset_pack_voxatl.dda");
+	WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_voxatl.dda");
     printf("Voxel Texture Atlas written successfully :D\n");
 }
 
@@ -1688,39 +1722,39 @@ INTERNAL_FUNCTION void WriteHero(){
     vec2 HeroAlign = {0.5f, 1.0f - 0.156682029f};
 
     BeginAssetType(Assets, Asset_Head);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_right_head.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_right_head.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleRight);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_back_head.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_back_head.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleBack);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_left_head.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_left_head.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleLeft);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_front_head.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_front_head.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleFront);
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Cape);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_right_cape.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_right_cape.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleRight);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_back_cape.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_back_cape.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleBack);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_left_cape.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_left_cape.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleLeft);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_front_cape.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_front_cape.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleFront);
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Torso);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_right_torso.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_right_torso.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleRight);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_back_torso.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_back_torso.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleBack);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_left_torso.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_left_torso.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleLeft);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_hero_front_torso.bmp", HeroAlign);
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_hero_front_torso.bmp", HeroAlign);
     AddTag(Assets, Tag_FacingDirection, AngleFront);
     EndAssetType(Assets);
 
-    WriteDDA(Assets, "../Data/asset_pack_hero.dda");
+    WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_hero.dda");
 	printf("Hero assets written successfully :D\n");
 }
 
@@ -1730,49 +1764,49 @@ INTERNAL_FUNCTION void WriteNonHero(){
     Initialize(Assets);
 
     BeginAssetType(Assets, Asset_Backdrop);
-    AddBitmapAsset(Assets, "../Data/HH/test/test_background.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test/test_background.bmp");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_LastOfUs);
-    AddBitmapAsset(Assets, "../Data/Images/last.jpg");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/last.jpg");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Tree);
-    AddBitmapAsset(Assets, "../Data/HH/test2/tree00.bmp", Vec2(0.5f, 0.3f));
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/test2/tree00.bmp", Vec2(0.5f, 0.3f));
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_StarWars);
-    AddBitmapAsset(Assets, "../Data/Images/star_wars.jpg");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/star_wars.jpg");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Witcher);
-    AddBitmapAsset(Assets, "../Data/Images/witcher.jpg");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/witcher.jpg");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Assassin);
-    AddBitmapAsset(Assets, "../Data/Images/assassin.jpg");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/assassin.jpg");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Grass);
-    AddBitmapAsset(Assets, "../Data/HH/Test2/grass00.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/grass01.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/grass00.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/grass01.bmp");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Stone);
-    AddBitmapAsset(Assets, "../Data/HH/Test2/ground00.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/ground01.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/ground02.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/ground03.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/ground00.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/ground01.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/ground02.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/ground03.bmp");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Tuft);
-    AddBitmapAsset(Assets, "../Data/HH/Test2/tuft00.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/tuft01.bmp");
-    AddBitmapAsset(Assets, "../Data/HH/Test2/tuft02.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/tuft00.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/tuft01.bmp");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/HH/Test2/tuft02.bmp");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Heart);
-    AddBitmapAsset(Assets, "../Data/Images/128/heart.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/heart.png");
     EndAssetType(Assets);
 
     float ColorBlue = GetFloatRepresentOfColor(Vec3(0.0f, 0.0f, 1.0f));
@@ -1780,32 +1814,32 @@ INTERNAL_FUNCTION void WriteNonHero(){
     float ColorRed = GetFloatRepresentOfColor(Vec3(1.0f, 0.0f, 0.0f));
 
     BeginAssetType(Assets, Asset_Diamond);
-    AddBitmapAsset(Assets, "../Data/Images/128/gemBlue.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/gemBlue.png");
     AddTag(Assets, Tag_Color, ColorBlue);
-    AddBitmapAsset(Assets, "../Data/Images/128/gemGreen.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/gemGreen.png");
     AddTag(Assets, Tag_Color, ColorGreen);
-    AddBitmapAsset(Assets, "../Data/Images/128/gemRed.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/gemRed.png");
     AddTag(Assets, Tag_Color, ColorRed);
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Bottle);
-    AddBitmapAsset(Assets, "../Data/Images/128/potionBlue.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/potionBlue.png");
     AddTag(Assets, Tag_Color, ColorBlue);
-    AddBitmapAsset(Assets, "../Data/Images/128/potionGreen.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/potionGreen.png");
     AddTag(Assets, Tag_Color, ColorGreen);
-    AddBitmapAsset(Assets, "../Data/Images/128/potionRed.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/potionRed.png");
     AddTag(Assets, Tag_Color, ColorRed);
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Book);
-    AddBitmapAsset(Assets, "../Data/Images/128/tome.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/128/tome.png");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Particle);
-    AddBitmapAsset(Assets, "../Data/Images/ShockSpell.png");
+    AddBitmapAsset(Assets, "../../IvanEngine/Data/Images/ShockSpell.png");
     EndAssetType(Assets);
     
-    WriteDDA(Assets, "../Data/asset_pack_non_hero.dda");
+    WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_non_hero.dda");
 	printf("Non-hero assets written successfully :D\n");
 }
 
@@ -1815,28 +1849,28 @@ INTERNAL_FUNCTION void WriteSounds(){
     Initialize(Assets);
 
     BeginAssetType(Assets, Asset_Bloop);
-    AddSoundAsset(Assets, "../Data/HH/test3/bloop_00.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/bloop_01.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/bloop_02.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/bloop_03.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/bloop_04.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/bloop_00.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/bloop_01.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/bloop_02.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/bloop_03.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/bloop_04.wav");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Crack);
-    AddSoundAsset(Assets, "../Data/HH/test3/crack_00.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/crack_00.wav");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Drop);
-    AddSoundAsset(Assets, "../Data/HH/test3/drop_00.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/drop_00.wav");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Glide);
-    AddSoundAsset(Assets, "../Data/HH/test3/glide_00.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/glide_00.wav");
     EndAssetType(Assets);
 
     BeginAssetType(Assets, Asset_Puhp);
-    AddSoundAsset(Assets, "../Data/HH/test3/puhp_00.wav");
-    AddSoundAsset(Assets, "../Data/HH/test3/puhp_01.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/puhp_00.wav");
+    AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/puhp_01.wav");
     EndAssetType(Assets);
 
     uint32 OneMusicChunk = 10 * 44100;
@@ -1854,14 +1888,14 @@ INTERNAL_FUNCTION void WriteSounds(){
             SampleCount = TotalMusicSampleCount - FirstSampleIndex;
         }
 
-        sound_id ThisMusic = AddSoundAsset(Assets, "../Data/HH/test3/music_test.wav", FirstSampleIndex, SampleCount);
+        sound_id ThisMusic = AddSoundAsset(Assets, "../../IvanEngine/Data/HH/test3/music_test.wav", FirstSampleIndex, SampleCount);
         if((FirstSampleIndex + OneMusicChunk) < TotalMusicSampleCount){
             Assets->Assets[ThisMusic.Value].Sound.Chain = DDASoundChain_Advance;
         }
     }
     EndAssetType(Assets);
 
-    WriteDDA(Assets, "../Data/asset_pack_sounds.dda");
+    WriteDDA(Assets, "../../IvanEngine/Data/asset_pack_sounds.dda");
 	printf("Sound assets written successfully :D\n");
 }
 

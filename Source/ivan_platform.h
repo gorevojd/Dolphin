@@ -529,6 +529,7 @@ typedef struct game_memory{
 extern game_memory* DebugGlobalMemory;
 
 #if IVAN_COMPILER_MSVC
+#include <Windows.h>
 #define IVAN_COMPLETE_WRITES_BEFORE_FUTURE _WriteBarrier();
 #define IVAN_COMPLETE_READS_BEFORE_FUTURE _ReadBarrier();
 #elif IVAN_COMPILER_GCC
@@ -554,8 +555,11 @@ inline uint64 AtomicExchangeU64(uint64 volatile* Value, uint64 New){
 }
 
 inline uint32 GetThreadID(void){
+	uint32 ThreadID = 0;
+#if __x86_64__
     uint8* ThreadLocalStorage = (uint8*)__readgsqword(0x30);
-    uint32 ThreadID = *(uint32*)(ThreadLocalStorage + 0x48);
+    ThreadID = *(uint32*)(ThreadLocalStorage + 0x48);
+#endif
 
     return(ThreadID);
 }

@@ -431,18 +431,15 @@ inline void SetNeighboursForChunk(
 }
 
 inline int32_t NeighboursWasChanged(
-	voxel_chunk* New,
-	voxel_chunk* OldRight,
-	voxel_chunk* OldLeft,
-	voxel_chunk* OldFront,
-	voxel_chunk* OldBack)
+	voxel_chunk* NewRight, voxel_chunk* NewLeft, voxel_chunk* NewFront, voxel_chunk* NewBack,
+	voxel_chunk* OldRight, voxel_chunk* OldLeft, voxel_chunk* OldFront, voxel_chunk* OldBack)
 {
 	int32_t Result = 0;
 
-	if((New->LeftNeighbour != OldLeft) ||
-		(New->RightNeighbour != OldRight) ||
-		(New->FrontNeighbour != OldFront) ||
-		(New->BackNeighbour != OldBack))
+	if((NewLeft != OldLeft) ||
+		(NewRight != OldRight) ||
+		(NewFront != OldFront) ||
+		(NewBack != OldBack))
 	{
 		Result = 1;
 	}
@@ -479,6 +476,7 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 			Work.Header->Chunk->RightChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex + 1, Chunk->VerticalIndex);
 			Work.Header->Chunk->FrontChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex - 1);
 			Work.Header->Chunk->BackChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex + 1);
+
 
 #if 0
 			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelChunkWork, ChunkWork);
@@ -724,7 +722,11 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 		GenerateVoxelChunk(Index, Context->Manager, Work->ReadTable);
 		
 		if(Index->ChunkState == VoxelChunkState_Generated){
+
 			voxel_chunk* Chunk = Index->Chunk;
+			
+
+#if 0
 			voxel_chunk* OldLeft = Chunk->LeftNeighbour;
 			voxel_chunk* OldRight = Chunk->RightNeighbour;
 			voxel_chunk* OldFront = Chunk->FrontNeighbour;
@@ -735,9 +737,29 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 				Chunk->HorizontalIndex,
 				Chunk->VerticalIndex,
 				Work->ReadTable);
+#endif
 
-			if(NeighboursWasChanged(Chunk, OldRight, OldLeft, OldFront, OldBack)){
+			voxel_chunk_manager* Manager = Context->Manager;
 
+			voxel_chunk* OldLeft = Chunk->LeftChunk;
+			voxel_chunk* OldRight = Chunk->RightChunk;
+			voxel_chunk* OldFront = Chunk->FrontChunk;
+			voxel_chunk* OldBack = Chunk->BackChunk;
+
+			Chunk->LeftChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex - 1, Chunk->VerticalIndex);
+			Chunk->RightChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex + 1, Chunk->VerticalIndex);
+			Chunk->FrontChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex - 1);
+			Chunk->BackChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex + 1);
+
+			voxel_chunk* NewLeft = Chunk->LeftChunk;
+			voxel_chunk* NewRight = Chunk->RightChunk;
+			voxel_chunk* NewFront = Chunk->FrontChunk;
+			voxel_chunk* NewBack = Chunk->BackChunk;
+
+			if(NeighboursWasChanged(
+				NewRight, NewLeft, NewFront, NewBack,
+				OldRight, OldLeft, OldFront, OldBack))
+			{
 				if(Index->MeshTask && Index->MeshState == VoxelMeshState_Generated){
 					Platform.DeallocateMemory(Index->Mesh->PUVN);
 					EndTaskWithMemory(Index->MeshTask);

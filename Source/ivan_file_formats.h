@@ -31,6 +31,10 @@ struct mesh_id{
 	unsigned int Value;
 };
 
+struct animated_model_id {
+	unsigned int Value;
+};
+
 struct dda_header{
 #define DDA_MAGIC_VALUE IVAN_CODE('d', 'd', 'a', ' ')
 	uint32 MagicValue; 
@@ -89,13 +93,26 @@ struct dda_joint_frames_header{
 
 #define DDA_ANIMATION_MAX_BONE_COUNT 256
 struct dda_animation{
-	//dda_joint_frames_info JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
 	uint32 JointAnimsCount;
 	uint32 TotalFileSize;
 
     float LengthTime;
 
     float TicksPerSecond;
+};
+
+struct dda_mesh {
+
+};
+
+struct dda_animated_model {
+	uint32 AnimationsCount;
+
+	int64 MeshOffset;
+	int64 SkeletonOffset;
+	int64 AnimationsOffset;
+
+	//Where should I put MeshID and AnimationID's
 };
 
 struct dda_font_glyph{
@@ -136,6 +153,7 @@ struct dda_asset{
 		dda_font Font;
 		dda_voxel_atlas VoxelAtlas;
 		dda_animation Animation;
+		dda_animated_model AnimatedModel;
 	};
 };
 

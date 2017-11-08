@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "ivan_platform.h"
 #include "ivan_math.h"
 #include "ivan_render_math.h"
@@ -11,7 +12,12 @@
 
 #include "ivan_voxel_shared.h"
 
+#undef BUILD_WITH_ASSIMP
 #if BUILD_WITH_ASSIMP
+#include <iostream>
+#include <map>
+#include <vector>
+
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>     
 #include <assimp/postprocess.h>
@@ -34,6 +40,11 @@ GLOBAL_VARIABLE HDC GlobalFontDeviceContext;
 
 #define ONE_PAST_MAX_FONT_CODEPOINT (0x10FFFF + 1)
 
+#define MAX_BONE_COUNT 64
+#define MAX_INFLUENCE_BONE_COUNT 4
+#define MAX_VERTICES_COUNT 100000
+#define MAX_INDICES_COUNT 150000
+
 enum asset_type{
 	AssetType_Sound,
 	AssetType_Bitmap,
@@ -41,9 +52,14 @@ enum asset_type{
 	AssetType_FontGlyph,
 	AssetType_VoxelAtlas,
 	AssetType_VoxelAtlasTexture,
-	AssetType_Mesh,
-	AssetType_SkinnedMesh,
+
+	//TODO(Dima): Do I actually need it???
 	AssetType_Animation,
+	AssetType_Model,
+
+	AssetType_AnimatedModel,
+
+	AssetType_Count,
 };
 
 struct loaded_font{
@@ -87,6 +103,7 @@ struct loaded_voxel_atlas{
 	uint32 OneTextureWidth;
 };
 
+#if BUILD_WITH_ASSIMP
 struct translation_key_frame{
     vec3 Translation;
 
@@ -126,7 +143,7 @@ struct loaded_animation{
     joint_animation JointAnims[DDA_ANIMATION_MAX_BONE_COUNT];
     uint32 JointAnimsCount;
 
-    uint8 Type;
+    uint32 Type;
 
     float LengthTime;
     float PlayCursorTime;
@@ -141,6 +158,70 @@ struct loaded_animations_result{
 
     void* Free;
 };
+
+struct bone_transform_info {
+	char* Name;
+
+	mat4 Offset;
+	mat4 FinalTransformation;
+
+	uint32* Children;
+	uint32 ChildrenCount;
+};
+
+struct loaded_skeleton {
+	std::map<std::string, uint32> BoneMapping;
+	std::vector<bone_transform_info> Bones;
+};
+
+struct simple_vertex {
+	vec3 P;
+	vec2 UV;
+	vec3 N;
+	vec3 T;
+};
+
+struct skinned_vertex {
+	vec3 P;
+	vec2 UV;
+	vec3 N;
+	vec3 T;
+	float Weights[MAX_INFLUENCE_BONE_COUNT];
+	uint8 BoneIDs[MAX_INFLUENCE_BONE_COUNT];
+};
+
+struct loaded_mesh {
+	simple_vertex Vertices[MAX_VERTICES_COUNT];
+	uint32 VerticesCount;
+
+	uint32 Indices[MAX_INDICES_COUNT];
+	uint32 IndicesCount;
+};
+
+
+struct loaded_skinned_mesh {
+	skinned_vertex Vertices[MAX_VERTICES_COUNT];
+	uint32 VerticesCount;
+
+	uint32 Indices[MAX_INDICES_COUNT];
+	uint32 IndicesCount;
+};
+
+#define MAX_ANIMATIONS_PER_MODEL 32
+struct loaded_animated_model {
+	loaded_animation* Animations[MAX_ANIMATIONS_PER_MODEL];
+	uint32 AnimationsCount;
+
+	bool32 IsSkinned;
+
+	loaded_skeleton Skeleton;
+
+	union {
+		loaded_mesh Mesh;
+		loaded_skinned_mesh SkinnedMesh;
+	};
+};
+#endif
 
 struct asset_source_font{
 	loaded_font* Font;
@@ -160,10 +241,6 @@ struct asset_source_sound{
 	uint32 FirstSampleIndex;
 };
 
-struct asset_source_model{
-	char* FileName;
-};
-
 struct asset_source_voxel_atlas{
 	loaded_voxel_atlas* Atlas;
 };
@@ -174,9 +251,23 @@ struct asset_source_voxel_atlas_texture{
 	loaded_voxel_atlas* Atlas;
 };
 
+#if BUILD_WITH_ASSIMP
 struct asset_source_animation{
 	loaded_animation* Animation;
 };
+
+struct asset_source_mesh {
+	loaded_mesh* Mesh;
+};
+
+struct asset_source_skinned_mesh {
+	loaded_skinned_mesh* SkinnedMesh;
+};
+
+struct asset_source_animated_model {
+	loaded_animated_model* AnimatedModel;
+};
+#endif
 
 struct asset_source{
 	asset_type Type;
@@ -185,10 +276,12 @@ struct asset_source{
 		asset_source_sound Sound;
 		asset_source_font Font;
 		asset_source_font_glyph Glyph;
-		asset_source_model Model;
 		asset_source_voxel_atlas VoxelAtlas;
 		asset_source_voxel_atlas_texture VoxelAtlasTexture;
+#if BUILD_WITH_ASSIMP
 		asset_source_animation Animation;
+		asset_source_animated_model AnimatedModel;
+#endif
 	};
 };
 
@@ -209,11 +302,6 @@ struct game_assets{
 	unsigned int AssetIndex;
 };
 
-#define MAX_BONE_COUNT 64
-#define MAX_INFLUENCE_BONE_COUNT 4
-#define MAX_VERTICES_COUNT 100000
-#define MAX_INDICES_COUNT 150000
-
 struct bone_vertex_info{
 	float Weights[MAX_INFLUENCE_BONE_COUNT];
 	uint32 BoneIDs[MAX_INFLUENCE_BONE_COUNT];
@@ -232,47 +320,6 @@ inline void AddBoneVertexInfo(bone_vertex_info* Info, float Weight, uint32 BoneI
 	}
 }
 
-struct bone_transform_info{
-	char* Name;
-
-	mat4 Offset;
-	mat4 FinalTransformation;
-
-	uint32* Children;
-	uint32 ChildrenCount;
-};
-
-struct simple_vertex{
-	vec3 P;
-	vec2 UV;
-	vec3 N;
-	vec3 T;
-};
-
-struct loaded_mesh{
-	simple_vertex Vertices[MAX_VERTICES_COUNT];
-	uint32 VerticesCount;
-
-	uint32 Indices[MAX_INDICES_COUNT];
-	uint32 IndicesCount;
-};
-
-struct skinned_vertex{
-	vec3 P;
-	vec2 UV;
-	vec3 N;
-	vec3 T;
-	float Weights[MAX_INFLUENCE_BONE_COUNT];
-	uint8 BoneIDs[MAX_INFLUENCE_BONE_COUNT];
-};
-
-struct loaded_skinned_mesh{
-	skinned_vertex Vertices[MAX_VERTICES_COUNT];
-	uint32 VerticesCount;
-
-	uint32 Indices[MAX_INDICES_COUNT];
-	uint32 IndicesCount;
-};
 
 #if BUILD_WITH_ASSIMP
 inline mat4 AiMatToOurs(aiMatrix4x4* aiMatr){
