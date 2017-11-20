@@ -845,7 +845,7 @@ OpenGLGroupToOutput(
                 mesh_shader_program* Program = &OpenGL.MeshShaderProgram;
                 opengl_program_common* Common = &Program->Common;
                 loaded_mesh* Mesh = EntryMesh->Mesh;
-                render_setup* Setup = EntryMesh->Setup;
+                render_setup* Setup = &EntryMesh->Setup;
 
                 mat4 ModelTransform = Translate(Identity(), EntryMesh->P);
                 
@@ -961,7 +961,7 @@ OpenGLGroupToOutput(
                 opengl_program_common* Common = &Program->Common;
                 voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
 
-                render_setup* Setup = EntryVoxelMesh->Setup;
+                render_setup* Setup = &EntryVoxelMesh->Setup;
                 int32 OneTextureWidth = EntryVoxelMesh->OneTextureWidth;
                 mat4 ModelTransform = Translate(Identity(), EntryVoxelMesh->P);
                 

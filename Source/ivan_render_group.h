@@ -81,7 +81,7 @@ struct render_entry_mesh{
 	loaded_mesh* Mesh;
 	vec3 P;
 
-	render_setup* Setup;
+	render_setup Setup;
 };
 
 enum camera_plane_index{
@@ -102,7 +102,7 @@ struct render_entry_voxel_mesh{
 	vec3 P;
 	int32 OneTextureWidth;
 
-	render_setup* Setup;
+	render_setup Setup;
 };
 
 struct bitmap_dimension{

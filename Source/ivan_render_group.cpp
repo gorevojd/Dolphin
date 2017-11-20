@@ -397,7 +397,7 @@ inline void PushVoxelChunkMesh(
         PushedMesh->P = Pos;
         PushedMesh->OneTextureWidth = VoxelBitmapInfo.OneTextureWidth;
 
-        PushedMesh->Setup = &RenderGroup->LastRenderSetup;
+        PushedMesh->Setup = RenderGroup->LastRenderSetup;
     }
 }
 
@@ -411,7 +411,7 @@ inline void PushMesh(
     if(PushedMesh){
         PushedMesh->Mesh = Mesh;
         PushedMesh->P = Pos;
-        PushedMesh->Setup = &RenderGroup->LastRenderSetup;
+        PushedMesh->Setup = RenderGroup->LastRenderSetup;
     }
 }
 
