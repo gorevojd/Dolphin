@@ -35,13 +35,6 @@ struct voxel_chunk{
 	uint8_t* Voxels;
 	uint32_t VoxelsCount;
 
-#if 1
-	voxel_chunk* LeftNeighbour;
-	voxel_chunk* RightNeighbour;
-	voxel_chunk* FrontNeighbour;
-	voxel_chunk* BackNeighbour;
-#endif
-
 	voxel_chunk* RightChunk;
 	voxel_chunk* LeftChunk;
 	voxel_chunk* FrontChunk;
@@ -79,6 +72,8 @@ struct voxel_chunk_header{
 
 	voxel_chunk* Chunk;
 	voxel_chunk_mesh* Mesh;
+
+	ticket_mutex ChangeMutex;
 };
 
 struct voxel_table_pair{

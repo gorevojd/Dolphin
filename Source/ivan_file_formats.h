@@ -92,6 +92,8 @@ struct dda_joint_frames_header{
 
 
 #define DDA_ANIMATION_MAX_BONE_COUNT 256
+#define DDA_MAX_BONE_COUNT 64
+#define DDA_MAX_INFLUENCE_BONE_COUNT 4
 struct dda_animation{
 	uint32 JointAnimsCount;
 	uint32 TotalFileSize;
@@ -99,6 +101,20 @@ struct dda_animation{
     float LengthTime;
 
     float TicksPerSecond;
+};
+
+
+enum dda_mesh_type {
+	DDAMeshType_Simple,
+	DDAMeshType_Skinned,
+};
+
+struct dda_mesh_header {
+	uint8 MeshType;
+
+	uint32 VertexStructureSize;
+	uint32 VerticesCount;
+	uint32 IndicesCount;
 };
 
 struct dda_mesh {

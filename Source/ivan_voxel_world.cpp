@@ -264,16 +264,14 @@ struct generate_chunk_work{
 INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	generate_chunk_work* Work = (generate_chunk_work*)Data;
 
+	BeginTicketMutex(&Work->Header->ChangeMutex);
+
 	voxel_chunk* Chunk = Work->Header->Chunk;
 	voxel_chunk_mesh* Mesh = Work->Header->Mesh;
 
 	//*Chunk = {};
 	Chunk->Voxels = 0;
 	Chunk->VoxelsCount = 0;
-	Chunk->LeftNeighbour = 0;
-	Chunk->RightNeighbour = 0;
-	Chunk->FrontNeighbour = 0;
-	Chunk->BackNeighbour = 0;
 
 	//TODO(Dima): Load those voxels from hash-table based file
 	Chunk->Voxels = PushArray(&Work->Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
@@ -287,6 +285,8 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelChunkWork){
 	Work->Header->ChunkTask = Work->Task;
 
 	//NOTE(Dima): Task will be ended when elements gets removed from the list
+
+	EndTicketMutex(&Work->Header->ChangeMutex);
 }
 
 inline void InsertPairToVoxelHashTable(
@@ -381,13 +381,16 @@ INTERNAL_FUNCTION voxel_chunk* GetChunkAtIndices(voxel_table_pair** Table, int32
 
 	if(Pair){
 		if(Pair->Value->ChunkState == VoxelChunkState_Generated){
+			BeginTicketMutex(&Pair->Value->ChangeMutex);
 			Result = Pair->Value->Chunk;
+			EndTicketMutex(&Pair->Value->ChangeMutex);
 		}
 	}
 
 	return(Result);
 }
 
+#if 0
 inline void SetNeighboursForChunk(
 	voxel_chunk* Chunk,
 	int32_t HorzIndex,
@@ -429,6 +432,7 @@ inline void SetNeighboursForChunk(
 		Assert(Chunk->BackNeighbour->Voxels);
 	}
 }
+#endif
 
 inline int32_t NeighboursWasChanged(
 	voxel_chunk* NewRight, voxel_chunk* NewLeft, voxel_chunk* NewFront, voxel_chunk* NewBack,
@@ -477,25 +481,11 @@ INTERNAL_FUNCTION void GenerateVoxelChunk(
 			Work.Header->Chunk->FrontChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex - 1);
 			Work.Header->Chunk->BackChunk = GetChunkAtIndices(Manager->Tables[Manager->TableIndex], Chunk->HorizontalIndex, Chunk->VerticalIndex + 1);
 
-
 #if 0
 			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelChunkWork, ChunkWork);
 #else
 			Chunk->Voxels = 0;
 			Chunk->VoxelsCount = 0;
-
-#if 1
-			Chunk->LeftNeighbour = 0;
-			Chunk->RightNeighbour = 0;
-			Chunk->FrontNeighbour = 0;
-			Chunk->BackNeighbour = 0;
-
-			SetNeighboursForChunk(
-				Chunk, 
-				Chunk->HorizontalIndex,
-				Chunk->VerticalIndex,
-				Table);
-#endif
 
 			Chunk->Voxels = PushArray(&Task->Arena, IVAN_MAX_VOXELS_IN_CHUNK, uint8_t);
 
@@ -522,14 +512,14 @@ INTERNAL_FUNCTION void GenerateVoxelMesh(
 	voxel_chunk_header* Header,
 	voxel_chunk_manager* Manager)
 {
-	if(AtomicCompareExchangeU32((uint32 volatile*)&Header->MeshState,
+	if(AtomicCompareExchangeU32(
+		(uint32 volatile*)&Header->MeshState,
 		VoxelMeshState_InProcess,
 		VoxelMeshState_Unloaded) == VoxelMeshState_Unloaded)
 	{
 		task_with_memory* Task = BeginMeshTaskWithMemory(Manager->TranState);
 
-
-		generate_mesh_work Work;
+		generate_mesh_work Work = {};
 		Work.Task = Task;
 		Work.Assets = Manager->TranState->Assets;
 		Work.Header = Header;
@@ -538,9 +528,9 @@ INTERNAL_FUNCTION void GenerateVoxelMesh(
 		if(Task){
 			voxel_chunk_mesh* Mesh = PushStruct(&Task->Arena, voxel_chunk_mesh);
 			Work.Header->Mesh = Mesh;
+
 			generate_mesh_work* MeshWork = PushStruct(&Task->Arena, generate_mesh_work);
 			*MeshWork = Work;
-
 #if 1
 			Platform.AddEntry(Manager->TranState->HighPriorityQueue, GenerateVoxelMeshWork, MeshWork);
 #else
@@ -706,11 +696,9 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 				NewHeader->IsSentinel = false;
 				NewHeader->HorzIndex = HorzIndex;
 				NewHeader->VertIndex = VertIndex;
+				NewHeader->ChangeMutex = {};
 				
 				InsertChunkHeaderAtFront(Context->VoxelChunkSentinel, NewHeader);
-				
-				//Think about writing to temp table...
-				//InsertPairToVoxelHashTable(TempTable, VOXEL_HASH_TABLE_SIZE, NewPair);
 			}
 		}
 	}
@@ -725,7 +713,6 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
 
 			voxel_chunk* Chunk = Index->Chunk;
 			
-
 #if 0
 			voxel_chunk* OldLeft = Chunk->LeftNeighbour;
 			voxel_chunk* OldRight = Chunk->RightNeighbour;
@@ -769,11 +756,9 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(UpdateVoxelChunkWork){
         				VoxelMeshState_Unloaded,
         				VoxelMeshState_Generated);
 				}
+			}
 
-			}
-			if(Index->MeshState == VoxelMeshState_Unloaded){
-				GenerateVoxelMesh(Index, Context->Manager);
-			}
+			GenerateVoxelMesh(Index, Context->Manager);
 
 			if(Index->MeshState == VoxelMeshState_Generated){
 				ChunksTotal++;

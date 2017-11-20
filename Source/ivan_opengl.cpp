@@ -236,9 +236,9 @@ OpenGLCreateProgram(char* VertexCode, char* FragmentCode, opengl_program_common*
     }
 
     Common->ProgramHandle = ProgramID;
-    Common->VertPID = glGetAttribLocation(ProgramID, "VertPos");
-    Common->VertNID = glGetAttribLocation(ProgramID, "VertNorm");
-    Common->VertUVID = glGetAttribLocation(ProgramID, "VertUV");
+    Common->VertPID = glGetAttribLocation(ProgramID, "P");
+    Common->VertNID = glGetAttribLocation(ProgramID, "N");
+    Common->VertUVID = glGetAttribLocation(ProgramID, "UV");
     Common->PUVNID = glGetAttribLocation(ProgramID, "VertexData");
 
     glDeleteShader(VertexShaderID);
@@ -301,6 +301,24 @@ OpenGLCompileVoxelShaderProgram(voxel_shader_program* Result)
     Result->DirLightAmbientLoc = glGetUniformLocation(Prog, "DirLight.Ambient");
 }
 
+INTERNAL_FUNCTION void
+OpenGLCompileMeshShaderProgram(mesh_shader_program* Result){
+    GLuint Prog = OpenGLLoadProgram(
+        "../Data/Shaders/mesh.vert",
+        "../Data/Shaders/mesh.frag",
+        &Result->Common);
+
+    Result->ProjectionLoc = glGetUniformLocation(Prog, "Projection");
+    Result->ViewLoc = glGetUniformLocation(Prog, "View");
+    Result->ModelLoc = glGetUniformLocation(Prog, "Model");
+
+    Result->ViewPositionLoc = glGetUniformLocation(Prog, "ViewPosition");
+    Result->DiffuseMapLoc = glGetUniformLocation(Prog, "DiffuseMap");
+    Result->DirLightDirectionLoc = glGetUniformLocation(Prog, "DirLight.Direction");
+    Result->DirLightDiffuseLoc = glGetUniformLocation(Prog, "DirLight.Diffuse");
+    Result->DirLightAmbientLoc = glGetUniformLocation(Prog, "DirLight.Ambient");
+}
+
 INTERNAL_FUNCTION bool32 
 IsValidArray(GLuint ArrayID){
     bool32 Result = false;
@@ -352,6 +370,27 @@ UseProgramEnd(voxel_shader_program* Program){
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+INTERNAL_FUNCTION void 
+UseProgramBegin(
+    mesh_shader_program* Program, 
+    render_setup* Setup, 
+    mat4 ModelTransform) 
+{
+    UseProgramBegin(&Program->Common);
+
+    glUniformMatrix4fv(Program->ProjectionLoc, 1, GL_TRUE, Setup->Projection.E);
+    glUniformMatrix4fv(Program->ViewLoc, 1, GL_TRUE, Setup->CameraTransform.E);
+    glUniformMatrix4fv(Program->ModelLoc, 1, GL_TRUE, ModelTransform.E);
+
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, AtlasTextureGLId);
+    //glUniform1i(Program->DiffuseMapLoc, 0);
+    glUniform3fv(Program->ViewPositionLoc, 1, Setup->CameraP.E);
+    glUniform3fv(Program->DirLightDirectionLoc, 1, Setup->DirLightDirection.E);
+    glUniform3fv(Program->DirLightDiffuseLoc, 1, Setup->DirLightDiffuse.E);
+    glUniform3fv(Program->DirLightAmbientLoc, 1, Setup->DirLightAmbient.E);
 }
 
 INTERNAL_FUNCTION void 
@@ -559,12 +598,10 @@ INTERNAL_FUNCTION void* OpenGLAllocateTexture(uint32 Width, uint32 Height, void*
         GL_TEXTURE_2D,
         0,
         OpenGL.DefaultSpriteTextureFormat,
-        //GL_RGBA8,
         Width, 
         Height,
         0,
         GL_BGRA_EXT, 
-        //GL_RGBA,
         GL_UNSIGNED_BYTE, 
         Data);
 
@@ -688,6 +725,9 @@ OpenGLInit(
     OpenGLFreeProgram(&OpenGL.VoxelShaderProgram.Common);
     OpenGLCompileVoxelShaderProgram(&OpenGL.VoxelShaderProgram);
 
+    OpenGLFreeProgram(&OpenGL.MeshShaderProgram.Common);
+    OpenGLCompileMeshShaderProgram(&OpenGL.MeshShaderProgram);
+
     GL_DEBUG_MARKER();
 }
 
@@ -798,6 +838,122 @@ OpenGLGroupToOutput(
                 HeaderAt += sizeof(*EntryCS);
             }break;
 
+            case RenderGroupEntry_render_entry_mesh:{
+#if 1
+                render_entry_mesh* EntryMesh = (render_entry_mesh*)EntryData;
+
+                mesh_shader_program* Program = &OpenGL.MeshShaderProgram;
+                opengl_program_common* Common = &Program->Common;
+                loaded_mesh* Mesh = EntryMesh->Mesh;
+                render_setup* Setup = EntryMesh->Setup;
+
+                mat4 ModelTransform = Translate(Identity(), EntryMesh->P);
+                
+
+                GLfloat CubeVertices[] = {
+                    /*P N UV*/
+                    //NOTE(Dima): Front side
+                    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+                    0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+                    0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+                    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                    //NOTE(Dima): Top side
+                    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+                    0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+                    0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+                    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+                    //NOTE(Dima): Right side
+                    0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+                    0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                    0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                    //NOTE(Dima): Left side
+                    -0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+                    -0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+                    -0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+                    -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                    //NOTE(Dima): Back side
+                    0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,
+                    -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+                    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,
+                    0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+                    //NOTE(Dima): Down side
+                    -0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+                    0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,
+                    0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+                    -0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f
+                };
+
+                GLuint CubeIndices[] = {
+                    0, 1, 2,
+                    0, 2, 3,
+
+                    4, 5, 6,
+                    4, 6, 7,
+
+                    8, 9, 10,
+                    8, 10, 11,
+
+                    12, 13, 14,
+                    12, 14, 15,
+
+                    16, 17, 18,
+                    16, 18, 19,
+
+                    20, 21, 22,
+                    20, 22, 23
+                };
+
+                GLuint VAO;
+                GLuint VBO;
+                GLuint EBO;
+
+                glGenVertexArrays(1, &VAO);
+                glGenBuffers(1, &VBO);
+                glGenBuffers(1, &EBO);
+
+                glBindVertexArray(VAO);
+
+                glBindBuffer(GL_ARRAY_BUFFER, VBO);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(CubeVertices), CubeVertices, GL_DYNAMIC_DRAW);
+
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(CubeIndices), CubeIndices, GL_DYNAMIC_DRAW);
+
+                if(IsValidArray(Common->VertPID)){
+                    glEnableVertexAttribArray(Common->VertPID);
+                    //TODO(Dima): Change last param for actual mesh
+                    glVertexAttribPointer(Common->VertPID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+                }
+
+                if(IsValidArray(Common->VertUVID)){
+                    glEnableVertexAttribArray(Common->VertUVID);
+                    glVertexAttribPointer(Common->VertUVID, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(6 * sizeof(GLfloat)));
+                }
+
+                if(IsValidArray(Common->VertNID)){
+                    glEnableVertexAttribArray(Common->VertNID);
+                    glVertexAttribPointer(Common->VertNID, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(GLfloat)));
+                }
+                
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+
+                UseProgramBegin(Program, Setup, ModelTransform);
+                glBindVertexArray(VAO);
+
+                //TODO(Dima): Change indices count;
+                glDrawArrays(GL_TRIANGLES, 0, ArrayCount(CubeIndices));
+
+                glBindVertexArray(0);
+                UseProgramEnd(&Program->Common);
+
+                glDeleteVertexArrays(1, &VAO);
+                glDeleteBuffers(1, &VBO);
+                glDeleteBuffers(1, &EBO);
+#endif
+            }break;
+
             case RenderGroupEntry_render_entry_voxel_mesh:{
                 render_entry_voxel_mesh* EntryVoxelMesh = (render_entry_voxel_mesh*)EntryData;
 
@@ -805,7 +961,7 @@ OpenGLGroupToOutput(
                 opengl_program_common* Common = &Program->Common;
                 voxel_chunk_mesh* Mesh = EntryVoxelMesh->Mesh;
 
-                render_setup* Setup = &EntryVoxelMesh->Setup;
+                render_setup* Setup = EntryVoxelMesh->Setup;
                 int32 OneTextureWidth = EntryVoxelMesh->OneTextureWidth;
                 mat4 ModelTransform = Translate(Identity(), EntryVoxelMesh->P);
                 

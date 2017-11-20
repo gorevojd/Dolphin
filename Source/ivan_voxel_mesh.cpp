@@ -20,7 +20,10 @@ INTERNAL_FUNCTION PLATFORM_WORK_QUEUE_CALLBACK(GenerateVoxelMeshWork){
 
 	*Mesh = {};
 
-	voxel_mesh_generation_context Context = InitVoxelMeshGeneration(Chunk, Work->Assets, Work->VoxelAtlasID);
+	voxel_mesh_generation_context Context = InitVoxelMeshGeneration(
+		Chunk, Work->Assets, 
+		Work->VoxelAtlasID);
+
 	Mesh->PUVN = (ivan_vertex_type*)Platform.AllocateMemory(Context.MemoryRequired);
 	FinalizeVoxelMeshGeneration(Mesh, &Context);
 
@@ -173,7 +176,7 @@ inline void PerformWorkForVoxelMeshQueue(
 
 INTERNAL_FUNCTION voxel_mesh_generation_context
 InitVoxelMeshGeneration(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
 	game_assets* Assets,
 	voxel_atlas_id VoxelAtlasID)
 {

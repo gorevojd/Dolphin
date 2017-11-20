@@ -2,6 +2,8 @@
 
 #define IVAN_ANIM_MAX_BONE_COUNT 256
 
+struct loaded_animation;
+
 struct translation_key_frame{
 	vec3 Translation;
 
@@ -63,7 +65,7 @@ struct animation_node{
 };
 
 struct animator_controller{
-	game_assets* Assets;
+	struct game_assets* Assets;
 
 	memory_arena Arena;
 

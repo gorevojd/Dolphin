@@ -240,12 +240,14 @@ INTERNAL_FUNCTION void LoadBoneInfoFromAssimp(
 
 INTERNAL_FUNCTION void
 LoadSkinnedMeshDataFromAssimp(
-	loaded_skinned_mesh* Result,
+	loaded_mesh* Result,
 	char* FileName, 
 	loaded_skeleton* Skeleton)
 {
 	Assimp::Importer Importer;
 	const aiScene* AssimpScene = Importer.ReadFile(FileName, 0);
+
+	Result->Type = DDAMeshType_Skinned;
 
     uint32 IndexBase = 0;
     uint32 VertexBase = 0;
@@ -289,7 +291,7 @@ LoadSkinnedMeshDataFromAssimp(
             aiVector3D* RefN = &Mesh->mNormals[VertexIndex];
 
             Assert(VertexBase + VertexIndex <= MAX_VERTICES_COUNT);
-            skinned_vertex* NewVertex = &Result->Vertices[VertexBase + VertexIndex];
+            skinned_vertex* NewVertex = &Result->SkinnedVertices[VertexBase + VertexIndex];
 
             NewVertex->P.x = RefP->x;
             NewVertex->P.y = RefP->y;
@@ -358,9 +360,9 @@ LoadSkinnedMeshDataFromAssimp(
                 NewT.z = f *(DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z);
                 NewT = Normalize(NewT);
                     
-                Result->Vertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
-                Result->Vertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
-                Result->Vertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
+                Result->SkinnedVertices[IndexBase + AssimpFace->mIndices[0]].T = NewT;
+                Result->SkinnedVertices[IndexBase + AssimpFace->mIndices[1]].T = NewT;
+                Result->SkinnedVertices[IndexBase + AssimpFace->mIndices[2]].T = NewT;
             }
         }
 #endif
@@ -1235,7 +1237,7 @@ AddSkinnedMeshToModelAsset(
 	char* FileName)
 {
 	LoadSkinnedMeshDataFromAssimp(
-		&AnimatedModel->SkinnedMesh,
+		&AnimatedModel->Mesh,
 		FileName,
 		&AnimatedModel->Skeleton);
 }
@@ -1494,6 +1496,44 @@ WriteDDA(game_assets* Assets, char* FileName){
                     free(Bitmap.Free);
                 }break;
 
+				case(AssetType_Mesh): {
+#if BUILD_WITH_ASSIMP
+					loaded_mesh* Mesh = Source->Mesh.Mesh;
+
+					dda_mesh_header MeshHeader;
+					MeshHeader.IndicesCount = Mesh->IndicesCount;
+					MeshHeader.VerticesCount = Mesh->VerticesCount;
+					MeshHeader.MeshType = Mesh->Type;
+
+					u8* VerticesToWrite = 0;
+					u32 VerticesToWriteSize = 0;
+					switch (MeshHeader.MeshType) {
+						case(DDAMeshType_Simple): {
+							MeshHeader.VertexStructureSize = sizeof(simple_vertex);
+							VerticesToWrite = (u8*)Mesh->SimpleVertices;
+						}break;
+
+						case(DDAMeshType_Skinned): {
+							MeshHeader.VertexStructureSize = sizeof(skinned_vertex);
+							VerticesToWrite = (u8*)Mesh->SkinnedVertices;
+						}break;
+
+						INVALID_DEFAULT_CASE;
+					}
+					
+					VerticesToWriteSize = Mesh->VerticesCount * MeshHeader.VertexStructureSize;
+
+					//NOTE(Dima): First I write the mesh header.
+					fwrite(&MeshHeader, 1, sizeof(dda_mesh_header), fp);
+
+					//NOTE(DIMA): Then I write all the vertices
+					fwrite(VerticesToWrite, VerticesToWriteSize, 1, fp);
+
+					//NOTE(Dima): Last I write indices. Index is uint32 value(4 bytes)
+					fwrite(Mesh->Indices, Mesh->IndicesCount, sizeof(u32), fp);
+#endif
+				}break;
+
                 case(AssetType_Animation):{
 #if BUILD_WITH_ASSIMP
                     loaded_animation* Anim = Source->Animation.Animation;
@@ -1534,6 +1574,14 @@ WriteDDA(game_assets* Assets, char* FileName){
                     DDA->Animation.TotalFileSize = TotalFileSize;
 #endif
                 }break;
+
+				case(AssetType_AnimatedModel): {
+#if BUILD_WITH_ASSIMP
+                    loaded_animated_model* Model = Source->AnimatedModel.AnimatedModel;
+
+
+#endif
+				}break;
 
                 case(AssetType_VoxelAtlas):{
                     loaded_voxel_atlas* Atlas = Source->VoxelAtlas.Atlas;
@@ -1591,14 +1639,14 @@ INTERNAL_FUNCTION void Initialize(game_assets* Assets){
     memset(Assets->AssetTypes, 0, sizeof(Assets->AssetTypes));
 }
 
-INTERNAL_FUNCTION void WriteAnimations(){
+INTERNAL_FUNCTION void WriteModels(){
 #if BUILD_WITH_ASSIMP
     game_assets Assets_;
     game_assets* Assets = &Assets_;
     Initialize(Assets);
 
 	loaded_animated_model OldSchoolDima = {};
-	AddSkinnedMeshToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/");
+	AddSkinnedMeshToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/Dima.fbx");
 	AddAnimationsToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/Dima_RunF01.fbx", AssetAnimationType_RunForward);
 	AddAnimationsToModelAsset(&OldSchoolDima, "../../IvanEngine/Data/Animations/Dima_Idle01Idle01.fbx", AssetAnimationType_Idle00);
 
@@ -1610,6 +1658,7 @@ INTERNAL_FUNCTION void WriteAnimations(){
     printf("Animation assets written successfully :D");
 #endif
 }
+
 
 INTERNAL_FUNCTION void WriteFonts(){
     game_assets Assets_;
@@ -1909,7 +1958,7 @@ int main(int ArgCount, char** Args){
     WriteFonts();
     WriteVoxelAtlases();
 
-    WriteAnimations();
+    WriteModels();
 
     system("pause");
 	return(0);

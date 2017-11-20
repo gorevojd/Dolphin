@@ -29,6 +29,7 @@ enum render_group_entry_type{
 	RenderGroupEntry_render_entry_coordinate_system,
 	RenderGroupEntry_render_entry_voxel_mesh,
 	RenderGroupEntry_render_entry_cube,
+	RenderGroupEntry_render_entry_mesh,
 };
 
 struct render_group_entry_header{
@@ -64,17 +65,6 @@ struct render_entry_bitmap{
 	vec2 Size;
 };
 
-enum camera_plane_index{
-	CameraPlane_Near,
-	CameraPlane_Far,
-	CameraPlane_Left,
-	CameraPlane_Right,
-	CameraPlane_Bottom,
-	CameraPlane_Top,
-
-	CameraPlane_Count,
-};
-
 struct render_setup{
 	vec3 CameraP;
 	mat4 Projection;
@@ -87,6 +77,24 @@ struct render_setup{
 	vec3 DirLightAmbient;
 };
 
+struct render_entry_mesh{
+	loaded_mesh* Mesh;
+	vec3 P;
+
+	render_setup* Setup;
+};
+
+enum camera_plane_index{
+	CameraPlane_Near,
+	CameraPlane_Far,
+	CameraPlane_Left,
+	CameraPlane_Right,
+	CameraPlane_Bottom,
+	CameraPlane_Top,
+
+	CameraPlane_Count,
+};
+
 struct voxel_chunk_mesh;
 struct render_entry_voxel_mesh{
 	voxel_chunk_mesh* Mesh;
@@ -94,7 +102,7 @@ struct render_entry_voxel_mesh{
 	vec3 P;
 	int32 OneTextureWidth;
 
-	render_setup Setup;
+	render_setup* Setup;
 };
 
 struct bitmap_dimension{

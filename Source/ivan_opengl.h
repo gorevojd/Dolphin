@@ -25,6 +25,20 @@ struct voxel_shader_program{
     GLint ViewPositionLoc;
 };
 
+struct mesh_shader_program{
+    opengl_program_common Common;
+
+    GLint ProjectionLoc;
+    GLint ViewLoc;
+    GLint ModelLoc;
+
+    GLint DiffuseMapLoc;
+    GLint DirLightDirectionLoc;
+    GLint DirLightDiffuseLoc;
+    GLint DirLightAmbientLoc;
+    GLint ViewPositionLoc;
+};
+
 struct opengl_info{
     bool32 ModernContext;
 
@@ -40,7 +54,6 @@ struct opengl_info{
 };
 
 struct open_gl{
-
     bool32 ShaderSimTexReadSRGB;
     bool32 ShaderSimTexWriteSRGB;
 
@@ -59,6 +72,7 @@ struct open_gl{
     debug_platform_free_file_memory* DEBUGFreeFileMemory;
 
     voxel_shader_program VoxelShaderProgram;
+    mesh_shader_program MeshShaderProgram;
 };
 
 #endif

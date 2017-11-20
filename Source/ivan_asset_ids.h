@@ -12,6 +12,7 @@ enum asset_voxel_atlas_type{
 	VoxelAtlasType_Minecraft = 1,
 };
 
+//NOTE(Dima): Probably need to rebuild assets when change this enum
 enum asset_animation_type {
 	AssetAnimationType_Unknown,
 
@@ -93,6 +94,9 @@ enum asset_type_id{
 
 	Asset_VoxelAtlas,
 	Asset_VoxelAtlasTexture,
+
+	Asset_Animation,
+	Asset_Mesh,
 
 	Asset_OldSchoolDima,
 

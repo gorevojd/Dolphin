@@ -12,7 +12,6 @@
 
 #include "ivan_voxel_shared.h"
 
-#undef BUILD_WITH_ASSIMP
 #if BUILD_WITH_ASSIMP
 #include <iostream>
 #include <map>
@@ -40,8 +39,8 @@ GLOBAL_VARIABLE HDC GlobalFontDeviceContext;
 
 #define ONE_PAST_MAX_FONT_CODEPOINT (0x10FFFF + 1)
 
-#define MAX_BONE_COUNT 64
-#define MAX_INFLUENCE_BONE_COUNT 4
+#define MAX_BONE_COUNT DDA_MAX_BONE_COUNT
+#define MAX_INFLUENCE_BONE_COUNT DDA_MAX_INFLUENCE_BONE_COUNT
 #define MAX_VERTICES_COUNT 100000
 #define MAX_INDICES_COUNT 150000
 
@@ -54,6 +53,7 @@ enum asset_type{
 	AssetType_VoxelAtlasTexture,
 
 	//TODO(Dima): Do I actually need it???
+	AssetType_Mesh,
 	AssetType_Animation,
 	AssetType_Model,
 
@@ -191,17 +191,13 @@ struct skinned_vertex {
 };
 
 struct loaded_mesh {
-	simple_vertex Vertices[MAX_VERTICES_COUNT];
+	union {
+		simple_vertex SimpleVertices[MAX_VERTICES_COUNT];
+		skinned_vertex SkinnedVertices[MAX_VERTICES_COUNT];
+	};
 	uint32 VerticesCount;
 
-	uint32 Indices[MAX_INDICES_COUNT];
-	uint32 IndicesCount;
-};
-
-
-struct loaded_skinned_mesh {
-	skinned_vertex Vertices[MAX_VERTICES_COUNT];
-	uint32 VerticesCount;
+	dda_mesh_type Type;
 
 	uint32 Indices[MAX_INDICES_COUNT];
 	uint32 IndicesCount;
@@ -216,10 +212,7 @@ struct loaded_animated_model {
 
 	loaded_skeleton Skeleton;
 
-	union {
-		loaded_mesh Mesh;
-		loaded_skinned_mesh SkinnedMesh;
-	};
+	loaded_mesh Mesh;
 };
 #endif
 
@@ -260,10 +253,6 @@ struct asset_source_mesh {
 	loaded_mesh* Mesh;
 };
 
-struct asset_source_skinned_mesh {
-	loaded_skinned_mesh* SkinnedMesh;
-};
-
 struct asset_source_animated_model {
 	loaded_animated_model* AnimatedModel;
 };
@@ -279,6 +268,7 @@ struct asset_source{
 		asset_source_voxel_atlas VoxelAtlas;
 		asset_source_voxel_atlas_texture VoxelAtlasTexture;
 #if BUILD_WITH_ASSIMP
+		asset_source_mesh Mesh;
 		asset_source_animation Animation;
 		asset_source_animated_model AnimatedModel;
 #endif

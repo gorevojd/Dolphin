@@ -21,7 +21,8 @@ inline mat4 InterpolateTranslation(float Time, joint_animation* JointAnim){
         translation_key_frame* CurrentFrame = &JointAnim->TranslationFrames[CurrentFrameIndex];
         translation_key_frame* NextFrame = &JointAnim->TranslationFrames[CurrentFrameIndex + 1];
         
-        float Delta = (Time - CurrentFrame->TimeStamp) / (NextFrame->TimeStamp - CurrentFrame->TimeStamp);
+        float Delta = (Time / CurrentFrame->TimeStamp) / (NextFrame->TimeStamp - CurrentFrame->TimeStamp);
+        Clamp01(Delta);
         
         Translation = Lerp(CurrentFrame->Translation, NextFrame->Translation, Delta);
     }
@@ -51,9 +52,11 @@ inline mat4 InterpolateRotation(float Time, joint_animation* JointAnim){
         
         rotation_key_frame* CurrentFrame = &JointAnim->RotationFrames[CurrentFrameIndex];
         rotation_key_frame* NextFrame = &JointAnim->RotationFrames[CurrentFrameIndex + 1];
-        
+
+        float Delta = (Time / CurrentFrame->TimeStamp) / (NextFrame->TimeStamp - CurrentFrame->TimeStamp);
+        Clamp01(Delta);
+
         Rotation = Slerp(CurrentFrame->Rotation, NextFrame->Rotation, Delta);
-        
     }
     
     mat4 ResultRot = RotationMatrix(Rotation);
@@ -65,7 +68,7 @@ inline mat4 InterpolateScaling(float Time, joint_animation* JointAnim){
     vec3 Scaling;
     
     if(JointAnim->ScalingFramesCount == 1){
-        Scaling = JointAnim->ScalingFrames[0].Scale;
+        Scaling = JointAnim->ScalingFrames[0].Scaling;
     }
     else{
         uint32 CurrentFrameIndex = 0;
@@ -81,8 +84,11 @@ inline mat4 InterpolateScaling(float Time, joint_animation* JointAnim){
         
         scaling_key_frame* CurrentFrame = &JointAnim->ScalingFrames[CurrentFrameIndex];
         scaling_key_frame* NextFrame = &JointAnim->ScalingFrames[CurrentFrameIndex + 1];
+
+        float Delta = (Time / CurrentFrame->TimeStamp) / (NextFrame->TimeStamp - CurrentFrame->TimeStamp);
+        Clamp01(Delta);
         
-        Scaling = Lerp(CurrentFrame->Scale, NextFrame->Scale, Delta);
+        Scaling = Lerp(CurrentFrame->Scaling, NextFrame->Scaling, Delta);
     }
     
     mat4 ResultScale = ScalingMatrix(Scaling);
@@ -93,9 +99,9 @@ inline mat4 InterpolateScaling(float Time, joint_animation* JointAnim){
 INTERNAL_FUNCTION mat4 InterpolateFrames(float Time, joint_animation* JointAnim){
     mat4 Transform;
     
-    mat4 ResultTransl = InterpolateTranslation(Time, JoinAnim);
-    mat4 ResultRot = InterpolateRotation(Time, JoinAnim);
-    mat4 ResultScale = InterpolateScaling(Time, JoinAnim);
+    mat4 ResultTransl = InterpolateTranslation(Time, JointAnim);
+    mat4 ResultRot = InterpolateRotation(Time, JointAnim);
+    mat4 ResultScale = InterpolateScaling(Time, JointAnim);
     
     Transform = ResultTransl * ResultRot * ResultScale;
     
@@ -103,10 +109,11 @@ INTERNAL_FUNCTION mat4 InterpolateFrames(float Time, joint_animation* JointAnim)
 }
 
 INTERNAL_FUNCTION void AnimateModel(
-animator_controller* Controller, 
-playing_animation* PlayingAnimation,
-skinned_mesh* Mesh, 
-float DeltaTime)
+    render_group* Group,
+    animator_controller* Controller, 
+    playing_animation* PlayingAnimation,
+    loaded_skinned_mesh* Mesh, 
+    float DeltaTime)
 {
     PlayingAnimation->PlayCursorTime += DeltaTime * PlayingAnimation->PlaybackSpeed;
     
@@ -120,7 +127,7 @@ float DeltaTime)
         }
     }
     
-    float CurrentTime = PlayingAnimation->PlayCursorTime;`
+    float CurrentTime = PlayingAnimation->PlayCursorTime;
     
     PlayingAnimation->Animation = GetAnimation(Group->Assets, PlayingAnimation->ID, Controller->GenerationID);
     if(PlayingAnimation->Animation){
@@ -140,7 +147,7 @@ INTERNAL_FUNCTION animation_node* PlayAnimation(animator_controller* Controller,
     }
     else{
         /*Free list is not empty. Use existing slot*/
-        Result = Controller->FirstFreeSentinel->Next;
+        Result = Controller->FirstFreeSentinel->NextInList;
         
         /*Remove slot from free list*/
         Result->NextInList->PrevInList = Result->PrevInList;
@@ -167,22 +174,22 @@ INTERNAL_FUNCTION animation_node* PlayAnimation(animator_controller* Controller,
 }
 
 INTERNAL_FUNCTION void UpdateAnimatorController(
-animator_controller* Controller,
-real32  DeltaTime)
+    animator_controller* Controller,
+    real32  DeltaTime)
 {
     Controller->GenerationID = BeginGeneration(Controller->Assets);
     
-    for(animation_node* Node = Controller->FirstSentinel->Next;
+    for(animation_node* Node = Controller->FirstSentinel->NextInList;
         Node != Controller->FirstSentinel;)
     {
         animation_node* TempNextNode = Node->NextInList;
         animation_node* TempPrevNode = Node->PrevInList;
         
-        if(Node->Animation->PlayCursorTime >= Node->Animation.Animation->Length){
+        if(Node->Animation.PlayCursorTime >= Node->Animation.Animation->Length){
             RemoveAnimationNode(Controller, Node);
         }
         else{
-            AnimateModel(Controller, &Node->PlayingAnimation, Mesh???, DeltaTime);
+            //AnimateModel(Controller, &Node->PlayingAnimation, Mesh???, DeltaTime);
         }
         
         Node = TempNextNode;
@@ -192,22 +199,19 @@ real32  DeltaTime)
 }
 
 INTERNAL_FUNCTION void InitializeAnimatorController(
-animator_controller* Animator, 
-memory_arena* PermanentArena,
-game_assets* Assets)
+    animator_controller* Animator, 
+    memory_arena* PermanentArena,
+    game_assets* Assets)
 {
-    Animator->TranState = TranState;
     Animator->Assets = Assets;
     
     SubArena(&Animator->Arena, PermanentArena, IVAN_KILOBYTES(100));
     
-    Animator->FirstSentinel = PushStruct(&Animator->Arena, animaion_node);
+    Animator->FirstSentinel = PushStruct(&Animator->Arena, animation_node);
     Animator->FirstSentinel->NextInList = Animator->FirstSentinel;
     Animator->FirstSentinel->PrevInList = Animator->FirstSentinel;
     
     Animator->FirstFreeSentinel = PushStruct(&Animator->Arena, animation_node);
     Animator->FirstFreeSentinel->NextInList = Animator->FirstFreeSentinel;
     Animator->FirstFreeSentinel->PrevInList = Animator->FirstFreeSentinel;
-    
-    return(Animator);
 }

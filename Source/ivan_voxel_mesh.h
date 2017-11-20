@@ -37,7 +37,7 @@
 		memory. CAVEAT: I can deallocate mesh memory as 
 		needed, but I still want one-memory-per-chunk 
 		because of future collision detection. So I need
-		to THINK ABOUT IT. REAL TALK... 
+		to think about it...
 */
 
 #ifndef IVAN_VOXEL_MESH_H
@@ -275,7 +275,7 @@ PrecalculateVoxelMeshSize(voxel_chunk* Chunk, uint32_t BytesPerVertex);
 #else
 INTERNAL_FUNCTION voxel_mesh_generation_context
 InitVoxelMeshGeneration(
-	voxel_chunk* Chunk, 
+	voxel_chunk* Chunk,
 	game_assets* Assets,
 	voxel_atlas_id VoxelAtlasID);
 

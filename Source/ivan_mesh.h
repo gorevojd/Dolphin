@@ -14,8 +14,8 @@ struct mesh_skinned_vertex{
 	vec3 N;
 	vec3 T;
 
-	float BoneWeights[MAX_INFLUENCE_BONE_COUNT];
-	uint8 BoneIDs[MAX_INFLUENCE_BONE_COUNT];
+	float BoneWeights[DDA_MAX_INFLUENCE_BONE_COUNT];
+	uint8 BoneIDs[DDA_MAX_INFLUENCE_BONE_COUNT];
 };
 
 struct loaded_mesh{

@@ -16,13 +16,18 @@
 #include "ivan_random.h"
 #include "ivan_simd.h"
 #include "ivan_render.h"
-#include "ivan_render_group.h"
 #include "ivan_file_formats.h"
+#include "ivan_mesh.h"
+#include "ivan_anim.h"
+#include "ivan_render_group.h"
 #include "ivan_asset.h"
 #include "ivan_audio.h"
 #include "ivan_particle.h"
 #include "ivan_render.h"
+#include "ivan_cutscene.h"
+#include "ivan_texted.h"
 #include "ivan_anim.h"
+#include "ivan_world_mode.h"
 
 #include "ivan_voxel_world.h"
 #include "ivan_voxel_mesh.h"
@@ -63,6 +68,15 @@ struct camera_transform{
 	vec3 Left;
 };
 
+enum engine_mode{
+	EngineMode_None,
+
+	EngineMode_TitleScreen,
+	EngineMode_CutScene,
+	EngineMode_World,
+	EngineMode_TextEditor,
+};
+
 struct game_state{
 	memory_arena PermanentArena;
 
@@ -79,6 +93,14 @@ struct game_state{
 	particle_cache FontainCache;
 
 	camera_transform Camera;
+
+	engine_mode EngineMode;
+	union{
+		engine_mode_title_screen* TitleScreen;
+		engine_mode_cutscene* CutScene;
+		engine_mode_world* WorldMode;
+		engine_mode_text_editor* TextEditor;
+	};
 };
 
 struct transient_state{
