@@ -117,6 +117,7 @@ bool32 UpdateAndRenderWorld(
     //PushBitmap(RenderGroup, GetFirstBitmapFrom(TranState->Assets, Asset_LastOfUs), 4.0f, Vec3(0.0f));
 
     UpdateVoxelChunks(TranState->VoxelChunkManager, RenderGroup, GameState->Camera.P);
+    //PushMesh(RenderGroup, 0, Vec3(0.0f, 0.0f, 0.0f));
 
     hero_bitmap_ids HeroBitmaps = {};
     asset_vector MatchVector = {};
