@@ -10,6 +10,7 @@
 #include "ivan_texted.cpp"
 #include "ivan_anim.cpp"
 #include "ivan_world_mode.cpp"
+#include "ivan_gui.cpp"
 
 INTERNAL_FUNCTION void OverlayCycleCounters(game_memory* Memory, render_group* RenderGroup);
 
@@ -174,6 +175,7 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
 
         //PlaySound(&GameState->AudioState, GetFirstSoundFrom(TranState->Assets, Asset_Music));
 
+        TranState->GUIState = InitGUI(&TranState->TranArena);
 
         TranState->VoxelChunkManager = AllocateVoxelChunkManager(TranState, TranState->Assets);
 
@@ -223,7 +225,17 @@ IVAN_DLL_EXPORT GAME_UPDATE_AND_RENDER(GameUpdateAndRender){
         }
     }while(Rerun);
 
+    BeginGUI(TranState->GUIState, TranState->Assets, RenderGroup);
+
+    EndGUI(TranState->GUIState);
+    
     EndTemporaryMemory(RenderMemory);
+
+
+    float CurrentY = GetBaseline(TranState->GUIState);
+
+    TextOutAt(TranState->GUIState, Vec2(0.0f, CurrentY), "Hello my friend. BOIIIIII. SUKA. ZAVTRA EBANIY SMOTR KONKURS");
+
 }
 
 #if IVAN_INTERNAL

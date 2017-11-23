@@ -13,6 +13,10 @@ del *.pdb > NUL 2> NUL
 REM Asset builder
 cl %CommonCompilerFlags% -D_CRT_SECURE_NO_WARNINGS ..\Source\asset_builder.cpp /link %CommonLinkerFlags%
 
+REM Source directory info collation
+cl %CommonCompilerFlags% -D_CRT_SECURE_NO_WARNINGS /EHsc ..\Source\source_statistics.cpp /link %CommonLinkerFlags%
+
+REM Engine
 echo WAITING FOR PDB > lock.tmp
 cl %CommonCompilerFlags% /LD ..\Source\ivan.cpp -Fmivan.map /link -incremental:no -opt:ref -PDB:ivan_%random%.pdb
 set LastError=%ERRORLEVEL%

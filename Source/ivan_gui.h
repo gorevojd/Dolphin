@@ -6,7 +6,7 @@ enum gui_text_op{
 	GUITextOp_SizeText,
 };
 
-struct gui_element_type{
+enum gui_element_type{
 	GUIElement_None,
 
 	GUIElement_Button,
@@ -16,10 +16,14 @@ struct gui_element_type{
 };
 
 struct gui_state{
-	render_group RenderGroup;
+	b32 Initialized;
+
+	render_group* RenderGroup;
 
 	dda_font* GUIFontInfo;
 	loaded_font* GUIFont;
+
+	font_id FontID;
 
 	float FontScale;
 };

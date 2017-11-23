@@ -10,8 +10,8 @@ INTERNAL_FUNCTION rectangle2 GUITextOut(
 {
 	rectangle2 Result = InvertedInfinityRectangle();
 
-	if(GUIState && GUIState->DebugFont){
-		render_group* RenderGroup = &GUIState->RenderGroup;
+	if(GUIState && GUIState->GUIFont){
+		render_group* RenderGroup = GUIState->RenderGroup;
 	    loaded_font* Font = PushFont(RenderGroup, GUIState->FontID);
 	    dda_font* Info = GUIState->GUIFontInfo;
 
@@ -134,8 +134,6 @@ GetBaseline(gui_state* GUIState){
 	return(Result);
 }
 
-
-
 INTERNAL_FUNCTION gui_state* InitGUI(memory_arena* Arena){
 	gui_state* Result = PushStruct(Arena, gui_state);
 
@@ -144,9 +142,8 @@ INTERNAL_FUNCTION gui_state* InitGUI(memory_arena* Arena){
 
 INTERNAL_FUNCTION void BeginGUI(
 	gui_state* GUIState,
-	game_render_commands* RenderCommands,
 	game_assets* Assets,
-	uint32 GenerationID)
+	render_group* RenderGroup)
 {
  	asset_vector MatchVector = {};
     asset_vector WeightVector = {};
@@ -156,15 +153,13 @@ INTERNAL_FUNCTION void BeginGUI(
     GUIState->FontID = GetBestMatchFontFrom(Assets, Asset_Font, &MatchVector, &WeightVector);
 	GUIState->FontScale = 1.0f;
 
-	GUIState->RenderGroup = BeginRenderGroup(Assets, RenderCommands, GenerationID);
+	GUIState->RenderGroup = RenderGroup;
 
-	GUIState->GUIFont = PushFont(&GUIState->RenderGroup, GUIState->FontID);
-	GUIState->GUIFontInfo = GetFontInfo(GUIState->RenderGroup.Assets, GUIState->FontID);
-
+	GUIState->GUIFont = PushFont(GUIState->RenderGroup, GUIState->FontID);
+	GUIState->GUIFontInfo = GetFontInfo(GUIState->RenderGroup->Assets, GUIState->FontID);
 }
 
-INTERNAL_FUNCTION void EndGUI(
-	gui_state* GUIState)
+INTERNAL_FUNCTION void EndGUI(gui_state* GUIState)
 {
-	EndRenderGroup(&GUIState->RenderGroup);
+
 }

@@ -34,6 +34,7 @@
 
 #include "ivan_debug_interface.h"
 #include "ivan_debug.h"
+#include "ivan_gui.h"
 
 struct task_with_memory{
     bool32 BeingUsed;
@@ -122,6 +123,8 @@ struct transient_state{
 	platform_work_queue* VoxelMeshQueue;
 
 	uint32 MainGenerationID;
+
+	gui_state* GUIState;
 	
 	voxel_chunk_manager* VoxelChunkManager;
 };
